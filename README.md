@@ -18,21 +18,16 @@ Vos émulateurs se voient comme s'ils étaient sur le même canapé.
 [![Plateforme](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#installation)
 [![Consoles](https://img.shields.io/badge/CONSOLES-3DS%20%7C%20SWITCH%20%7C%20PSP%20%7C%20DS-1b1e24?labelColor=3d4048&style=for-the-badge)](#les-consoles)
 
-<!-- Badges communauté : prêts, en attente des deux URL. Remplacer les deux
-     marqueurs ci-dessous et retirer les balises de commentaire.
-
-[![Discord](https://img.shields.io/badge/DISCORD-REJOINDRE-5865F2?labelColor=3d4048&style=for-the-badge&logo=discord&logoColor=white)](URL_DISCORD)
-[![Patreon](https://img.shields.io/badge/PATREON-SOUTENIR-FF424D?labelColor=3d4048&style=for-the-badge&logo=patreon&logoColor=white)](URL_PATREON)
--->
-
-<!-- FIN badges communauté -->
+[![Discord](https://img.shields.io/badge/DISCORD-REJOINDRE-5865F2?labelColor=3d4048&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
+[![Patreon](https://img.shields.io/badge/PATREON-SOUTENIR-FF424D?labelColor=3d4048&style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/Emufii)
 
 <br>
 
 **[Télécharger](https://github.com/jojodogm-ctrl/emufii/releases/latest)** •
 [Installation](#installation) •
 [Les consoles](#les-consoles) •
-[Vie privée](#vie-privée)
+[Vie privée](#vie-privée) •
+[Discord](https://discord.gg/tvWcb28vBZ)
 
 </div>
 
