@@ -170,7 +170,10 @@ ul.plain li{display:flex; gap:11px; color:var(--muted); font-size:15.5px; line-h
 ul.plain .dot{flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--teal); margin-top:9px}
 ul.plain strong{color:var(--ink); font-weight:600}
 
-.warn{border-left:3px solid var(--violet); padding-left:18px; margin:0}
+/* Un encart se creuse, il ne se borde pas. Le filet coloré sur le flanc était
+   du chrome portant de la couleur — contraire à la direction du projet, où la
+   couleur appartient au contenu. C'est le même creux que le bloc d'empreinte. */
+.warn{background:var(--shell); border-radius:14px; padding:16px 18px; margin:0}
 .warn p{margin:0 0 10px; color:var(--muted); font-size:15.5px}
 .warn p:last-child{margin-bottom:0}
 .warn strong{color:var(--ink)}
