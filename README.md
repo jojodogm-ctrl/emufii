@@ -11,8 +11,12 @@ Vos émulateurs se voient comme s'ils étaient sur le même canapé.
 
 <br>
 
-[![Version](https://img.shields.io/github/v/release/jojodogm-ctrl/emufii?label=VERSION&labelColor=3d4048&color=2ea043&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
-[![Téléchargements](https://img.shields.io/github/downloads/jojodogm-ctrl/emufii/total?label=T%C3%89L%C3%89CHARGEMENTS&labelColor=3d4048&color=2ea043&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases)
+<!-- Le compteur de téléchargements est volontairement absent : la release a été
+     recréée le 2026-08-09 et le compteur est reparti de zéro. À remettre quand
+     le chiffre vaudra la peine :
+     [![Téléchargements](https://img.shields.io/github/downloads/jojodogm-ctrl/emufii/total?label=T%C3%89L%C3%89CHARGEMENTS&labelColor=3d4048&color=2ea043&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases) -->
+
+[![Version](https://img.shields.io/github/v/release/jojodogm-ctrl/emufii?label=VERSION&labelColor=3d4048&color=2ea043&style=for-the-badge&cacheSeconds=300)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![Licence](https://img.shields.io/badge/LICENCE-APACHE--2.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Plateforme](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#installation)
