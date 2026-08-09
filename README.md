@@ -9,9 +9,12 @@
 Emufii puts your devices on a single network for as long as you're playing.
 Your emulators find each other exactly as they would over local Wi-Fi.
 
+**Builds are handed out on Discord for now.** There is nothing to download here
+yet: come and say hello, and you'll get the current one.
+
 <br>
 
-[![Version](https://img.shields.io/github/v/release/jojodogm-ctrl/emufii?label=VERSION&labelColor=3d4048&color=2ea043&style=for-the-badge&cacheSeconds=300)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
+[![Version](https://img.shields.io/badge/VERSION-1.10.10-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
@@ -22,7 +25,7 @@ Your emulators find each other exactly as they would over local Wi-Fi.
 
 <br>
 
-**[Download](https://github.com/jojodogm-ctrl/emufii/releases/latest)** •
+**[Download](https://discord.gg/tvWcb28vBZ)** •
 [Install](#install) •
 [Consoles](#consoles) •
 [Privacy](#privacy) •
@@ -89,11 +92,13 @@ and every release is checked against the binary before it goes out.
 ## Install
 
 The app is signed but distributed outside any store, so Android will warn you
-about an unknown source.
+about an unknown source. It isn't on this page either: while the project finds
+its feet, builds go out through [Discord](https://discord.gg/tvWcb28vBZ) so that whoever installs
+one can say what broke.
 
 **1. Install the emulators** you plan to use, from the sites in the table above.
 
-**2. [Download the latest release](https://github.com/jojodogm-ctrl/emufii/releases/latest)** and install it.
+**2. [Ask for the build on Discord](https://discord.gg/tvWcb28vBZ)** and install it.
 
 **3. Open Emufii and walk through setup:** your games folder, a nickname,
 notifications, and the autofill permission.
@@ -175,5 +180,6 @@ the AGPL can be arranged: ask on [Discord](https://discord.gg/tvWcb28vBZ).
 Poppins is used under the SIL OFL 1.1, whose text ships inside the APK at
 `assets/POPPINS-OFL.txt`.
 
-The app source is not published yet. For now this repository carries the builds,
-the release notes, and what you need to know before installing.
+The app source is not published yet, and neither are the builds: this page
+exists to say what Emufii is and what it does with your data, before you decide
+to ask for it on [Discord](https://discord.gg/tvWcb28vBZ).
