@@ -12,7 +12,7 @@ Your emulators find each other exactly as they would over local Wi-Fi.
 <br>
 
 [![Version](https://img.shields.io/github/v/release/jojodogm-ctrl/emufii?label=VERSION&labelColor=3d4048&color=2ea043&style=for-the-badge&cacheSeconds=300)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
-[![License](https://img.shields.io/badge/LICENSE-APACHE--2.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
 [![Consoles](https://img.shields.io/badge/CONSOLES-3DS%20%7C%20SWITCH%20%7C%20PSP%20%7C%20DS-1b1e24?labelColor=3d4048&style=for-the-badge)](#consoles)
@@ -121,7 +121,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-1.10.8.apk
+apksigner verify --print-certs Emufii-*.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to
@@ -159,10 +159,21 @@ Nothing installs until you tap Install.
 
 ## License
 
-**Apache-2.0.** See [`LICENSE`](LICENSE) and [`NOTICE.md`](NOTICE.md).
+**AGPL-3.0.** See [`LICENSE`](LICENSE) and [`NOTICE.md`](NOTICE.md).
+
+In plain terms: study it, change it, pass it on. Whatever you build from it
+carries the same licence and ships its source, including when you only ever run
+it as a service. Nobody gets to close this code and sell it back.
+
+The Emufii name and the logo are not part of that grant. Forks are fine. Forks
+calling themselves Emufii are not.
+
+The server side, which brokers sessions and runs the relay, is a separate
+program and is not published. Copyright stays with the project, so terms outside
+the AGPL can be arranged: ask on [Discord](https://discord.gg/tvWcb28vBZ).
 
 Poppins is used under the SIL OFL 1.1, whose text ships inside the APK at
 `assets/POPPINS-OFL.txt`.
 
-The source is not published at this time. This repository exists to distribute
-the app, publish its release notes, and tell you what you're installing.
+The app source is not published yet. For now this repository carries the builds,
+the release notes, and what you need to know before installing.
