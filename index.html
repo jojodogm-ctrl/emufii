@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Emufii — jouer à plusieurs, à distance, avec vos émulateurs</title>
+<title>Emufii : jouer à plusieurs, à distance, avec vos émulateurs</title>
 <meta name="description" content="Emufii met vos appareils sur le même réseau le temps d'une partie. 3DS, Switch, PSP et DS, sans configurer un seul port ni une seule adresse.">
 <meta property="og:title" content="Emufii">
 <meta property="og:description" content="Un code, et vous êtes dans la même pièce. Multijoueur distant pour émulateurs Android.">
@@ -15,7 +15,7 @@
 <style>
 :root{
   /* Les deux hues viennent du logo : deux anneaux, deux joueurs. Le chrome
-     reste neutre — la couleur appartient au contenu, jamais au cadre. */
+     reste neutre : la couleur appartient au contenu, jamais au cadre. */
   --violet:#9C6BF0;
   --teal:#33C7A6;
   --ink:#16181D;
@@ -125,7 +125,7 @@ section{padding:60px 0}
 h2{font-size:clamp(1.5rem,3.4vw,2.05rem); line-height:1.18; letter-spacing:-.025em; font-weight:600; margin:0 0 14px; max-width:22ch; text-wrap:balance}
 .section-lede{color:var(--muted); max-width:56ch; margin:0 0 30px}
 
-/* tuiles flottantes — sans cadre rigide */
+/* tuiles flottantes, sans cadre rigide */
 .tile{background:var(--tile); border-radius:var(--r); box-shadow:var(--lift); padding:26px}
 .grid{display:grid; gap:16px}
 .g4{grid-template-columns:repeat(4,1fr)}
@@ -133,7 +133,7 @@ h2{font-size:clamp(1.5rem,3.4vw,2.05rem); line-height:1.18; letter-spacing:-.025
 @media(max-width:860px){.g4{grid-template-columns:repeat(2,1fr)} .g2{grid-template-columns:1fr}}
 @media(max-width:460px){.g4{grid-template-columns:1fr}}
 
-/* le flux de jeu — une vraie séquence, donc numérotée */
+/* le flux de jeu : une vraie séquence, donc numérotée */
 .step{position:relative; padding-left:0}
 .step .n{
   font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:600;
@@ -171,7 +171,7 @@ ul.plain .dot{flex:0 0 auto; width:6px; height:6px; border-radius:50%; backgroun
 ul.plain strong{color:var(--ink); font-weight:600}
 
 /* Un encart se creuse, il ne se borde pas. Le filet coloré sur le flanc était
-   du chrome portant de la couleur — contraire à la direction du projet, où la
+   du chrome portant de la couleur, contraire à la direction du projet, où la
    couleur appartient au contenu. C'est le même creux que le bloc d'empreinte. */
 .warn{background:var(--shell); border-radius:14px; padding:16px 18px; margin:0}
 .warn p{margin:0 0 10px; color:var(--muted); font-size:15.5px}
@@ -199,7 +199,7 @@ footer{padding:52px 0 60px; border-top:1px solid var(--hair); margin-top:24px}
   <div class="hero">
     <h1>Un code, et vous êtes dans la même pièce.</h1>
     <p class="lede">Emufii met vos appareils sur le même réseau le temps d'une partie.
-      Vous gardez vos émulateurs, vos jeux et vos sauvegardes — elle s'occupe du reste.</p>
+      Vous gardez vos émulateurs, vos jeux et vos sauvegardes. Elle s'occupe du reste.</p>
 
     <div class="stage">
       <svg class="rings anim" viewBox="0 0 660 300" role="img"
@@ -279,7 +279,7 @@ footer{padding:52px 0 60px; border-top:1px solid var(--hair); margin-top:24px}
 
     <div class="tile" style="margin-top:16px">
       <span class="n" style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:10px">03</span>
-      <h3 style="font-size:1.02rem;font-weight:600;margin:0 0 10px">Autorisez le remplissage automatique — l'interrupteur est grisé au départ</h3>
+      <h3 style="font-size:1.02rem;font-weight:600;margin:0 0 10px">Autorisez le remplissage automatique : l'interrupteur est grisé au départ</h3>
       <div class="warn">
         <p>Emufii peut saisir l'adresse de session dans l'écran multijoueur de l'émulateur, pour vous éviter
           de la recopier. C'est un service d'accessibilité, et Android le traite comme un
@@ -296,7 +296,7 @@ footer{padding:52px 0 60px; border-top:1px solid var(--hair); margin-top:24px}
   <section id="signature">
     <p class="eyebrow">Vérifier</p>
     <h2>Toutes les versions portent cette signature</h2>
-    <p class="section-lede">Une copie qui en porte une autre n'est pas la nôtre — et Android refusera
+    <p class="section-lede">Une copie qui en porte une autre n'est pas la nôtre, et Android refusera
       de l'installer par-dessus une Emufii légitime.</p>
     <div class="tile">
       <p class="hash" id="hash">21:EF:2D:D6:11:E0:96:5A:70:8F:61:F6:00:77:DE:97:D4:0D:59:FD:56:2F:1D:C5:F6:EF:6C:87:77:5E:81:D5</p>
@@ -316,7 +316,7 @@ footer{padding:52px 0 60px; border-top:1px solid var(--hair); margin-top:24px}
             le multijoueur, et c'est ce que ça implique.</p>
           <p>Les sessions sont isolées les unes des autres, mais à l'intérieur d'une session, les appareils
             s'atteignent. Rejoindre un salon public revient à se brancher sur le même réseau local qu'un
-            inconnu — avec les mêmes précautions.</p>
+            inconnu, avec les mêmes précautions.</p>
           <p>Entre gens qui se connaissent, le code se passe de la main à la main et la partie ne paraît
             dans aucune liste.</p>
         </div>
@@ -327,7 +327,7 @@ footer{padding:52px 0 60px; border-top:1px solid var(--hair); margin-top:24px}
           <li><span class="dot"></span><span>Votre <strong>photo de profil</strong> ne quitte jamais le téléphone.</span></li>
           <li><span class="dot"></span><span>Votre <strong>liste d'amis</strong> aussi.</span></li>
           <li><span class="dot"></span><span>Le serveur ne connaît qu'un code, un pseudo, un titre de jeu et une adresse valable le temps de la partie. <strong>Rien n'est conservé après.</strong></span></li>
-          <li><span class="dot"></span><span>Le tunnel ne transporte <strong>que</strong> le trafic de la session — votre navigation ne passe jamais par nos machines.</span></li>
+          <li><span class="dot"></span><span>Le tunnel ne transporte <strong>que</strong> le trafic de la session : votre navigation ne passe jamais par nos machines.</span></li>
           <li><span class="dot"></span><span>Aucune sauvegarde cloud : les clés que l'app détient ne sortent pas de l'appareil.</span></li>
         </ul>
       </div>
@@ -338,7 +338,7 @@ footer{padding:52px 0 60px; border-top:1px solid var(--hair); margin-top:24px}
     <p class="eyebrow">Une règle du projet</p>
     <h2>Aucun jeu, aucun BIOS, aucune clé</h2>
     <p class="section-lede" style="max-width:60ch">Emufii ne distribue ni ROM, ni image de BIOS, ni clé de
-      console, ni émulateur. Vous fournissez tout cela vous-même — vos propres sauvegardes de vos propres
+      console, ni émulateur. Vous fournissez tout cela vous-même : vos propres sauvegardes de vos propres
       cartouches et disques. C'est une règle du projet, pas une omission, et elle est vérifiée sur le
       binaire à chaque version.</p>
   </section>

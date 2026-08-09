@@ -1,4 +1,4 @@
-# NOTICE — Emufii
+# NOTICE d'Emufii
 
 Copyright 2026 Emufii contributors
 
@@ -7,7 +7,7 @@ fichier [`LICENSE`](LICENSE).
 
 ## Apports tiers
 
-### WireGuard — couche réseau des sessions
+### WireGuard, couche réseau des sessions
 
 - Source : <https://github.com/WireGuard/wireguard-android>
 - Artefact : `com.wireguard.android:tunnel`
@@ -19,11 +19,11 @@ qui passe par le `VpnService` d'Android. Aucun binaire natif n'est vendoré.
 ### Bibliothèques Android
 
 AndroidX et Jetpack Compose, Coil, Haze (`dev.chrisbanes.haze`), et la
-bibliothèque standard Kotlin — toutes sous **Apache License 2.0**.
+bibliothèque standard Kotlin, toutes sous **Apache License 2.0**.
 
 ### Serveur
 
-Express — **licence MIT**. L'agent du relais n'a aucune dépendance.
+Express, sous **licence MIT**. L'agent du relais n'a aucune dépendance.
 
 ### Poppins
 
@@ -42,5 +42,5 @@ Emufii **ne contient aucun code d'émulateur**. Azahar, Eden, PPSSPP et melonDS
 sont lancés par intent, comme des applications tierces installées séparément.
 Leur licence respective ne remonte donc pas jusqu'à ce dépôt.
 
-De même : ni ROM, ni image de BIOS, ni clé de console — c'est un invariant du
+De même, ni ROM, ni image de BIOS, ni clé de console : c'est un invariant du
 projet, vérifié sur le binaire à chaque version.

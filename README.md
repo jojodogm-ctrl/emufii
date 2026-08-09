@@ -1,6 +1,6 @@
 # Emufii
 
-**Jouer à plusieurs, à distance, avec des émulateurs de consoles portables —
+**Jouer à plusieurs, à distance, avec des émulateurs de consoles portables,
 sans configurer un seul port ni une seule adresse.**
 
 Emufii n'émule rien. Elle ouvre une session, partage un réseau entre vos
@@ -28,7 +28,7 @@ Il faut le même jeu de chaque côté.
 
 | Console | Émulateur | Où le prendre |
 |---|---|---|
-| **3DS** | Azahar | <https://azahar-emu.org> — une **pre-release ≥ 2126.0-rc**, les stables antérieures n'ont pas d'écran multijoueur |
+| **3DS** | Azahar | <https://azahar-emu.org>, une **pre-release ≥ 2126.0-rc**, les stables antérieures n'ont pas d'écran multijoueur |
 | **Switch** | Eden | <https://eden-emu.dev> |
 | **PSP** | PPSSPP | <https://www.ppsspp.org> |
 | **DS** | melonDS | <https://melonds.kuribo64.net> (ou melonDS DualS sur les appareils AYN) |
@@ -39,7 +39,7 @@ séparément et lancées par intent.
 ## Ce que ce projet ne distribue pas, et ne distribuera jamais
 
 **Aucun jeu, aucun BIOS, aucune clé de console, aucun émulateur.** Vous
-fournissez tout cela vous-même — vos propres sauvegardes de vos propres
+fournissez tout cela vous-même : vos propres sauvegardes de vos propres
 cartouches et disques. C'est une règle du projet, pas une omission, et elle est
 vérifiée sur le binaire à chaque version.
 
@@ -86,7 +86,7 @@ Une session est un **réseau partagé entre ses joueurs** : c'est ce qui fait
 marcher le multijoueur, et c'est ce que ça implique. Les sessions sont isolées
 les unes des autres, mais à l'intérieur d'une session, les appareils
 s'atteignent. Rejoindre un salon public revient à se brancher sur le même
-réseau local qu'un inconnu — avec les mêmes précautions.
+réseau local qu'un inconnu, avec les mêmes précautions.
 
 Les parties entre gens qui se connaissent passent par un code partagé de la
 main à la main, sans passer par la liste publique.
@@ -101,22 +101,22 @@ main à la main, sans passer par la liste publique.
 - Aucune sauvegarde cloud : les clés que l'app détient ne sortent pas de
   l'appareil.
 - Le tunnel ne transporte **que** le trafic de la session. Votre navigation,
-  vos mises à jour, tout le reste ne passe jamais par nos machines — on ne le
+  vos mises à jour, tout le reste ne passe jamais par nos machines : on ne le
   voit pas et on ne le paie pas.
 
 ## Mises à jour
 
 L'app vous prévient quand une version plus récente existe, et sait s'installer
 elle-même. Deux verrous : elle ne télécharge que depuis son propre serveur, et
-elle **vérifie la signature du binaire avant de proposer quoi que ce soit** —
-une version qui ne porte pas notre clé est refusée, et un retour à une version
+elle **vérifie la signature du binaire avant de proposer quoi que ce soit**.
+Une version qui ne porte pas notre clé est refusée, et un retour à une version
 antérieure aussi.
 
 Rien ne s'installe sans que vous ayez appuyé sur « Installer ».
 
 ## Licence
 
-**Apache-2.0** — voir [`LICENSE`](LICENSE) et [`NOTICE.md`](NOTICE.md).
+**Apache-2.0**, voir [`LICENSE`](LICENSE) et [`NOTICE.md`](NOTICE.md).
 
 La police Poppins est sous SIL OFL 1.1, dont le texte voyage dans l'APK
 (`assets/POPPINS-OFL.txt`).
