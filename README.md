@@ -121,7 +121,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-*.apk
+apksigner verify --print-certs Emufii-1.10.10.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to
