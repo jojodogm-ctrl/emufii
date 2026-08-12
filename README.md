@@ -21,7 +21,7 @@ yet: come and say hello, and you'll get the current one.
 [![Consoles](https://img.shields.io/badge/CONSOLES-3DS%20%7C%20SWITCH%20%7C%20PSP%20%7C%20DS-1b1e24?labelColor=3d4048&style=for-the-badge)](#consoles)
 
 [![Discord](https://img.shields.io/badge/DISCORD-JOIN-5865F2?labelColor=3d4048&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
-[![Patreon](https://img.shields.io/badge/PATREON-SUPPORT-FF424D?labelColor=3d4048&style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/Emufii)
+[![Ko-fi](https://img.shields.io/badge/KO--FI-SUPPORT-13C3FF?labelColor=3d4048&style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/emufii)
 
 <br>
 
