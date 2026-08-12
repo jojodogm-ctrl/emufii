@@ -14,7 +14,7 @@ yet: come and say hello, and you'll get the current one.
 
 <br>
 
-[![Version](https://img.shields.io/badge/VERSION-1.10.10-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
+[![Version](https://img.shields.io/badge/VERSION-1.11.3-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
@@ -50,6 +50,9 @@ Emufii replaces all of that with a six-character code.
 | **3. The guest joins** | Emufii opens the emulator on its multiplayer screen and fills in the address for them. |
 | **4. You play** | Both sides need the same game. |
 
+Where the host has to open the room first, the guest's button says so and waits
+instead of sending them into an emulator with nothing to find.
+
 Emufii emulates nothing and implements no netplay of its own. It opens a
 session, shares a network, and lets the emulator do what it already knows how to
 do.
@@ -62,7 +65,7 @@ them and stays out of the way.
 | Console | Emulator | Worth knowing |
 |---|---|---|
 | **3DS** | [Azahar](https://azahar-emu.org) | Grab a **pre-release ≥ 2126.0-rc**. Earlier stable builds have no multiplayer screen at all. |
-| **Switch** | [Eden](https://eden-emu.dev) | The lobby runs on our server, so nobody has to host the game from their phone. |
+| **Switch** | [Eden](https://eden-emu.dev) | The lobby runs on our server, so nobody has to host the game from their phone. Any Eden build is picked up, including the Optimized one that installs under another name. |
 | **PSP** | [PPSSPP](https://www.ppsspp.org) | The console's own ad hoc mode, between two devices that are no longer in the same room. |
 | **DS** | [melonDS](https://melonds.kuribo64.net) | **Online** play through Kaeru WFC. On AYN handhelds the preinstalled build is melonDS DualS. |
 
@@ -103,6 +106,9 @@ one can say what broke.
 **3. Open Emufii and walk through setup:** your games folder, a nickname,
 notifications, and the autofill permission.
 
+The app speaks English and French, and comes in light, dark and OLED black. All
+three are in the profile page, along with the folder you scan for games.
+
 ### The autofill permission, and why it looks broken
 
 Emufii can type the session address into the emulator's multiplayer screen so
@@ -126,7 +132,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-1.10.10.apk
+apksigner verify --print-certs Emufii-1.11.3.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to

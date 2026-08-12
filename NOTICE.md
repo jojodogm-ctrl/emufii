@@ -29,10 +29,6 @@ AndroidX and Jetpack Compose, Coil, Haze (`dev.chrisbanes.haze`) and the Kotlin
 standard library, all under the **Apache License 2.0**, which is compatible with
 the AGPL-3.0 in this direction.
 
-### Server
-
-Express, under the **MIT licence**. The relay agent has no dependencies.
-
 ### Poppins
 
 Poppins, by Indian Type Foundry, Jonny Pinhorn and Ninad Kale, under the **SIL
