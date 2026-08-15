@@ -14,11 +14,11 @@ yet: come and say hello, and you'll get the current one.
 
 <br>
 
-[![Version](https://img.shields.io/badge/VERSION-1.11.3-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
+[![Version](https://img.shields.io/badge/VERSION-1.11.4-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
-[![Consoles](https://img.shields.io/badge/CONSOLES-3DS%20%7C%20SWITCH%20%7C%20PSP%20%7C%20DS-1b1e24?labelColor=3d4048&style=for-the-badge)](#consoles)
+[![Consoles](https://img.shields.io/badge/CONSOLES-3DS%20%7C%20SWITCH%20%7C%20WII%20%7C%20GAMECUBE%20%7C%20PSP%20%7C%20DS-1b1e24?labelColor=3d4048&style=for-the-badge)](#consoles)
 
 [![Discord](https://img.shields.io/badge/DISCORD-JOIN-5865F2?labelColor=3d4048&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
 [![Ko-fi](https://img.shields.io/badge/KO--FI-SUPPORT-13C3FF?labelColor=3d4048&style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/emufii)
@@ -66,6 +66,7 @@ them and stays out of the way.
 |---|---|---|
 | **3DS** | [Azahar](https://azahar-emu.org) | Grab a **pre-release ≥ 2126.0-rc**. Earlier stable builds have no multiplayer screen at all. |
 | **Switch** | [Eden](https://eden-emu.dev) | The lobby runs on our server, so nobody has to host the game from their phone. Any Eden build is picked up, including the Optimized one that installs under another name. |
+| **Wii** and **GameCube** | [Dolphin](https://dolphin-emu.org) | Dolphin's own netplay, which reached Android in 2026. You need a **dev build**: the netplay screen is not in release 2606a. Both players need the same dump. |
 | **PSP** | [PPSSPP](https://www.ppsspp.org) | The console's own ad hoc mode, between two devices that are no longer in the same room. |
 | **DS** | [melonDS](https://melonds.kuribo64.net) | **Online** play through Kaeru WFC. On AYN handhelds the preinstalled build is melonDS DualS. |
 
@@ -79,10 +80,10 @@ None of these are missing features. They're facts that sit outside the project.
 - **DS local wireless.** The DS radio is emulated down at the physical layer,
   timing and all. No tunnel gets underneath that, and the melonDS authors say so
   themselves. DS online play is unaffected.
-- **Wii.** Wiimmfi needs a NAND dump from a real console. A NAND can't be
-  shared: handing one around gets the original console banned.
-- **GameCube.** Only three games ever shipped with LAN support. There was
-  nothing to unlock.
+- **Nintendo's own Wii servers.** Reaching them through Wiimmfi needs a NAND
+  dump from a real console, and a NAND can't be shared: handing one around gets
+  the original console banned. Playing Wii and GameCube games together does not
+  go that way — it goes through Dolphin's netplay, which needs none of it.
 
 </details>
 
@@ -132,7 +133,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-1.11.3.apk
+apksigner verify --print-certs Emufii-1.11.4.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to
