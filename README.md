@@ -19,7 +19,7 @@ fixed, and there will be problems.
 [![Version](https://img.shields.io/badge/VERSION-1.11.5-2ea043?labelColor=3d4048&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
-[![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
+[![Platform](https://img.shields.io/badge/ANDROID-13%20ONLY-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
 [![Consoles](https://img.shields.io/badge/CONSOLES-3DS%20%7C%20SWITCH%20%7C%20WII%20%7C%20GAMECUBE%20%7C%20PSP%20%7C%20DS-1b1e24?labelColor=3d4048&style=for-the-badge)](#consoles)
 
 [![Discord](https://img.shields.io/badge/DISCORD-JOIN-5865F2?labelColor=3d4048&style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
@@ -44,8 +44,14 @@ Sessions that don't come up, an emulator that ignores the autofill, a game that
 desyncs for a reason nobody has pinned down yet. That is the honest state of it.
 
 It is worth saying plainly rather than letting you find out: this is early
-software, built and tested on a handful of devices, against emulators that keep
-moving underneath it.
+software, built against emulators that keep moving underneath it.
+
+**Android 13, and one device.** Everything you read here was tested on an
+**AYN Thor running Android 13** — that is the whole test bench, and there is no
+second one. Android will happily install Emufii on 14, 15 or 16 because nothing
+stops it, but none of those have been tried: if you run one, you are the first,
+and we would genuinely like to hear how it went. Anything older than 13 will not
+install at all.
 
 **When something breaks, come and say so on
 [Discord](https://discord.gg/tvWcb28vBZ).** Downloading takes one click and asks
@@ -115,6 +121,10 @@ cartridges and discs. This is a rule of the project rather than an oversight,
 and every release is checked against the binary before it goes out.
 
 ## Install
+
+> **Android 13, on an AYN Thor.** That is the only combination Emufii has ever
+> been tested on. Newer Android versions will let it install, and nobody has
+> checked what happens next.
 
 The app is signed but distributed outside any store, so Android will warn you
 about an unknown source. Every build is published here, and announced on
