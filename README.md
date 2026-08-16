@@ -9,13 +9,14 @@
 Emufii puts your devices on a single network for as long as you're playing.
 Your emulators find each other exactly as they would over local Wi-Fi.
 
-**Builds are handed out on Discord for now.** There is nothing to download here
-yet: come and say hello, and you'll get the current one.
+**[Grab the latest build here](https://github.com/jojodogm-ctrl/emufii/releases/latest)**,
+then come and say hello on Discord — that is where problems get reported and
+fixed, and there will be problems.
 
 <br>
 
 [![Beta](https://img.shields.io/badge/BETA-EXPECT%20BUGS-FF7A18?labelColor=3d4048&style=for-the-badge)](#this-is-a-beta)
-[![Version](https://img.shields.io/badge/VERSION-1.11.5-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
+[![Version](https://img.shields.io/badge/VERSION-1.11.5-2ea043?labelColor=3d4048&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
@@ -26,7 +27,7 @@ yet: come and say hello, and you'll get the current one.
 
 <br>
 
-**[Download](https://discord.gg/tvWcb28vBZ)** •
+**[Download](https://github.com/jojodogm-ctrl/emufii/releases/latest)** •
 [Install](#install) •
 [Consoles](#consoles) •
 [Privacy](#privacy) •
@@ -47,11 +48,11 @@ software, built and tested on a handful of devices, against emulators that keep
 moving underneath it.
 
 **When something breaks, come and say so on
-[Discord](https://discord.gg/tvWcb28vBZ).** It is the whole reason builds go out
-there and not from a download button. A bug nobody reports is a bug that stays,
-and half of what works today was fixed because someone described what they saw
-on their own device. Tell us the console, the emulator build, and what you
-expected to happen.
+[Discord](https://discord.gg/tvWcb28vBZ).** Downloading takes one click and asks
+nothing of you, so this is the part that actually matters: a bug nobody reports
+is a bug that stays, and half of what works today was fixed because someone
+described what they saw on their own device. Tell us the console, the emulator
+build, and what you expected to happen.
 
 ---
 
@@ -116,13 +117,13 @@ and every release is checked against the binary before it goes out.
 ## Install
 
 The app is signed but distributed outside any store, so Android will warn you
-about an unknown source. It isn't on this page either: while the project finds
-its feet, builds go out through [Discord](https://discord.gg/tvWcb28vBZ) so that whoever installs
-one can say what broke.
+about an unknown source. Every build is published here, and announced on
+[Discord](https://discord.gg/tvWcb28vBZ) — which is also where you tell us what
+broke, and the project still very much needs that.
 
 **1. Install the emulators** you plan to use, from the sites in the table above.
 
-**2. [Ask for the build on Discord](https://discord.gg/tvWcb28vBZ)** and install it.
+**2. [Download the latest build](https://github.com/jojodogm-ctrl/emufii/releases/latest)** and install it.
 
 **3. Open Emufii and walk through setup:** your games folder, a nickname,
 notifications, and the autofill permission.
@@ -207,9 +208,8 @@ the AGPL can be arranged: ask on [Discord](https://discord.gg/tvWcb28vBZ).
 Poppins is used under the SIL OFL 1.1, whose text ships inside the APK at
 `assets/POPPINS-OFL.txt`.
 
-The app source is not published yet, and neither are the builds: this page
-exists to say what Emufii is and what it does with your data, before you decide
-to ask for it on [Discord](https://discord.gg/tvWcb28vBZ).
+The app source is not published yet. The builds are: this page exists to say
+what Emufii is and what it does with your data, before you install one.
 
 ---
 
