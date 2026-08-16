@@ -218,7 +218,19 @@ to ask for it on [Discord](https://discord.gg/tvWcb28vBZ).
 Emufii has been through a security review covering the app, the session broker
 and the relay: how clients are authenticated, how sessions are walled off from
 one another, what the tunnel is allowed to carry, and how updates are verified
-before they install. Everything that review turned up has been fixed.
+before they install.
+
+Every flaw it turned up has been fixed, with two exceptions that are not flaws
+so much as consequences of what the app is, and those are documented rather than
+patched:
+
+- **A session is a shared network.** That is the feature, and it is why the
+  emulators find each other at all. It also means the devices in a session can
+  reach each other, which is why [joining strangers](#before-you-join-strangers)
+  deserves the same thought as plugging into someone's home network.
+- **Public sessions are listed.** A room you open publicly shows a nickname, a
+  game and a code, because that is what makes it findable. Sessions you keep
+  private appear in no list, and the code alone gets people in.
 
 That is a statement about what was looked for and found, not a promise that
 nothing is left. No review catches everything, and this is beta software.
