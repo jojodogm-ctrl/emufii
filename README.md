@@ -89,13 +89,28 @@ do.
 These emulators are installed separately, from their own sites. Emufii launches
 them and stays out of the way.
 
-| Console | Emulator | Worth knowing |
-|---|---|---|
-| **3DS** | [Azahar](https://azahar-emu.org) | Grab a **pre-release ≥ 2126.0-rc**. Earlier stable builds have no multiplayer screen at all. |
-| **Switch** | [Eden](https://eden-emu.dev) | The lobby runs on our server, so nobody has to host the game from their phone. Any Eden build is picked up, including the Optimized one that installs under another name. |
-| **Wii** and **GameCube** | [Dolphin](https://dolphin-emu.org) | Dolphin's own netplay, which reached Android in 2026. Get **2606a** or later from the Android download on dolphin-emu.org. Both players need the same dump. |
-| **PSP** | [PPSSPP](https://www.ppsspp.org) | The console's own ad hoc mode, between two devices that are no longer in the same room. |
-| **DS** | [melonDS](https://melonds.kuribo64.net) | **Online** play through Kaeru WFC. On AYN handhelds the preinstalled build is melonDS DualS. |
+**Not every console means the same thing by "multiplayer",** and that changes
+which games work. Four of the five are the console's *local* mode, the one that
+used to need everyone in the same room: those games work, and games that only
+ever had online servers do not. The DS is the exception and goes to real
+servers.
+
+| Console | Emulator | What you're actually playing | Which games work |
+|---|---|---|---|
+| **3DS** | [Azahar](https://azahar-emu.org) | **Local wireless, over distance.** Azahar's own room system, the thing that stands in for two 3DS consoles sitting next to each other. Emufii puts you both in one room without either of you hosting a public server. | The games that had **local play / download play**. Nintendo Network games, no. |
+| **Switch** | [Eden](https://eden-emu.dev) | **Local wireless (LDN), over distance.** Same idea, except the lobby runs on our server rather than on someone's phone, so nobody has to be the host and nobody's battery decides when the session ends. | The games with **local wireless play**. Nintendo Switch Online, no. |
+| **Wii** and **GameCube** | [Dolphin](https://dolphin-emu.org) | **Netplay.** Different in kind: Dolphin runs both emulators in lockstep and sends your controller inputs across. It's the couch, moved. | Anything **same-console multiplayer**, split-screen and versus included. That's most of the library. Not Nintendo's old servers. |
+| **PSP** | [PPSSPP](https://www.ppsspp.org) | **Ad hoc, over distance.** The PSP's own system-link mode, between two devices that are no longer in the same room. | The **ad hoc** games. Infrastructure mode, no. |
+| **DS** | [melonDS](https://melonds.kuribo64.net) | **Real online.** The only one here that isn't local play pretending: the game talks Nintendo Wi-Fi Connection, and Emufii points it at the [Kaeru WFC](https://kaeru.world) revival servers instead of the servers Nintendo shut down in 2014. | The **Nintendo WFC** games, with strangers as well as friends. DS local wireless, no, and it can't be done. |
+
+Practical bits: Azahar needs a **pre-release ≥ 2126.0-rc**, since the stable
+builds have no multiplayer screen at all. Dolphin needs the **Android build the
+site lists as `2606a`**, which reports itself as `2606-302` once installed. Any
+current Eden works, including the Optimized one that installs under another
+name. On AYN handhelds the preinstalled melonDS is melonDS DualS.
+
+**Both players need the same emulator build and the same dump of the same
+game.**
 
 <details>
 <summary><b>What won't work, and why</b></summary>
