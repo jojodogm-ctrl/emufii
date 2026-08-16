@@ -14,7 +14,7 @@ yet: come and say hello, and you'll get the current one.
 
 <br>
 
-[![Version](https://img.shields.io/badge/VERSION-1.11.4-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
+[![Version](https://img.shields.io/badge/VERSION-1.11.5-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%2B-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
@@ -133,7 +133,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-1.11.4.apk
+apksigner verify --print-certs Emufii-1.11.5.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to
