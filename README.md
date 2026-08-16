@@ -10,7 +10,7 @@ Emufii puts your devices on a single network for as long as you're playing.
 Your emulators find each other exactly as they would over local Wi-Fi.
 
 **[Grab the latest build here](https://github.com/jojodogm-ctrl/emufii/releases/latest)**,
-then come and say hello on Discord — that is where problems get reported and
+then come and say hello on Discord. That is where problems get reported and
 fixed, and there will be problems.
 
 <br>
@@ -47,7 +47,7 @@ It is worth saying plainly rather than letting you find out: this is early
 software, built against emulators that keep moving underneath it.
 
 **Android 13, and one device.** Everything you read here was tested on an
-**AYN Thor running Android 13** — that is the whole test bench, and there is no
+**AYN Thor running Android 13**. That is the whole test bench, and there is no
 second one. Android will happily install Emufii on 14, 15 or 16 because nothing
 stops it, but none of those have been tried: if you run one, you are the first,
 and we would genuinely like to hear how it went. Anything older than 13 will not
@@ -110,7 +110,7 @@ None of these are missing features. They're facts that sit outside the project.
 - **Nintendo's own Wii servers.** Reaching them through Wiimmfi needs a NAND
   dump from a real console, and a NAND can't be shared: handing one around gets
   the original console banned. Playing Wii and GameCube games together does not
-  go that way — it goes through Dolphin's netplay, which needs none of it.
+  go that way: it goes through Dolphin's netplay, which needs none of it.
 
 </details>
 
@@ -128,7 +128,7 @@ and every release is checked against the binary before it goes out.
 
 The app is signed but distributed outside any store, so Android will warn you
 about an unknown source. Every build is published here, and announced on
-[Discord](https://discord.gg/tvWcb28vBZ) — which is also where you tell us what
+[Discord](https://discord.gg/tvWcb28vBZ), which is also where you tell us what
 broke, and the project still very much needs that.
 
 **1. Install the emulators** you plan to use, from the sites in the table above.
