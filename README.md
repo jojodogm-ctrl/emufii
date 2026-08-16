@@ -93,7 +93,7 @@ them and stays out of the way.
 |---|---|---|
 | **3DS** | [Azahar](https://azahar-emu.org) | Grab a **pre-release ≥ 2126.0-rc**. Earlier stable builds have no multiplayer screen at all. |
 | **Switch** | [Eden](https://eden-emu.dev) | The lobby runs on our server, so nobody has to host the game from their phone. Any Eden build is picked up, including the Optimized one that installs under another name. |
-| **Wii** and **GameCube** | [Dolphin](https://dolphin-emu.org) | Dolphin's own netplay, which reached Android in 2026. Release **2606a** works. Both players need the same dump. |
+| **Wii** and **GameCube** | [Dolphin](https://dolphin-emu.org) | Dolphin's own netplay, which reached Android in 2026. You need a **dev build**: the netplay screen is not in release 2606a. Both players need the same dump. |
 | **PSP** | [PPSSPP](https://www.ppsspp.org) | The console's own ad hoc mode, between two devices that are no longer in the same room. |
 | **DS** | [melonDS](https://melonds.kuribo64.net) | **Online** play through Kaeru WFC. On AYN handhelds the preinstalled build is melonDS DualS. |
 
