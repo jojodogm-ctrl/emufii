@@ -14,6 +14,7 @@ yet: come and say hello, and you'll get the current one.
 
 <br>
 
+[![Beta](https://img.shields.io/badge/BETA-EXPECT%20BUGS-FF7A18?labelColor=3d4048&style=for-the-badge)](#this-is-a-beta)
 [![Version](https://img.shields.io/badge/VERSION-1.11.5-2ea043?labelColor=3d4048&style=for-the-badge)](https://discord.gg/tvWcb28vBZ)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
@@ -32,6 +33,25 @@ yet: come and say hello, and you'll get the current one.
 [Discord](https://discord.gg/tvWcb28vBZ)
 
 </div>
+
+---
+
+## This is a beta
+
+**Emufii is not stable yet, and you are going to run into plenty of problems.**
+Sessions that don't come up, an emulator that ignores the autofill, a game that
+desyncs for a reason nobody has pinned down yet. That is the honest state of it.
+
+It is worth saying plainly rather than letting you find out: this is early
+software, built and tested on a handful of devices, against emulators that keep
+moving underneath it.
+
+**When something breaks, come and say so on
+[Discord](https://discord.gg/tvWcb28vBZ).** It is the whole reason builds go out
+there and not from a download button. A bug nobody reports is a bug that stays,
+and half of what works today was fixed because someone described what they saw
+on their own device. Tell us the console, the emulator build, and what you
+expected to happen.
 
 ---
 
@@ -190,3 +210,30 @@ Poppins is used under the SIL OFL 1.1, whose text ships inside the APK at
 The app source is not published yet, and neither are the builds: this page
 exists to say what Emufii is and what it does with your data, before you decide
 to ask for it on [Discord](https://discord.gg/tvWcb28vBZ).
+
+---
+
+## Security
+
+Emufii has been through a security review covering the app, the session broker
+and the relay: how clients are authenticated, how sessions are walled off from
+one another, what the tunnel is allowed to carry, and how updates are verified
+before they install. Everything that review turned up has been fixed.
+
+That is a statement about what was looked for and found, not a promise that
+nothing is left. No review catches everything, and this is beta software.
+
+**If you find something, please report it on
+[Discord](https://discord.gg/tvWcb28vBZ)** rather than posting it publicly, and
+it will be looked at quickly. Sessions are shared networks between real people's
+devices, so a flaw here is worth taking seriously.
+
+## How it was built
+
+Emufii is co-coded with [Claude Code](https://claude.com/claude-code). The
+design decisions, the testing on real hardware and the calls about what ships
+are the author's; a good deal of the code, the scouting of emulator internals
+and the reviews were done alongside the model.
+
+Said out loud because it is part of how this project is made, and you are
+entitled to know what is behind the build you install.
