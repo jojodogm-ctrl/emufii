@@ -16,7 +16,7 @@ fixed, and there will be problems.
 <br>
 
 [![Beta](https://img.shields.io/badge/BETA-EXPECT%20BUGS-FF7A18?labelColor=3d4048&style=for-the-badge)](#this-is-a-beta)
-[![Version](https://img.shields.io/badge/VERSION-2.0.0-2ea043?labelColor=3d4048&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
+[![Version](https://img.shields.io/badge/VERSION-1.12-2ea043?labelColor=3d4048&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%20ONLY-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
@@ -101,7 +101,7 @@ servers.
 | **Switch** | [Eden](https://eden-emu.dev) | **Local wireless (LDN), over distance.** Same idea, except the lobby runs on our server rather than on someone's phone, so nobody has to be the host and nobody's battery decides when the session ends. | The games with **local wireless play**. Nintendo Switch Online, no. |
 | **Wii** and **GameCube** | [Dolphin](https://dolphin-emu.org) | **Netplay.** Different in kind: Dolphin runs both emulators in lockstep and sends your controller inputs across, so the game behaves as if you were both holding a pad on one console. | Anything **same-console multiplayer**, split-screen and versus included. That's most of the library. Not Nintendo's old servers. |
 | **PSP** | [PPSSPP](https://www.ppsspp.org) | **Ad hoc, over distance.** The PSP's own system-link mode, between two devices that are no longer in the same room. | The **ad hoc** games. Infrastructure mode, no. |
-| **PS2** | [ARMSX2](https://github.com/Xrysnow/ARMSX2) | **Local Link, over distance.** The PS2's own two-console cable mode, without the cable. New in 2.0, and honest about it: the traffic is measured going through, but no one has yet sat down and played a full match on it. Tell us how it goes. | The **System Link / LAN** games. The PS2's old online servers, no. |
+| **PS2** | [ARMSX2](https://github.com/Xrysnow/ARMSX2) | **Local Link, over distance.** The PS2's own two-console cable mode, without the cable. New in 1.12, and honest about it: the traffic is measured going through, but no one has yet sat down and played a full match on it. Tell us how it goes. | The **System Link / LAN** games. The PS2's old online servers, no. |
 | **DS** | [melonDS](https://melonds.kuribo64.net) | **Real online.** The only one here that isn't local play pretending: the game talks Nintendo Wi-Fi Connection, and Emufii points it at the [Kaeru WFC](https://kaeru.world) revival servers instead of the servers Nintendo shut down in 2014. | The **Nintendo WFC** games, with strangers as well as friends. DS local wireless, no, and it can't be done. |
 
 Practical bits: Azahar needs a **pre-release ≥ 2126.0-rc**, since the stable
@@ -180,7 +180,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-2.0.0.apk
+apksigner verify --print-certs Emufii-1.12.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to
