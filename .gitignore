@@ -1,4 +1,18 @@
-*.apk
-COMMENT-PUBLIER.md
-NOTES-*.md
-.DS_Store
+# Liste blanche, et pas une liste noire.
+#
+# Ce dépôt est la vitrine publique : il ne contient aucune source, et c'est ça
+# qui protège l'infrastructure, pas la licence. Une liste noire n'interdit que
+# ce qu'on a pensé à nommer, et un « git add -A » lancé depuis ce dossier
+# suffisait à publier ce qui traînait à côté. On ignore donc tout, et on
+# rouvre les cinq fichiers qui ont le droit d'exister ici.
+#
+# Ce qui ne doit jamais s'y retrouver, en clair : app-android/, coordinator/,
+# relay/, scripts/ (dont compat.mjs et compat-ui.mjs, qui portent le
+# déploiement), docs/, CLAUDE.md, .claude/ et .env.local.
+*
+
+!.gitignore
+!LICENSE
+!NOTICE.md
+!README.md
+!logo.png
