@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!--
+      Installer la mise à jour depuis la bannière. Ne donne pas le droit
+      d'installer : elle donne le droit de *demander*, et Android n'ouvre son
+      dialogue qu'après que le joueur a autorisé Emufii dans ses réglages. Voir
+      UpdateInstaller pour les trois verrous qui encadrent ce chemin.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!--
+      Tenir la radio Wi-Fi éveillée pendant une session. Mesuré entre deux Thor :
+      25 % de perte à un paquet par seconde, 0 % à trois — l'économie d'énergie
+      du Wi-Fi, que le LDN de la Switch ne supporte pas. Voir EmufiiWgService.
+    -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <queries>
+        <package android:name="org.azahar_emu.azahar" />
+        <package android:name="org.azahar_emu.azahar.debug" />
+        <package android:name="org.ppsspp.ppsspp" />
+        <package android:name="org.ppsspp.ppssppgold" />
+        <package android:name="me.magnum.melonds" />
+        <package android:name="me.magnum.melonds.debug" />
+        <package android:name="me.magnum.melondualds" />
+        <package android:name="dev.eden.eden_emulator" />
+        <package android:name="dev.eden.eden_emulator.nightly" />
+        <!-- "Eden Optimized": the same app, under Genshin Impact's identity,
+             which some phones treat better. So the name does not say Eden, and
+             it really is a Switch emulator. -->
+        <package android:name="com.miHoYo.Yuanshen" />
+        <package android:name="com.miHoYo.Yuanshen.nightly" />
+        <package android:name="dev.legacy.eden_emulator" />
+        <!-- Our fork, installed alongside Eden. Without this declaration
+             Android 11's package visibility filtering hides it, and Emufii
+             concludes no Switch emulator is present. -->
+        <package android:name="dev.eden.eden_emulator.emufii" />
+        <!-- Dolphin. One package name for all three channels: the 2606-302 dev
+             build replaced the 2606a release *in place* on the Thor, same
+             package and same certificate. Only the developer build is
+             suffixed. -->
+        <package android:name="org.dolphinemu.dolphinemu" />
+        <package android:name="org.dolphinemu.dolphinemu.debug" />
+        <!--
+          ARMSX2, for the PS2. `xyz.aethersx2.android` is deliberately not
+          declared: that is the original AetherSX2, with no network layer, and the
+          two live side by side on the Thor.
+        -->
+        <package android:name="com.armsx2" />
+    </queries>
+
+    <application
+        android:name=".EmufiiApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Emufii">
+        <!--
+          Le retour d'Android sur la session d'installation. Non exporté : seul
+          le PendingIntent qu'on a créé nous-mêmes l'atteint.
+        -->
+        <receiver
+            android:name=".update.UpdateInstallReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Emufii"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".wg.EmufiiWgService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Session VPN tunnel for remote multiplayer" />
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+
+        <!--
+          DNS-only tunnel for DS online play. Separate from the session tunnel service
+          on purpose: the Kaeru route shares nothing with it, and Android runs one
+          VpnService at a time anyway. Scoped to melonDS alone at runtime.
+        -->
+        <service
+            android:name=".wfc.WfcDnsService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="DNS redirection to a third-party WFC revival server" />
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+
+
+        <!--
+          Optional. Fills the connection address into Azahar's multiplayer
+          dialog. Off unless the user enables it in Android's accessibility
+          settings; everything works without it, just with manual typing.
+        -->
+        <service
+            android:name=".azahar.AzaharNetplayService"
+            android:exported="false"
+            android:label="@string/netplay_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/azahar_netplay_service" />
+        </service>
+    </application>
+
+</manifest>

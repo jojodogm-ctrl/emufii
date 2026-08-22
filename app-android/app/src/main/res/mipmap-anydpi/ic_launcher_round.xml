@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Le logo v2 est un dessin large (deux anneaux, ~1,86:1) posé sur du blanc. Il
+  est donc la couche de *fond*, celle que le lanceur découpe, et la couche
+  d'avant-plan est vide — il n'y a rien à faire flotter au-dessus.
+
+  Il est mis à l'échelle à 58 % de la largeur du cadre : c'est le plus grand
+  rectangle de ce rapport qui tienne entièrement dans le cercle de sécurité
+  d'une icône adaptative. Aucune découpe de lanceur, ronde ou en écusson, ne
+  peut donc rogner les anneaux. Le prix est une marge blanche généreuse ; la
+  version pleine cadre coupait les extrémités du mot.
+
+  `monochrome` est la silhouette du dessin, pour les icônes thématiques
+  d'Android 13 — celles de la Thor. Sans elle, le système garde l'icône en
+  couleur au milieu d'un écran d'accueil teinté.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_art" />
+    <foreground android:drawable="@android:color/transparent" />
+    <monochrome android:drawable="@mipmap/ic_launcher_mono" />
+</adaptive-icon>

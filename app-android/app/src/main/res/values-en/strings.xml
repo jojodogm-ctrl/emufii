@@ -1,0 +1,427 @@
+<resources>
+    <!--
+      English translation. Written to read like an app, not like a translation:
+      the French is deliberately informal ("tes potes"), and the English matches
+      that register rather than going stiff.
+
+      "Coordinator" and "session code" stay as they are: they are the project's
+      own vocabulary and appear in its documentation.
+    -->
+    <string name="netplay_service_label">Emufii: Azahar and Eden netplay filling</string>
+    <string name="netplay_service_description">Lets Emufii fill in the connection address in Azahar\'s or Eden\'s multiplayer menu, so you don\'t have to retype it. Emufii only watches those two emulators, and only while a session is running.</string>
+
+    <!-- Library layout and sorting -->
+    <string name="lib_layout">Layout</string>
+    <string name="lib_layout_grid">Grid</string>
+    <string name="lib_layout_carousel">Carousel</string>
+    <string name="lib_layout_list">List</string>
+    <string name="lib_sort">Sort</string>
+    <string name="lib_sort_name">A → Z</string>
+    <string name="lib_sort_recent">Recently added</string>
+    <string name="lib_sort_console">By console</string>
+    <string name="lib_folder_count">%1$d games</string>
+    <string name="lib_folder_count_one">1 game</string>
+
+    <!-- Library -->
+    <string name="lib_no_folder_title">No folder yet</string>
+    <string name="lib_no_folder_body">Pick the folder your ROMs are in. Subfolders are scanned too, whichever console they hold.</string>
+    <string name="lib_choose_folder">Pick a folder</string>
+    <string name="lib_scanning">Scanning…</string>
+    <string name="lib_create_session">Create a session</string>
+    <string name="lib_private_session">Private session</string>
+    <string name="lib_private_session_on">It won\'t show in the session list: people will need your code to get in.</string>
+    <string name="lib_private_session_off">It will show in the session list, where anyone can join it.</string>
+    <string name="lib_join_by_code">Join with a code</string>
+    <string name="launch_mode_online">%1$s · online play</string>
+    <string name="launch_mode_session">%1$s · multiplayer session</string>
+    <string name="launch_online_1">Emufii points melonDS at Kaeru</string>
+    <string name="launch_online_2">The game opens on its own</string>
+    <string name="launch_online_3">You play online, nothing to set up</string>
+    <string name="launch_session_1">Emufii opens a session and gives you a code</string>
+    <string name="launch_session_2">Your friends type it in to join you</string>
+    <string name="launch_session_3">The consoles see each other as on local Wi-Fi</string>
+    <string name="psp_online_title">Play online</string>
+    <string name="psp_online_what_body">You play with strangers, on a public server run by third parties. Emufii creates no session and brings up no tunnel: it opens PPSSPP, and PPSSPP is what connects you.</string>
+    <string name="psp_online_steps_title">To do, once and for all</string>
+    <string name="psp_online_step_1">Open PPSSPP with the button below, then go to Settings → Networking.</string>
+    <string name="psp_online_step_2">Turn networking on, and pick a public server from the list PPSSPP keeps up to date.</string>
+    <string name="psp_online_step_3">Leave “Try to use the server’s packet relay” on Automatic: that is what public servers want. Set it back to Disabled if you come back to play with friends.</string>
+    <string name="psp_online_step_4">Come back here and launch the game, then take its ad hoc mode.</string>
+    <string name="psp_online_open_settings">1. Open PPSSPP to set up online play</string>
+    <string name="psp_online_open_again">1. Reopen PPSSPP for setup</string>
+    <string name="psp_online_launch_game">2. Launch the game</string>
+    <string name="update_available">Emufii %1$s is available</string>
+    <string name="update_later">Later</string>
+    <string name="update_open">See it</string>
+    <string name="update_install">Install</string>
+    <string name="update_failed_permission">Allow Emufii to install apps in your Android settings.</string>
+    <string name="update_failed_unavailable">This version isn\'t downloadable here yet.</string>
+    <string name="update_failed_download">Download interrupted. Try again, the file is there.</string>
+    <string name="update_failed_rejected">File rejected: it isn\'t signed like this app.</string>
+    <string name="lib_open_emulator">See what to do</string>
+    <string name="lib_mode_friends">With friends</string>
+    <string name="lib_mode_public">Online</string>
+    <string name="launch_psp_public_1">Emufii creates no session: this mode does not go through it.</string>
+    <string name="launch_psp_public_2">Emufii opens PPSSPP for you to set up, then the game, in that order.</string>
+    <string name="launch_psp_public_3">In the game, take ad hoc mode: you land among the players already connected.</string>
+    <string name="lib_play_online">Play online</string>
+
+    <!-- Session -->
+    <string name="session_mine">Your session</string>
+    <string name="session_joined">Session joined</string>
+    <string name="session_code_label">Session code</string>
+    <string name="session_code_hint">Share it, or let your friends find you in the open sessions.</string>
+    <string name="session_members_label">In the session</string>
+    <plurals name="session_members_count">
+        <item quantity="one">%d player</item>
+        <item quantity="other">%d players</item>
+    </plurals>
+    <string name="profile_default_name">Player</string>
+    <string name="session_you_alone">Just you, for now</string>
+    <string name="session_waiting">Waiting for someone to join…</string>
+    <string name="session_live">live</string>
+    <string name="session_host_address">Host address</string>
+    <string name="session_psp_address">Address to set in PPSSPP</string>
+    <string name="session_room_address">Room address</string>
+    <string name="session_copy_ip">Copy IP</string>
+    <string name="session_copy_port">Copy port</string>
+    <string name="session_ip_copied">IP copied</string>
+    <string name="session_port_copied">Port copied</string>
+    <string name="session_game">Game</string>
+    <string name="session_port">Port</string>
+    <string name="session_close">Close session</string>
+    <string name="session_leave">Leave session</string>
+    <string name="session_no_rom">You don\'t have this game</string>
+    <string name="session_launch_emulation">Start emulation</string>
+    <string name="session_launch_step2">2. Start emulation</string>
+    <string name="session_netplay_open">1. Set %1$s up automatically</string>
+    <string name="session_netplay_waiting_host">1. Waiting for the host…</string>
+    <string name="session_netplay_again">1. Set %1$s up again</string>
+    <string name="session_netplay_done">1. %1$s is set up</string>
+    <string name="session_netplay_no_address">Session address unavailable.</string>
+    <string name="session_wfc_not_a_session">DS online play doesn\'t go through a session</string>
+    <string name="session_unsupported_short">Multiplayer not supported yet</string>
+    <string name="session_unsupported_console">Multiplayer isn\'t supported for this console yet</string>
+    <string name="session_wfc_launch_from_library">DS online play starts from the library, not from a session</string>
+    <string name="session_no_rom_attached">No ROM attached to this session</string>
+    <string name="session_you">You</string>
+    <string name="session_member_since">· %1$s has been here for %2$s</string>
+    <string name="duration_seconds">a few seconds</string>
+    <string name="duration_minutes">%1$d min</string>
+    <string name="duration_hours">%1$d h</string>
+    <string name="session_launching">Starting %1$s…</string>
+    <string name="err_generic">Error: %1$s</string>
+
+    <!-- Per-emulator hints -->
+    <string name="hint_azahar_title">In Azahar</string>
+    <string name="hint_azahar_automated">Emufii opens multiplayer and fills the address in for you.</string>
+    <string name="hint_azahar_important">Important</string>
+    <string name="hint_azahar_username">Before you play, set your name by hand in Azahar → Settings and system: it needs at least 5 characters. Emufii leaves it alone, and Azahar refuses the room when the name is too short, blaming the address, which is fine.</string>
+    <string name="hint_azahar_manual">Open the menu → Multiplayer, then enter %1$s.</string>
+    <string name="hint_azahar_enable">Let Emufii fill it in</string>
+    <string name="session_offline_title">Coordinator unreachable</string>
+    <string name="session_offline_body">Emufii can no longer reach the session server: the player list below is from the last answer we got. The tunnel itself is holding: a game already running keeps running. Check your connection.</string>
+    <string name="hint_missing_rom_title">Game missing from your library</string>
+    <string name="hint_missing_rom_body">You\'re in the session and on the same network, but Emufii couldn\'t find this game on your device. Add it to your ROMs folder, rescan, then come back.</string>
+    <string name="hint_psp_title">In PPSSPP, once and for all</string>
+    <string name="hint_psp_body">PPSSPP cannot be driven by Emufii: it draws its own interface. These four settings are yours to make, once, and never again.</string>
+    <string name="hint_psp_step1">Networking → Enable networking/WLAN</string>
+    <string name="hint_psp_step2">Networking → Ad hoc server address → Add server → paste %1$s</string>
+    <string name="hint_psp_step2b">Just below it: “Try to use the server’s packet relay” set to Disabled</string>
+    <string name="hint_psp_relay_why">PPSSPP says so itself: that mode is for when a public server relays packets for you. Here your consoles talk to each other directly: it has nothing to do.</string>
+    <string name="hint_psp_step3">Networking → Enable built-in ad hoc server</string>
+    <string name="hint_psp_step4">System → Nickname: yours, Emufii never touches it</string>
+    <string name="hint_psp_copied">Address copied, just paste it</string>
+    <string name="hint_psp_copy">Copy the address</string>
+    <string name="hint_psp_wifi_title">Stay near your router</string>
+    <string name="hint_psp_wifi">This is the one setting that really changes how the game feels, and it is not in the emulator. Measured on a real match: a player sitting far from their router sends packets in bursts instead of a steady stream, and it shows up on screen as stutter. Same player, closer in, and it is gone. Prefer 5 GHz over 2.4, and turn power saving off.</string>
+    <string name="session_psp_setup">Manual setup (required)</string>
+    <string name="session_psp_setup_again">Open PPSSPP again</string>
+    <string name="hint_psp_why">This address never changes: the relay sends it to whoever is hosting your session, game after game.</string>
+    <string name="hint_same_version">You both need the exact same version of the game, updates and DLC included. A version that differs on one side stops the game, usually without saying why: the room joins, then nothing starts.</string>
+    <string name="hint_eden_title">In Eden</string>
+    <string name="hint_eden_host">Eden\'s multiplayer lives in its settings, not in the game: ⚙ Settings → Multiplayer → “Create”. You can open it before or during play.</string>
+    <string name="hint_eden_guest">Eden\'s multiplayer lives in its settings, not in the game: ⚙ Settings → Multiplayer → “Join”. You can open it before or during play.</string>
+    <string name="hint_eden_automated">Emufii fills the address, the port and your nickname in for you as soon as the dialog opens.</string>
+    <string name="hint_eden_username">Your Emufii nickname is copied into Eden: two players with the same nickname cannot share a room, and Eden gives everyone the same one by default.</string>
+    <string name="hint_eden_manual">Then enter %1$s.</string>
+    <string name="hint_wfc_title">DS online</string>
+    <string name="hint_wfc_body">DS online play doesn\'t work by session: each console dials the revival server, there is no network to share. Go back to the library and start the game from there.</string>
+    <string name="hint_unknown_console">Unknown console</string>
+    <string name="hint_unsupported_body">The game is in your library, but Emufii doesn\'t know how to set up multiplayer for this console yet. The session network is up: go ahead if your emulator can make use of it.</string>
+
+    <!-- Open sessions -->
+    <string name="finder_title">Open sessions</string>
+    <string name="finder_unreachable">Coordinator unreachable</string>
+    <string name="finder_empty">No open sessions. Start yours from your library and it will show up here for everyone else.</string>
+    <string name="finder_unknown_game">Unknown game</string>
+    <string name="finder_host">Host</string>
+    <string name="finder_join">Join</string>
+    <string name="finder_starting">starting…</string>
+    <string name="finder_ps2_profile">PS2 profile needed</string>
+    <string name="finder_nobody_yet">Nobody yet</string>
+    <string name="finder_one_player">1 player</string>
+    <string name="finder_n_players">%1$d players</string>
+    <string name="finder_one_session">%1$d session</string>
+    <string name="finder_many_sessions">%1$d sessions</string>
+    <string name="finder_in_progress">%1$s in progress</string>
+
+    <!-- Join -->
+    <string name="join_title">Join</string>
+    <string name="join_code_example">e.g. KMR-347</string>
+    <string name="join_action">Join</string>
+
+    <!-- Waiting screens -->
+    <string name="prep_first_time">This can take 10-15 s the first time.</string>
+
+    <!-- Profile and settings -->
+    <string name="profile_photo_note">Your photo stays on your phone. Other players see your initials and your colour.</string>
+    <string name="profile_remove_photo">Remove photo</string>
+    <string name="profile_name_label">Nickname</string>
+    <string name="profile_name_hint">What everyone else sees in the session.</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System language</string>
+    <string name="settings_language_fr">Français</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System theme</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_oled">OLED (true black)</string>
+    <string name="compat_perfect">Verified, works</string>
+    <string name="compat_untested">Compatible, not tried yet</string>
+    <string name="compat_partial">Runs with caveats</string>
+    <string name="compat_broken">Does not work</string>
+    <string name="common_done">Done</string>
+    <string name="settings_theme_short_system">System</string>
+    <string name="settings_theme_short_light">Light</string>
+    <string name="settings_theme_short_dark">Dark</string>
+    <string name="settings_theme_short_oled">OLED</string>
+    <string name="settings_accent">Accent colour</string>
+    <string name="settings_accent_system">System colour</string>
+    <string name="settings_accent_cyan">Cyan</string>
+    <string name="settings_accent_amber">Amber</string>
+    <string name="settings_accent_violet">Violet</string>
+    <string name="settings_accent_rose">Rose</string>
+    <string name="settings_library_note">Subfolders are scanned too, whichever console they hold.</string>
+    <string name="settings_library_change">Change folder</string>
+    <string name="settings_keys_none">No keys. Switch and Wii games keep their initials.</string>
+    <string name="settings_keys_ok">Keys in place. Switch icons are being read.</string>
+    <string name="settings_keys_note">Emufii ships no keys and downloads none: point it at your own prod.keys, the one your Switch emulator already uses. It stays on your phone.</string>
+    <string name="settings_keys_pick">Choose a keys file</string>
+    <string name="settings_keys_replace">Replace keys</string>
+    <string name="settings_keys_forget">Forget keys</string>
+    <string name="settings_keys_bad">That file does not hold the expected keys.</string>
+    <string name="settings_library_rescan">Rescan now</string>
+    <plurals name="settings_library_found">
+        <item quantity="one">%d game found</item>
+        <item quantity="other">%d games found</item>
+    </plurals>
+    <string name="settings_about_body">Emufii sets up remote multiplayer between emulators: it shares a network, it doesn\'t reimplement any game. Distributed under the AGPL 3.0 licence, it never routes to Nintendo\'s official servers and ships no ROMs, no BIOS and no keys.</string>
+    <!-- Settings screen sections and rows -->
+    <string name="settings_sec_you">You</string>
+    <string name="settings_sec_library">Library</string>
+    <string name="settings_sec_app">App</string>
+    <string name="settings_sec_danger">Danger zone</string>
+    <string name="settings_row_identity">Name and photo</string>
+    <string name="settings_row_folder">ROM folder</string>
+    <string name="settings_row_keys">Console keys</string>
+    <string name="settings_row_artwork">Game icons</string>
+    <string name="settings_row_autofill">Automatic filling</string>
+    <string name="settings_value_autofill_on">On</string>
+    <string name="settings_value_autofill_off">Off</string>
+    <string name="settings_autofill_on">Emufii can fill the address into the emulator\'s multiplayer menu, so you have nothing to copy out.</string>
+    <string name="settings_autofill_off">Emufii cannot fill the emulator\'s form in. Sessions still work, the address just has to be typed by hand.</string>
+    <string name="settings_autofill_note">Android can switch it off on its own, after an update or a change of device. This is where it goes back on.</string>
+    <string name="settings_autofill_open">Open Android settings</string>
+    <string name="emulators_installed_unknown">Installed</string>
+    <string name="settings_row_consoles">Consoles</string>
+    <string name="settings_value_consoles_all">All</string>
+    <string name="settings_value_consoles_some">%1$d of %2$d</string>
+    <string name="settings_row_about">About Emufii</string>
+    <string name="settings_value_keys_ok">In place</string>
+    <string name="settings_value_keys_none">None</string>
+    <string name="settings_value_artwork_on">On</string>
+    <string name="settings_value_artwork_off">No key</string>
+    <string name="settings_value_none">None</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_copied">Copied: %1$s</string>
+
+    <!-- Session flow -->
+    <string name="flow_create_failed">Could not create the session</string>
+    <string name="flow_connecting_tunnel">Connecting to the network…</string>
+    <string name="flow_session_full">This session is full</string>
+    <string name="flow_too_many_requests">Too many attempts, try again in a minute</string>
+    <string name="flow_tunnel_failed">The tunnel did not start</string>
+    <string name="flow_no_vpn_host">Without VPN permission, Emufii cannot bring the network up</string>
+    <string name="flow_finding_session">Looking for the session…</string>
+    <string name="flow_session_not_found">Session not found, the code may have expired</string>
+    <string name="flow_coordinator_unreachable">Emufii can\'t reach its server. Check your connection and try again.</string>
+    <string name="flow_wrong_game">This session is for %1$s. Join it with that game.</string>
+    <string name="flow_wrong_game_unnamed">another game</string>
+    <string name="flow_host_not_ready">The host has not finished connecting</string>
+    <string name="flow_no_vpn_guest">Without VPN permission, Emufii cannot join</string>
+    <string name="flow_host_closed">The host closed the session</string>
+
+    <!-- Android runs one VpnService at a time -->
+    <string name="tunnel_conflict_title">One tunnel at a time</string>
+    <string name="tunnel_conflict_wfc">DS online play is holding the tunnel, and Android allows only one. Continuing will cut the redirection to Kaeru: a DS game in progress would be interrupted.</string>
+    <string name="tunnel_conflict_session">A session is still open and holding the tunnel, and Android allows only one. Continuing will close it.</string>
+    <string name="tunnel_conflict_confirm">Cut it and continue</string>
+    <string name="tunnel_conflict_stuck">The previous tunnel did not stop</string>
+
+    <!-- DS online (Kaeru WFC) -->
+    <string name="wfc_title">DS online play</string>
+    <string name="wfc_card_title">Kaeru WFC</string>
+    <string name="wfc_card_body">Nintendo\'s servers have been off since 2014. Kaeru WFC is a third-party reimplementation that replays the original protocol. Emufii points melonDS\'s lookups at it, and nothing else on the device is affected.</string>
+    <string name="wfc_state_idle">Redirection off</string>
+    <string name="wfc_state_active">Redirection on · %1$s</string>
+    <string name="wfc_state_unreachable">Kaeru isn\'t answering, the game won\'t be able to connect</string>
+    <string name="wfc_state_stopping">Stopping…</string>
+    <string name="wfc_state_error">Error: %1$s</string>
+    <string name="wfc_launch">Play online</string>
+    <string name="wfc_launched">melonDS started</string>
+    <string name="wfc_stop">Stop and go back</string>
+    <string name="wfc_not_installed">melonDS isn\'t installed</string>
+    <string name="wfc_no_vpn">Without the VPN the console will go to Nintendo\'s dead servers</string>
+
+    <!-- Service notifications and errors -->
+    <string name="svc_wg_channel">Emufii · tunnel</string>
+    <string name="svc_wg_channel_desc">Session tunnel status for remote multiplayer</string>
+    <string name="svc_wg_title">Emufii · session</string>
+    <string name="svc_wg_connecting">Connecting to session %1$s</string>
+    <string name="svc_wg_online">Session connected · %1$s</string>
+    <string name="svc_wfc_channel">Emufii · Kaeru WFC</string>
+    <string name="svc_wfc_channel_desc">DNS redirection for DS online play</string>
+    <string name="svc_wfc_text">DNS redirection to Kaeru WFC</string>
+    <string name="svc_wfc_text_unreachable">Kaeru isn\'t answering</string>
+    <string name="err_launch">Launch failed</string>
+    <string name="err_not_installed">%1$s isn\'t installed</string>
+    <string name="err_no_netplay_ui">This build of %1$s (%2$s) has no multiplayer. Update it to play online.</string>
+    <string name="onb_name_title">Your name</string>
+    <string name="onb_name_body">It identifies you to other players, and doubles as your pseudo in the emulator\'s multiplayer.</string>
+    <string name="onb_name_too_short">%1$d characters minimum: emulators reject a shorter name.</string>
+    <string name="azahar_automation_stopped">Automation stopped, enter %1$s in Azahar</string>
+    <string name="azahar_fields_filled">Fields filled, confirm in Azahar</string>
+    <string name="netplay_automation_stopped">Automation stopped, enter %2$s in %1$s</string>
+    <string name="netplay_fields_filled">Fields filled, confirm in %1$s</string>
+    <!-- First run -->
+    <string name="onb_welcome_title">Welcome to Emufii</string>
+    <string name="onb_welcome_body">Emufii sets up remote multiplayer between emulators. It shares a network between your devices, then lets the emulator do the rest, as if you were in the same room.</string>
+    <string name="onb_start">Get started</string>
+    <string name="onb_next">Continue</string>
+    <string name="onb_skip">Later</string>
+    <string name="onb_finish">Done</string>
+    <string name="onb_folder_title">Where are your games?</string>
+    <string name="onb_folder_body">Pick your ROMs folder. Subfolders are scanned too, whichever console they hold, keep your filing as it is.</string>
+    <string name="onb_folder_done">Folder picked</string>
+    <string name="onb_notif_title">Keeping you posted mid-game</string>
+    <string name="onb_notif_body">Emufii shows the tunnel and local network status in a notification while you play inside the emulator. Without it, Android may cut the network when Emufii goes to the background.</string>
+    <string name="onb_notif_enable">Allow notifications</string>
+    <string name="onb_notif_done">Notifications allowed</string>
+    <string name="onb_notif_refused">Declined. You can turn it on later in Android\'s settings.</string>
+    <string name="onb_fill_title">Filling netplay in for you</string>
+    <string name="onb_fill_body">Azahar asks for the host\'s address and port by hand, every game. Allow Emufii and it types them for you. It only ever sees Azahar\'s screen, nothing else.</string>
+    <string name="onb_fill_enable">Open Android settings</string>
+    <string name="onb_fill_done">Emufii can fill netplay in</string>
+
+    <!-- Friends -->
+    <string name="friends_title">Friends</string>
+    <string name="friends_my_code">My friend code</string>
+    <string name="friends_my_code_note">Give this code to someone so they can add you. It never changes, unless you reset your profile.</string>
+    <string name="friends_copy">Copy</string>
+    <string name="friends_share">Share</string>
+    <string name="friends_share_text">Add me on Emufii: %1$s</string>
+    <string name="friends_add">Add a friend</string>
+    <string name="friends_add_hint">E7K2-9QM4-XR8T</string>
+    <string name="friends_add_action">Add</string>
+    <string name="friends_error_invalid">That code isn\'t valid. Check you copied all of it.</string>
+    <string name="friends_error_duplicate">They\'re already in your list.</string>
+    <string name="friends_error_self">That\'s your own code.</string>
+    <string name="friends_none_title">Nobody yet</string>
+    <string name="friends_none_body">Swap codes with someone: you\'ll then see when they\'re playing, and join them in one tap.</string>
+    <string name="friends_list">Your list</string>
+    <string name="friends_offline">Offline</string>
+    <string name="friends_online">Online</string>
+    <string name="friends_playing">Playing %1$s</string>
+    <string name="friends_playing_unknown">In a game</string>
+    <string name="friends_join">Join</string>
+    <string name="friends_starting">starting…</string>
+    <string name="friends_remove">Remove</string>
+    <string name="friends_remove_confirm">Remove %1$s from your friends? You\'ll need their code to add them back.</string>
+    <string name="friends_cancel">Cancel</string>
+    <string name="friends_privacy_note">Your friends list stays on your phone. The server only knows who is online, and forgets it after two minutes.</string>
+
+    <!-- Profile reset -->
+    <string name="profile_reset">Delete my profile</string>
+    <string name="profile_reset_confirm">Delete your profile? This can\'t be undone: your friend code changes, and your friends list is erased.</string>
+    <string name="profile_reset_done">Profile deleted</string>
+    <string name="settings_artwork_body">ROMs only carry a 32 or 48 pixel icon. With a SteamGridDB key, the library fetches real, sharp ones.</string>
+    <string name="settings_artwork_field">SteamGridDB key</string>
+    <string name="settings_artwork_where">Free key at steamgriddb.com, in your account preferences. Without it, the ROMs\' own icons stay.</string>
+    <string name="onb_artwork_title">A library worth looking at</string>
+    <string name="onb_artwork_body">ROMs only carry a tiny icon. A free SteamGridDB key replaces them with real game icons.</string>
+    <string name="onb_artwork_where">Create one at steamgriddb.com, in your account preferences. You can skip this and add it later in settings.</string>
+    <string name="tile_menu_icon">Change icon</string>
+    <string name="icon_pick_title">Pick an icon</string>
+    <string name="icon_pick_search">Game name</string>
+    <string name="icon_pick_none">No icon for this game. Try another name: matching uses the file name, which isn\'t always the game\'s.</string>
+    <string name="icon_pick_reset">Original icon</string>
+    <string name="icon_pick_close">Close</string>
+    <string name="tile_menu_rename">Rename</string>
+    <string name="tile_menu_hide">Remove from menu</string>
+    <string name="hide_title">Remove %1$s?</string>
+    <string name="hide_body">The game leaves Emufii\'s library. The file and its saves are untouched, and the settings bring everything back.</string>
+    <string name="hide_cancel">Cancel</string>
+    <string name="hide_confirm">Remove</string>
+    <string name="settings_row_hidden">Games removed from the menu</string>
+    <string name="settings_value_hidden_none">None</string>
+    <string name="settings_value_hidden_some">%1$d</string>
+    <string name="settings_hidden_body">Removed games stay on your storage: only their tile is gone. Restoring puts them all back in the grid, in alphabetical place.</string>
+    <string name="settings_hidden_restore">Restore all</string>
+    <string name="rename_title">Rename game</string>
+    <string name="rename_body">Inside Emufii only: the file on your storage is left alone. Leave empty to restore the original title.</string>
+    <string name="rename_cancel">Cancel</string>
+    <string name="rename_save">Save</string>
+    <string name="artwork_service_name">SteamGridDB</string>
+    <string name="artwork_service_host">steamgriddb.com · free</string>
+    <string name="finder_search">Search a game, a player, a code</string>
+    <string name="finder_no_match">No session matches that</string>
+    <string name="hint_dolphin_title">Dolphin</string>
+    <string name="hint_dolphin_host">Open the room, then pick the game inside it: everyone starts it together.</string>
+    <string name="hint_dolphin_guest">Join the room, then wait for the host to pick the game. Do not start anything yourself.</string>
+    <string name="hint_dolphin_same_dump">You both need the exact same dump. Dolphin compares hashes and refuses otherwise.</string>
+    <string name="hint_dolphin_same_save">You also need to start from the same save. If one of you is further along, the two games diverge the moment they start: each player sees a different match, with no error message. Safest is for neither of you to have a save at all.</string>
+    <string name="hint_dolphin_automated">Emufii fills in the address and port, sets the connection to direct, and points the room at the session\'s game.</string>
+    <string name="hint_dolphin_manual">In Dolphin, ⋮ menu then Netplay: direct connection, and enter %1$s.</string>
+    <string name="session_dolphin_lobby">2. Back to the Dolphin lobby</string>
+    <string name="session_dolphin_lobby_opened">Back to the Dolphin lobby</string>
+    <string name="launch_ps2_profile_missing">The PS2 network profile is missing. Open Emufii\'s settings, "PS2 network profile": without it, no PS2 LAN game will open its local menu.</string>
+    <string name="settings_row_ps2_profile">PS2 network profile</string>
+    <string name="settings_value_ps2_profile_on">Ready</string>
+    <string name="settings_value_ps2_profile_off">To do</string>
+    <string name="settings_ps2_profile_body">A PS2 LAN game only opens its local menu when the console has a network configuration on its memory card. Most games expect it without being able to create it. Emufii hands over a memory card that carries one. It is copy-protected, so it cannot join your usual card: your saves come to it instead.</string>
+    <string name="settings_ps2_profile_created">File created in Downloads: %1$s</string>
+    <string name="settings_ps2_profile_steps_title">Then, in ARMSX2</string>
+    <string name="settings_ps2_profile_step1">Open ARMSX2, then Memory cards.</string>
+    <string name="settings_ps2_profile_step2">Choose &quot;Import file&quot; and pick the file prepared above.</string>
+    <string name="settings_ps2_profile_step3">Put it in slot 1, and your old card in slot 2.</string>
+    <string name="settings_ps2_profile_step4">Boot the BIOS, then copy a game\'s data from card 2 onto card 1. Keep the old card: whatever is protected will never leave it.</string>
+    <string name="settings_ps2_profile_warning">Do not skip the last step: card 1 has to hold a game\'s data, or this will not work. Once it does, create your profiles straight on it, with no need to go back to your old card.</string>
+    <string name="settings_ps2_profile_confirm">I imported it into ARMSX2</string>
+    <string name="hint_ps2_title">PS2 (ARMSX2)</string>
+    <string name="hint_ps2_host">In the game, pick LAN, System Link or Network Play. You are the one opening the match.</string>
+    <string name="hint_ps2_guest">Wait for the host to open their match, then join it from the game\'s LAN menu.</string>
+    <string name="hint_ps2_lan_only">Only games that shipped with a LAN or System Link mode work here, around sixty in all. If the game asks you to sign in to a server, it was an online game, and Emufii cannot help with it.</string>
+    <string name="hint_ps2_profile_button">Prepare the network profile</string>
+    <string name="hint_ps2_profile_failed">Could not write to Downloads.</string>
+    <string name="hint_ps2_pad">With the network adapter attached, some games stop responding to the controller entirely. If that happens, turn DEV9 Ethernet off in ARMSX2.</string>
+    <string name="hint_ps2_automated">Emufii turns DEV9 on, sets ARMSX2 to local mode, and fills in the address, port and room code.</string>
+    <string name="hint_ps2_manual">In ARMSX2, Settings then Network: local mode, and enter %1$s.</string>
+    <string name="emulators_version_short">v%1$s</string>
+    <string name="emulators_absent_short">Not installed</string>
+    <string name="consoles_pick_title">Your consoles</string>
+    <string name="consoles_pick_body">These are the emulators that run the games, Emufii runs none itself. Turn a console off to take it out of your library, with its games.</string>
+    <string name="consoles_pick_note">Proven at the versions shown here.</string>
+</resources>

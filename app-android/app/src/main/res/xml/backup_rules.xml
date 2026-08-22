@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Kept, and empty, because the manifest turns backup off outright.
+
+  What this app holds in its private storage is the reason: the WireGuard
+  private key that identifies this device to the relay, and the subset of the
+  player's console keys used to read Switch icons. Neither belongs in a cloud
+  backup, and neither is worth restoring — a restored WireGuard key would put
+  two devices behind one identity, and the console keys are a file the player
+  already has.
+-->
+<full-backup-content />

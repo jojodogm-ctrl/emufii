@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Scoped as tightly as the platform allows: events from the Azahar and Eden
+  packages only, no others. Emufii never reads the rest of the screen.
+
+  The file keeps its Azahar name for the same reason the service class does —
+  renaming the component would silently switch the automation off for everyone
+  who had already enabled it.
+
+  **`packageNames` est une seconde liste de paquets, et elle s'oublie.** Un
+  émulateur absent d'ici ne produit aucun événement d'accessibilité : le
+  service ne se réveille jamais, le formulaire ne se remplit pas, et il n'y a
+  ni erreur ni ligne de journal — l'appui a simplement l'air de ne rien faire.
+  C'est ce qui est arrivé aux variantes « Optimized » d'Eden, qui se déclarent
+  sous l'identité de Genshin Impact : déclarées dans `<queries>`, donc bien
+  détectées, mais muettes pour le service.
+
+  Cette liste doit donc rester le miroir de `NetplayTarget.all`, de
+  `DolphinTarget.packages` **et de `Ps2Target.packages`** — Dolphin est piloté par le même service mais par
+  un pilote à part, parce que son écran est en Compose et n'a aucun identifiant
+  de vue. Un test compare les deux listes (`PackageVisibilityTest`) : le
+  compilateur, lui, ne lit pas ce fichier.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:description="@string/netplay_service_description"
+    android:notificationTimeout="100"
+    android:packageNames="org.azahar_emu.azahar,org.azahar_emu.azahar.debug,dev.eden.eden_emulator,dev.eden.eden_emulator.nightly,dev.eden.eden_emulator.emufii,com.miHoYo.Yuanshen,com.miHoYo.Yuanshen.nightly,dev.legacy.eden_emulator,org.dolphinemu.dolphinemu,org.dolphinemu.dolphinemu.debug,com.armsx2"
+    android:settingsActivity="eu.emufii.app.MainActivity" />

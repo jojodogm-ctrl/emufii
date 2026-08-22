@@ -16,7 +16,7 @@ fixed, and there will be problems.
 <br>
 
 [![Beta](https://img.shields.io/badge/BETA-EXPECT%20BUGS-FF7A18?labelColor=3d4048&style=for-the-badge)](#this-is-a-beta)
-[![Version](https://img.shields.io/badge/VERSION-1.12.1-2ea043?labelColor=3d4048&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
+[![Version](https://img.shields.io/badge/VERSION-1.12.2-2ea043?labelColor=3d4048&style=for-the-badge)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![License](https://img.shields.io/badge/LICENSE-AGPL--3.0-9C6BF0?labelColor=3d4048&style=for-the-badge)](LICENSE)
 
 [![Platform](https://img.shields.io/badge/ANDROID-13%20ONLY-33C7A6?labelColor=3d4048&style=for-the-badge&logo=android&logoColor=white)](#install)
@@ -180,7 +180,7 @@ Every build of Emufii carries this certificate:
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-1.12.1.apk
+apksigner verify --print-certs Emufii-1.12.2.apk
 ```
 
 A copy carrying any other signature isn't ours, and Android will refuse to
@@ -234,8 +234,13 @@ the AGPL can be arranged: ask on [Discord](https://discord.gg/tvWcb28vBZ).
 Poppins is used under the SIL OFL 1.1, whose text ships inside the APK at
 `assets/POPPINS-OFL.txt`.
 
-The app source is not published yet. The builds are: this page exists to say
-what Emufii is and what it does with your data, before you install one.
+The app source is published here, under the AGPL-3.0, from 1.12.2 onwards. The
+server side is not, and that is the one deliberate gap: the session broker and
+the relay stay closed, so a fork gets a client with no network behind it.
+
+Building it needs a client secret the coordinator checks, which is not in this
+repository. Without it the app installs and the library works, and no session
+can be created.
 
 ---
 

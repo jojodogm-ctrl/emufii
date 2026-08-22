@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Everything the app talks to is HTTPS, and this says so out loud.
+
+  The three cleartext hosts that used to sit here are a development
+  convenience — a coordinator running on the machine that builds the app,
+  reached from an emulator through 10.0.2.2. They now live in the debug source
+  set only, so a release build cannot be talked into plain HTTP by a hostile
+  network, whatever a future URL override might say.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

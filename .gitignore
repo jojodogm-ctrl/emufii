@@ -1,18 +1,44 @@
-# Liste blanche, et pas une liste noire.
+# Ce dépôt porte l'app et rien d'autre.
 #
-# Ce dépôt est la vitrine publique : il ne contient aucune source, et c'est ça
-# qui protège l'infrastructure, pas la licence. Une liste noire n'interdit que
-# ce qu'on a pensé à nommer, et un « git add -A » lancé depuis ce dossier
-# suffisait à publier ce qui traînait à côté. On ignore donc tout, et on
-# rouvre les cinq fichiers qui ont le droit d'exister ici.
+# La liste blanche a sauté le jour où les sources ont été publiées (2026-08-22),
+# mais la règle qu'elle protégeait n'a pas bougé : l'infrastructure ne se
+# publie pas. Ce qui suit est interdit ici, et la raison est la même pour les
+# trois — un fork doit se retrouver avec un client sans réseau :
 #
-# Ce qui ne doit jamais s'y retrouver, en clair : app-android/, coordinator/,
-# relay/, scripts/ (dont compat.mjs et compat-ui.mjs, qui portent le
-# déploiement), docs/, CLAUDE.md, .claude/ et .env.local.
-*
+#   coordinator/   le serveur de sessions et son contrôle d'accès
+#   relay/         le relais WireGuard, le DNS du tunnel, les nftables
+#   scripts/       le déploiement vers le VPS, dont compat.mjs et compat-ui.mjs
+#
+# Et ce qui n'a rien à faire dans un dépôt public : les notes de travail.
+coordinator/
+relay/
+scripts/
+docs/
+CLAUDE.md
+.claude/
+.agents/
+.impeccable
+skills-lock.json
+PRODUCT.md
+DESIGN.md
 
-!.gitignore
-!LICENSE
-!NOTICE.md
-!README.md
-!logo.png
+# Secrets et clés de signature, jamais.
+.env
+.env.local
+*.jks
+*.keystore
+local.properties
+gradle.properties.local
+
+# Sorties de build et bazar d'IDE.
+build/
+.gradle/
+.idea/
+*.apk
+*.aab
+mapping.txt
+.DS_Store
+
+# Notes qui parlent à l'auteur, pas au public.
+COMMENT-PUBLIER.md
+NOTES-*.md

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+
+    <!--
+      Resolving a string through LocalContext, which is what this app does on
+      purpose.
+
+      All sixteen sites lint flags sit in event lambdas: a button's onClick, an
+      activity-result callback, a local `fun` called from one of them. None of
+      them is in composition, so `stringResource` is simply not callable there,
+      it being a @Composable.
+
+      The rule is right in general. Reading a resource during composition through
+      LocalContext skips recomposition on a configuration change, and the text
+      goes stale. Here the read happens the moment the player presses something,
+      so it uses the configuration in force at that moment, which is what an
+      error message should say.
+
+      Turned off rather than left at warning level: sixteen findings that are all
+      false is noise, and noise is what hides the one that would be real. Worth
+      revisiting the day a *composition* site starts reading strings this way,
+      because that one would be a genuine bug.
+    -->
+    <issue id="LocalContextGetResourceValueCall" severity="ignore" />
+
+    <!--
+      The launcher icon filling its square, which is what an adaptive icon's
+      background layer is for.
+
+      `ic_launcher_art.png` is an opaque white square with the wordmark at 58 %
+      in the middle, and it is wired as the <background> of `ic_launcher.xml`.
+      A background layer is *required* to cover the whole 108dp square: the
+      launcher is what applies the round or squircle mask on top. Lint sees a
+      square-filling bitmap named ic_launcher_* and reads it as a legacy icon.
+
+      The design is deliberate and its reasoning is written where it belongs, in
+      `mipmap-anydpi/ic_launcher.xml`. Nothing to fix here; the rule simply does
+      not describe this case.
+    -->
+    <issue id="IconLauncherShape" severity="ignore" />
+
+</lint>
