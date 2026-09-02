@@ -216,6 +216,8 @@ android {
 
     buildTypes {
         debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
             // x86_64 lives here and nowhere else: it is the AVDs' ABI, and they
             // now serve only to reproduce a doubt (see CLAUDE.md).
             ndk {
