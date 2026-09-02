@@ -89,6 +89,8 @@ import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.wallpaper.TrayBackdrop
 import kotlinx.coroutines.delay
+import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * The run has no fixed length: the emulator pages are drawn from what the player
@@ -107,8 +109,8 @@ fun OnboardingScreen(
     val dark = LocalEmufiiDarkTheme.current
     val context = LocalContext.current
     val settingsStore = remember { SettingsStore.get(context) }
-    val hiddenConsoles by settingsStore.hiddenConsoles.collectAsState()
-    val cocoonFolder by settingsStore.cocoonFolder.collectAsState()
+    val hiddenConsoles by settingsStore.hiddenConsoles.collectAsStateWithLifecycle()
+    val cocoonFolder by settingsStore.cocoonFolder.collectAsStateWithLifecycle()
 
     var name by remember { mutableStateOf(initialName) }
     var artworkKey by remember { mutableStateOf("") }
@@ -635,7 +637,7 @@ private fun StepBody(
                     if (has) {
                         BlockFact(
                             stringResource(R.string.settings_library_fact_folder),
-                            folderLabel(Uri.parse(cocoonFolder))
+                            folderLabel(cocoonFolder.toUri())
                         )
                         BlockNotice(stringResource(R.string.onb_cocoon_after))
                     } else {

@@ -14,13 +14,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.EmufiiApp
 import eu.emufii.app.ui.SplashGate
@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
             // Not inside EmufiiApp: two stores, two StateFlows, and the settings page
             // updates the one the theme is not reading.
             val settings = remember { SettingsStore.get(this@MainActivity) }
-            val theme by settings.theme.collectAsState()
+            val theme by settings.theme.collectAsStateWithLifecycle()
             val dark = theme.isDark(isSystemInDarkTheme())
 
             // enableEdgeToEdge picks the bar icon colour once, from the system theme:
@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            val secondScreen by settings.secondScreen.collectAsState()
+            val secondScreen by settings.secondScreen.collectAsStateWithLifecycle()
             SecondScreenHost(enabled = secondScreen)
 
             EmufiiTheme(darkTheme = dark, oled = theme.isOled) {
