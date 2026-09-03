@@ -343,8 +343,10 @@
     <string name="settings_artwork_fact_fallback">Fallback</string>
     <string name="settings_artwork_fallback_on">Key saved</string>
     <string name="settings_artwork_fallback_off">No key</string>
-    <string name="settings_cocoon_body">If you use Cocoon, Emufii can take the artwork you already have there, including the ones you re-cropped yourself. No key, no download: your games wear the face you gave them.</string>
-    <string name="settings_cocoon_choose">Pick the Cocoon folder</string>
+    <string name="settings_frontend_body">If you use Cocoon or ES-DE, Emufii can take the artwork you already have there, including the ones you re-cropped yourself. No key, no download: your games wear the face you gave them.</string>
+    <string name="settings_frontend_choose">Pick the %1$s folder</string>
+    <string name="artwork_frontend_cocoon">Cocoon</string>
+    <string name="artwork_frontend_esde">ES-DE</string>
     <string name="settings_cocoon_change">Change folder</string>
     <string name="settings_cocoon_forget">Stop using it</string>
     <string name="settings_artwork_body">A ROM holds only a 32 or 48 pixel icon. With a SteamGridDB key, Emufii fetches real box art for the games Cocoon does not cover.</string>
@@ -525,7 +527,6 @@
     <string name="settings_ps2_step1">Pick ARMSX2\'s custom folder. Emufii finds the memory card and the BIOS in it.</string>
     <string name="settings_ps2_step2">Emufii prepares a checked card carrying the network profile: a copy of yours where possible, otherwise a fresh card holding a folder card\'s saves.</string>
     <string name="settings_ps2_step3">At launch it is assigned to the chosen game only. No save is ever deleted.</string>
-    <string name="settings_artwork_source_cocoon">Cocoon</string>
     <string name="settings_artwork_source_catalogue">Catalogue</string>
     <string name="settings_artwork_source_none">ROM icons</string>
     <string name="settings_profile_seen_by">What others see</string>
@@ -603,10 +604,11 @@
     <string name="onb_cocoon_body">Your frontend has already downloaded real artwork for your games. Emufii can read it straight from there: no account, no key, no network.</string>
     <string name="onb_cocoon_pill_on">Folder linked</string>
     <string name="onb_cocoon_pill_off">Optional</string>
-    <string name="onb_cocoon_step1">Tap Choose your frontend\'s folder.</string>
-    <string name="onb_cocoon_step2">Go to Android → data → your frontend\'s folder, then confirm.</string>
-    <string name="onb_cocoon_step3">Emufii only reads images there. It never writes into your frontend\'s folder.</string>
-    <string name="onb_cocoon_after">Emufii will prefer your frontend\'s artwork. Only a picture you chose yourself comes ahead of it.</string>
+    <string name="onb_cocoon_step1">Tap Pick the %1$s folder.</string>
+    <string name="onb_frontend_step2_cocoon">Go to Android → data → Cocoon\'s folder (Cocoonv2), then confirm.</string>
+    <string name="onb_frontend_step2_esde">Go to the ES-DE folder at the root of your storage, then confirm. Its downloaded_media folder also works.</string>
+    <string name="onb_cocoon_step3">Emufii only reads images there. It never writes into %1$s\'s folder.</string>
+    <string name="onb_cocoon_after">Emufii will prefer %1$s\'s artwork. Only a picture you chose yourself comes ahead of it.</string>
 
     <string name="onb_artwork_body">Without a frontend, your games show only the tiny icon tucked inside the ROM. A free SteamGridDB key replaces it with real box art.</string>
     <string name="onb_artwork_step1">Create an account on steamgriddb.com, it is free.</string>

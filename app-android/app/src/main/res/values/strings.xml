@@ -379,8 +379,10 @@
          le titre du bloc, et une etiquette longue efface ce titre. -->
     <string name="settings_artwork_fallback_on">Clé enregistrée</string>
     <string name="settings_artwork_fallback_off">Aucune clé</string>
-    <string name="settings_cocoon_body">Si tu utilises Cocoon, Emufii peut reprendre les images que tu y as déjà, y compris celles que tu as retouchées. Aucune clé, aucun téléchargement : tes jeux ont ici le visage que tu leur as donné là-bas.</string>
-    <string name="settings_cocoon_choose">Choisir le dossier Cocoon</string>
+    <string name="settings_frontend_body">Si tu utilises Cocoon ou ES-DE, Emufii peut reprendre les images que tu y as déjà, y compris celles que tu as retouchées. Aucune clé, aucun téléchargement : tes jeux ont ici le visage que tu leur as donné là-bas.</string>
+    <string name="settings_frontend_choose">Choisir le dossier %1$s</string>
+    <string name="artwork_frontend_cocoon">Cocoon</string>
+    <string name="artwork_frontend_esde">ES-DE</string>
     <string name="settings_cocoon_change">Changer de dossier</string>
     <string name="settings_cocoon_forget">Ne plus utiliser</string>
     <string name="settings_artwork_body">Une ROM ne contient qu\'une icône de 32 ou 48 pixels. Avec une clé SteamGridDB, Emufii va chercher de vraies jaquettes pour les jeux que Cocoon ne couvre pas.</string>
@@ -542,7 +544,6 @@
     <string name="settings_ps2_step1">Choisis le dossier personnalisé d\'ARMSX2. Emufii y trouve la carte mémoire et le BIOS.</string>
     <string name="settings_ps2_step2">Emufii prépare une carte vérifiée portant le profil réseau : une copie de la tienne quand c\'est possible, sinon une carte neuve avec les sauvegardes d\'une carte dossier.</string>
     <string name="settings_ps2_step3">Au lancement, elle n\'est affectée qu\'au jeu choisi. Aucune sauvegarde n\'est supprimée.</string>
-    <string name="settings_artwork_source_cocoon">Cocoon</string>
     <string name="settings_artwork_source_catalogue">Catalogue</string>
     <string name="settings_artwork_source_none">Icônes des ROMs</string>
     <string name="settings_profile_seen_by">Ce que les autres voient</string>
@@ -623,10 +624,11 @@
     <string name="onb_cocoon_body">Ton frontend a téléchargé de vraies jaquettes pour tes jeux. Emufii peut les lire directement : pas de compte, pas de clé, pas de réseau.</string>
     <string name="onb_cocoon_pill_on">Dossier lié</string>
     <string name="onb_cocoon_pill_off">Facultatif</string>
-    <string name="onb_cocoon_step1">Appuie sur Choisir le dossier de ton frontend.</string>
-    <string name="onb_cocoon_step2">Va dans Android → data → le dossier de ton frontend, puis valide.</string>
-    <string name="onb_cocoon_step3">Emufii n\'y lit que les images. Elle n\'écrit jamais dans le dossier de ton frontend.</string>
-    <string name="onb_cocoon_after">Emufii utilisera en priorité les jaquettes de ton frontend. Seule une image que tu as choisie toi-même passe avant.</string>
+    <string name="onb_cocoon_step1">Appuie sur Choisir le dossier %1$s.</string>
+    <string name="onb_frontend_step2_cocoon">Va dans Android → data → le dossier de Cocoon (Cocoonv2), puis valide.</string>
+    <string name="onb_frontend_step2_esde">Va dans le dossier ES-DE à la racine de ton stockage, puis valide. Son dossier downloaded_media fonctionne aussi.</string>
+    <string name="onb_cocoon_step3">Emufii n\'y lit que les images. Elle n\'écrit jamais dans le dossier de %1$s.</string>
+    <string name="onb_cocoon_after">Emufii utilisera en priorité les jaquettes de %1$s. Seule une image que tu as choisie toi-même passe avant.</string>
 
     <string name="onb_artwork_body">Sans frontend, tes jeux n\'ont que la minuscule icône rangée dans la ROM. Une clé SteamGridDB, gratuite, la remplace par une vraie jaquette.</string>
     <string name="onb_artwork_step1">Crée un compte sur steamgriddb.com, c\'est gratuit.</string>
