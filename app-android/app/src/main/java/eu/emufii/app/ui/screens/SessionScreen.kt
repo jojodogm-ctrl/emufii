@@ -1,6 +1,5 @@
 package eu.emufii.app.ui.screens
 
-import eu.emufii.app.ui.sounded
 import android.icu.text.ListFormatter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
@@ -14,26 +13,20 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -47,50 +40,55 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.withFrameNanos
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import eu.emufii.app.ui.ActionShape
-import eu.emufii.app.ui.CONFIRM_KEYS
-import androidx.compose.foundation.layout.heightIn
-import eu.emufii.app.ui.theme.PillShape
-import eu.emufii.app.ui.controlRing
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.R
 import eu.emufii.app.azahar.AzaharLauncher
 import eu.emufii.app.azahar.LaunchResult
@@ -100,68 +98,66 @@ import eu.emufii.app.azahar.NetplayProgress
 import eu.emufii.app.azahar.PlanStore
 import eu.emufii.app.dolphin.DolphinLauncher
 import eu.emufii.app.dolphin.DolphinTarget
-import eu.emufii.app.ps2.Ps2Launcher
-import eu.emufii.app.ps2.Ps2GameSettings
-import eu.emufii.app.ps2.Ps2NetworkProfile
-import eu.emufii.app.ps2.Ps2ProvisioningPlan
-import eu.emufii.app.ps2.Ps2Target
 import eu.emufii.app.eden.EdenLauncher
-import eu.emufii.app.netplay.NetplayNames
-import eu.emufii.app.psp.HOST_SENTINEL
-import eu.emufii.app.psp.PpssppConfigStore
-import eu.emufii.app.psp.PpssppLauncher
 import eu.emufii.app.library.Backend
+import eu.emufii.app.library.Rom
+import eu.emufii.app.library.RomsRepository
+import eu.emufii.app.netplay.NetplayNames
 import eu.emufii.app.network.CoordinatorClient
 import eu.emufii.app.network.CoordinatorError
 import eu.emufii.app.network.Member
 import eu.emufii.app.profile.Profile
 import eu.emufii.app.profile.playerDisplayName
-import eu.emufii.app.session.Session
-import eu.emufii.app.ui.components.WarnIcon
-import eu.emufii.app.ui.components.AvatarStack
-import eu.emufii.app.ui.components.EmufiiScaffold
-import eu.emufii.app.ui.components.LocalScaffoldFocus
-import eu.emufii.app.ui.components.GhostButton
-import eu.emufii.app.ui.components.SectionHeader
-import eu.emufii.app.ui.components.SoftCard
-import eu.emufii.app.ui.components.softCardFill
-import eu.emufii.app.ui.components.padEntry
-import androidx.compose.foundation.layout.BoxWithConstraints
-import eu.emufii.app.library.Rom
-import eu.emufii.app.ui.components.CrossIcon
-import eu.emufii.app.ui.components.PadDialog
-import eu.emufii.app.ui.components.PadDialogText
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import eu.emufii.app.library.RomsRepository
+import eu.emufii.app.ps2.Ps2GameSettings
+import eu.emufii.app.ps2.Ps2Launcher
+import eu.emufii.app.ps2.Ps2NetworkProfile
+import eu.emufii.app.ps2.Ps2ProvisioningPlan
+import eu.emufii.app.ps2.Ps2Target
+import eu.emufii.app.psp.HOST_SENTINEL
+import eu.emufii.app.psp.PpssppConfigStore
+import eu.emufii.app.psp.PpssppLauncher
 import eu.emufii.app.secondscreen.PanelStep
-import eu.emufii.app.ui.components.RomArtwork
 import eu.emufii.app.secondscreen.SecondScreen
 import eu.emufii.app.secondscreen.rememberPresentationDisplay
+import eu.emufii.app.session.Session
 import eu.emufii.app.settings.SettingsStore
+import eu.emufii.app.ui.ActionShape
+import eu.emufii.app.ui.CONFIRM_KEYS
+import eu.emufii.app.ui.LocalRingTone
+import eu.emufii.app.ui.RingTone
+import eu.emufii.app.ui.Sfx
+import eu.emufii.app.ui.components.AvatarStack
+import eu.emufii.app.ui.components.CrossIcon
+import eu.emufii.app.ui.components.EmufiiScaffold
+import eu.emufii.app.ui.components.GhostButton
+import eu.emufii.app.ui.components.LocalScaffoldFocus
+import eu.emufii.app.ui.components.PadDialog
+import eu.emufii.app.ui.components.PadDialogText
+import eu.emufii.app.ui.components.RomArtwork
+import eu.emufii.app.ui.components.SectionHeader
+import eu.emufii.app.ui.components.SoftCard
+import eu.emufii.app.ui.components.WarnIcon
+import eu.emufii.app.ui.components.padEntry
+import eu.emufii.app.ui.components.softCardFill
+import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.copyToClipboard
+import eu.emufii.app.ui.sounded
+import eu.emufii.app.ui.tap
 import eu.emufii.app.ui.theme.Coral
 import eu.emufii.app.ui.theme.ErrorDark
 import eu.emufii.app.ui.theme.ErrorLight
 import eu.emufii.app.ui.theme.GoodDark
 import eu.emufii.app.ui.theme.GoodLight
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
-import eu.emufii.app.ui.theme.socket
-import eu.emufii.app.ui.theme.plate
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
-import eu.emufii.app.ui.LocalRingTone
-import eu.emufii.app.ui.RingTone
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.clickable
+import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.edgeColor
+import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.theme.socket
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import eu.emufii.app.ui.tap
-import eu.emufii.app.ui.Sfx
+import kotlinx.coroutines.withContext
 
 @Composable
 private fun danger() = if (LocalEmufiiDarkTheme.current) ErrorDark else ErrorLight
@@ -216,7 +212,7 @@ fun SessionScreen(
     var netplayDone by remember(session.code) { mutableStateOf(false) }
 
     var pspOpened by remember(session.code) { mutableStateOf(false) }
-    val netplayProgress by NetplayAutomation.progress.collectAsState()
+    val netplayProgress by NetplayAutomation.progress.collectAsStateWithLifecycle()
     LaunchedEffect(netplayProgress) {
         if (netplayProgress is NetplayProgress.Done) netplayDone = true
     }
@@ -397,7 +393,7 @@ fun SessionScreen(
     // pourquoi : docs/decisions/session.md § What the rear panel carries, the front screen does not repeat
     val panelDisplay by rememberPresentationDisplay()
     val panelWanted by remember(context) { SettingsStore.get(context).secondScreen }
-        .collectAsState()
+        .collectAsStateWithLifecycle()
     val panelLive = panelWanted && panelDisplay != null
 
     // The session carries only a ROM reference, no icon and no extracted colour.
@@ -485,7 +481,7 @@ fun SessionScreen(
 
     // Focus does not cross windows, so the front pad drives the panel's steps.
     // pourquoi : docs/decisions/second-ecran.md § R turns the page from both screens
-    val panelCursor by SecondScreen.stepCursor.collectAsState()
+    val panelCursor by SecondScreen.stepCursor.collectAsStateWithLifecycle()
 
     // Back closes the session: a red cross, and a question before cutting the tunnel.
     // pourquoi : docs/decisions/session.md § Back closes the session, so it carries a cross and it asks

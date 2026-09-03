@@ -41,7 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -137,7 +137,7 @@ import kotlinx.coroutines.withContext
 fun SecondScreenContent(model: SecondScreenModel) {
     SilenceSystemSfx()
     val dark = LocalEmufiiDarkTheme.current
-    val page by SecondScreen.page.collectAsState()
+    val page by SecondScreen.page.collectAsStateWithLifecycle()
 
     // One listener per screen: keyboard focus goes to a window, not to the device.
     // pourquoi : docs/decisions/second-ecran.md § R turns the page from both screens
@@ -278,7 +278,7 @@ private fun PanelHeader(modifier: Modifier = Modifier) {
  */
 @Composable
 private fun NoteStrip(modifier: Modifier = Modifier) {
-    val note by PanelFeed.note.collectAsState()
+    val note by PanelFeed.note.collectAsStateWithLifecycle()
     val dark = LocalEmufiiDarkTheme.current
     val oled = LocalEmufiiOledTheme.current
 
@@ -790,8 +790,8 @@ private fun panelLocale(): java.util.Locale {
 private fun rememberFrontendStills(rom: eu.emufii.app.library.Rom): List<Any> {
     val context = LocalContext.current
     val settings = remember(context) { eu.emufii.app.settings.SettingsStore.get(context) }
-    val folder by settings.frontendFolder.collectAsState()
-    val frontend by settings.artworkFrontend.collectAsState()
+    val folder by settings.frontendFolder.collectAsStateWithLifecycle()
+    val frontend by settings.artworkFrontend.collectAsStateWithLifecycle()
     val stills = remember(rom.uri, folder, frontend) { mutableStateOf<List<Any>>(emptyList()) }
     LaunchedEffect(rom.uri, folder, frontend) {
         stills.value = withContext(Dispatchers.IO) {
@@ -994,7 +994,7 @@ private fun InSession(model: SecondScreenModel.InSession) {
     val dark = LocalEmufiiDarkTheme.current
     val oled = LocalEmufiiOledTheme.current
     val accent = LocalAccent.current
-    val steps by SecondScreen.steps.collectAsState()
+    val steps by SecondScreen.steps.collectAsStateWithLifecycle()
 
     // One column: split, each half fell to 268 dp and the port wrapped one digit per
     // line.
@@ -1060,7 +1060,7 @@ private fun InSession(model: SecondScreenModel.InSession) {
         // windows.
         // pourquoi : docs/decisions/second-ecran.md § One column, and the code takes the whole width
         if (steps.isNotEmpty()) {
-            val stepCursor by SecondScreen.stepCursor.collectAsState()
+            val stepCursor by SecondScreen.stepCursor.collectAsStateWithLifecycle()
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth().padding(top = 2.dp).height(IntrinsicSize.Min)

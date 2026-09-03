@@ -9,19 +9,18 @@ import android.view.Display
 import android.view.WindowManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.notify.AppForeground
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.theme.EmufiiTheme
+import kotlinx.coroutines.delay
 
 /**
  * Mounts the second screen while there is a reason to light it, as a [Presentation].
@@ -31,8 +30,8 @@ import eu.emufii.app.ui.theme.EmufiiTheme
 fun SecondScreenHost(enabled: Boolean) {
     val context = LocalContext.current
     val display by rememberPresentationDisplay()
-    val foreground by AppForeground.visible.collectAsState()
-    val model by SecondScreen.model.collectAsState()
+    val foreground by AppForeground.visible.collectAsStateWithLifecycle()
+    val model by SecondScreen.model.collectAsStateWithLifecycle()
 
     val wanted = secondScreenWanted(enabled, foreground, model)
 
@@ -120,9 +119,9 @@ private fun Context.withAppLocales(): Context {
 private fun SecondScreenSurface() {
     val context = LocalContext.current
     val settings = remember(context) { SettingsStore.get(context) }
-    val theme by settings.theme.collectAsState()
-    val published by SecondScreen.model.collectAsState()
-    val aside by SecondScreen.aside.collectAsState()
+    val theme by settings.theme.collectAsStateWithLifecycle()
+    val published by SecondScreen.model.collectAsStateWithLifecycle()
+    val aside by SecondScreen.aside.collectAsStateWithLifecycle()
 
     /**
      * The resting face waits: switching front screens is not atomic.

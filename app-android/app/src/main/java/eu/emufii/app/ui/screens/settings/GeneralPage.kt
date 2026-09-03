@@ -5,7 +5,7 @@ import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,7 +18,6 @@ import eu.emufii.app.settings.AppLanguage
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.components.DetailActions
 import eu.emufii.app.ui.components.DetailNote
-import eu.emufii.app.ui.components.DetailStatus
 import eu.emufii.app.ui.components.DetailTone
 import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.SwitchRow
@@ -30,9 +29,9 @@ internal fun GeneralPage(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val notifyFriends by settingsStore.notifyFriends.collectAsState()
-    val notifyUpdates by settingsStore.notifyUpdates.collectAsState()
-    val secondScreenOn by settingsStore.secondScreen.collectAsState()
+    val notifyFriends by settingsStore.notifyFriends.collectAsStateWithLifecycle()
+    val notifyUpdates by settingsStore.notifyUpdates.collectAsStateWithLifecycle()
+    val secondScreenOn by settingsStore.secondScreen.collectAsStateWithLifecycle()
 
     SettingsPage(
         title = stringResource(R.string.settings_page_general),

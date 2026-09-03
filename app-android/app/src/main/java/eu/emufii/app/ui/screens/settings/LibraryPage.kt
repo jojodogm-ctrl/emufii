@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -305,8 +305,8 @@ private fun ArtworkBlock(
 ) {
     val context = LocalContext.current
     val settingsStore = remember(context) { SettingsStore.get(context) }
-    val folder by settingsStore.frontendFolder.collectAsState()
-    val frontend by settingsStore.artworkFrontend.collectAsState()
+    val folder by settingsStore.frontendFolder.collectAsStateWithLifecycle()
+    val frontend by settingsStore.artworkFrontend.collectAsStateWithLifecycle()
     val linked = folder.isNotBlank()
 
     val folderPicker = rememberLauncherForActivityResult(

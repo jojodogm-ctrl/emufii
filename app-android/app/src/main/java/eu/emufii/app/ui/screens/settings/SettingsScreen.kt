@@ -6,34 +6,25 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.BuildConfig
 import eu.emufii.app.R
 import eu.emufii.app.azahar.AzaharLauncher
@@ -57,12 +48,10 @@ import eu.emufii.app.ui.components.DetailTone
 import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.GridMark
 import eu.emufii.app.ui.components.InfoMark
-import eu.emufii.app.ui.components.PersonMark
 import eu.emufii.app.ui.components.PadDialog
 import eu.emufii.app.ui.components.PadDialogText
 import eu.emufii.app.ui.components.PaintMark
 import eu.emufii.app.ui.components.ShelfMark
-import eu.emufii.app.ui.components.SectionHeader
 import eu.emufii.app.ui.components.SlidersMark
 import eu.emufii.app.ui.components.labelRes
 import eu.emufii.app.wg.WgKeys
@@ -104,10 +93,10 @@ fun SettingsScreen(
     var photoError by remember { mutableStateOf<String?>(null) }
     var confirmingReset by remember { mutableStateOf(false) }
 
-    val language by settingsStore.language.collectAsState()
-    val theme by settingsStore.theme.collectAsState()
-    val artworkKey by settingsStore.steamGridDbKey.collectAsState()
-    val hiddenConsoles by settingsStore.hiddenConsoles.collectAsState()
+    val language by settingsStore.language.collectAsStateWithLifecycle()
+    val theme by settingsStore.theme.collectAsStateWithLifecycle()
+    val artworkKey by settingsStore.steamGridDbKey.collectAsStateWithLifecycle()
+    val hiddenConsoles by settingsStore.hiddenConsoles.collectAsStateWithLifecycle()
 
     val ppssppConfig = remember(context) { PpssppConfigStore(context) }
     var ppssppConfigReady by remember { mutableStateOf(ppssppConfig.isReady()) }

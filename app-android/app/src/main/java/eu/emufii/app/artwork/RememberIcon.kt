@@ -2,7 +2,7 @@ package eu.emufii.app.artwork
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,10 +33,10 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
     val context = LocalContext.current
     val store = remember(context) { ArtworkStore(context.applicationContext) }
     val settings = remember(context) { SettingsStore.get(context) }
-    val apiKey by settings.steamGridDbKey.collectAsState()
-    val folder by settings.frontendFolder.collectAsState()
-    val frontend by settings.artworkFrontend.collectAsState()
-    val revision by ArtworkStore.revision.collectAsState()
+    val apiKey by settings.steamGridDbKey.collectAsStateWithLifecycle()
+    val folder by settings.frontendFolder.collectAsStateWithLifecycle()
+    val frontend by settings.artworkFrontend.collectAsStateWithLifecycle()
+    val revision by ArtworkStore.revision.collectAsStateWithLifecycle()
     val state = remember(rom.uri) { mutableStateOf(TileArt(null, rom.iconFile)) }
 
     LaunchedEffect(rom.uri, apiKey, folder, frontend, revision) {

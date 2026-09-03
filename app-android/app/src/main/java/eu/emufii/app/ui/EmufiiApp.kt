@@ -3,73 +3,69 @@ package eu.emufii.app.ui
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import eu.emufii.app.compat.LocalCompatDb
-import eu.emufii.app.compat.CompatCheck
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.LocalEnsureVpnPermission
 import eu.emufii.app.R
-import eu.emufii.app.library.Backend
-import eu.emufii.app.library.Rom
-import eu.emufii.app.library.RomsRepository
-import eu.emufii.app.network.CoordinatorClient
+import eu.emufii.app.artwork.ArtworkPreload
 import eu.emufii.app.azahar.NetplayAutomation
 import eu.emufii.app.azahar.PlanStore
-import eu.emufii.app.network.CoordinatorError
-import eu.emufii.app.network.CreatedSession
+import eu.emufii.app.compat.CompatCheck
+import eu.emufii.app.compat.LocalCompatDb
+import eu.emufii.app.library.Backend
 import eu.emufii.app.library.Console
 import eu.emufii.app.library.GameTitles
-import eu.emufii.app.artwork.ArtworkPreload
+import eu.emufii.app.library.Rom
+import eu.emufii.app.library.RomsRepository
 import eu.emufii.app.library.allEmulators
-import eu.emufii.app.notify.AppForeground
-import eu.emufii.app.notify.FriendEvent
-import eu.emufii.app.notify.FriendWatcher
-import eu.emufii.app.notify.FriendWatchJob
-import eu.emufii.app.notify.Notifications
-import eu.emufii.app.profile.FriendStore
 import eu.emufii.app.meta.LocalGameMetaDb
 import eu.emufii.app.meta.MetaCheck
-import eu.emufii.app.secondscreen.PadLegendBar
-import eu.emufii.app.secondscreen.PanelFeed
-import eu.emufii.app.ui.components.FriendAlert
+import eu.emufii.app.network.CoordinatorClient
+import eu.emufii.app.network.CoordinatorError
+import eu.emufii.app.network.CreatedSession
+import eu.emufii.app.notify.AppForeground
+import eu.emufii.app.notify.FriendEvent
+import eu.emufii.app.notify.FriendWatchJob
+import eu.emufii.app.notify.FriendWatcher
+import eu.emufii.app.notify.Notifications
+import eu.emufii.app.profile.Friend
+import eu.emufii.app.profile.FriendStore
+import eu.emufii.app.profile.Profile
 import eu.emufii.app.profile.ProfileStore
 import eu.emufii.app.ps2.Ps2NetworkProfile
-import eu.emufii.app.settings.SettingsStore
-import eu.emufii.app.session.RomRef
-import eu.emufii.app.profile.Friend
-import eu.emufii.app.profile.Profile
+import eu.emufii.app.secondscreen.PadLegendBar
+import eu.emufii.app.secondscreen.PanelFeed
 import eu.emufii.app.secondscreen.PanelFriend
 import eu.emufii.app.secondscreen.SecondScreen
 import eu.emufii.app.secondscreen.SecondScreenModel
 import eu.emufii.app.secondscreen.rememberPresentationDisplay
+import eu.emufii.app.session.RomRef
 import eu.emufii.app.session.Session
 import eu.emufii.app.session.SessionCodes
+import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.tunnel.TunnelHolder
 import eu.emufii.app.tunnel.slotIsFree
 import eu.emufii.app.tunnel.tunnelHolder
+import eu.emufii.app.ui.components.FriendAlert
 import eu.emufii.app.ui.components.TunnelConflictDialog
 import eu.emufii.app.ui.screens.FriendsScreen
 import eu.emufii.app.ui.screens.JoinScreen
@@ -79,9 +75,9 @@ import eu.emufii.app.ui.screens.PreparingScreen
 import eu.emufii.app.ui.screens.PspOnlineScreen
 import eu.emufii.app.ui.screens.SessionFinderScreen
 import eu.emufii.app.ui.screens.SessionScreen
-import eu.emufii.app.ui.screens.settings.SettingsScreen
 import eu.emufii.app.ui.screens.SplashScreen
 import eu.emufii.app.ui.screens.WfcScreen
+import eu.emufii.app.ui.screens.settings.SettingsScreen
 import eu.emufii.app.wfc.WfcManager
 import eu.emufii.app.wfc.WfcState
 import eu.emufii.app.wg.EmufiiWgManager
@@ -186,7 +182,7 @@ fun EmufiiApp(settings: SettingsStore) {
     // store.
     val settingsStore = settings
     val romsRepo = remember { RomsRepository(context) }
-    val profile by profileStore.profile.collectAsState()
+    val profile by profileStore.profile.collectAsStateWithLifecycle()
     /**
      * Survives the activity recreation a language change causes.
      * pourquoi : docs/decisions/lancement-et-navigation.md § The logo, once per process and never on first launch
@@ -536,9 +532,9 @@ fun EmufiiApp(settings: SettingsStore) {
      * Asked once for the whole app: presence is not the friends screen's business.
      * pourquoi : docs/decisions/lancement-et-navigation.md § What is hoisted to app level, and why
      */
-    val friends by friendStore.friends.collectAsState()
+    val friends by friendStore.friends.collectAsStateWithLifecycle()
     val watcher = remember { FriendWatcher(context, client) }
-    val friendStatuses by watcher.statuses.collectAsState()
+    val friendStatuses by watcher.statuses.collectAsStateWithLifecycle()
     val friendCodes = friends.map { it.code }
     LaunchedEffect(friendCodes) { watcher.run(friendCodes) }
 
@@ -612,7 +608,7 @@ fun EmufiiApp(settings: SettingsStore) {
 
     // Honoured here rather than in the activity: this is the only place that owns
     // `screen`.
-    val pendingOpen by Notifications.PendingOpen.target.collectAsState()
+    val pendingOpen by Notifications.PendingOpen.target.collectAsStateWithLifecycle()
     LaunchedEffect(pendingOpen) {
         if (Notifications.PendingOpen.consume() == Notifications.OPEN_FRIENDS) {
             onProfilePage = false
@@ -624,10 +620,10 @@ fun EmufiiApp(settings: SettingsStore) {
      * Scheduling is idempotent, and an app with nothing to watch schedules nothing.
      * pourquoi : docs/decisions/lancement-et-navigation.md § What is hoisted to app level, and why
      */
-    val notifyFriends by settingsStore.notifyFriends.collectAsState()
-    val notifyUpdates by settingsStore.notifyUpdates.collectAsState()
+    val notifyFriends by settingsStore.notifyFriends.collectAsStateWithLifecycle()
+    val notifyUpdates by settingsStore.notifyUpdates.collectAsStateWithLifecycle()
     // A key, not a decoration: the notification permission is granted outside the app.
-    val foreground by AppForeground.visible.collectAsState()
+    val foreground by AppForeground.visible.collectAsStateWithLifecycle()
     LaunchedEffect(notifyFriends, notifyUpdates, friends.size, foreground) {
         if (!foreground) return@LaunchedEffect
         Notifications.ensureChannels(context)
@@ -815,14 +811,14 @@ fun EmufiiApp(settings: SettingsStore) {
 
     // The setting is not enough: the device may have only one screen.
     val panelDisplay by rememberPresentationDisplay()
-    val panelWanted by settings.secondScreen.collectAsState()
+    val panelWanted by settings.secondScreen.collectAsStateWithLifecycle()
     val panelLive = panelWanted && panelDisplay != null
 
     // One screen: the legend the panel would carry goes at the foot of this one, drawn
     // from the same motif so the two cannot drift.
     // pourquoi : docs/decisions/second-ecran.md § The legend, and why the symbols are drawn
     if (!panelLive) {
-        val legendModel by SecondScreen.model.collectAsState()
+        val legendModel by SecondScreen.model.collectAsStateWithLifecycle()
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter

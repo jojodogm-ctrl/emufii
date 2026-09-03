@@ -24,7 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -101,7 +100,7 @@ fun FriendsScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val friends by friendStore.friends.collectAsState()
+    val friends by friendStore.friends.collectAsStateWithLifecycle()
     var input by remember { mutableStateOf("") }
     var addError by remember { mutableStateOf<String?>(null) }
     var pendingRemoval by remember { mutableStateOf<Friend?>(null) }
@@ -149,7 +148,7 @@ fun FriendsScreen(
     // pourquoi : docs/decisions/second-ecran.md § The friends list goes to the back, both cards stay in front
     val panelDisplay by rememberPresentationDisplay()
     val panelWanted by remember(context) { SettingsStore.get(context).secondScreen }
-        .collectAsState()
+        .collectAsStateWithLifecycle()
     val panelLive = panelWanted && panelDisplay != null
 
     // The social domain: the pad cursor turns coral here.
