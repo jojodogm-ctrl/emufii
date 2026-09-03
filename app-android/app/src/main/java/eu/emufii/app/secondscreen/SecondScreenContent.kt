@@ -1,6 +1,5 @@
 package eu.emufii.app.secondscreen
 
-import eu.emufii.app.ui.sounded
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.SizeTransform
@@ -11,27 +10,33 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,103 +44,89 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.content.res.ResourcesCompat
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import eu.emufii.app.R
-import eu.emufii.app.artwork.rememberTileArt
-import eu.emufii.app.library.Console
-import eu.emufii.app.BuildConfig
-import eu.emufii.app.meta.GameMeta
-import eu.emufii.app.session.Session
-import eu.emufii.app.ui.components.CompatBadge
-import eu.emufii.app.ui.components.compatLabel
-import eu.emufii.app.ui.components.VpsLamp
-import eu.emufii.app.ui.theme.ArtworkShape
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import eu.emufii.app.ui.theme.GoodLight
-import eu.emufii.app.ui.theme.GoodDark
-import eu.emufii.app.secondscreen.PanelFriend
-import eu.emufii.app.ui.components.Avatar
-import androidx.compose.runtime.setValue
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import eu.emufii.app.ui.components.CrossIcon
-import eu.emufii.app.ui.components.GhostButton
-import eu.emufii.app.ui.theme.ErrorLight
-import eu.emufii.app.ui.theme.ErrorDark
-import eu.emufii.app.ui.theme.InkText
-import eu.emufii.app.ui.ActionShape
-import eu.emufii.app.ui.focusRing
-import eu.emufii.app.ui.theme.CardShape
-import eu.emufii.app.ui.theme.LocalAccent
-import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
-import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
-import eu.emufii.app.ui.theme.PillShape
-import eu.emufii.app.ui.theme.TileShape
-import eu.emufii.app.ui.theme.moldedRim
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import eu.emufii.app.ui.theme.tilePlateBrush
-import eu.emufii.app.ui.theme.plate
-import eu.emufii.app.ui.theme.socket
-import androidx.compose.foundation.focusable
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import eu.emufii.app.ui.wallpaper.TrayBackdrop
-import eu.emufii.app.ui.components.InfoMark
-import eu.emufii.app.ui.components.SlidersMark
-import eu.emufii.app.ui.components.PaintMark
-import eu.emufii.app.ui.components.ChipMark
-import eu.emufii.app.ui.components.GridMark
-import eu.emufii.app.ui.components.LensMark
-import eu.emufii.app.ui.components.SignalMark
-import eu.emufii.app.ui.components.ShelfMark
-import eu.emufii.app.ui.components.PersonMark
-import eu.emufii.app.ui.theme.Teal
-import eu.emufii.app.ui.theme.Coral
-import eu.emufii.app.ui.tap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import eu.emufii.app.BuildConfig
+import eu.emufii.app.R
+import eu.emufii.app.artwork.rememberTileArt
+import eu.emufii.app.library.Console
+import eu.emufii.app.ui.ActionShape
 import eu.emufii.app.ui.SilenceSystemSfx
+import eu.emufii.app.ui.components.Avatar
+import eu.emufii.app.ui.components.ChipMark
+import eu.emufii.app.ui.components.CompatBadge
+import eu.emufii.app.ui.components.CrossIcon
+import eu.emufii.app.ui.components.GhostButton
+import eu.emufii.app.ui.components.GridMark
+import eu.emufii.app.ui.components.InfoMark
+import eu.emufii.app.ui.components.LensMark
+import eu.emufii.app.ui.components.PaintMark
+import eu.emufii.app.ui.components.PersonMark
+import eu.emufii.app.ui.components.ShelfMark
+import eu.emufii.app.ui.components.SignalMark
+import eu.emufii.app.ui.components.SlidersMark
+import eu.emufii.app.ui.components.VpsLamp
+import eu.emufii.app.ui.components.compatLabel
+import eu.emufii.app.ui.focusRing
+import eu.emufii.app.ui.sounded
+import eu.emufii.app.ui.tap
+import eu.emufii.app.ui.theme.ArtworkShape
+import eu.emufii.app.ui.theme.CardShape
+import eu.emufii.app.ui.theme.Coral
+import eu.emufii.app.ui.theme.ErrorDark
+import eu.emufii.app.ui.theme.ErrorLight
+import eu.emufii.app.ui.theme.GoodDark
+import eu.emufii.app.ui.theme.GoodLight
+import eu.emufii.app.ui.theme.InkText
+import eu.emufii.app.ui.theme.LocalAccent
+import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
+import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
+import eu.emufii.app.ui.theme.PillShape
+import eu.emufii.app.ui.theme.Teal
+import eu.emufii.app.ui.theme.TileShape
+import eu.emufii.app.ui.theme.moldedRim
+import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.theme.socket
+import eu.emufii.app.ui.theme.tilePlateBrush
+import eu.emufii.app.ui.wallpaper.TrayBackdrop
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 /**
  * What the second panel draws, whoever is holding the window.
@@ -736,9 +727,9 @@ private fun Details(model: SecondScreenModel.Browsing) {
             }
         }
 
-        // The card's own pictures first; the catalogue only fills in for a game Cocoon
-        // never saw.
-        val local = rememberCocoonStills(model.rom)
+        // The card's own pictures first; the catalogue only fills in for a game the
+        // frontend never saw.
+        val local = rememberFrontendStills(model.rom)
         val stills = local.ifEmpty { meta?.screenshots.orEmpty() }
         val summary = meta?.summaryFor(locale)
 
@@ -796,17 +787,19 @@ private fun panelLocale(): java.util.Locale {
 
 /** Off the main thread: the folder listing is a disk read. */
 @Composable
-private fun rememberCocoonStills(rom: eu.emufii.app.library.Rom): List<Any> {
+private fun rememberFrontendStills(rom: eu.emufii.app.library.Rom): List<Any> {
     val context = LocalContext.current
     val settings = remember(context) { eu.emufii.app.settings.SettingsStore.get(context) }
-    val cocoon by settings.cocoonFolder.collectAsState()
-    val stills = remember(rom.uri, cocoon) { mutableStateOf<List<Any>>(emptyList()) }
-    LaunchedEffect(rom.uri, cocoon) {
+    val folder by settings.frontendFolder.collectAsState()
+    val frontend by settings.artworkFrontend.collectAsState()
+    val stills = remember(rom.uri, folder, frontend) { mutableStateOf<List<Any>>(emptyList()) }
+    LaunchedEffect(rom.uri, folder, frontend) {
         stills.value = withContext(Dispatchers.IO) {
             runCatching {
-                eu.emufii.app.artwork.CocoonMedia.stillsFor(
+                eu.emufii.app.artwork.FrontendMedia.stillsFor(
                     context,
-                    cocoon.takeIf { it.isNotBlank() }?.let(android.net.Uri::parse),
+                    frontend,
+                    folder.takeIf { it.isNotBlank() }?.let(android.net.Uri::parse),
                     rom
                 )
             }.getOrDefault(emptyList())

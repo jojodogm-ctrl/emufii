@@ -6,7 +6,6 @@ import android.provider.DocumentsContract
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +41,8 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.R
-import eu.emufii.app.artwork.CocoonMedia
+import eu.emufii.app.artwork.ArtworkFrontend
+import eu.emufii.app.artwork.FrontendMedia
 import eu.emufii.app.library.Rom
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.components.ChevronRight
@@ -305,9 +305,11 @@ private fun ArtworkBlock(
 ) {
     val context = LocalContext.current
     val settingsStore = remember(context) { SettingsStore.get(context) }
-    val cocoon by settingsStore.cocoonFolder.collectAsState()
+    val folder by settingsStore.frontendFolder.collectAsState()
+    val frontend by settingsStore.artworkFrontend.collectAsState()
+    val linked = folder.isNotBlank()
 
-    val cocoonPicker = rememberLauncherForActivityResult(
+    val folderPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         if (uri != null) {
@@ -320,12 +322,14 @@ private fun ArtworkBlock(
                 true
             }.getOrDefault(false)
             if (granted) {
-                settingsStore.setCocoonFolder(uri.toString())
-                CocoonMedia.forget()
+                settingsStore.setFrontendFolder(uri.toString())
+                FrontendMedia.forget()
                 onSourceChanged()
             }
         }
     }
+    // Straight to the frontend's folder, not wherever the picker was left.
+    val pick = { folderPicker.launch(defaultFolderOf(frontend)) }
 
     SettingsBlock(
         modifier = modifier,
@@ -333,36 +337,36 @@ private fun ArtworkBlock(
         spread = true,
         title = stringResource(R.string.settings_row_artwork),
         state = BlockState(
-            if (cocoon.isNotBlank()) DetailTone.GOOD else DetailTone.WARN,
-            stringResource(
-                if (cocoon.isNotBlank()) R.string.settings_artwork_source_cocoon
-                else R.string.settings_artwork_source_none
-            )
+            if (linked) DetailTone.GOOD else DetailTone.WARN,
+            if (linked) stringResource(frontend.labelRes)
+            else stringResource(R.string.settings_artwork_source_none)
         ),
         footer = {
             DetailActions {
-                if (cocoon.isBlank()) {
+                if (!linked) {
                     PrimaryButton(
-                        label = stringResource(R.string.settings_cocoon_choose),
-                        // Straight to Cocoon's folder, not wherever the picker was left.
-                        onClick = { cocoonPicker.launch(COCOON_DEFAULT_FOLDER) },
+                        label = stringResource(
+                            R.string.settings_frontend_choose,
+                            stringResource(frontend.labelRes)
+                        ),
+                        onClick = pick,
                         modifier = Modifier.fillMaxWidth()
                     )
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         GhostButton(
                             label = stringResource(R.string.settings_cocoon_change),
-                            onClick = { cocoonPicker.launch(COCOON_DEFAULT_FOLDER) },
+                            onClick = pick,
                             fillWidth = true,
                             modifier = Modifier.weight(1f)
                         )
                         GhostButton(
                             label = stringResource(R.string.settings_cocoon_forget),
                             onClick = {
-                                settingsStore.setCocoonFolder("")
+                                settingsStore.setFrontendFolder("")
                                 // Clears the index only: the scan's thumbnails stay on disk.
                                 // pourquoi : docs/decisions/reglages-ecran.md § Giving up Cocoon needs a fresh walk
-                                CocoonMedia.forget()
+                                FrontendMedia.forget()
                                 onSourceChanged()
                             },
                             fillWidth = true,
@@ -374,7 +378,27 @@ private fun ArtworkBlock(
         }
     ) {
         ArtworkStrip(sample)
-        DetailNote(stringResource(R.string.settings_cocoon_body))
+        // Same tight gap as the language list: the choices are one object.
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            ArtworkFrontend.entries.forEachIndexed { index, option ->
+                ChoiceRow(
+                    label = stringResource(option.labelRes),
+                    selected = option == frontend,
+                    onClick = {
+                        if (option != frontend) {
+                            settingsStore.setArtworkFrontend(option)
+                            // The folder was granted for the other layout: a Cocoon root
+                            // read as ES-DE finds nothing, so the link is dropped with it.
+                            settingsStore.setFrontendFolder("")
+                            FrontendMedia.forget()
+                            onSourceChanged()
+                        }
+                    },
+                    entry = index == 0
+                )
+            }
+        }
+        DetailNote(stringResource(R.string.settings_frontend_body))
     }
 }
 
@@ -434,7 +458,7 @@ private fun HiddenRomsBlock(count: Int, onRestore: () -> Unit) {
     }
 }
 
-private val COCOON_DEFAULT_FOLDER: Uri = DocumentsContract.buildDocumentUri(
+private fun defaultFolderOf(frontend: ArtworkFrontend): Uri = DocumentsContract.buildDocumentUri(
     "com.android.externalstorage.documents",
-    "primary:Cocoonv2"
+    frontend.defaultFolderId
 )

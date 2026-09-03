@@ -34,7 +34,8 @@ object ArtworkPreload {
         val app = context.applicationContext
         val settings = SettingsStore.get(app)
         val apiKey = settings.steamGridDbKey.value
-        val cocoon = settings.cocoonFolder.value.takeIf { it.isNotBlank() }?.toUri()
+        val folder = settings.frontendFolder.value.takeIf { it.isNotBlank() }?.toUri()
+        val frontend = settings.artworkFrontend.value
         val store = ArtworkStore(app)
 
         // Every address: this is where the folder indexes are built, once per console
@@ -42,7 +43,7 @@ object ArtworkPreload {
         val models = roms.map { rom ->
             runCatching {
                 val local = if (store.chosenFor(rom) == null) {
-                    CocoonMedia.uriFor(app, cocoon, rom, CocoonMedia.Kind.ICON)
+                    FrontendMedia.uriFor(app, frontend, folder, rom, FrontendMedia.Kind.ICON)
                 } else {
                     null
                 }

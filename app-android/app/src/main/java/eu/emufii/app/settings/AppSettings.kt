@@ -4,6 +4,7 @@ import android.app.LocaleManager
 import android.content.Context
 import android.os.LocaleList
 import androidx.core.content.edit
+import eu.emufii.app.artwork.ArtworkFrontend
 import eu.emufii.app.library.Console
 import eu.emufii.app.library.LibraryLayout
 import eu.emufii.app.library.LibrarySort
@@ -70,15 +71,29 @@ class SettingsStore private constructor(context: Context) {
     val steamGridDbKey: StateFlow<String> = _steamGridDbKey.asStateFlow()
 
     /**
-     * A Cocoon folder serves the library with no key and no network.
+     * A frontend's folder serves the library with no key and no network.
      * pourquoi : docs/decisions/reglages-et-consoles.md § Every player brings their own key
      */
-    private val _cocoonFolder = MutableStateFlow(prefs.getString(KEY_COCOON, "").orEmpty())
-    val cocoonFolder: StateFlow<String> = _cocoonFolder.asStateFlow()
+    private val _frontendFolder = MutableStateFlow(prefs.getString(KEY_FRONTEND_FOLDER, "").orEmpty())
+    val frontendFolder: StateFlow<String> = _frontendFolder.asStateFlow()
 
-    fun setCocoonFolder(uri: String) {
-        _cocoonFolder.value = uri
-        prefs.edit { putString(KEY_COCOON, uri) }
+    fun setFrontendFolder(uri: String) {
+        _frontendFolder.value = uri
+        prefs.edit { putString(KEY_FRONTEND_FOLDER, uri) }
+    }
+
+    /**
+     * Which frontend's layout the folder is read with. Cocoon by default: it was the only
+     * one before, and a folder linked back then is a Cocoon folder.
+     */
+    private val _artworkFrontend = MutableStateFlow(
+        ArtworkFrontend.fromName(prefs.getString(KEY_FRONTEND, null))
+    )
+    val artworkFrontend: StateFlow<ArtworkFrontend> = _artworkFrontend.asStateFlow()
+
+    fun setArtworkFrontend(frontend: ArtworkFrontend) {
+        prefs.edit { putString(KEY_FRONTEND, frontend.name) }
+        _artworkFrontend.value = frontend
     }
 
     /**
@@ -223,7 +238,9 @@ class SettingsStore private constructor(context: Context) {
         private const val KEY_THEME = "theme"
         private const val KEY_ONBOARDING_DONE = "onboarding_done"
         private const val KEY_SGDB = "steamgriddb_key"
-        private const val KEY_COCOON = "cocoon_folder"
+        /** Kept under its old name: a folder linked before ES-DE existed here must survive. */
+        private const val KEY_FRONTEND_FOLDER = "cocoon_folder"
+        private const val KEY_FRONTEND = "artwork_frontend"
         private const val KEY_LAYOUT = "library_layout"
         private const val KEY_SORT = "library_sort"
         private const val KEY_HIDDEN_CONSOLES = "hidden_consoles"
