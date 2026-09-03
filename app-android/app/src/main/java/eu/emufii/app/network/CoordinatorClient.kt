@@ -1,6 +1,6 @@
 package eu.emufii.app.network
 
-//import eu.emufii.app.BuildConfig
+import eu.emufii.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -16,7 +16,7 @@ import eu.emufii.app.profile.Profile
  * release → hosted coordinator over HTTPS, overridden at build time with
  *          -Pemufii.coordinatorUrl=https://...
  */
-val COORDINATOR_BASE_URL: String = "BuildConfig.COORDINATOR_BASE_URL"
+val COORDINATOR_BASE_URL: String = BuildConfig.COORDINATOR_BASE_URL
 
 /**
  * The code is public, so [token] is what authorises. Returned at creation only,
