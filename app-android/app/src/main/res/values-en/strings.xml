@@ -599,16 +599,16 @@
     <string name="onb_consoles_body">Pick the consoles you actually play. The others stay out of your library, and we won\'t bother you with their setup.</string>
     <string name="onb_consoles_note">You can change your mind any time in Settings → Consoles.</string>
 
-    <string name="onb_cocoon_title">Already using Cocoon?</string>
-    <string name="onb_cocoon_body">Cocoon has already downloaded real artwork for your games. Emufii can read it straight from there: no account, no key, no network.</string>
+    <string name="onb_cocoon_title">Already using a frontend?</string>
+    <string name="onb_cocoon_body">Your frontend has already downloaded real artwork for your games. Emufii can read it straight from there: no account, no key, no network.</string>
     <string name="onb_cocoon_pill_on">Folder linked</string>
     <string name="onb_cocoon_pill_off">Optional</string>
-    <string name="onb_cocoon_step1">Tap Choose Cocoon\'s folder.</string>
-    <string name="onb_cocoon_step2">Go to Android → data → Cocoon\'s folder, then confirm.</string>
-    <string name="onb_cocoon_step3">Emufii only reads images there. It never writes into Cocoon\'s folder.</string>
-    <string name="onb_cocoon_after">Emufii will prefer Cocoon\'s artwork. Only a picture you chose yourself comes ahead of it.</string>
+    <string name="onb_cocoon_step1">Tap Choose your frontend\'s folder.</string>
+    <string name="onb_cocoon_step2">Go to Android → data → your frontend\'s folder, then confirm.</string>
+    <string name="onb_cocoon_step3">Emufii only reads images there. It never writes into your frontend\'s folder.</string>
+    <string name="onb_cocoon_after">Emufii will prefer your frontend\'s artwork. Only a picture you chose yourself comes ahead of it.</string>
 
-    <string name="onb_artwork_body">Without Cocoon, your games show only the tiny icon tucked inside the ROM. A free SteamGridDB key replaces it with real box art.</string>
+    <string name="onb_artwork_body">Without a frontend, your games show only the tiny icon tucked inside the ROM. A free SteamGridDB key replaces it with real box art.</string>
     <string name="onb_artwork_step1">Create an account on steamgriddb.com, it is free.</string>
     <string name="onb_artwork_step2">Open your account preferences, API section, and generate a key.</string>
     <string name="onb_artwork_step3">Paste it below. It is only used to look up images, and stays on this device.</string>

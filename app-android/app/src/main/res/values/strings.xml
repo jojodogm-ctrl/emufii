@@ -619,16 +619,16 @@
     <string name="onb_consoles_body">Choisis les consoles auxquelles tu joues. Les autres n\'apparaîtront pas dans ta bibliothèque, et on ne t\'embêtera pas avec leurs réglages.</string>
     <string name="onb_consoles_note">Tu peux changer d\'avis à tout moment dans Réglages → Consoles.</string>
 
-    <string name="onb_cocoon_title">Tu utilises déjà Cocoon ?</string>
-    <string name="onb_cocoon_body">Cocoon a téléchargé de vraies jaquettes pour tes jeux. Emufii peut les lire directement : pas de compte, pas de clé, pas de réseau.</string>
+    <string name="onb_cocoon_title">Tu utilises déjà un frontend ?</string>
+    <string name="onb_cocoon_body">Ton frontend a téléchargé de vraies jaquettes pour tes jeux. Emufii peut les lire directement : pas de compte, pas de clé, pas de réseau.</string>
     <string name="onb_cocoon_pill_on">Dossier lié</string>
     <string name="onb_cocoon_pill_off">Facultatif</string>
-    <string name="onb_cocoon_step1">Appuie sur Choisir le dossier de Cocoon.</string>
-    <string name="onb_cocoon_step2">Va dans Android → data → le dossier de Cocoon, puis valide.</string>
-    <string name="onb_cocoon_step3">Emufii n\'y lit que les images. Elle n\'écrit jamais dans le dossier de Cocoon.</string>
-    <string name="onb_cocoon_after">Emufii utilisera en priorité les jaquettes de Cocoon. Seule une image que tu as choisie toi-même passe avant.</string>
+    <string name="onb_cocoon_step1">Appuie sur Choisir le dossier de ton frontend.</string>
+    <string name="onb_cocoon_step2">Va dans Android → data → le dossier de ton frontend, puis valide.</string>
+    <string name="onb_cocoon_step3">Emufii n\'y lit que les images. Elle n\'écrit jamais dans le dossier de ton frontend.</string>
+    <string name="onb_cocoon_after">Emufii utilisera en priorité les jaquettes de ton frontend. Seule une image que tu as choisie toi-même passe avant.</string>
 
-    <string name="onb_artwork_body">Sans Cocoon, tes jeux n\'ont que la minuscule icône rangée dans la ROM. Une clé SteamGridDB, gratuite, la remplace par une vraie jaquette.</string>
+    <string name="onb_artwork_body">Sans frontend, tes jeux n\'ont que la minuscule icône rangée dans la ROM. Une clé SteamGridDB, gratuite, la remplace par une vraie jaquette.</string>
     <string name="onb_artwork_step1">Crée un compte sur steamgriddb.com, c\'est gratuit.</string>
     <string name="onb_artwork_step2">Va dans les préférences de ton compte, section API, et génère une clé.</string>
     <string name="onb_artwork_step3">Colle-la ci-dessous. Elle ne sert qu\'à chercher des images, et reste sur l\'appareil.</string>
