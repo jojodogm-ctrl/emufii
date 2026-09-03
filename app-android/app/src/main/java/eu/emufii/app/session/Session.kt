@@ -77,12 +77,13 @@ object SessionCodes {
     private const val DIGITS = "23456789"
 
     /**
-     * The code is the whole lock: it admits to the session, and ARMSX2 takes it as the
-     * room password. Four and four is what that asks for while staying inside ARMSX2's
-     * 4..12 alphanumerics once the hyphen is filtered out.
+     * Three and three, and the join screen is why: its keypad draws that many boxes and
+     * stops taking keys at the sixth, so a longer code cannot be typed at all. Widening
+     * the code means widening that screen first.
+     * pourquoi : docs/decisions/coquille-ecrans.md § Six slots rather than a field
      */
-    private const val LETTERS = 4
-    private const val NUMBERS = 4
+    private const val LETTERS = 3
+    private const val NUMBERS = 3
 
     /**
      * `SecureRandom`, like the friend code beside it: `Random.Default` is a XorWow seeded
@@ -103,11 +104,11 @@ object SessionCodes {
      */
     fun normalize(typed: String): String {
         val body = typed.uppercase().filter { it.isLetterOrDigit() }
-        // Both shapes, and no length of its own: a session opened by a build still on
-        // three and three has to stay joinable from one on four and four.
+        // Four and four is recognised too: one build generated it, and such a session
+        // stays joinable from the finder, where nothing has to be typed.
         val letters = body.takeWhile { it.isLetter() }.length
         val digits = body.length - letters
-        val known = (letters == 3 && digits == 3) || (letters == LETTERS && digits == NUMBERS)
+        val known = (letters == LETTERS && digits == NUMBERS) || (letters == 4 && digits == 4)
         if (!known) return typed.uppercase().trim()
         return "${body.take(letters)}-${body.drop(letters)}"
     }

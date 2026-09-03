@@ -138,8 +138,12 @@ android {
         // first one that can survive a change of server: from here on, moving
         // machines is a DNS record and nobody reinstalls anything. Builds up to
         // 45 keep calling the old address, which is why that machine stays up.
-        versionCode = 46
-        versionName = "1.12.8"
+        // 48: 47 shipped four-letter, four-digit session codes and could not join its
+        // own: the join keypad draws six boxes and refuses the seventh key. Back to
+        // three and three, and 47 is withdrawn. 48 rather than reusing 47, so two
+        // different binaries never answer to one number in the release archive.
+        versionCode = 48
+        versionName = "1.12.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
