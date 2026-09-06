@@ -192,7 +192,7 @@
     <string name="join_action">Join</string>
 
     <!-- Waiting screens -->
-    <string name="prep_first_time">This can take 10-15 s the first time.</string>
+    <string name="prep_first_time">This can take 10–15 s the first time.</string>
 
     <!-- Profile and settings -->
     <string name="profile_photo_note">Your photo stays on your phone. Other players see your initials and your colour.</string>
@@ -318,7 +318,7 @@
     <string name="friends_share">Share</string>
     <string name="friends_share_text">Add me on Emufii: %1$s</string>
     <string name="friends_add">Add a friend</string>
-    <string name="friends_add_hint">E7K2-9QM4-XR8T</string>
+    <string name="friends_add_hint">E7K2–9QM4–XR8T</string>
     <string name="friends_add_action">Add</string>
     <string name="friends_error_invalid">That code isn\'t valid. Check you copied all of it.</string>
     <string name="friends_error_duplicate">They\'re already in your list.</string>
@@ -635,4 +635,24 @@
     <string name="onb_recap_autofill">Auto-fill</string>
     <string name="onb_recap_notif">Notifications</string>
     <string name="onb_recap_later">Later</string>
+
+    <!-- Crash logger: the reports Emufii keeps when it dies unexpectedly -->
+    <string name="settings_page_crash_logs">Crash logs</string>
+    <string name="settings_sub_crash_logs">What Emufii kept from its last unexpected exits</string>
+    <string name="crash_logs_description">Every time Emufii dies unexpectedly, the last thing it did is written here. Ten reports are kept, oldest first are dropped.</string>
+    <string name="crash_logs_report_issue">Report an issue</string>
+    <!-- Emufii\'s upstream repository: this is where its issue tracker lives. -->
+    <string name="crash_logs_report_issue_url" translatable="false">https://github.com/jojodogm-ctrl/emufii/issues/new</string>
+    <string name="crash_logs_clear_all">Clear all</string>
+    <string name="crash_logs_clear_all_dialog_title">Clear all crash logs?</string>
+    <string name="crash_logs_clear_all_dialog_message">This will permanently delete %1$d crash report(s).</string>
+    <string name="crash_logs_detail_title">Crash report</string>
+    <string name="crash_logs_detail_copy">Copy</string>
+    <string name="crash_logs_detail_close">Close</string>
+    <string name="crash_logs_copied_toast">Copied to clipboard</string>
+    <string name="crash_logs_delete">Delete</string>
+    <string name="crash_logs_empty_title">Nothing to show</string>
+    <string name="crash_logs_empty_description">Emufii hasn\'t crashed recently. Reports show up here if it does.</string>
+    <!-- Debug builds only: verifies the crash logger end-to-end. -->
+    <string name="crash_logs_test_crash">Trigger a test crash</string>
 </resources>

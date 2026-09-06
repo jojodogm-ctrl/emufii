@@ -640,4 +640,21 @@
     <string name="onb_recap_autofill">Remplissage automatique</string>
     <string name="onb_recap_notif">Notifications</string>
     <string name="onb_recap_later">Plus tard</string>
+
+    <!-- Journal de plantages : ce qu\'Emufii garde quand elle meurt sans crier gare -->
+    <string name="settings_page_crash_logs">Journal de plantages</string>
+    <string name="settings_sub_crash_logs">Ce qu\'Emufii a gardé de ses dernières sorties inattendues</string>
+    <string name="crash_logs_description">Chaque fois qu\'Emufii meurt sans prévenir, ce qu\'elle faisait juste avant est écrit ici. Dix rapports sont gardés, les plus vieux disparaissent.</string>
+    <string name="crash_logs_report_issue">Signaler un souci</string>
+    <string name="crash_logs_clear_all">Tout effacer</string>
+    <string name="crash_logs_clear_all_dialog_title">Effacer tous les rapports ?</string>
+    <string name="crash_logs_clear_all_dialog_message">Cela supprimera %1$d rapport(s) définitivement.</string>
+    <string name="crash_logs_detail_title">Rapport de plantage</string>
+    <string name="crash_logs_detail_copy">Copier</string>
+    <string name="crash_logs_detail_close">Fermer</string>
+    <string name="crash_logs_copied_toast">Copié dans le presse-papiers</string>
+    <string name="crash_logs_delete">Supprimer</string>
+    <string name="crash_logs_empty_title">Rien à afficher</string>
+    <string name="crash_logs_empty_description">Emufii n\'a pas planté récemment. Les rapports apparaîtront ici sinon.</string>
+    <string name="crash_logs_test_crash">Déclencher un plantage de test</string>
 </resources>

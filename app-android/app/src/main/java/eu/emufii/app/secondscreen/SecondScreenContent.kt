@@ -93,6 +93,7 @@ import eu.emufii.app.ui.components.CompatBadge
 import eu.emufii.app.ui.components.CrossIcon
 import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.GridMark
+import eu.emufii.app.ui.components.BugMark
 import eu.emufii.app.ui.components.InfoMark
 import eu.emufii.app.ui.components.LensMark
 import eu.emufii.app.ui.components.PaintMark
@@ -127,6 +128,7 @@ import eu.emufii.app.ui.wallpaper.TrayBackdrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * What the second panel draws, whoever is holding the window.
@@ -286,7 +288,7 @@ private fun NoteStrip(modifier: Modifier = Modifier) {
     // before.
     LaunchedEffect(note?.id) {
         val shown = note ?: return@LaunchedEffect
-        delay(NOTE_LIFETIME_MS)
+        delay(NOTE_LIFETIME_MS.milliseconds)
         PanelFeed.dismiss(shown.id)
     }
 
@@ -576,6 +578,7 @@ private fun PanelMarkGlyph(mark: PanelMark, tint: Color) {
         PanelMark.APPEARANCE -> PaintMark(color = tint, size = size)
         PanelMark.GENERAL -> SlidersMark(color = tint, size = size)
         PanelMark.ABOUT -> InfoMark(color = tint, size = size)
+        PanelMark.CRASH_LOGS -> BugMark(color = tint, size = size)
         PanelMark.SEARCH -> LensMark(color = tint, size = size)
         PanelMark.LAYOUT -> GridMark(color = tint, size = size)
         PanelMark.SORT -> SlidersMark(color = tint, size = size)

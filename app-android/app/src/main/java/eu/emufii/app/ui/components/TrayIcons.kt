@@ -45,32 +45,32 @@ private fun TrayIcon(
 }
 
 @Composable
-fun ChevronLeft(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun ChevronLeft(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(15f * u, 5f * u); lineTo(9f * u, 12f * u); lineTo(15f * u, 19f * u)
     }
 
 @Composable
-fun ChevronRight(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun ChevronRight(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(9f * u, 5f * u); lineTo(15f * u, 12f * u); lineTo(9f * u, 19f * u)
     }
 
 @Composable
-fun CrossIcon(size: Dp = 18.dp, color: Color, modifier: Modifier = Modifier) =
+fun CrossIcon(modifier: Modifier = Modifier, size: Dp = 18.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(6.5f * u, 6.5f * u); lineTo(17.5f * u, 17.5f * u)
         moveTo(17.5f * u, 6.5f * u); lineTo(6.5f * u, 17.5f * u)
     }
 
 @Composable
-fun CheckIcon(size: Dp = 18.dp, color: Color, modifier: Modifier = Modifier) =
+fun CheckIcon(modifier: Modifier = Modifier, size: Dp = 18.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(5f * u, 12.5f * u); lineTo(10f * u, 17.5f * u); lineTo(19f * u, 6.5f * u)
     }
 
 @Composable
-fun SignalMark(size: Dp = 40.dp, color: Color, modifier: Modifier = Modifier) =
+fun SignalMark(modifier: Modifier = Modifier, size: Dp = 40.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addArc(
             androidx.compose.ui.geometry.Rect(
@@ -90,7 +90,7 @@ fun SignalMark(size: Dp = 40.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun FolderMark(size: Dp = 44.dp, color: Color, modifier: Modifier = Modifier) =
+fun FolderMark(modifier: Modifier = Modifier, size: Dp = 44.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(3.5f * u, 18.5f * u)
         lineTo(3.5f * u, 6f * u)
@@ -106,14 +106,15 @@ fun FolderMark(size: Dp = 44.dp, color: Color, modifier: Modifier = Modifier) =
  * pourquoi : docs/decisions/lancement-et-navigation.md § The app's icons are drawn, not typed
  */
 @Composable
-fun WarnIcon(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
+fun WarnIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(12f * u, 5f * u); lineTo(12f * u, 14f * u)
         moveTo(12f * u, 18.6f * u); lineTo(12f * u, 18.6f * u)
     }
 
 @Composable
-fun BlockedIcon(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
+@Suppress("Unused")
+fun BlockedIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addOval(
             androidx.compose.ui.geometry.Rect(
@@ -126,7 +127,7 @@ fun BlockedIcon(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
 
 /** Not tried yet: the quietest of the four marks, the other three being verdicts. */
 @Composable
-fun TildeIcon(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
+fun TildeIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(4.5f * u, 14f * u)
         cubicTo(7f * u, 8.5f * u, 9.5f * u, 8.5f * u, 12f * u, 12f * u)
@@ -140,7 +141,7 @@ fun TildeIcon(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
  */
 
 @Composable
-fun PersonMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun PersonMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addOval(
             androidx.compose.ui.geometry.Rect(
@@ -152,7 +153,7 @@ fun PersonMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun ShelfMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun ShelfMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(5f * u, 4.5f * u); lineTo(5f * u, 17f * u)
         moveTo(10f * u, 4.5f * u); lineTo(10f * u, 17f * u)
@@ -161,7 +162,7 @@ fun ShelfMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun GridMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun GridMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addRoundRect(
             androidx.compose.ui.geometry.RoundRect(
@@ -185,7 +186,7 @@ fun GridMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun ChipMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun ChipMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addRoundRect(
             androidx.compose.ui.geometry.RoundRect(
@@ -204,7 +205,7 @@ fun ChipMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun PaintMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun PaintMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(12f * u, 3.5f * u)
         cubicTo(12f * u, 3.5f * u, 5f * u, 11.5f * u, 5f * u, 15.2f * u)
@@ -215,7 +216,7 @@ fun PaintMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun SlidersMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun SlidersMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(4f * u, 8.5f * u); lineTo(20f * u, 8.5f * u)
         moveTo(4f * u, 15.5f * u); lineTo(20f * u, 15.5f * u)
@@ -232,7 +233,7 @@ fun SlidersMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
     }
 
 @Composable
-fun InfoMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun InfoMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addOval(
             androidx.compose.ui.geometry.Rect(
@@ -243,8 +244,29 @@ fun InfoMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
         moveTo(12f * u, 7.6f * u); lineTo(12f * u, 7.6f * u)
     }
 
+/**
+ * The report page: an oval body with two antennae, two side legs and a spine down the
+ * middle. Drawn on the same 24-unit grid as every other tray glyph.
+ */
 @Composable
-fun PencilMark(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
+fun BugMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
+    TrayIcon(size, color, modifier) { u ->
+        addOval(
+            androidx.compose.ui.geometry.Rect(
+                Offset(7f * u, 7.5f * u), Size(10f * u, 12f * u)
+            )
+        )
+        moveTo(12f * u, 8.5f * u); lineTo(12f * u, 18.5f * u)
+        moveTo(3.5f * u, 12f * u); lineTo(7f * u, 12f * u)
+        moveTo(17f * u, 12f * u); lineTo(20.5f * u, 12f * u)
+        moveTo(3.5f * u, 17.5f * u); lineTo(7f * u, 16f * u)
+        moveTo(17f * u, 16f * u); lineTo(20.5f * u, 17.5f * u)
+        moveTo(9f * u, 4f * u); lineTo(10.5f * u, 7f * u)
+        moveTo(15f * u, 4f * u); lineTo(13.5f * u, 7f * u)
+    }
+
+@Composable
+fun PencilMark(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         moveTo(4.5f * u, 19.5f * u)
         lineTo(5.5f * u, 15f * u)
@@ -260,7 +282,7 @@ fun PencilMark(size: Dp = 14.dp, color: Color, modifier: Modifier = Modifier) =
  * pourquoi : docs/decisions/lancement-et-navigation.md § The app's icons are drawn, not typed
  */
 @Composable
-fun LensMark(size: Dp = 20.dp, color: Color, modifier: Modifier = Modifier) =
+fun LensMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
         addOval(
             androidx.compose.ui.geometry.Rect(
