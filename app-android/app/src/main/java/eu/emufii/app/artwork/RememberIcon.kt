@@ -18,9 +18,20 @@ import kotlinx.coroutines.withContext
  * The two are not drawn the same way: [embedded] is 48 px of pixel art, scaled up
  * without smoothing on pain of mush, [remote] a real image that is smoothed instead.
  */
-data class TileArt(val remote: String?, val embedded: java.io.File?) {
+data class TileArt(
+    val remote: String?,
+    val embedded: java.io.File?,
+    val fromFrontend: Boolean = false,
+) {
     val isPixelArt: Boolean get() = remote == null
     val model: Any? get() = remote ?: embedded
+
+    /**
+     * Whole-image display: pixel-art icons lose visible parts under a crop, and the
+     * artwork a frontend hands us — an ES-DE box front or a Cocoon key art the player
+     * re-cropped — is already framed the way it should be shown.
+     */
+    val fitsWhole: Boolean get() = isPixelArt || fromFrontend
 }
 
 /**
@@ -43,7 +54,8 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
         // The frontend comes before the catalogue, and the player's own choice before the
         // frontend, which `iconUrl` already honours: the frontend's artwork sits on the
         // device, was downloaded for this exact file, and in places was re-cropped by hand.
-        if (store.chosenFor(rom) == null) {
+        val remote: String = run {
+            if (store.chosenFor(rom) != null) return@run store.iconUrl(rom, apiKey)
             val local = withContext(Dispatchers.IO) {
                 runCatching {
                     FrontendMedia.uriFor(
@@ -55,13 +67,14 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
                     )
                 }.getOrNull()
             }
-            if (local != null) {
-                state.value = TileArt(local.toString(), rom.iconFile)
-                return@LaunchedEffect
-            }
-        }
-        val url = store.iconUrl(rom, apiKey) ?: return@LaunchedEffect
-        state.value = TileArt(url, rom.iconFile)
+            local?.toString() ?: store.iconUrl(rom, apiKey)
+        } ?: return@LaunchedEffect
+
+        // Anything not on `http(s)://` came off the device — either the frontend
+        // lookup or a manual pick against a local tree — and gets whole-image display.
+        // SteamGridDB choices stay cropped.
+        val fromFrontend = !remote.startsWith("http")
+        state.value = TileArt(remote, rom.iconFile, fromFrontend)
     }
     return state
 }

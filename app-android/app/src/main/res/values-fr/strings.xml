@@ -98,10 +98,16 @@
     <string name="session_launch_done">Émulation lancée</string>
     <string name="session_launch_done_step2">2. Émulation lancée</string>
     <string name="session_netplay_open">1. Paramétrage automatique de %1$s</string>
+    <string name="session_netplay_manual_open">Paramétrage manuel</string>
     <string name="session_netplay_waiting_host">1. En attente de l\'hôte…</string>
     <string name="session_netplay_again">1. Refaire le paramétrage de %1$s</string>
     <string name="session_netplay_done">1. %1$s est paramétré</string>
     <string name="session_netplay_no_address">Adresse de session indisponible.</string>
+    <string name="session_manual_hint">À saisir dans %1$s si le remplissage automatique échoue.</string>
+    <string name="session_manual_nickname">Pseudo</string>
+    <string name="session_manual_room_name">Nom du salon / Code de session</string>
+    <string name="session_manual_password">Mot de passe</string>
+    <string name="session_manual_copy">Copier %1$s</string>
     <string name="session_wfc_not_a_session">Le jeu en ligne DS ne passe pas par une session</string>
     <string name="session_unsupported_short">Multijoueur pas encore pris en charge</string>
     <string name="session_unsupported_console">Multijoueur pas encore pris en charge pour cette console</string>

@@ -952,7 +952,7 @@ private fun EntryRow(
                         AsyncImage(
                             model = ImageRequest.Builder(context).data(art.model).build(),
                             contentDescription = entry.rom.displayName,
-                            contentScale = if (art.isPixelArt) ContentScale.Fit else ContentScale.Crop,
+                            contentScale = if (art.fitsWhole) ContentScale.Fit else ContentScale.Crop,
                             filterQuality =
                                 if (art.isPixelArt) FilterQuality.None else FilterQuality.High,
                             modifier = Modifier.fillMaxSize(),

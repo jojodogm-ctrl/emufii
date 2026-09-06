@@ -189,8 +189,8 @@ internal fun RomTile(
                     model = ImageRequest.Builder(context).data(art.model).build(),
                     contentDescription = rom.displayName,
                     // The ROM's icon is left whole: at 48 px, cropping removes a visible
-                    // part of the drawing.
-                    contentScale = if (art.isPixelArt) ContentScale.Fit else ContentScale.Crop,
+                    // part of the drawing. ES-DE serves box fronts, cropped the same way.
+                    contentScale = if (art.fitsWhole) ContentScale.Fit else ContentScale.Crop,
                     // Pixel art scales up without smoothing, or it turns to mush.
                     filterQuality =
                         if (art.isPixelArt) FilterQuality.None else FilterQuality.High,
