@@ -511,6 +511,7 @@ private fun RomsGrid(
     contentPadding: PaddingValues
 ) {
     val localWindowInfo = LocalWindowInfo.current
+    val density = LocalDensity.current
     val landscape = localWindowInfo.containerSize.width > localWindowInfo.containerSize.height
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         // Whole rows, or none: leftover height goes to the *top* padding, never
@@ -534,9 +535,13 @@ private fun RomsGrid(
         fun rowFor(c: Int) = cellFor(c) + 8.dp + TILE_TITLE_ROOM
         val wantRows = if (landscape) 2 else 3
         val widthCols = if (landscape) {
+            // containerSize is in pixels, and everything this count is compared against
+            // is in dp: read raw, a 1920 px screen asked for sixteen columns instead of
+            // six and the titles no longer fit their tile.
+            val widthDp = with(density) { localWindowInfo.containerSize.width.toDp() }
             max(
                 GRID_COLS_PORTRAIT,
-                (localWindowInfo.containerSize.width - 40) / (TILE_MIN_WIDTH_DP + 18)
+                ((widthDp - 40.dp) / (TILE_MIN_WIDTH_DP + 18).dp).toInt()
             )
         } else {
             GRID_COLS_PORTRAIT
