@@ -7,6 +7,7 @@ import android.provider.DocumentsContract
 import android.util.Log
 import eu.emufii.app.library.psp.PspUmdReader
 import eu.emufii.app.library.switchfs.SwitchReader
+import androidx.core.content.edit
 
 private const val TAG = "RomsRepository"
 private const val PREFS = "emufii_library"
@@ -28,7 +29,7 @@ private const val MAX_FILES = 5000
  * recognised as a PSP game.
  * pourquoi : docs/decisions/scan-bibliotheque.md § A decision chain, cheapest first
  */
-class RomsRepository(private val context: Context) {
+class RomsRepository private constructor(private val context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val headerReader = RomHeaderReader(context)
@@ -81,7 +82,7 @@ class RomsRepository(private val context: Context) {
         }
         // This key's old tree is no longer read: release it, unless the other key uses it.
         val previous = prefs.getString(key, null)?.let(Uri::parse)
-        prefs.edit().putString(key, uri.toString()).apply()
+        prefs.edit { putString(key, uri.toString()) }
         if (previous != null && previous != uri) release(previous)
         cachedRoms = null
     }
@@ -89,14 +90,14 @@ class RomsRepository(private val context: Context) {
     fun clear() {
         val kept = secondFolderUri()
         savedFolderUri()?.takeIf { it != kept }?.let(::release)
-        prefs.edit().remove(KEY_FOLDER_URI).apply()
+        prefs.edit { remove(KEY_FOLDER_URI) }
         cachedRoms = null
     }
 
     fun clearSecondFolder() {
         val kept = savedFolderUri()
         secondFolderUri()?.takeIf { it != kept }?.let(::release)
-        prefs.edit().remove(KEY_FOLDER_URI_2).apply()
+        prefs.edit { remove(KEY_FOLDER_URI_2) }
         cachedRoms = null
     }
 
@@ -113,10 +114,23 @@ class RomsRepository(private val context: Context) {
      * Last scan's result, shared across instances.
      * pourquoi : docs/decisions/scan-bibliotheque.md § The cache belongs to the process, not to the screen
      */
-    private companion object {
+    companion object {
         @Volatile
-        var cachedRoms: List<Rom>? = null
-        val scanLock = Any()
+        private var cachedRoms: List<Rom>? = null
+        private val scanLock = Any()
+
+        /**
+         * `RomsRepository` holds reader and cache state; building one per screen let
+         * two scans race the same folder. Same pattern as
+         * [eu.emufii.app.settings.SettingsStore].
+         */
+        @Volatile
+        private var instance: RomsRepository? = null
+
+        fun get(context: Context): RomsRepository =
+            instance ?: synchronized(this) {
+                instance ?: RomsRepository(context.applicationContext).also { instance = it }
+            }
     }
 
     fun cachedOrScan(): List<Rom> = cachedRoms?.let(::named) ?: scan()

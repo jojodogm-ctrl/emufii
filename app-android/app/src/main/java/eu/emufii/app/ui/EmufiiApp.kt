@@ -88,6 +88,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
 private sealed interface Screen {
     data object Library : Screen
@@ -164,7 +165,7 @@ private const val TUNNEL_RELEASE_MS = 6_000L
  */
 private suspend fun pollHostIp(client: CoordinatorClient, code: String): String? {
     repeat(20) {
-        delay(500)
+        delay(500.milliseconds)
         client.getSession(code).getOrNull()?.hostIp?.let { return it }
     }
     return null
@@ -181,15 +182,16 @@ fun EmufiiApp(settings: SettingsStore) {
     // Handed in: the theme is applied above this composable and must read the same
     // store.
     val settingsStore = settings
-    val romsRepo = remember { RomsRepository(context) }
+    val romsRepo = remember { RomsRepository.get(context) }
     val profile by profileStore.profile.collectAsStateWithLifecycle()
+
     /**
      * Survives the activity recreation a language change causes.
      * pourquoi : docs/decisions/lancement-et-navigation.md § The logo, once per process and never on first launch
      */
     var onProfilePage by rememberSaveable { mutableStateOf(false) }
     var screen by remember {
-        mutableStateOf<Screen>(if (onProfilePage) Screen.ProfileAndSettings else Screen.Library)
+        mutableStateOf(if (onProfilePage) Screen.ProfileAndSettings else Screen.Library)
     }
     // The gate must not re-arm while a session lives, or returning lands on the logo.
     SideEffect {
@@ -218,7 +220,7 @@ fun EmufiiApp(settings: SettingsStore) {
     var librarySecondFolder by remember { mutableStateOf(romsRepo.secondFolderLabel()) }
     var libraryScanning by remember { mutableStateOf(false) }
     var libraryCount by remember { mutableStateOf<Int?>(null) }
-    var libraryRevision by remember { mutableStateOf(0) }
+    var libraryRevision by remember { mutableIntStateOf(0) }
 
     fun rescanLibrary() {
         if (libraryScanning) return
@@ -289,7 +291,7 @@ fun EmufiiApp(settings: SettingsStore) {
             val freed = when (held) {
                 TunnelHolder.WFC -> {
                     WfcManager.stop(context)
-                    withTimeoutOrNull(TUNNEL_RELEASE_MS) {
+                    withTimeoutOrNull(TUNNEL_RELEASE_MS.milliseconds) {
                         WfcManager.state.first { it !is WfcState.Active }
                     }
                 }
@@ -297,10 +299,11 @@ fun EmufiiApp(settings: SettingsStore) {
                 // the code.
                 TunnelHolder.SESSION -> {
                     EmufiiWgManager.stop(context)
-                    withTimeoutOrNull(TUNNEL_RELEASE_MS) {
+                    withTimeoutOrNull(TUNNEL_RELEASE_MS.milliseconds) {
                         EmufiiWgManager.state.first { it is WgState.Idle || it is WgState.Error }
                     }
                 }
+
                 TunnelHolder.NONE -> Unit
             }
             if (freed == null) fail(R.string.tunnel_conflict_stuck) else proceed()
@@ -311,92 +314,97 @@ fun EmufiiApp(settings: SettingsStore) {
      * Null if it errored or took too long.
      * pourquoi : docs/decisions/lancement-et-navigation.md § Android's single VPN slot
      */
-    suspend fun awaitTunnel(): WgState.Online? = withTimeoutOrNull(TUNNEL_TIMEOUT_MS) {
+    suspend fun awaitTunnel(): WgState.Online? = withTimeoutOrNull(TUNNEL_TIMEOUT_MS.milliseconds) {
         EmufiiWgManager.state.first { it is WgState.Error || it is WgState.Online } as? WgState.Online
     }
 
-    fun startHostSession(rom: Rom, private: Boolean = false) = withTunnelSlot(TunnelHolder.SESSION) {
-        // No screen change: the launch card is still spinning and carries this leg.
-        // pourquoi : docs/decisions/lancement-et-navigation.md § Android's single VPN slot
-        scope.launch {
-            // Codes are short and random: the coordinator rejects duplicates and a
-            // fresh draw fixes it.
-            var created: CreatedSession? = null
-            var code = ""
-            var lastError: Throwable? = null
-            for (attempt in 1..CODE_ATTEMPTS) {
-                code = SessionCodes.generate()
-                val outcome = client.createSession(
-                    code, rom.sessionId, rom.displayName, profile.name, profile.id,
-                    // Stated, never guessed: 3DS and Switch write titleId alike, and
-                    // this decides the VPS room.
-                    console = rom.console.wireName,
-                    private = private
-                )
-                created = outcome.getOrNull()
-                if (created != null) break
-                lastError = outcome.exceptionOrNull()
-                // Only a collision is worth another draw; an unreachable coordinator
-                // costs three timeouts.
-                val collision = lastError.let { it is CoordinatorError.Http && it.status == 409 }
-                if (!collision) break
-            }
-            val session = created ?: return@launch fail(
-                if (lastError is CoordinatorError.Unreachable) R.string.flow_coordinator_unreachable
-                else R.string.flow_create_failed
-            )
+    fun startHostSession(rom: Rom, private: Boolean = false) =
+        withTunnelSlot(TunnelHolder.SESSION) {
+            // No screen change: the launch card is still spinning and carries this leg.
+            // pourquoi : docs/decisions/lancement-et-navigation.md § Android's single VPN slot
+            scope.launch {
+                // Codes are short and random: the coordinator rejects duplicates and a
+                // fresh draw fixes it.
+                var created: CreatedSession? = null
+                var code = ""
+                var lastError: Throwable? = null
 
-            ensureVpn(
-                onGranted = {
-                    val epoch = prepEpoch
-                    screen = Screen.Preparing(context.getString(R.string.flow_connecting_tunnel))
-                    scope.launch {
-                        // Claiming the address publishes host_ip: the profile id
-                        // identifies the host.
-                        val hostToken = session.token
-                        val info = client.claimAddress(
-                            code, EmufiiWgManager.publicKey(context), profile.name, profile.id
-                        ).getOrNull() ?: run {
-                            client.deleteSession(code, hostToken)
-                            return@launch fail(R.string.flow_tunnel_failed)
-                        }
-                        // PS2 only: its keyboard has no dot key, so it dials a name.
-                        EmufiiWgManager.start(
-                            context, code, info,
-                            announceDns = rom.console.backend == Backend.ARMSX2
-                        )
-                        if (awaitTunnel() == null) {
-                            client.deleteSession(code, hostToken)
-                            EmufiiWgManager.stop(context)
-                            return@launch fail(R.string.flow_tunnel_failed)
-                        }
-                        // The target emulator's port: Dolphin listens on 2626, the
-                        // others on 24872.
-                        // pourquoi : docs/decisions/lancement-et-navigation.md § Android's single VPN slot
-                        val netplayPort = rom.console.backend.defaultNetplayPort
-                        client.patchSession(code, info.address, netplayPort, hostToken)
-                        if (prepEpoch != epoch) return@launch
-                        screen = Screen.InSession(
-                            Session(
-                                code = code,
-                                hostIp = info.address,
-                                port = netplayPort.toString(),
-                                role = Session.Role.HOST,
-                                rom = rom.toRef(),
-                                token = hostToken,
-                                // With a VPS room the host joins like everyone else.
-                                room = session.room
-                            )
-                        )
-                    }
-                },
-                onDenied = {
-                    scope.launch { client.deleteSession(code, session.token) }
-                    fail(R.string.flow_no_vpn_host)
+                @Suppress("unused")
+                for (attempt in 1..CODE_ATTEMPTS) {
+                    code = SessionCodes.generate()
+                    val outcome = client.createSession(
+                        code, rom.sessionId, rom.displayName, profile.name, profile.id,
+                        // Stated, never guessed: 3DS and Switch write titleId alike, and
+                        // this decides the VPS room.
+                        console = rom.console.wireName,
+                        private = private
+                    )
+                    created = outcome.getOrNull()
+                    if (created != null) break
+                    lastError = outcome.exceptionOrNull()
+                    // Only a collision is worth another draw; an unreachable coordinator
+                    // costs three timeouts.
+                    val collision =
+                        lastError.let { it is CoordinatorError.Http && it.status == 409 }
+                    if (!collision) break
                 }
-            )
+                val session = created ?: return@launch fail(
+                    if (lastError is CoordinatorError.Unreachable) R.string.flow_coordinator_unreachable
+                    else R.string.flow_create_failed
+                )
+
+                ensureVpn(
+                    onGranted = {
+                        val epoch = prepEpoch
+                        screen =
+                            Screen.Preparing(context.getString(R.string.flow_connecting_tunnel))
+                        scope.launch {
+                            // Claiming the address publishes host_ip: the profile id
+                            // identifies the host.
+                            val hostToken = session.token
+                            val info = client.claimAddress(
+                                code, EmufiiWgManager.publicKey(context), profile.name, profile.id
+                            ).getOrNull() ?: run {
+                                client.deleteSession(code, hostToken)
+                                return@launch fail(R.string.flow_tunnel_failed)
+                            }
+                            // PS2 only: its keyboard has no dot key, so it dials a name.
+                            EmufiiWgManager.start(
+                                context, code, info,
+                                announceDns = rom.console.backend == Backend.ARMSX2
+                            )
+                            if (awaitTunnel() == null) {
+                                client.deleteSession(code, hostToken)
+                                EmufiiWgManager.stop(context)
+                                return@launch fail(R.string.flow_tunnel_failed)
+                            }
+                            // The target emulator's port: Dolphin listens on 2626, the
+                            // others on 24872.
+                            // pourquoi : docs/decisions/lancement-et-navigation.md § Android's single VPN slot
+                            val netplayPort = rom.console.backend.defaultNetplayPort
+                            client.patchSession(code, info.address, netplayPort, hostToken)
+                            if (prepEpoch != epoch) return@launch
+                            screen = Screen.InSession(
+                                Session(
+                                    code = code,
+                                    hostIp = info.address,
+                                    port = netplayPort.toString(),
+                                    role = Session.Role.HOST,
+                                    rom = rom.toRef(),
+                                    token = hostToken,
+                                    // With a VPS room the host joins like everyone else.
+                                    room = session.room
+                                )
+                            )
+                        }
+                    },
+                    onDenied = {
+                        scope.launch { client.deleteSession(code, session.token) }
+                        fail(R.string.flow_no_vpn_host)
+                    }
+                )
+            }
         }
-    }
 
     fun startJoinFlow(rom: RomRef?, code: String) {
         // Gates joining as well as hosting, and is said before the VPN prompt.
@@ -436,17 +444,20 @@ fun EmufiiApp(settings: SettingsStore) {
                 ensureVpn(
                     onGranted = {
                         val epoch = prepEpoch
-                        screen = Screen.Preparing(context.getString(R.string.flow_connecting_tunnel))
+                        screen =
+                            Screen.Preparing(context.getString(R.string.flow_connecting_tunnel))
                         scope.launch {
                             // 503 is full, 429 is asking too fast.
                             val info = client.claimAddress(
                                 code, EmufiiWgManager.publicKey(context), profile.name, profile.id
                             ).getOrElse { err ->
-                                val why = when {
-                                    err is CoordinatorError.Http && err.status == 503 ->
+                                val why = when (err) {
+                                    is CoordinatorError.Http if err.status == 503 ->
                                         R.string.flow_session_full
-                                    err is CoordinatorError.Http && err.status == 429 ->
+
+                                    is CoordinatorError.Http if err.status == 429 ->
                                         R.string.flow_too_many_requests
+
                                     else -> R.string.flow_tunnel_failed
                                 }
                                 return@launch fail(why)
@@ -462,10 +473,10 @@ fun EmufiiApp(settings: SettingsStore) {
                             // The host publishes its address once its tunnel is up,
                             // possibly after we got here.
                             val hostIp = remote.hostIp ?: pollHostIp(client, code)
-                                ?: run {
-                                    EmufiiWgManager.stop(context)
-                                    return@launch fail(R.string.flow_host_not_ready)
-                                }
+                            ?: run {
+                                EmufiiWgManager.stop(context)
+                                return@launch fail(R.string.flow_host_not_ready)
+                            }
                             // It brings back the token that lets us withdraw ourselves
                             // later.
                             // pourquoi : docs/decisions/lancement-et-navigation.md § Android's single VPN slot
@@ -477,10 +488,10 @@ fun EmufiiApp(settings: SettingsStore) {
                                     code = code,
                                     hostIp = hostIp,
                                     port = (
-                                        remote.port
-                                            ?: rom?.console?.backend?.defaultNetplayPort
-                                            ?: DEFAULT_PORT
-                                        ).toString(),
+                                            remote.port
+                                                ?: rom?.console?.backend?.defaultNetplayPort
+                                                ?: DEFAULT_PORT
+                                            ).toString(),
                                     role = Session.Role.GUEST,
                                     rom = rom,
                                     token = memberToken,
@@ -524,7 +535,7 @@ fun EmufiiApp(settings: SettingsStore) {
         if (inSession) return@LaunchedEffect
         while (true) {
             client.announcePresence(profile.id, profile.name, inSession = false)
-            delay(PRESENCE_MS)
+            delay(PRESENCE_MS.milliseconds)
         }
     }
 
@@ -568,6 +579,7 @@ fun EmufiiApp(settings: SettingsStore) {
                                 line = when {
                                     status?.inSession == true ->
                                         status.romTitle ?: friendPlayingUnknown
+
                                     status?.online == true -> friendOnline
                                     else -> friendOffline
                                 },
@@ -662,7 +674,7 @@ fun EmufiiApp(settings: SettingsStore) {
             runCatching { allEmulators(context) }
             runCatching { ArtworkPreload.warm(context, roms) }
         }
-        withTimeoutOrNull(PRELOAD_MS) { warm.join() }
+        withTimeoutOrNull(PRELOAD_MS.milliseconds) { warm.join() }
         libraryReady = true
     }
 
@@ -693,111 +705,129 @@ fun EmufiiApp(settings: SettingsStore) {
         LocalCompatDb provides compat,
         LocalGameMetaDb provides gameMeta,
     ) {
-    when (val s = screen) {
-        Screen.Library -> LibraryScreen(
-            profile = profile,
-            onOpenProfile = { onProfilePage = true; screen = Screen.ProfileAndSettings },
-            onOpenFriends = { screen = Screen.Friends },
-            onOpenFinder = { screen = Screen.Finder },
-            // DS online play shares nothing with the session flow: no code to create,
-            // none to join.
-            onCreate = { rom, private ->
-                if (rom.console.backend == Backend.MELONDS_WFC) screen = Screen.Wfc(rom)
-                else startHostSession(rom, private)
-            },
-            onJoinWith = { rom ->
-                if (rom.console.backend == Backend.MELONDS_WFC) screen = Screen.Wfc(rom)
-                else screen = Screen.Join(rom.toRef())
-            },
-            // No session, no tunnel: the player picks a server inside PPSSPP.
-            // pourquoi : docs/decisions/lancement-et-navigation.md § Two routes that are not sessions
-            onPlayPublic = { rom -> screen = Screen.PspOnline(rom) },
-            onFolderPicked = { uri -> changeLibraryFolder(uri) },
-            libraryRevision = libraryRevision
-        )
-        is Screen.PspOnline -> PspOnlineScreen(
-            rom = (screen as Screen.PspOnline).rom,
-            onBack = { screen = Screen.Library }
-        )
-        Screen.Finder -> SessionFinderScreen(
-            client = client,
-            romsRepo = romsRepo,
-            onBack = { screen = Screen.Library },
-            onJoin = { open -> joinKnownSession(open.code, open.romTitleId, open.romTitle) }
-        )
-        Screen.Friends -> FriendsScreen(
-            profile = profile,
-            friendStore = friendStore,
-            statuses = friendStatuses,
-            onJoin = { code, romTitleId, romTitle -> joinKnownSession(code, romTitleId, romTitle) },
-            onBack = { screen = Screen.Library }
-        )
-        is Screen.Preparing -> PreparingScreen(
-            label = s.label,
-            onGiveUp = {
-                // The counter first, the tunnel after: the attempt in flight is
-                // orphaned before it loses the floor.
-                prepEpoch++
-                EmufiiWgManager.stop(context)
-                screen = Screen.Library
-            }
-        )
-        is Screen.Join -> JoinScreen(
-            rom = s.rom,
-            client = client,
-            onBack = { screen = Screen.Library },
-            onSubmitCode = { code -> startJoinFlow(s.rom, code) }
-        )
-        Screen.ProfileAndSettings -> SettingsScreen(
-            profile = profile,
-            profileStore = profileStore,
-            friendStore = friendStore,
-            settingsStore = settingsStore,
-            romsRepo = romsRepo,
-            libraryFolder = libraryFolder,
-            librarySecondFolder = librarySecondFolder,
-            libraryScanning = libraryScanning,
-            libraryCount = libraryCount,
-            onFolderPicked = { uri -> changeLibraryFolder(uri) },
-            onSecondFolderPicked = { uri -> changeSecondLibraryFolder(uri) },
-            onSecondFolderRemoved = { removeSecondLibraryFolder() },
-            onRescan = { rescanLibrary() },
-            onBack = {
-                onProfilePage = false
-                screen = Screen.Library
-            }
-        )
-        is Screen.Wfc -> WfcScreen(
-            rom = s.rom,
-            onRequestTunnelSlot = { proceed -> withTunnelSlot(TunnelHolder.WFC, proceed) },
-            onBack = { screen = Screen.Library }
-        )
-        is Screen.InSession -> SessionScreen(
-            session = s.session,
-            profile = profile,
-            client = client,
-            onSessionEnded = {
-                scope.launch { EmufiiWgManager.stop(context) }
-                fail(R.string.flow_host_closed)
-            },
-            onLeave = {
-                // The plan outlives the process, but must not outlive the session that
-                // justified it.
-                NetplayAutomation.clear(PlanStore(context))
-                scope.launch {
-                    if (s.session.role == Session.Role.HOST) {
-                        client.deleteSession(s.session.code, s.session.token)
-                    } else {
-                        // Leave at once, so the host sees the departure now rather than
-                        // at the TTL.
-                        client.leaveSession(s.session.code, profile.id, s.session.token)
+        when (val s = screen) {
+            Screen.Library -> LibraryScreen(
+                profile = profile,
+                onOpenProfile = { onProfilePage = true; screen = Screen.ProfileAndSettings },
+                onOpenFriends = { screen = Screen.Friends },
+                onOpenFinder = { screen = Screen.Finder },
+                // DS online play shares nothing with the session flow: no code to create,
+                // none to join.
+                onCreate = { rom, private ->
+                    if (rom.console.backend == Backend.MELONDS_WFC) screen = Screen.Wfc(rom)
+                    else startHostSession(rom, private)
+                },
+                onJoinWith = { rom ->
+                    screen = if (rom.console.backend == Backend.MELONDS_WFC) {
+                        Screen.Wfc(rom)
                     }
+                    else {
+                        Screen.Join(rom.toRef())
+                    }
+                },
+                // No session, no tunnel: the player picks a server inside PPSSPP.
+                // pourquoi : docs/decisions/lancement-et-navigation.md § Two routes that are not sessions
+                onPlayPublic = { rom -> screen = Screen.PspOnline(rom) },
+                onFolderPicked = { uri -> changeLibraryFolder(uri) },
+                libraryRevision = libraryRevision
+            )
+
+            is Screen.PspOnline -> PspOnlineScreen(
+                rom = (screen as Screen.PspOnline).rom,
+                onBack = { screen = Screen.Library }
+            )
+
+            Screen.Finder -> SessionFinderScreen(
+                client = client,
+                romsRepo = romsRepo,
+                onBack = { screen = Screen.Library },
+                onJoin = { open -> joinKnownSession(open.code, open.romTitleId, open.romTitle) }
+            )
+
+            Screen.Friends -> FriendsScreen(
+                profile = profile,
+                friendStore = friendStore,
+                statuses = friendStatuses,
+                onJoin = { code, romTitleId, romTitle ->
+                    joinKnownSession(
+                        code,
+                        romTitleId,
+                        romTitle
+                    )
+                },
+                onBack = { screen = Screen.Library }
+            )
+
+            is Screen.Preparing -> PreparingScreen(
+                label = s.label,
+                onGiveUp = {
+                    // The counter first, the tunnel after: the attempt in flight is
+                    // orphaned before it loses the floor.
+                    prepEpoch++
                     EmufiiWgManager.stop(context)
+                    screen = Screen.Library
                 }
-                screen = Screen.Library
-            }
-        )
-    }
+            )
+
+            is Screen.Join -> JoinScreen(
+                rom = s.rom,
+                client = client,
+                onBack = { screen = Screen.Library },
+                onSubmitCode = { code -> startJoinFlow(s.rom, code) }
+            )
+
+            Screen.ProfileAndSettings -> SettingsScreen(
+                profile = profile,
+                profileStore = profileStore,
+                friendStore = friendStore,
+                settingsStore = settingsStore,
+                romsRepo = romsRepo,
+                libraryFolder = libraryFolder,
+                librarySecondFolder = librarySecondFolder,
+                libraryScanning = libraryScanning,
+                libraryCount = libraryCount,
+                onFolderPicked = { uri -> changeLibraryFolder(uri) },
+                onSecondFolderPicked = { uri -> changeSecondLibraryFolder(uri) },
+                onSecondFolderRemoved = { removeSecondLibraryFolder() },
+                onRescan = { rescanLibrary() },
+                onBack = {
+                    onProfilePage = false
+                    screen = Screen.Library
+                }
+            )
+
+            is Screen.Wfc -> WfcScreen(
+                rom = s.rom,
+                onRequestTunnelSlot = { proceed -> withTunnelSlot(TunnelHolder.WFC, proceed) },
+                onBack = { screen = Screen.Library }
+            )
+
+            is Screen.InSession -> SessionScreen(
+                session = s.session,
+                profile = profile,
+                client = client,
+                onSessionEnded = {
+                    scope.launch { EmufiiWgManager.stop(context) }
+                    fail(R.string.flow_host_closed)
+                },
+                onLeave = {
+                    // The plan outlives the process, but must not outlive the session that
+                    // justified it.
+                    NetplayAutomation.clear(PlanStore(context))
+                    scope.launch {
+                        if (s.session.role == Session.Role.HOST) {
+                            client.deleteSession(s.session.code, s.session.token)
+                        } else {
+                            // Leave at once, so the host sees the departure now rather than
+                            // at the TTL.
+                            client.leaveSession(s.session.code, profile.id, s.session.token)
+                        }
+                        EmufiiWgManager.stop(context)
+                    }
+                    screen = Screen.Library
+                }
+            )
+        }
     }
 
     // Last in source order, so it covers everything.

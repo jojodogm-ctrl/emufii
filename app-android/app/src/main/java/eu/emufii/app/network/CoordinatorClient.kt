@@ -16,7 +16,7 @@ import eu.emufii.app.profile.Profile
  * release → hosted coordinator over HTTPS, overridden at build time with
  *          -Pemufii.coordinatorUrl=https://...
  */
-val COORDINATOR_BASE_URL: String = BuildConfig.COORDINATOR_BASE_URL
+const val COORDINATOR_BASE_URL: String = BuildConfig.COORDINATOR_BASE_URL
 
 /**
  * The code is public, so [token] is what authorises. Returned at creation only,
@@ -37,7 +37,7 @@ data class CreatedSession(
  */
 sealed class CoordinatorError(message: String) : Exception(message) {
     /** 404: no such session, or one purged after its TTL. */
-    object NotFound : CoordinatorError("session introuvable")
+    class NotFound : CoordinatorError("session introuvable")
 
     /** Nothing answered: no network, DNS, TLS, timeout. */
     class Unreachable(cause: Throwable) : CoordinatorError(cause.message ?: "injoignable")
@@ -352,7 +352,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                 payload?.let { conn.outputStream.use { out -> out.write(it.toByteArray(Charsets.UTF_8)) } }
                 val status = conn.responseCode
                 when {
-                    status == 404 -> throw CoordinatorError.NotFound
+                    status == 404 -> throw CoordinatorError.NotFound()
                     status !in 200..299 -> throw CoordinatorError.Http(status)
                     // 204 has no body, and reading it would throw.
                     status == 204 || conn.contentLength == 0 -> ""
@@ -365,7 +365,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             // Anything that is not already a verdict on the answer is a failure to get
             // one: `openConnection`, `responseCode` and the body read all surface as
             // IOException when nothing answers.
-            throw if (err is CoordinatorError) err else CoordinatorError.Unreachable(err)
+            throw err as? CoordinatorError ?: CoordinatorError.Unreachable(err)
         }
     }
 
