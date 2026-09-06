@@ -166,7 +166,7 @@ data class PanelFriend(
  * pourquoi : docs/decisions/second-ecran.md § What travels to the panel travels already resolved
  */
 enum class PanelMark {
-    PROFILE, LIBRARY, CONSOLES, EMULATORS, APPEARANCE, GENERAL, ABOUT,
+    PROFILE, LIBRARY, CONSOLES, EMULATORS, APPEARANCE, GENERAL, ABOUT, CRASH_LOGS,
 
     // The top bar's pills borrow marks already drawn rather than adding more.
     SEARCH, LAYOUT, SORT, SESSIONS, FRIENDS,

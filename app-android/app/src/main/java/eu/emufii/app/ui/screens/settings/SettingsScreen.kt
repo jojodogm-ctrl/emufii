@@ -43,6 +43,7 @@ import eu.emufii.app.secondscreen.SecondScreen
 import eu.emufii.app.secondscreen.SecondScreenModel
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.components.Avatar
+import eu.emufii.app.ui.components.BugMark
 import eu.emufii.app.ui.components.ChipMark
 import eu.emufii.app.ui.components.DetailTone
 import eu.emufii.app.ui.components.GhostButton
@@ -58,6 +59,7 @@ import eu.emufii.app.wg.WgKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A hub holding nothing but entries, and seven pages: it is crossed, not read.
@@ -129,7 +131,7 @@ fun SettingsScreen(
     LaunchedEffect(Unit) {
         while (true) {
             autofillOn = autofillLauncher.isNetplayAutomationEnabled()
-            delay(700)
+            delay(700.milliseconds)
         }
     }
 
@@ -162,11 +164,7 @@ fun SettingsScreen(
     val face = settingsFace(
         page = page,
         displayName = playerDisplayName(name.ifBlank { Profile.DEFAULT_NAME }),
-        libraryFolder = libraryFolder,
-        libraryCount = libraryCount,
-        libraryScanning = libraryScanning,
         hiddenConsoleCount = hiddenConsoles.size,
-        emulatorsReady = listOf(ppssppConfigReady, ps2ProfileReady, autofillOn).count { it },
         themeLabel = stringResource(theme.labelRes),
         languageLabel = stringResource(language.labelRes),
     )
@@ -267,6 +265,8 @@ fun SettingsScreen(
         )
 
         SettingsPageId.ABOUT -> AboutPage(onBack = toHub, modifier = modifier)
+
+        SettingsPageId.CRASH_LOGS -> CrashLogsPage(onBack = toHub, modifier = modifier)
     }
 
     if (confirmingReset) {
@@ -315,11 +315,7 @@ private const val ARTWORK_SAMPLE = 5
 private fun settingsFace(
     page: SettingsPageId,
     displayName: String,
-    libraryFolder: String?,
-    libraryCount: Int?,
-    libraryScanning: Boolean,
     hiddenConsoleCount: Int,
-    emulatorsReady: Int,
     themeLabel: String,
     languageLabel: String,
 ): SecondScreenModel.SettingsEntry? {
@@ -375,11 +371,16 @@ private fun settingsFace(
             BuildConfig.VERSION_NAME,
             PanelMark.ABOUT
         )
+        SettingsPageId.CRASH_LOGS -> face(
+            stringResource(R.string.settings_page_crash_logs),
+            stringResource(R.string.settings_sub_crash_logs),
+            PanelMark.CRASH_LOGS
+        )
     }
 }
 
 internal enum class SettingsPageId {
-    HUB, PROFILE, LIBRARY, CONSOLES, EMULATORS, APPEARANCE, GENERAL, ABOUT
+    HUB, PROFILE, LIBRARY, CONSOLES, EMULATORS, APPEARANCE, GENERAL, ABOUT, CRASH_LOGS
 }
 
 /**
@@ -421,11 +422,7 @@ private fun SettingsHub(
         fun faceOf(page: SettingsPageId) = settingsFace(
             page = page,
             displayName = displayName,
-            libraryFolder = libraryFolder,
-            libraryCount = libraryCount,
-            libraryScanning = libraryScanning,
             hiddenConsoleCount = hiddenConsoleCount,
-            emulatorsReady = emulatorsReady,
             themeLabel = themeLabel,
             languageLabel = languageLabel,
         )!!
@@ -553,6 +550,18 @@ private fun SettingsHub(
                     entry = first,
                     modifier = mod,
                     icon = { InfoMark(color = it) },
+                    onFocused = { if (it) SecondScreen.publish(face) }
+                )
+            },
+            { first, mod ->
+                val face = faceOf(SettingsPageId.CRASH_LOGS)
+                SettingsEntry(
+                    label = face.title,
+                    summary = face.summary,
+                    onOpen = { onOpen(SettingsPageId.CRASH_LOGS) },
+                    entry = first,
+                    modifier = mod,
+                    icon = { BugMark(color = it) },
                     onFocused = { if (it) SecondScreen.publish(face) }
                 )
             }
