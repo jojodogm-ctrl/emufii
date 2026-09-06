@@ -2,7 +2,6 @@ package eu.emufii.app.session
 
 import eu.emufii.app.azahar.NetplayPlan
 import eu.emufii.app.network.RoomRef
-import eu.emufii.app.ui.screens.netplayPlan
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
