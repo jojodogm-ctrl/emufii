@@ -105,10 +105,16 @@
     <string name="session_launch_done">Emulation started</string>
     <string name="session_launch_done_step2">2. Emulation started</string>
     <string name="session_netplay_open">1. Set %1$s up automatically</string>
+    <string name="session_netplay_manual_open">Manual setup</string>
     <string name="session_netplay_waiting_host">1. Waiting for the host…</string>
     <string name="session_netplay_again">1. Set %1$s up again</string>
     <string name="session_netplay_done">1. %1$s is set up</string>
     <string name="session_netplay_no_address">Session address unavailable.</string>
+    <string name="session_manual_hint">Type these into %1$s if autofill doesn\'t work.</string>
+    <string name="session_manual_nickname">Nickname</string>
+    <string name="session_manual_room_name">Room name / Session code</string>
+    <string name="session_manual_password">Password</string>
+    <string name="session_manual_copy">Copy %1$s</string>
     <string name="session_wfc_not_a_session">DS online play doesn\'t go through a session</string>
     <string name="session_unsupported_short">Multiplayer not supported yet</string>
     <string name="session_unsupported_console">Multiplayer isn\'t supported for this console yet</string>

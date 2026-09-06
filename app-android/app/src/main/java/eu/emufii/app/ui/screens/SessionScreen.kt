@@ -3,11 +3,15 @@ package eu.emufii.app.ui.screens
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -15,8 +19,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -43,19 +50,21 @@ import eu.emufii.app.secondscreen.PanelStep
 import eu.emufii.app.secondscreen.SecondScreen
 import eu.emufii.app.secondscreen.rememberPresentationDisplay
 import eu.emufii.app.session.Session
+import eu.emufii.app.session.netplayPlan
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.screens.session.CodeCard
 import eu.emufii.app.ui.screens.session.ConnectionCard
 import eu.emufii.app.ui.screens.session.EmulatorHintCard
 import eu.emufii.app.ui.screens.session.LaunchButton
 import eu.emufii.app.ui.screens.session.LeaveButton
-import eu.emufii.app.ui.screens.session.NetplayButton
+import eu.emufii.app.ui.screens.session.AutoSetupNetplayButton
 import eu.emufii.app.ui.screens.session.OfflineCard
 import eu.emufii.app.ui.screens.session.PresenceCard
 import eu.emufii.app.ui.screens.session.PspHintCard
 import eu.emufii.app.ui.screens.session.PspSetupButton
 import eu.emufii.app.ui.screens.session.SessionCodeChip
 import eu.emufii.app.ui.screens.session.SessionLandscapeLayout
+import eu.emufii.app.ui.screens.session.SessionManualDialog
 import eu.emufii.app.ui.screens.session.StatusLine
 import eu.emufii.app.ui.screens.session.danger
 import eu.emufii.app.ui.screens.session.launchEnabled
@@ -73,6 +82,7 @@ import eu.emufii.app.ui.components.PadDialog
 import eu.emufii.app.ui.components.PadDialogText
 import eu.emufii.app.ui.components.ScaffoldFocus
 import eu.emufii.app.ui.components.padEntry
+import eu.emufii.app.ui.screens.session.ManualSetupNetplayButton
 
 @Composable
 fun SessionScreen(
@@ -350,14 +360,38 @@ fun SessionScreen(
                     // The order the emulator expects: join the room from its main menu, then boot the
                     // game. One button did both, and the ROM started in an emulator that had joined nothing.
                     if (session.backend.hasNetplay && !ps2Automatic) {
-                        NetplayButton(
-                            session = session,
-                            netplayDone = netplayDone,
-                            netplayPrepared = netplayPrepared,
-                            waitingForHost = waitingForHost,
-                            onClick = onNetplayStep,
-                            modifier = Modifier.padEntry()
-                        )
+                        var showManualDialog by remember { mutableStateOf(false) }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            AutoSetupNetplayButton(
+                                session = session,
+                                netplayDone = netplayDone,
+                                waitingForHost = waitingForHost,
+                                onClick = onNetplayStep,
+                                modifier = Modifier
+                                    .weight(0.9f)
+                                    .padEntry()
+                            )
+
+                            Spacer(Modifier.width(12.dp))
+
+                            ManualSetupNetplayButton(
+                                onClick = { showManualDialog = true },
+                                modifier = Modifier.weight(0.1f)
+                            )
+                        }
+                        if (showManualDialog) {
+                            session.netplayPlan(profile.name)?.let { plan ->
+                                SessionManualDialog(
+                                    plan = plan,
+                                    addressLabel = addressLabel,
+                                    emulatorName = session.backend.emulatorName,
+                                    onDismiss = { showManualDialog = false },
+                                )
+                            }
+                        }
                     }
 
                     // The button does not apply the settings, it opens the emulator, and says so.

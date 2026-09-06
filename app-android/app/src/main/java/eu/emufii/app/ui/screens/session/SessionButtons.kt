@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.session
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
@@ -7,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,11 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,10 +61,9 @@ import eu.emufii.app.ui.theme.plate
  * pourquoi : docs/decisions/session.md § Two proofs that a room exists, and the second is knowingly weaker
  */
 @Composable
-internal fun NetplayButton(
+internal fun AutoSetupNetplayButton(
     session: Session,
     netplayDone: Boolean,
-    netplayPrepared: Boolean,
     /**
      * The button greys out and says so rather than sending the guest to a room that does not exist.
      * pourquoi : docs/decisions/session.md § Host then guest is not a comfort detail
@@ -67,6 +71,49 @@ internal fun NetplayButton(
     waitingForHost: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
+) {
+    NetplayButtonContainer(
+        session = session,
+        netPlayReadyStrRes = R.string.session_netplay_open,
+        netplayDone = netplayDone,
+        waitingForHost = waitingForHost,
+        modifier = modifier,
+        onClick = onClick
+    )
+}
+
+@Composable
+internal fun ManualSetupNetplayButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val label = stringResource(R.string.session_netplay_manual_open)
+    Button(
+        onClick = sounded(onClick),
+        shape = ActionShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ),
+        contentPadding = PaddingValues(0.dp),
+        modifier = modifier
+            .height(56.dp)
+            .controlRing(ActionShape)
+            .semantics { contentDescription = label }
+    ) {
+        InfoMark(color = good())
+    }
+}
+
+@Composable
+private fun NetplayButtonContainer(
+    session: Session,
+    @StringRes netPlayReadyStrRes: Int,
+    modifier: Modifier = Modifier,
+    netplayDone: Boolean = false,
+    waitingForHost: Boolean = false,
+    netplayPrepared: Boolean = false,
+    onClick: () -> Unit,
 ) {
     val enabled = session.rom != null && !waitingForHost
     Button(
@@ -79,7 +126,6 @@ internal fun NetplayButton(
             ButtonDefaults.buttonColors()
         },
         modifier = modifier
-            .fillMaxWidth()
             .height(56.dp)
             .controlRing(ActionShape)
             // Greyed out but still reachable: focus says where you are, not that a click lands.
@@ -96,7 +142,7 @@ internal fun NetplayButton(
                     waitingForHost -> R.string.session_netplay_waiting_host
                     netplayDone -> R.string.session_netplay_done
                     netplayPrepared -> R.string.session_netplay_again
-                    else -> R.string.session_netplay_open
+                    else -> netPlayReadyStrRes
                 },
                 // The emulator this session drives: "Azahar" was hard-coded in the string, so a
                 // Switch session announced the wrong program by name.
@@ -319,5 +365,22 @@ private fun CheckMark(color: Color, size: Dp = 18.dp) {
             lineTo(w * 0.86f, w * 0.24f)
         }
         drawPath(path, color = color, style = stroke)
+    }
+}
+
+@Composable
+private fun InfoMark(color: Color, size: Dp = 24.dp) {
+    Canvas(Modifier.size(size)) {
+        val w = this.size.width
+        val strokeWidth = w * 0.12f
+        drawCircle(color = color, radius = w * 0.44f, style = Stroke(width = strokeWidth))
+        drawCircle(color = color, radius = w * 0.07f, center = Offset(w / 2f, w * 0.28f))
+        drawLine(
+            color = color,
+            start = Offset(w / 2f, w * 0.44f),
+            end = Offset(w / 2f, w * 0.76f),
+            strokeWidth = strokeWidth,
+            cap = StrokeCap.Round,
+        )
     }
 }

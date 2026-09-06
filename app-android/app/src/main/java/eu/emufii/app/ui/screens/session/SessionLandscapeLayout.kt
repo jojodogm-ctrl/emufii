@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -29,6 +33,7 @@ import eu.emufii.app.library.Rom
 import eu.emufii.app.network.Member
 import eu.emufii.app.profile.Profile
 import eu.emufii.app.session.Session
+import eu.emufii.app.session.netplayPlan
 import eu.emufii.app.ui.components.RomArtwork
 import eu.emufii.app.ui.components.padEntry
 
@@ -172,14 +177,38 @@ internal fun SessionLandscapeLayout(
                 // pourquoi : docs/decisions/session.md § Down aims at the first button that answers
                 Spacer(Modifier.height(2.dp))
                 if (session.backend.hasNetplay && !ps2Automatic) {
-                    NetplayButton(
-                        session = session,
-                        netplayDone = netplayDone,
-                        netplayPrepared = netplayPrepared,
-                        waitingForHost = waitingForHost,
-                        onClick = onNetplayStep,
-                        modifier = Modifier.padEntry()
-                    )
+                    var showManualDialog by remember { mutableStateOf(false) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        AutoSetupNetplayButton(
+                            session = session,
+                            netplayDone = netplayDone,
+                            waitingForHost = waitingForHost,
+                            onClick = onNetplayStep,
+                            modifier = Modifier
+                                .weight(0.9f)
+                                .padEntry()
+                        )
+
+                        Spacer(Modifier.width(12.dp))
+
+                        ManualSetupNetplayButton(
+                            onClick = { showManualDialog = true },
+                            modifier = Modifier.weight(0.1f)
+                        )
+                    }
+                    if (showManualDialog) {
+                        session.netplayPlan(profile.name)?.let { plan ->
+                            SessionManualDialog(
+                                plan = plan,
+                                addressLabel = addressLabel,
+                                emulatorName = session.backend.emulatorName,
+                                onDismiss = { showManualDialog = false },
+                            )
+                        }
+                    }
                 }
                 if (session.backend == Backend.PPSSPP && !pspAutomatic) {
                     PspSetupButton(

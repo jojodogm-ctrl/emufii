@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -90,6 +91,7 @@ import eu.emufii.app.ui.SilenceSystemSfx
 import eu.emufii.app.ui.components.Avatar
 import eu.emufii.app.ui.components.ChipMark
 import eu.emufii.app.ui.components.CompatBadge
+import eu.emufii.app.ui.components.CopyMark
 import eu.emufii.app.ui.components.CrossIcon
 import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.GridMark
@@ -103,6 +105,7 @@ import eu.emufii.app.ui.components.SignalMark
 import eu.emufii.app.ui.components.SlidersMark
 import eu.emufii.app.ui.components.VpsLamp
 import eu.emufii.app.ui.components.compatLabel
+import eu.emufii.app.ui.copyToClipboard
 import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.sounded
 import eu.emufii.app.ui.tap
@@ -953,7 +956,7 @@ private fun Cover(model: SecondScreenModel.Browsing, modifier: Modifier = Modifi
                 AsyncImage(
                     model = ImageRequest.Builder(context).data(cover).build(),
                     contentDescription = null,
-                    contentScale = if (art.isPixelArt) ContentScale.Fit else ContentScale.Crop,
+                    contentScale = if (art.fitsWhole) ContentScale.Fit else ContentScale.Crop,
                     filterQuality = if (art.isPixelArt) FilterQuality.None else FilterQuality.High,
                     placeholder = ColorPainter(Color.Transparent),
                     error = ColorPainter(Color.Transparent),
@@ -998,6 +1001,7 @@ private fun InSession(model: SecondScreenModel.InSession) {
     val oled = LocalEmufiiOledTheme.current
     val accent = LocalAccent.current
     val steps by SecondScreen.steps.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     // One column: split, each half fell to 268 dp and the port wrapped one digit per
     // line.
@@ -1029,9 +1033,7 @@ private fun InSession(model: SecondScreenModel.InSession) {
 
         // Ten of lift rather than four: this is the one object on the screen.
         Box(
-            modifier = Modifier
-                .plate(CardShape, dark = dark, oled = oled, lift = 10.dp)
-                .padding(horizontal = 34.dp, vertical = if (steps.isEmpty()) 20.dp else 12.dp)
+            modifier = Modifier.plate(CardShape, dark = dark, oled = oled, lift = 10.dp)
         ) {
             val codeSize = if (steps.isEmpty()) 80.sp else 64.sp
             Text(
@@ -1046,7 +1048,17 @@ private fun InSession(model: SecondScreenModel.InSession) {
                 color = accent.bright,
                 maxLines = 1,
                 softWrap = false,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(
+                    horizontal = 34.dp,
+                    vertical = if (steps.isEmpty()) 20.dp else 12.dp
+                )
+            )
+            CopyChip(
+                onCopy = { copyToClipboard(context, model.code, model.code) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-4).dp, y = 8.dp),
             )
         }
 
@@ -1054,8 +1066,14 @@ private fun InSession(model: SecondScreenModel.InSession) {
         // pourquoi : docs/decisions/second-ecran.md § The session code carries no label
         if (model.hostAddress != null || model.port != null) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                model.hostAddress?.let { Fact(stringResource(R.string.session_host_address), it) }
-                model.port?.let { Fact(stringResource(R.string.session_port), it) }
+                model.hostAddress?.let { value ->
+                    val label = stringResource(R.string.session_host_address)
+                    Fact(label, value, onCopy = { copyToClipboard(context, label, value) })
+                }
+                model.port?.let { value ->
+                    val label = stringResource(R.string.session_port)
+                    Fact(label, value, onCopy = { copyToClipboard(context, label, value) })
+                }
             }
         }
 
@@ -1305,32 +1323,60 @@ private fun StepButton(step: PanelStep, selected: Boolean, modifier: Modifier = 
 }
 
 @Composable
-private fun Fact(label: String, value: String) {
+private fun Fact(label: String, value: String, onCopy: (() -> Unit)? = null) {
     val dark = LocalEmufiiDarkTheme.current
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(1.dp),
+    Box(
         modifier = Modifier
             .socket(RoundedCornerShape(14.dp), dark)
             .padding(horizontal = 18.dp, vertical = 9.dp)
     ) {
-        // Neither label nor value wraps: squeezed between two columns, "Port" broke as
-        // "Por / t".
-        // pourquoi : docs/decisions/second-ecran.md § The panel takes the steps, because it is touch
-        Text(
-            label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            softWrap = false
-        )
-        Text(
-            value,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            softWrap = false
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+        ) {
+            // Neither label nor value wraps: squeezed between two columns, "Port" broke as
+            // "Por / t".
+            // pourquoi : docs/decisions/second-ecran.md § The panel takes the steps, because it is touch
+            Text(
+                label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                softWrap = false
+            )
+            Text(
+                value,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                softWrap = false
+            )
+        }
+        if (onCopy != null) {
+            CopyChip(
+                onCopy = onCopy,
+                iconSize = 14.dp,
+                targetSize = 24.dp,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (16).dp, y = (-8).dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun CopyChip(
+    onCopy: () -> Unit,
+    modifier: Modifier = Modifier,
+    iconSize: Dp = 20.dp,
+    targetSize: Dp = 32.dp,
+) {
+    Box(
+        modifier = modifier.size(targetSize).tap(onClick = onCopy),
+        contentAlignment = Alignment.Center,
+    ) {
+        CopyMark(size = iconSize, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
