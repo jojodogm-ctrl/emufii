@@ -245,6 +245,28 @@ fun InfoMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     }
 
 /**
+ * Two overlapping sheets: the front one full, the back one peeking out top and right,
+ * the standard "duplicate" pictogram. Drawn on the same 24-unit grid as every other mark.
+ */
+@Composable
+fun CopyMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
+    TrayIcon(size, color, modifier) { u ->
+        addRoundRect(
+            androidx.compose.ui.geometry.RoundRect(
+                left = 4f * u, top = 7.5f * u, right = 15.5f * u, bottom = 20.5f * u,
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(2f * u)
+            )
+        )
+        moveTo(8.5f * u, 7.5f * u); lineTo(8.5f * u, 5.5f * u)
+        cubicTo(8.5f * u, 4.4f * u, 9.4f * u, 3.5f * u, 10.5f * u, 3.5f * u)
+        lineTo(18f * u, 3.5f * u)
+        cubicTo(19.1f * u, 3.5f * u, 20f * u, 4.4f * u, 20f * u, 5.5f * u)
+        lineTo(20f * u, 13f * u)
+        cubicTo(20f * u, 14.1f * u, 19.1f * u, 15f * u, 18f * u, 15f * u)
+        lineTo(15.5f * u, 15f * u)
+    }
+
+/**
  * The report page: an oval body with two antennae, two side legs and a spine down the
  * middle. Drawn on the same 24-unit grid as every other tray glyph.
  */

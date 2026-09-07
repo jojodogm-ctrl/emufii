@@ -57,8 +57,8 @@ fun RomArtwork(rom: Rom, size: Dp, modifier: Modifier = Modifier) {
                 model = ImageRequest.Builder(context).data(art.model).build(),
                 contentDescription = null,
                 // The ROM's own icon is left whole: at 48 px, cropping removes a visible
-                // part of the drawing.
-                contentScale = if (art.isPixelArt) ContentScale.Fit else ContentScale.Crop,
+                // part of the drawing. ES-DE serves box fronts, cropped the same way.
+                contentScale = if (art.fitsWhole) ContentScale.Fit else ContentScale.Crop,
                 filterQuality = if (art.isPixelArt) FilterQuality.None else FilterQuality.High,
                 modifier = Modifier
                     .fillMaxSize()
