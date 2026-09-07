@@ -59,6 +59,12 @@ fun artworkRim(): Color =
 fun SoftCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    /**
+     * The cursor's band is a share of the card's smaller side, so a tall card wears a
+     * thick one. A card that folds open doubles in height and the band followed it to the
+     * ceiling; those pass a smaller share rather than let the ring become the subject.
+     */
+    bandFraction: Float = 0.12f,
     content: @Composable () -> Unit
 ) {
     val shape = CardShape
@@ -71,7 +77,10 @@ fun SoftCard(
             // Before everything that clips: the ring's glow overflows the node's bounds,
             // and after the plate's clip it stopped dead inside the card. It stays above
             // the `clickable` in the chain, so it still reads its focus.
-            .then(if (onClick != null) Modifier.controlRing(shape) else Modifier)
+            .then(
+                if (onClick != null) Modifier.controlRing(shape, bandFraction = bandFraction)
+                else Modifier
+            )
             .plate(shape = shape, dark = dark, oled = oled, lift = 6.dp)
             .then(if (onClick != null) Modifier.tap(onClick = onClick) else Modifier)
     ) {

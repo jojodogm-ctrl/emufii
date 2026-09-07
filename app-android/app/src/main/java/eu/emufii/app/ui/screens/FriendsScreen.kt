@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import eu.emufii.app.ui.EntryScroll
+import eu.emufii.app.ui.LocalEntryScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -159,10 +161,13 @@ fun FriendsScreen(
             // The whole page scrolls as one document; the list is rendered eagerly rather
             // than as a `LazyColumn`, Compose refusing two nested vertical scrolls. A
             // friends list is counted in tens.
+            val pageScroll = rememberScrollState()
+            val page = remember(pageScroll) { EntryScroll(pageScroll) }
+            CompositionLocalProvider(LocalEntryScroll provides page) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(pageScroll)
                     .padding(
                         start = 20.dp, end = 20.dp,
                         // Past the gesture handle: the footnote used to rest struck through by it.
@@ -222,6 +227,7 @@ fun FriendsScreen(
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 }
+            }
             }
             return@EmufiiScaffold
         }

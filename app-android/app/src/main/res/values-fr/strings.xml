@@ -548,6 +548,7 @@
     <string name="settings_library_subfolders">Sous-dossiers explorés aussi, quelle que soit la console.</string>
     <string name="settings_row_fallback">Images de secours</string>
     <string name="settings_library_second_note">Second dossier, exploré avec le premier.</string>
+    <string name="settings_library_folders_body">Emufii se contente de lire ces dossiers : rien n\'est déplacé, renommé ni copié. Une nouvelle analyse prend ce que tu as ajouté et retire ce que tu as enlevé.</string>
     <string name="settings_library_add_second">Ajouter un 2e dossier</string>
     <string name="settings_library_remove_second">Retirer le 2e</string>
     <string name="settings_about_fact_licence">Licence</string>

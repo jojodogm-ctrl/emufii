@@ -9,6 +9,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -18,12 +19,15 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
@@ -32,10 +36,13 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.findRootCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -206,6 +213,53 @@ private fun deepCut(bright: Color): Color = when (bright) {
 val LocalScaffoldBand = compositionLocalOf { 0.dp }
 
 /**
+ * The scrolling column a control sits in, filled in by the screen, read by [controlRing];
+ * null in a page that does not scroll, and in the library, whose grid scrolls itself.
+ * pourquoi : docs/decisions/navigation-manette.md § The outermost control pulls the page to its edge
+ */
+val LocalEntryScroll = compositionLocalOf<EntryScroll?> { null }
+
+/**
+ * A scrolling page and the roll of the controls inside it.
+ *
+ * Every control carrying a cursor signs in with where it sits in the *content*, which does
+ * not change as the page scrolls. Being the first or the last is then read off that roll
+ * instead of guessed from a distance: three attempts at guessing failed on real pages,
+ * the last of them because the topmost control of Emulators is a button with its card's
+ * title and note above it, so it never looked close to the top of anything.
+ * pourquoi : docs/decisions/navigation-manette.md § The outermost control pulls the page to its edge
+ */
+@Stable
+class EntryScroll(val state: ScrollState) {
+    private val spans = mutableStateMapOf<Any, ClosedFloatingPointRange<Float>>()
+
+    fun signIn(key: Any, top: Float, bottom: Float) {
+        spans[key] = top..bottom
+    }
+
+    fun signOut(key: Any) {
+        spans.remove(key)
+    }
+
+    /** A pixel of slack: two controls on one row are level, never equal to the float. */
+    private fun leader(pick: (ClosedFloatingPointRange<Float>) -> Float, top: Boolean): Float? =
+        spans.values.map(pick).let { if (it.isEmpty()) null else if (top) it.min() else it.max() }
+
+    fun isFirst(key: Any): Boolean {
+        val mine = spans[key] ?: return false
+        val edge = leader({ it.start }, top = true) ?: return false
+        return mine.start <= edge + 1f
+    }
+
+    fun isLast(key: Any): Boolean {
+        val mine = spans[key] ?: return false
+        val edge = leader({ it.endInclusive }, top = false) ?: return false
+        return mine.endInclusive >= edge - 1f
+    }
+}
+
+
+/**
  * Named apart from [ActionShape] because the ring needs the number.
  * pourquoi : docs/decisions/navigation-manette.md § One radius, named once
  */
@@ -236,8 +290,10 @@ fun Modifier.controlRing(
     var focused by remember { mutableStateOf(false) }
     var height by remember { mutableIntStateOf(0) }
     var widthPx by remember { mutableIntStateOf(0) }
+    var topInWindow by remember { mutableFloatStateOf(0f) }
+    var viewportHeight by remember { mutableIntStateOf(0) }
     val requester = remember { BringIntoViewRequester() }
-    val scope = rememberCoroutineScope()
+    val seat = remember { Any() }
 
     // Compose counts a control under the header as visible, so a top margin below the
     // header's height never reaches the top.
@@ -245,6 +301,71 @@ fun Modifier.controlRing(
         maxOf(scrollMargin, LocalScaffoldBand.current).toPx()
     }
     val bottom = with(LocalDensity.current) { scrollMargin.toPx() }
+    val entryScroll = LocalEntryScroll.current
+
+    // Signed out on the way past: a control left on the roll would keep an empty page
+    // believing it still had a bottom.
+    DisposableEffect(entryScroll, seat) {
+        onDispose { entryScroll?.signOut(seat) }
+    }
+
+    // Two different jobs behind one effect, and telling them apart is the whole trick.
+    //
+    // The cursor arriving moves the page once, smoothly. A control growing under the
+    // cursor -- a block folding open -- is followed *instantly* instead, frame by frame,
+    // so the page travels in step with the growth: animating that, or animating it only
+    // until the block became the page's last control and snapping from then on, is what
+    // jolted.
+    var grownTo by remember { mutableIntStateOf(-1) }
+    LaunchedEffect(focused, height, entryScroll) {
+        if (!focused) {
+            grownTo = -1
+            return@LaunchedEffect
+        }
+        val arriving = grownTo < 0
+        val growing = !arriving && height > grownTo
+        grownTo = height
+        if (!arriving && !growing) return@LaunchedEffect
+
+        runCatching {
+            val page = entryScroll
+            val scroll = page?.state
+            if (page == null || scroll == null || scroll.maxValue == Int.MAX_VALUE) {
+                if (arriving) requester.bringIntoView(
+                    Rect(0f, -top, widthPx.toFloat(), height + bottom)
+                )
+                return@runCatching
+            }
+
+            val edge = when {
+                // Both, on a page barely longer than the screen: the nearer edge is the
+                // one being walked towards.
+                page.isFirst(seat) && page.isLast(seat) ->
+                    if (scroll.value <= scroll.maxValue - scroll.value) 0 else scroll.maxValue
+                page.isFirst(seat) -> 0
+                page.isLast(seat) -> scroll.maxValue
+                else -> null
+            }
+
+            if (arriving) {
+                if (edge != null) scroll.animateScrollTo(edge)
+                else requester.bringIntoView(
+                    Rect(0f, -top, widthPx.toFloat(), height + bottom)
+                )
+                return@runCatching
+            }
+
+            // Growing: keep its foot on screen, or ride the page's end if it owns it.
+            // Never an animation here -- the growth is the animation.
+            val overflow = (topInWindow + height + bottom) - viewportHeight
+            val by = when {
+                edge == scroll.maxValue -> scroll.maxValue
+                overflow > 0f -> (scroll.value + overflow).toInt().coerceAtMost(scroll.maxValue)
+                else -> return@runCatching
+            }
+            scroll.scrollTo(by)
+        }
+    }
 
     return this
         // The ring overflows and the last sibling drawn wins; a multi-row grid raises its
@@ -253,18 +374,17 @@ fun Modifier.controlRing(
         .zIndex(if (focused && enabled) 1f else 0f)
         .bringIntoViewRequester(requester)
         .onSizeChanged { widthPx = it.width; height = it.height }
-        .onFocusEvent { event ->
-            focused = event.hasFocus
-            if (event.hasFocus) {
-                scope.launch {
-                    runCatching {
-                        requester.bringIntoView(
-                            Rect(0f, -top, widthPx.toFloat(), height + bottom)
-                        )
-                    }
-                }
+        .onGloballyPositioned {
+            topInWindow = it.positionInWindow().y
+            viewportHeight = it.findRootCoordinates().size.height
+            // Content coordinates, not window ones: the page scrolls under the control and
+            // the window figure moves with it, where this one holds still.
+            entryScroll?.let { page ->
+                val contentTop = topInWindow + page.state.value
+                page.signIn(seat, contentTop, contentTop + it.size.height)
             }
         }
+        .onFocusEvent { event -> focused = event.hasFocus }
         .focusRing(
             focused && enabled,
             shape,

@@ -183,7 +183,8 @@ private fun FoldersBlock(
             note = if (folder == null) stringResource(R.string.settings_library_note)
             else stringResource(R.string.settings_library_subfolders),
             onClick = onPickFolder,
-            entry = true
+            entry = true,
+            bandFraction = 0.095f
         )
 
         if (folder != null) {
@@ -200,6 +201,10 @@ private fun FoldersBlock(
                 )
             }
         }
+
+        // The one card on the page with nothing to read: stretched to its neighbour's
+        // height, it ended on a hand's width of empty plate under the buttons.
+        DetailNote(stringResource(R.string.settings_library_folders_body))
     }
 }
 
@@ -208,7 +213,13 @@ private fun FolderSlot(
     name: String,
     note: String,
     onClick: () -> Unit,
-    entry: Boolean = false
+    entry: Boolean = false,
+    /**
+     * The band is a share of the slot's height, and the first slot's note runs to two
+     * lines where the second's fits on one: at the same share the first wore the thicker
+     * cursor of the two. A smaller share for the taller slot puts them back level.
+     */
+    bandFraction: Float = 0.12f
 ) {
     val dark = LocalEmufiiDarkTheme.current
     Row(
@@ -217,7 +228,7 @@ private fun FolderSlot(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (entry) Modifier.padEntry() else Modifier)
-            .controlRing(ROW_SHAPE)
+            .controlRing(ROW_SHAPE, bandFraction = bandFraction)
             .socket(ROW_SHAPE, dark)
             .clip(ROW_SHAPE)
             .tap(onClick = onClick)
@@ -415,7 +426,10 @@ private fun FallbackBlock(key: String, onKeyChange: (String) -> Unit) {
             )
         ),
         onToggleExpanded = { expanded = !expanded },
-        expanded = expanded
+        expanded = expanded,
+        // Open, this block carries a field and two notes: three times its folded height,
+        // and a band cut from that reached the ceiling and framed the card like a tube.
+        bandFraction = if (expanded) 0.032f else 0.09f
     ) {
         // Outside the fold: it is what says what the block is for.
         DetailNote(stringResource(R.string.settings_artwork_body))

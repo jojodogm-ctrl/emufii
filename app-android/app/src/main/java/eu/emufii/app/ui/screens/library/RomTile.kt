@@ -76,6 +76,11 @@ internal fun RomTile(
     onDismissMenu: () -> Unit,
     /** Zero in the grid; the carousel drops it so the ring does not cross the title. */
     titleDrop: Dp = 0.dp,
+    /**
+     * A share of the tile's smaller side, so the carousel's card -- three times a grid
+     * tile -- wore three times the band. It sends a smaller share of its own.
+     */
+    band: Float = TILE_BAND,
 ) {
     val context = LocalContext.current
     val interaction = remember { MutableInteractionSource() }
@@ -161,7 +166,7 @@ internal fun RomTile(
                 // through a translucent layer. Thinner than elsewhere, so the cursor
                 // circles the cover art without disputing the cell.
                 // pourquoi : docs/decisions/bibliotheque.md § One clock for everything that marks the cell
-                .focusRing(lit, TileShape, bandFraction = TILE_BAND)
+                .focusRing(lit, TileShape, bandFraction = band)
                 .clip(TileShape)
                 .background(tilePlate())
                 // Over the artwork: box art running to the corner turns the tile

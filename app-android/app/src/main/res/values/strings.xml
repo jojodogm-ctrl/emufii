@@ -545,6 +545,7 @@
     <string name="settings_library_subfolders">Subfolders are scanned too, whichever console they hold.</string>
     <string name="settings_row_fallback">Fallback artwork</string>
     <string name="settings_library_second_note">Second folder, scanned along with the first.</string>
+    <string name="settings_library_folders_body">Emufii only reads these folders: nothing is moved, renamed or copied. A rescan takes in what you have added and drops what you have taken away.</string>
     <string name="settings_library_add_second">Add a 2nd folder</string>
     <string name="settings_library_remove_second">Remove 2nd</string>
     <string name="settings_about_fact_licence">Licence</string>

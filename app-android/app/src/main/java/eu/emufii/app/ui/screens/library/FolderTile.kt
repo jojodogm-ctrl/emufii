@@ -62,6 +62,8 @@ internal fun FolderTile(
     onClick: () -> Unit,
     selected: Boolean,
     padHeld: Boolean,
+    /** As on the game tile: the carousel's card is large and sends a smaller share. */
+    band: Float = 0.12f,
 ) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
@@ -102,7 +104,7 @@ internal fun FolderTile(
                     spotColor = if (selected) ringColor() else InkText.copy(alpha = 0.30f),
                     ambientColor = InkText.copy(alpha = 0.22f)
                 )
-                .focusRing(selected, TileShape)
+                .focusRing(selected, TileShape, bandFraction = band)
                 .clip(TileShape)
                 .background(consolePlate(folder.console))
                 .moldedRim(

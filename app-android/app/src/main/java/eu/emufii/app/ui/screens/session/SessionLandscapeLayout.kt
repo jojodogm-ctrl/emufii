@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,8 @@ import eu.emufii.app.network.Member
 import eu.emufii.app.profile.Profile
 import eu.emufii.app.session.Session
 import eu.emufii.app.session.netplayPlan
+import eu.emufii.app.ui.EntryScroll
+import eu.emufii.app.ui.LocalEntryScroll
 import eu.emufii.app.ui.components.RomArtwork
 import eu.emufii.app.ui.components.padEntry
 
@@ -137,6 +140,9 @@ internal fun SessionLandscapeLayout(
             // The explanation gives way, never the buttons; the fade exists on one screen only.
             // pourquoi : docs/decisions/session.md § What the panel carries, the front screen gives back in space
             val fade = !panelLive
+            val paneScroll = rememberScrollState()
+            val pane = remember(paneScroll) { EntryScroll(paneScroll) }
+            CompositionLocalProvider(LocalEntryScroll provides pane) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -159,7 +165,7 @@ internal fun SessionLandscapeLayout(
                                 )
                             }
                     )
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(paneScroll),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 if (offline) OfflineCard()
@@ -231,6 +237,7 @@ internal fun SessionLandscapeLayout(
                     ) Modifier
                     else Modifier.padEntry()
                 )
+            }
             }
             status?.let { StatusLine(it) }
         }

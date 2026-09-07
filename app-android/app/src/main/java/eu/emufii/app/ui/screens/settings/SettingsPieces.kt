@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import eu.emufii.app.ui.EntryScroll
+import eu.emufii.app.ui.LocalEntryScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -151,24 +153,43 @@ internal fun SettingsPage(
      * pourquoi : docs/decisions/reglages-ecran.md § What sits at the end of a page title
      */
     trailing: (@Composable () -> Unit)? = null,
+    /**
+     * True for a page whose content fits the screen: it is then centred rather than hung
+     * from the top, and no scrolling appears. The column still scrolls if the content ever
+     * outgrows the screen -- a crash list is as long as the crashes -- so nothing can end
+     * up out of reach.
+     */
+    centred: Boolean = false,
     content: @Composable () -> Unit
 ) {
     EmufiiScaffold(title = title, onBack = onBack, trailing = trailing, modifier = modifier) { topPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-                .padding(top = topPadding, bottom = 24.dp)
-                .navigationBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Bounded to both columns' width; [SettingsColumns] decides how many there are.
-            // pourquoi : docs/decisions/reglages-ecran.md § Two columns, once the accordion is gone
+        val pageScroll = rememberScrollState()
+        val page = remember(pageScroll) { EntryScroll(pageScroll) }
+        CompositionLocalProvider(LocalEntryScroll provides page) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val full = maxHeight
             Column(
-                modifier = Modifier.widthIn(max = TWO_COLUMN_MAX).fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) { content() }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(pageScroll)
+                    // The floor is what lets the arrangement centre: a wrapping column has
+                    // no room to spare and centring in it changes nothing.
+                    .then(if (centred) Modifier.heightIn(min = full) else Modifier.fillMaxHeight())
+                    .padding(horizontal = 20.dp)
+                    .padding(top = topPadding, bottom = 24.dp)
+                    .navigationBarsPadding(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement =
+                    if (centred) Arrangement.Center else Arrangement.Top
+            ) {
+                // Bounded to both columns' width; [SettingsColumns] decides how many there are.
+                // pourquoi : docs/decisions/reglages-ecran.md § Two columns, once the accordion is gone
+                Column(
+                    modifier = Modifier.widthIn(max = TWO_COLUMN_MAX).fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) { content() }
+            }
+        }
         }
     }
 }
@@ -256,6 +277,8 @@ internal fun SettingsBlock(
      * pourquoi : docs/decisions/reglages-ecran.md § Two columns, once the accordion is gone
      */
     spread: Boolean = false,
+    /** Passed straight to [SoftCard]; a block that folds open sends a smaller share. */
+    bandFraction: Float = 0.12f,
     footer: (@Composable () -> Unit)? = null,
     /**
      * Non-null when the block folds. For what is set once.
@@ -266,7 +289,7 @@ internal fun SettingsBlock(
     content: @Composable () -> Unit
 ) {
     var bounds by remember { mutableStateOf(CardBounds(0f, 0f)) }
-    SoftCard(modifier = modifier, onClick = onToggleExpanded) {
+    SoftCard(modifier = modifier, onClick = onToggleExpanded, bandFraction = bandFraction) {
         CompositionLocalProvider(LocalCardBounds provides bounds) {
             Column(
                 modifier = Modifier
@@ -457,6 +480,9 @@ internal fun SettingsEntry(
 ) {
     SoftCard(
         onClick = onOpen,
+        // A hub tile is 92 dp tall and the full share made a band you read before the
+        // label. Thinner, and the tile is still the thing lit.
+        bandFraction = 0.095f,
         modifier = modifier
             .then(if (entry) Modifier.padEntry() else Modifier)
             .then(

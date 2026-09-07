@@ -139,6 +139,37 @@ the scroll settles at zero. Hence the top inset at least equal to the header's
 height, published as a `CompositionLocal` rather than a parameter: every control
 would need it, and none has to know the value.
 
+## The outermost control pulls the page to its edge
+
+`bringIntoView` moves the least it can. That is right in the middle of a page and
+wrong at either end: these columns finish on 24 dp of padding plus the navigation
+bar's inset, more than the 28 dp the ring asks for, so the bottom control settled
+against the edge with that strip still hidden and the page read as cut off. The
+top does the same against the header.
+
+The page therefore goes all the way when the control receiving focus is the
+outermost one. Two things were got wrong before it worked:
+
+- **Correcting afterwards shows the seam.** Asking for the usual `bringIntoView`
+  and then finishing the travel lands in the right place in two animations, and
+  the join between them is visible. The choice is made before anything moves, and
+  the page travels once.
+- **How far the page has left to travel says nothing.** It is a page-wide number.
+  A settings page barely longer than the screen has little of it under every
+  control alike, so going by it slammed each page to its end and held it there on
+  the way back up. What is measured is past the *control*: where it would sit with
+  the page pushed to that side, and how much content would be left beyond it.
+  Only the outermost control has next to nothing beyond it.
+
+A control also has to survive the move, whole and clear of both the header and the
+bottom edge, or it is not the outermost one. A page barely longer than the screen
+answers to both ends at once; the nearer edge wins, being the one walked towards.
+
+The scrolling column reaches the ring as a `CompositionLocal`, empty on a page
+that does not scroll. The library is not concerned: its grid is a
+`LazyVerticalGrid` that scrolls itself, and a lazy list does not lay out what is
+off-screen, which is what this measurement reads.
+
 ## One radius, named once
 
 The radius of the large action buttons is named separately and shared: guessed at

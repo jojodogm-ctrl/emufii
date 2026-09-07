@@ -46,8 +46,18 @@ private val CAROUSEL_TITLE_ROOM = 66.dp
  * The active card carries the cursor's 7 % scale and its ring, which spill past its
  * layout bounds and would cross the title's first line. A drawing offset, not a layout
  * one, or the active card would grow the row and re-centre its neighbours at every step.
+ *
+ * Follows [CAROUSEL_TILE_BAND]: the band lost about 5 dp, so the title climbs by as much
+ * rather than keep clearing a ring that is no longer there.
  */
-private val CAROUSEL_TITLE_DROP = 18.dp
+private val CAROUSEL_TITLE_DROP = 13.dp
+
+/**
+ * The band is a share of the card's smaller side, and a carousel card is around 300 dp
+ * where a grid tile is a third of that: at the grid's share the ring read as a tube around
+ * the cover rather than a cursor on it.
+ */
+private const val CAROUSEL_TILE_BAND = 0.055f
 
 /**
  * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
@@ -245,7 +255,8 @@ internal fun RomsCarousel(
                             folder = entry,
                             onClick = onTap,
                             selected = padFocused && active,
-                            padHeld = hold.down && active
+                            padHeld = hold.down && active,
+                            band = CAROUSEL_TILE_BAND
                         )
 
                         is Entry.Game -> RomTile(
@@ -259,7 +270,8 @@ internal fun RomsCarousel(
                             onRename = { onMenuAction(entry.rom, TileAction.RENAME) },
                             onHide = { onMenuAction(entry.rom, TileAction.HIDE) },
                             onDismissMenu = onDismissMenu,
-                            titleDrop = CAROUSEL_TITLE_DROP
+                            titleDrop = CAROUSEL_TITLE_DROP,
+                            band = CAROUSEL_TILE_BAND
                         )
                     }
                 }

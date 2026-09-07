@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import eu.emufii.app.ui.EntryScroll
+import eu.emufii.app.ui.LocalEntryScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -306,10 +308,13 @@ fun SessionScreen(
                 return@EmufiiScaffold
             }
 
+            val pageScroll = rememberScrollState()
+            val page = remember(pageScroll) { EntryScroll(pageScroll) }
+            CompositionLocalProvider(LocalEntryScroll provides page) {
             Column(
                 modifier = panelPilot
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(pageScroll)
                     .padding(
                         top = topPadding,
                         bottom = bottomInset + 24.dp,
@@ -426,6 +431,7 @@ fun SessionScreen(
                 status?.let { StatusLine(it) }
 
                 LeaveButton(session = session, onLeave = state::confirmLeave)
+            }
             }
         }
     }
