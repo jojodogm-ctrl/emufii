@@ -75,21 +75,6 @@ class Ps2Launcher(private val context: Context) {
     }
 
     /**
-     * The session's second step: the network was set at the first, and re-arming would
-     * send the driver to fill the form in again over a running game. Unlike Dolphin,
-     * ARMSX2 can be handed a game from outside.
-     */
-    fun launchGame(rom: Uri): LaunchResult {
-        val pkg = installedPackage() ?: return LaunchResult.NotInstalled
-        val intent = viewIntent(pkg, rom).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
-        return runCatching {
-            Ps2ProvisioningAutomation.clear(Ps2ProvisioningStore(context))
-            context.startActivity(intent)
-            LaunchResult.Success
-        }.getOrElse { LaunchResult.Error(it.message ?: "Unknown launch error") }
-    }
-
-    /**
      * Writes ARMSX2's native per-game layer and boots the ROM in one operation.
      * No accessibility plan is armed: the emulator reads this file after its
      * private global preferences and before DEV9 initialises.

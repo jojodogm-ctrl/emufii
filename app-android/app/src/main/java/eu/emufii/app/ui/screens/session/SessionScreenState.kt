@@ -373,15 +373,16 @@ internal class SessionScreenState(
             // on `content`. Still no armed plan.
             // pourquoi : docs/decisions/session.md § What each backend receives at launch
             Backend.ARMSX2 -> {
-                val launcher = Ps2Launcher(context)
+                // No fallback launch. The accessibility pass it named was removed with the
+                // move to injection, so a launch that skips the per-game layer boots ARMSX2
+                // on the previous session's room code and role, and still reports success.
+                // Measured 2026-09-08 on Midnight Club 3: the host stayed a guest, nobody
+                // opened udp/19072, and the relay answered `port unreachable` to both
+                // players for a whole session. `launchPrivateGame` runs the same checks as
+                // `canConfigureNow` and, unlike it, names what is missing.
                 val plan = session.netplayPlan(profileName = null)
-                val result = if (plan != null && Ps2GameSettings.canConfigureNow(context, rom)) {
-                    launcher.launchPrivateGame(rom, plan)
-                } else {
-                    // Unsupported CHD codec or a pre-migration profile: keep the proven
-                    // accessibility setup as the fallback.
-                    launcher.launchGame(rom.uri)
-                }
+                    ?: return context.getString(R.string.session_netplay_no_address)
+                val result = Ps2Launcher(context).launchPrivateGame(rom, plan)
                 if (result == LaunchResult.Success) onPs2Started()
                 result to "ARMSX2"
             }

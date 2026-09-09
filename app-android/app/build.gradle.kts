@@ -142,8 +142,13 @@ android {
         // own: the join keypad draws six boxes and refuses the seventh key. Back to
         // three and three, and 47 is withdrawn. 48 rather than reusing 47, so two
         // different binaries never answer to one number in the release archive.
-        versionCode = 48
-        versionName = "1.12.9"
+        // 49: the PS2 plays. 48 launched ARMSX2 without ever writing the
+        // per-game layer when it could not, and the emulator then booted on the
+        // previous session's room code and role while the launch reported
+        // success. Two players spent an afternoon with no host. A launch that
+        // cannot be configured now names what is missing and refuses.
+        versionCode = 49
+        versionName = "1.12.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
