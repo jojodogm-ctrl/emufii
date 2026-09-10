@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.Motion
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -168,7 +169,7 @@ private fun RowScope.Key(
     // bites into its neighbours instead of passing in front of them.
     val lift by animateFloatAsState(
         targetValue = if (selected) 1.06f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        animationSpec = Motion.press(),
         label = "key-lift"
     )
 

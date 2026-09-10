@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.library
 
+import eu.emufii.app.ui.Motion
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +53,9 @@ import eu.emufii.app.ui.components.CompatBadge
 import eu.emufii.app.ui.components.TileMenu
 import eu.emufii.app.ui.components.artworkRim
 import eu.emufii.app.ui.components.tilePlate
+import eu.emufii.app.ui.LocalCardRom
 import eu.emufii.app.ui.focusRing
+import eu.emufii.app.ui.sharedCover
 import eu.emufii.app.ui.gamepadClick
 import eu.emufii.app.ui.ringColor
 import eu.emufii.app.ui.tapOrHold
@@ -81,6 +85,7 @@ internal fun RomTile(
      * tile -- wore three times the band. It sends a smaller share of its own.
      */
     band: Float = TILE_BAND,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val interaction = remember { MutableInteractionSource() }
@@ -93,26 +98,52 @@ internal fun RomTile(
     LaunchedEffect(rom.uri) { shown = true }
 
 
+    /**
+     * The card, when it is holding this game, wears this very cover: the tile stops
+     * drawing it and the two are matched by uri, so it travels rather than crossfades.
+     */
+    val onTheCard = LocalCardRom.current == rom.uri
+
+    /**
+     * The card gives the focus back to the grid from a `LaunchedEffect`, which runs
+     * *after* composition: for a frame or two the card is gone, the tile is visible
+     * again and [selected] is still false. The mark's fall is instant by design, so it
+     * collapsed in that gap -- the tile shrank by its 7 % and slid off its step just as
+     * the cover landed on it, then climbed back over [RING_IN_MS]. That was the second
+     * placement. Held across the hand-over, exactly as the header holds its panel.
+     * pourquoi : docs/decisions/bibliotheque.md § One animation for the cursor's three marks
+     */
+    var handingOver by remember { mutableStateOf(false) }
+    LaunchedEffect(onTheCard) {
+        if (onTheCard) {
+            handingOver = true
+        } else {
+            delay(CARD_HANDOVER_MS)
+            handingOver = false
+        }
+    }
+    val marked = selected || onTheCard || handingOver
+
     // A bouncy spring split the cursor into two halves for a few frames; one animation
     // for the three marks.
     // pourquoi : docs/decisions/bibliotheque.md § One clock for everything that marks the cell
     // pourquoi : docs/decisions/bibliotheque.md § One animation for the cursor's three marks
     val mark by animateFloatAsState(
-        targetValue = if (selected) 1f else 0f,
-        animationSpec = tween(if (selected) RING_IN_MS else 0),
+        targetValue = if (marked) 1f else 0f,
+        animationSpec = tween(if (marked) RING_IN_MS else 0),
         label = "tile-mark"
     )
     val focusScale = 1f + 0.07f * mark
 
     val entrance by animateFloatAsState(
         targetValue = if (shown) 1f else 0f,
-        animationSpec = spring(dampingRatio = 0.7f, stiffness = Spring.StiffnessLow),
+        animationSpec = Motion.arrival(),
         label = "tile-entrance"
     )
 
     val scale by animateFloatAsState(
         targetValue = if (pressed || padHeld) 0.94f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        animationSpec = Motion.press(),
         label = "tile-scale"
     )
     val elevation by animateFloatAsState(
@@ -125,12 +156,13 @@ internal fun RomTile(
     val riseX = TILE_RISE * mark
     val riseY = TILE_RISE * mark
 
-    val lit = selected && entrance > 0.99f
+    val lit = marked && entrance > 0.99f
 
     Column(
         // Above its neighbours while enlarged, or the next one draws over it and cuts
-        // the glow clean off.
-        modifier = Modifier
+        // the glow clean off. The caller's modifier stays on this same node, so the
+        // grid's placement animation and the zIndex do not end up on two different ones.
+        modifier = modifier
             .fillMaxWidth()
             .zIndex(if (selected) 1f else 0f),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -138,11 +170,15 @@ internal fun RomTile(
         // Pulled from the artwork: the chrome stays neutral, the content brings the
         // palette. No colour to borrow, plain shadow.
         val accent = rom.accentArgb?.let { Color(it) }
+        // Read above the box: the ring's width depends on which of the two the tile shows.
+        val art by rememberTileArt(rom)
+        val ringBand = if (art.model == null) band * PLACEHOLDER_BAND_SHARE else band
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(x = -riseX, y = -riseY)
                 .aspectRatio(1f)
+                .sharedCover(rom.uri, mine = !onTheCard)
                 .scale(scale * focusScale * (0.88f + 0.12f * entrance))
                 // `graphicsLayer`, never `alpha`: under 1, `alpha` lays a rectangular
                 // clip that squares off the ring.
@@ -166,7 +202,7 @@ internal fun RomTile(
                 // through a translucent layer. Thinner than elsewhere, so the cursor
                 // circles the cover art without disputing the cell.
                 // pourquoi : docs/decisions/bibliotheque.md § One clock for everything that marks the cell
-                .focusRing(lit, TileShape, bandFraction = band)
+                .focusRing(lit, TileShape, bandFraction = ringBand)
                 .clip(TileShape)
                 .background(tilePlate())
                 // Over the artwork: box art running to the corner turns the tile
@@ -188,7 +224,6 @@ internal fun RomTile(
                 )
                 .gamepadClick(interaction, onClick = onClick)
         ) {
-            val art by rememberTileArt(rom)
             if (art.model != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(context).data(art.model).build(),
@@ -257,3 +292,10 @@ internal fun RomTile(
         )
     }
 }
+
+/**
+ * Long enough to cover the frames between the card leaving and the grid getting its
+ * focus back. Two orders of magnitude above a focus hand-over, like the header's own.
+ * pourquoi : docs/decisions/bibliotheque.md § One animation for the cursor's three marks
+ */
+private const val CARD_HANDOVER_MS = 120L

@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -155,9 +158,9 @@ internal fun SettingsPage(
     trailing: (@Composable () -> Unit)? = null,
     /**
      * True for a page whose content fits the screen: it is then centred rather than hung
-     * from the top, and no scrolling appears. The column still scrolls if the content ever
-     * outgrows the screen -- a crash list is as long as the crashes -- so nothing can end
-     * up out of reach.
+     * from the top, so no scroll appears where there is nothing to reach. The floor is a
+     * minimum, never a ceiling: content that outgrows the screen scrolls, or the last
+     * button ends up sliced off the bottom edge with no way down to it.
      */
     centred: Boolean = false,
     content: @Composable () -> Unit
@@ -167,14 +170,22 @@ internal fun SettingsPage(
         val page = remember(pageScroll) { EntryScroll(pageScroll) }
         CompositionLocalProvider(LocalEntryScroll provides page) {
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            val full = maxHeight
+            // The screen minus everything laid around the content. Taking the full height
+            // as the floor and then adding the margins on top made the column taller than
+            // the room it had, so a centred page scrolled by exactly its own margins with
+            // nothing down there to reach.
+            val room = (
+                maxHeight - topPadding - 24.dp -
+                    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                ).coerceAtLeast(0.dp)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(pageScroll)
-                    // The floor is what lets the arrangement centre: a wrapping column has
-                    // no room to spare and centring in it changes nothing.
-                    .then(if (centred) Modifier.heightIn(min = full) else Modifier.fillMaxHeight())
+                    // A floor, not a height: it is what lets the arrangement centre, since
+                    // a wrapping column has no room to spare, and it still gives way when
+                    // the content is taller than the screen.
+                    .then(if (centred) Modifier.heightIn(min = room) else Modifier.fillMaxHeight())
                     .padding(horizontal = 20.dp)
                     .padding(top = topPadding, bottom = 24.dp)
                     .navigationBarsPadding(),

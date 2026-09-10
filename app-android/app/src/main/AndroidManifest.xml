@@ -57,7 +57,13 @@
         <package android:name="com.armsx2" />
     </queries>
 
+    <!--
+      The system's predictive back: without it the platform runs the old, opaque path and
+      a `PredictiveBackHandler` never sees the finger's progress. On by default from
+      Android 16, declared here because minSdk is 33.
+    -->
     <application
+        android:enableOnBackInvokedCallback="true"
         android:name=".EmufiiApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"

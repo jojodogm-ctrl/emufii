@@ -45,16 +45,18 @@ fun CrashLogsList(
 
 @Composable
 fun EmptyCrashLogsView(modifier: Modifier = Modifier) {
+    // 16 dp, not 48: with the page's own margins the empty state alone ran past the
+    // bottom of a landscape handheld, and the report button was sliced off there.
     Box(
-        modifier = modifier.fillMaxWidth().padding(vertical = 48.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             BugMark(
-                size = 48.dp,
+                size = 40.dp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
             )
             Text(

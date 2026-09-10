@@ -1,7 +1,14 @@
 package eu.emufii.app.ui.components
 
 import eu.emufii.app.ui.sounded
-import androidx.activity.compose.BackHandler
+import androidx.activity.BackEventCompat
+import androidx.activity.compose.PredictiveBackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.graphics.graphicsLayer
+import eu.emufii.app.ui.Motion
+import kotlin.coroutines.cancellation.CancellationException
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -46,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -160,9 +168,33 @@ fun GameLaunchDialog(
         }
     }
 
-    // Live even while starting: disabled, a B during launch closed the app.
-    // pourquoi : docs/decisions/lancement-et-navigation.md § The cursor has to enter the card, and not leave it again
-    BackHandler { if (!starting) onDismiss() }
+    /**
+     * The card follows the thumb out rather than vanishing on release. Kept enabled even
+     * while starting -- disabled, a B during launch closed the app -- but the gesture is
+     * then swallowed and moves nothing.
+     * pourquoi : docs/decisions/lancement-et-navigation.md § The cursor has to enter the card, and not leave it again
+     */
+    val back = remember { Animatable(0f) }
+    var backEdge by remember { mutableIntStateOf(BackEventCompat.EDGE_LEFT) }
+    val launching by rememberUpdatedState(starting)
+    val settle = Motion.press<Float>()
+    PredictiveBackHandler { events ->
+        if (launching) {
+            events.collect {}
+            return@PredictiveBackHandler
+        }
+        try {
+            events.collect { event ->
+                backEdge = event.swipeEdge
+                back.snapTo(event.progress)
+            }
+            onDismiss()
+        } catch (cancelled: CancellationException) {
+            // Let go halfway: it comes back, it does not blink back.
+            back.animateTo(0f, settle)
+            throw cancelled
+        }
+    }
 
     // Flipped from a LaunchedEffect: an animation starting at its target plays nothing.
     var shown by remember { mutableStateOf(false) }
@@ -296,8 +328,22 @@ fun GameLaunchDialog(
                 // Bounded by the screen, never by a number.
                 // pourquoi : docs/decisions/lancement-et-navigation.md § The card replaced a bottom sheet, and for two reasons
                 .heightIn(max = (configuration.screenHeightDp - 32).dp)
-                .scale(0.92f + 0.08f * entrance)
-                .alpha(entrance)
+                // One layer for the arrival and the departure: two modifiers fighting
+                // over scale would have the card blink at the hand-over.
+                .graphicsLayer {
+                    val leaving = back.value
+                    val size = (0.92f + 0.08f * entrance) * (1f - 0.12f * leaving)
+                    scaleX = size
+                    scaleY = size
+                    // Three times the speed of the geometry: the cover flying in from
+                    // its tile is *inside* this layer, and at the card's own opacity it
+                    // made the trip invisible -- the grid showed a hole, then the card
+                    // appeared with the cover already home.
+                    alpha = (entrance * 3f).coerceAtMost(1f) * (1f - 0.45f * leaving)
+                    translationX =
+                        (if (backEdge == BackEventCompat.EDGE_LEFT) 1f else -1f) *
+                            24.dp.toPx() * leaving
+                }
                 // Here, not at the head of the chain: `drawWithContent` takes the wrapped size.
                 .waitTrim(blend)
                 // Taps only; `canFocus = false` here would disable the whole subtree.
@@ -321,26 +367,59 @@ fun GameLaunchDialog(
                     modifier = Modifier.fillMaxWidth().padding(24.dp),
                     horizontalArrangement = Arrangement.spacedBy(26.dp)
                 ) {
-                    // The geometry tells the two cases apart on its own.
+                    // The game as an object: the cover, and the verdict stamped under
+                    // it. A figure beside its text, so it centres on the column that
+                    // sets the card's height instead of being asked to match it.
                     // pourquoi : docs/decisions/lancement-et-navigation.md § What gives way, and in what order
                     Column(
                         modifier = Modifier
-                            .width(186.dp)
+                            .width(150.dp)
                             .align(Alignment.CenterVertically),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        RomArtwork(rom, size = 120.dp)
-                        TitleBlock(rom, online)
+                        RomArtwork(rom, size = 134.dp)
+                        // The tile is scanned, this card is read: here there is room for
+                        // what the mark means.
+                        // pourquoi : docs/decisions/lancement-et-navigation.md § The compatibility verdict, where the decision is made
+                        LocalCompatDb.current.ratingFor(rom.compatKeys())?.let { known ->
+                            CompatNote(known)
+                        }
                     }
 
+                    // Name it, say what will happen, then act: one column read top to
+                    // bottom, ending on the button. It is the tall side by construction,
+                    // so nothing in the card floats in the middle.
+                    // pourquoi : docs/decisions/lancement-et-navigation.md § What gives way, and in what order
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            // pourquoi : docs/decisions/lancement-et-navigation.md § What gives way, and in what order
                             .align(Alignment.CenterVertically),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        verticalArrangement = Arrangement.spacedBy(18.dp)
                     ) {
+                        // Tight against its own label, generous from what follows: the
+                        // name and the mode are one thing.
+                        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Text(
+                                rom.displayName,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                stringResource(
+                                    if (online) R.string.launch_mode_online
+                                    else R.string.launch_mode_session,
+                                    // The full label: "GC/Wii" only makes sense squeezed
+                                    // into a badge.
+                                    rom.console.label
+                                ),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
                         // A selector rather than a link: it rewrites the card, it does not act.
                         // pourquoi : docs/decisions/lancement-et-navigation.md § The choice of world comes first, not last
                         if (onPlayOnline != null) {
@@ -354,6 +433,7 @@ fun GameLaunchDialog(
                                 )
                             }
                         }
+
                         // The explanation scrolls, the actions never do.
                         // pourquoi : docs/decisions/lancement-et-navigation.md § What gives way, and in what order
                         Column(
@@ -366,44 +446,46 @@ fun GameLaunchDialog(
                             steps.forEachIndexed { index, text -> Step(index + 1, text) }
                         }
 
-                        // Stacked: two pills sharing 400 dp clip their labels silently.
+                        // The actions are one group: tighter among themselves than the
+                        // gap that separates them from what they act on.
                         // pourquoi : docs/decisions/lancement-et-navigation.md § The buttons are stacked, and it is a trap avoided
-                        if (!online) {
-                            CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
-                                PrivacyToggle(
-                                    checked = isPrivate,
-                                    enabled = !starting,
-                                    onChange = { isPrivate = it }
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            if (!online) {
+                                CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
+                                    PrivacyToggle(
+                                        checked = isPrivate,
+                                        enabled = !starting,
+                                        onChange = { isPrivate = it }
+                                    )
+                                }
+                            }
+                            if (ps2Blocked) {
+                                Ps2ProfileMissing()
+                            } else if (pspBlocked) {
+                                PpssppSetupMissing()
+                            } else {
+                                PrimaryAction(
+                                    label = primaryLabel,
+                                    starting = starting,
+                                    onClick = { starting = true },
+                                    modifier = Modifier.fillMaxWidth().focusRequester(firstAction)
                                 )
                             }
-                        }
-                        if (ps2Blocked) {
-                            Ps2ProfileMissing()
-                        } else if (pspBlocked) {
-                            PpssppSetupMissing()
-                        } else {
-                            PrimaryAction(
-                                label = primaryLabel,
-                                starting = starting,
-                                onClick = { starting = true },
-                                modifier = Modifier.fillMaxWidth().focusRequester(firstAction)
-                            )
-                        }
-                        if (!setupBlocked && onJoinWithCode != null && !publicMode) {
-                            CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
-                                OutlinedButton(
-                                    onClick = sounded(onJoinWithCode),
-                                    enabled = !starting,
-                                    shape = PillShape,
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = if (dark) Coral.darkBright else Coral.deep
-                                    ),
-                                    modifier = Modifier.fillMaxWidth().height(52.dp)
-                                        .controlRing(PillShape)
-                                ) { Text(stringResource(R.string.lib_join_by_code)) }
+                            if (!setupBlocked && onJoinWithCode != null && !publicMode) {
+                                CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
+                                    OutlinedButton(
+                                        onClick = sounded(onJoinWithCode),
+                                        enabled = !starting,
+                                        shape = PillShape,
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            contentColor = if (dark) Coral.darkBright else Coral.deep
+                                        ),
+                                        modifier = Modifier.fillMaxWidth().height(52.dp)
+                                            .controlRing(PillShape)
+                                    ) { Text(stringResource(R.string.lib_join_by_code)) }
+                                }
                             }
                         }
-
                     }
                 }
                 return@SoftCard

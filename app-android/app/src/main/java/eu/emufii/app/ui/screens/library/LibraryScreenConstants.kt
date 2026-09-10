@@ -37,6 +37,21 @@ internal val LocalTileEntrance = staticCompositionLocalOf { false }
 /** Thinner than the default: cover art is what the grid serves. */
 internal const val TILE_BAND = 0.070f
 
+/**
+ * How far a grid tile's title steps aside for the cursor. Half the carousel's 13 dp: the
+ * grid tile grows less, and the row below is right there, so the same drop would read as
+ * the title falling into the next row rather than making way.
+ * pourquoi : docs/decisions/bibliotheque.md § One clock for everything that marks the cell
+ */
+internal val TILE_TITLE_DROP = 6.dp
+
+/**
+ * What a tile keeps of its band when it wears the placeholder rather than cover art: the
+ * flat gradient has no detail to protect, and at full width the tube was the whole cell.
+ * A share, not a constant, so the carousel's already thinner band shrinks with it.
+ */
+internal const val PLACEHOLDER_BAND_SHARE = 0.7f
+
 internal const val ENTRANCE_WINDOW_MS = 900L
 
 /**
@@ -47,3 +62,15 @@ internal const val ENTRANCE_WINDOW_MS = 900L
 internal val BADGE_INSET = 9.dp
 
 internal val TILE_RISE = 2.5.dp
+
+/**
+ * How fast the shelf leaves and comes back. Short on purpose: it moves because the grid
+ * moved, so anything slower reads as lagging behind the thumb rather than answering it.
+ * The veil's band rides the same two numbers -- animated apart, the two drifted and the
+ * wallpaper stayed high after the shelf had gone.
+ * pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
+ */
+internal const val SHELF_AWAY_MS = 130
+
+internal const val SHELF_BACK_MS = 90
+

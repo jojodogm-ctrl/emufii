@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.Motion
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -100,7 +101,7 @@ fun SwitchFace(checked: Boolean) {
     val axis = ringColor()
     val knob by animateDpAsState(
         targetValue = if (checked) TRACK_WIDTH - KNOB - PAD else PAD,
-        animationSpec = spring(dampingRatio = 0.7f, stiffness = 900f),
+        animationSpec = Motion.press(),
         label = "switch-row-knob"
     )
     val fill by animateColorAsState(

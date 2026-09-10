@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.Motion
 import eu.emufii.app.ui.sounded
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.core.animateFloatAsState
@@ -291,7 +292,7 @@ fun CircleIconButton(
     // only loses its shadow loses almost nothing, there being little shadow to lose.
     val press by animateFloatAsState(
         targetValue = if (pressed) 0.92f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        animationSpec = Motion.press(),
         label = "circle-press"
     )
     Box(

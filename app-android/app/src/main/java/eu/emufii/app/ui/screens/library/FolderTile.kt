@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.library
 
+import eu.emufii.app.ui.Motion
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -62,8 +63,13 @@ internal fun FolderTile(
     onClick: () -> Unit,
     selected: Boolean,
     padHeld: Boolean,
-    /** As on the game tile: the carousel's card is large and sends a smaller share. */
-    band: Float = 0.12f,
+    /**
+     * As on the game tile: the carousel's card is large and sends a smaller share. The
+     * default is the grid's own, not the 0.12 of an airy icon -- sorted by console the
+     * grid is made of these, and they wore a tube twice the width of their neighbours'.
+     */
+    band: Float = TILE_BAND,
+    modifier: Modifier = Modifier,
 ) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
@@ -77,7 +83,7 @@ internal fun FolderTile(
     val focusScale = 1f + 0.07f * mark
     val scale by animateFloatAsState(
         targetValue = if (pressed || padHeld) 0.94f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        animationSpec = Motion.press(),
         label = "folder-scale"
     )
     // pourquoi : docs/decisions/theme-duotone-shelves.md § The diagonal staircase
@@ -85,7 +91,7 @@ internal fun FolderTile(
     val riseY = TILE_RISE * mark
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .zIndex(if (selected) 1f else 0f),
         horizontalAlignment = Alignment.CenterHorizontally

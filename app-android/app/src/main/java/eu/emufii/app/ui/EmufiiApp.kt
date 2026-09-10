@@ -3,6 +3,8 @@ package eu.emufii.app.ui
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.SizeTransform
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -55,6 +57,19 @@ import eu.emufii.app.ps2.Ps2NetworkProfile
 import eu.emufii.app.secondscreen.PadLegendBar
 import eu.emufii.app.secondscreen.PanelFeed
 import eu.emufii.app.secondscreen.PanelFriend
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.ui.unit.IntOffset
+import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
+import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
+import eu.emufii.app.ui.theme.ShellDark
+import eu.emufii.app.ui.theme.ShellLight
+import eu.emufii.app.ui.theme.ShellOled
 import eu.emufii.app.secondscreen.SecondScreen
 import eu.emufii.app.secondscreen.SecondScreenModel
 import eu.emufii.app.secondscreen.rememberPresentationDisplay
@@ -89,6 +104,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.milliseconds
+
+/**
+ * How deep a screen sits. The crossing reads it to know which way it is going: the
+ * library is the floor, everything reached from it is one step in, and what a launch
+ * leads to is one further.
+ * pourquoi : docs/decisions/lancement-et-navigation.md § Two routes that are not sessions
+ */
+private val Screen.depth: Int
+    get() = when (this) {
+        Screen.Library -> 0
+        is Screen.Preparing, is Screen.InSession -> 2
+        else -> 1
+    }
 
 private sealed interface Screen {
     data object Library : Screen
@@ -705,7 +733,53 @@ fun EmufiiApp(settings: SettingsStore) {
         LocalCompatDb provides compat,
         LocalGameMetaDb provides gameMeta,
     ) {
-        when (val s = screen) {
+        // Screens used to replace one another frame to frame. A shared axis says which
+        // way you went: forward slides in from the right, back from the left, both over
+        // a short fade. `s` and never `screen` inside: during the crossing the outgoing
+        // branch is still composed and `screen` already holds the arriving one.
+        // pourquoi : docs/decisions/lancement-et-navigation.md § Two routes that are not sessions
+        // The ground the crossing happens over. Each screen paints its own wallpaper, so
+        // while the two fade past each other both are translucent and whatever is behind
+        // shows through -- and the window's own background is white, inherited from
+        // `Theme.Material.Light`. That was the flash. A solid shell, one rectangle, and
+        // the seam is the wallpaper's own ground instead.
+        // pourquoi : docs/decisions/theme-duotone-shelves.md § MATERIAL (background)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    when {
+                        LocalEmufiiOledTheme.current -> ShellOled
+                        LocalEmufiiDarkTheme.current -> ShellDark
+                        else -> ShellLight
+                    }
+                )
+        )
+
+        // Read here: `transitionSpec` is a lambda, not a composable scope, and the specs
+        // have to ask whether animations are on.
+        val slideIn: FiniteAnimationSpec<IntOffset> = motionTween(Motion.SCREEN_IN_MS)
+        val slideOut: FiniteAnimationSpec<IntOffset> = motionTween(Motion.SCREEN_OUT_MS)
+        val veilIn: FiniteAnimationSpec<Float> = motionTween(Motion.SCREEN_IN_MS)
+        val veilOut: FiniteAnimationSpec<Float> = motionTween(Motion.SCREEN_OUT_MS)
+        AnimatedContent(
+            targetState = screen,
+            transitionSpec = {
+                val forward = targetState.depth >= initialState.depth
+                fun shift(full: Int) = (full * 0.12f).toInt()
+                val enter = slideInHorizontally(slideIn) { full ->
+                    if (forward) shift(full) else -shift(full)
+                } + fadeIn(veilIn)
+                val exit = slideOutHorizontally(slideOut) { full ->
+                    if (forward) -shift(full) else shift(full)
+                } + fadeOut(veilOut)
+                // No size transform: every screen is full-bleed, and animating a size
+                // that never changes only gives the crossing a jump to chew on.
+                (enter togetherWith exit).using(SizeTransform(clip = false))
+            },
+            label = "screen"
+        ) { s ->
+        when (s) {
             Screen.Library -> LibraryScreen(
                 profile = profile,
                 onOpenProfile = { onProfilePage = true; screen = Screen.ProfileAndSettings },
@@ -733,7 +807,7 @@ fun EmufiiApp(settings: SettingsStore) {
             )
 
             is Screen.PspOnline -> PspOnlineScreen(
-                rom = (screen as Screen.PspOnline).rom,
+                rom = s.rom,
                 onBack = { screen = Screen.Library }
             )
 
@@ -827,6 +901,7 @@ fun EmufiiApp(settings: SettingsStore) {
                     screen = Screen.Library
                 }
             )
+        }
         }
     }
 

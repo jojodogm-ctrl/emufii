@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.sharedCover
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,9 @@ fun RomArtwork(rom: Rom, size: Dp, modifier: Modifier = Modifier) {
     val accent = rom.accentArgb?.let { Color(it) }
     Box(
         modifier = modifier
+            // The other end of the flight: the same cover, keyed on the same uri.
+            // pourquoi : docs/decisions/bibliotheque.md § The veils, and why the launch card is where it is
+            .sharedCover(rom.uri, mine = true)
             .size(size)
             .shadow(
                 elevation = if (accent != null) 18.dp else 8.dp,

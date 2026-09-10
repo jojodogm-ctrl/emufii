@@ -200,6 +200,12 @@ fun SecondScreenContent(model: SecondScreenModel) {
                     // Read here, not captured with the key: during a fade the outgoing
                     // face is still composed.
                     val shown = remember(key) { model }
+                    // The page a face shows is frozen once that face is on its way out.
+                    // Changing game resets the page to 0, and the face being faded away
+                    // used to slide a whole page in the same breath.
+                    // pourquoi : docs/decisions/second-ecran.md § The fade between two faces is not decoration
+                    val frozenPage = remember(key) { page }
+                    val shownPage = if (key == faceKey(model)) page else frozenPage
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()
@@ -213,7 +219,7 @@ fun SecondScreenContent(model: SecondScreenModel) {
                                 (model as? SecondScreenModel.ConsoleFolder)?.console
                                     ?: shown.console
                             )
-                            is SecondScreenModel.Browsing -> BrowsingPages(shown, page)
+                            is SecondScreenModel.Browsing -> BrowsingPages(shown, shownPage)
                             // Live, like the console card: every entry shares one face
                             // key.
                             // pourquoi : docs/decisions/second-ecran.md § The console is read live, the other faces are frozen

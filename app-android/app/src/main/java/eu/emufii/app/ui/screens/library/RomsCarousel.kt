@@ -100,7 +100,20 @@ internal fun RomsCarousel(
     // from a passing card.
     var settling by remember { mutableStateOf(false) }
 
+    /**
+     * Which reveal is the current one. Held fast, one press lands several: an older
+     * reveal reaching its end would otherwise lower [settling] under the newer one still
+     * animating, and the centre-follower wrote the card being passed back over the
+     * cursor. The cell was then lit, unlit and lit again, and rang each time.
+     * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
+     */
+    val revealId = remember { mutableIntStateOf(0) }
+
     fun reveal(index: Int) {
+        // Raised here and not in the coroutine: a `launch` lands a frame later, and in
+        // that frame the row has not moved yet, so the centre was still the old card.
+        settling = true
+        val id = ++revealId.intValue
         scope.launch {
             val info = listState.layoutInfo
             // Leading padding is already in `animateScrollToItem`'s frame;
@@ -109,11 +122,11 @@ internal fun RomsCarousel(
             val viewport = info.viewportEndOffset - info.viewportStartOffset
             val itemWidth = info.visibleItemsInfo.firstOrNull()?.size ?: 0
             val offset = ((viewport - itemWidth) / 2 - info.beforeContentPadding)
-            settling = true
             try {
                 listState.animateScrollToItem(index, -offset)
             } finally {
-                settling = false
+                // Only the latest reveal hands the row back to the centre-follower.
+                if (revealId.intValue == id) settling = false
             }
         }
     }

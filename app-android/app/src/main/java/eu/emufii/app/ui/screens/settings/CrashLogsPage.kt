@@ -59,8 +59,7 @@ internal fun CrashLogsPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
         title = stringResource(R.string.settings_page_crash_logs),
         onBack = onBack,
         modifier = modifier,
-        // One block on the page, and it fits: hung from the top it left the screen empty
-        // below and a scroll that never moved.
+        // One block on the page, and it fits: centred, and the page does not scroll.
         centred = true
     ) {
         SettingsBlock(title = null) {
