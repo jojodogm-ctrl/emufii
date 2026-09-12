@@ -37,9 +37,6 @@ import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -57,7 +54,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberCoroutineScope
@@ -94,6 +93,7 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -158,8 +158,6 @@ import eu.emufii.app.ui.screens.library.PlaceholderArtwork
 import eu.emufii.app.ui.screens.library.PublishHovered
 import eu.emufii.app.ui.screens.library.RomTile
 import eu.emufii.app.ui.screens.library.RomsCarousel
-import eu.emufii.app.ui.screens.library.SHELF_AWAY_MS
-import eu.emufii.app.ui.screens.library.SHELF_BACK_MS
 import eu.emufii.app.ui.screens.library.SHELF_INSET
 import eu.emufii.app.ui.screens.library.TILE_MIN_WIDTH_DP
 import eu.emufii.app.ui.screens.library.TILE_TITLE_ROOM
@@ -272,14 +270,20 @@ fun LibraryScreen(
         var shelfBottom by remember { mutableStateOf(0.dp) }
         // Raised by the grid once it has left the top: the shelf then gets out of the
         // way of the covers.
-        val gridScrolled = remember { mutableStateOf(false) }
+        val gridScrolled = remember { mutableFloatStateOf(0f) }
         // Hoisted, because the veil has to know it too: a band that kept the shelf's
         // height after the shelf had gone left a dead strip the size of a row.
         val barCursor = remember { mutableStateOf(false) }
-        val shelfAway = gridScrolled.value && !barCursor.value
+        /**
+         * How far the shelf is out of the way, 0 to 1. A lambda, not a value: read in
+         * the composition it would recompose the whole chrome on every frame of every
+         * scroll; read inside a draw lambda it only redraws.
+         * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
+         */
+        val shelfAway = { if (barCursor.value) 0f else gridScrolled.floatValue }
         // A list that is rebuilt, emptied or swapped for another layout starts at the
         // top again, and nothing else would ever lower the flag.
-        LaunchedEffect(ui.openConsole, ui.revision, ui.layout) { gridScrolled.value = false }
+        LaunchedEffect(ui.openConsole, ui.revision, ui.layout) { gridScrolled.floatValue = 0f }
         val density = LocalDensity.current
 
         Box(
@@ -312,15 +316,8 @@ fun LibraryScreen(
             // shelf: held at full height once the shelf had gone, it was a dead strip.
             // pourquoi : docs/decisions/bibliotheque.md § The veils, and why the launch card is where it is
             val fullBand = shelfBottom.takeIf { it > 0.dp } ?: (topInset + 60.dp)
-            val band by animateDpAsState(
-                targetValue = if (shelfAway) topInset + 8.dp else fullBand,
-                animationSpec = tween(
-                    durationMillis = if (shelfAway) SHELF_AWAY_MS else SHELF_BACK_MS,
-                    easing = if (shelfAway) FastOutLinearInEasing else LinearOutSlowInEasing
-                ),
-                label = "veil-band"
-            )
-            WallpaperVeil(band = band, dark = dark)
+            val bare = topInset + 8.dp
+            WallpaperVeil(band = { lerp(fullBand, bare, shelfAway()) }, dark = dark)
             // Just enough that the last row does not touch the screen edge while scrolling.
             WallpaperVeil(band = bottomInset + 14.dp, dark = dark, fromTop = false)
         }
@@ -356,7 +353,7 @@ fun LibraryScreen(
             // Down from the header leads to the grid: the keypad is the system's and is
             // not a cursor stop.
             onLeaveDown = { runCatching { gridFocus.requestFocus() } },
-            dimmed = gridScrolled.value,
+            away = shelfAway,
             barCursor = barCursor,
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -449,8 +446,8 @@ private fun HandleState(
     bottomInset: androidx.compose.ui.unit.Dp,
     /** The shelf's measured bottom edge: where the first row is allowed to rest. */
     contentTop: androidx.compose.ui.unit.Dp,
-    /** Raised by the grid when it leaves its first row; the shelf reads it to step aside. */
-    scrolled: MutableState<Boolean>,
+    /** How far the grid has pushed the shelf away, 0 to 1. */
+    scrolled: MutableFloatState,
 ) {
     when {
         ui.folderUri == null -> EmptyState(
@@ -537,7 +534,7 @@ private fun HandleState(
                         contentPadding = contentPadding
                     ).also {
                         // A row that only moves sideways never hides the shelf.
-                        LaunchedEffect(Unit) { scrolled.value = false }
+                        LaunchedEffect(Unit) { scrolled.floatValue = 0f }
                     }
 
                     LibraryLayout.LIST -> RomsList(
@@ -605,8 +602,13 @@ private fun RomsGrid(
     canGoBack: Boolean,
     gridFocus: FocusRequester,
     contentPadding: PaddingValues,
-    /** Raised as soon as the first row is behind us; the shelf reads it to step aside. */
-    scrolled: MutableState<Boolean>
+    /**
+     * How far the shelf has been pushed away, 0 to 1. Written here, read only inside
+     * draw lambdas: read in a composition it would recompose the chrome on every frame
+     * of every scroll.
+     * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
+     */
+    scrolled: MutableFloatState
 ) {
     val localWindowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -670,12 +672,18 @@ private fun RomsGrid(
         val totalSlots = totalRows * columns
 
         val gridState = rememberLazyGridState()
-        // `canScrollBackward`, not an item index: a grid eight columns wide counts
-        // items, not rows, so the first sideways cursor step already read as "scrolled"
-        // and the shelf vanished under the hand.
-        LaunchedEffect(gridState) {
-            snapshotFlow { gridState.canScrollBackward }
-                .collect { scrolled.value = it }
+        // How far the shelf has been pushed away, 0 to 1, and not whether it should be:
+        // a duration cannot be in step with a thumb. The travel is the shelf's own
+        // height, so the shelf has finished leaving exactly when the first row reaches
+        // where it used to sit.
+        // pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
+        val travelPx = with(density) { (contentPadding.calculateTopPadding() - 20.dp).toPx() }
+            .coerceAtLeast(1f)
+        LaunchedEffect(gridState, travelPx) {
+            snapshotFlow {
+                if (gridState.firstVisibleItemIndex > 0) 1f
+                else (gridState.firstVisibleItemScrollOffset / travelPx).coerceIn(0f, 1f)
+            }.collect { scrolled.floatValue = it }
         }
         val scope = rememberCoroutineScope()
         val marginPx = marginPx()
@@ -811,7 +819,18 @@ private fun RomsGrid(
                 val held = remember(i) { derivedStateOf { hold.down && i == cursorState.intValue } }
                 // The whole point of the identity key above: a re-sort slides the tiles
                 // to their new cells instead of redrawing the grid in place.
-                val travel = Modifier.animateItem(placementSpec = Motion.arrival())
+                //
+                // Placement only. `animateItem` fades appearances and disappearances by
+                // default, and a lazy grid appears and disappears items for a living:
+                // running the cursor down the rows put a fade on every tile crossing an
+                // edge, and the frame's animation phase went to 43 ms. Measured on the
+                // Thor, 2026-09-10. A re-sort moves tiles, it does not summon them.
+                // pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
+                val travel = Modifier.animateItem(
+                    fadeInSpec = null,
+                    placementSpec = Motion.arrival(),
+                    fadeOutSpec = null
+                )
                 when (entry) {
                     null -> EmptySlot(modifier = travel)
                     is Entry.Folder -> FolderTile(
@@ -863,8 +882,13 @@ private fun RomsList(
     canGoBack: Boolean,
     gridFocus: FocusRequester,
     contentPadding: PaddingValues,
-    /** Raised as soon as the first row is behind us; the shelf reads it to step aside. */
-    scrolled: MutableState<Boolean>
+    /**
+     * How far the shelf has been pushed away, 0 to 1. Written here, read only inside
+     * draw lambdas: read in a composition it would recompose the chrome on every frame
+     * of every scroll.
+     * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
+     */
+    scrolled: MutableFloatState
 ) {
     val marginPx = marginPx()
     val listState = rememberLazyListState()
@@ -1222,11 +1246,12 @@ private fun FloatingTopBar(
     folderFocus: FocusRequester,
     onLeaveDown: () -> Unit,
     /**
-     * True once the grid has left its first row. The shelf then gets out of the way of
-     * what you came for, and comes back the moment the cursor climbs into it.
+     * How far the grid has pushed the shelf out of the way, 0 to 1, read on every frame
+     * it draws. It follows the thumb rather than playing a duration of its own: a timed
+     * exit is never in step with a scroll, however short it is made.
      * pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
      */
-    dimmed: Boolean = false,
+    away: () -> Float,
     /** Hoisted: the veil steps back with the shelf, so it needs the same signal. */
     barCursor: MutableState<Boolean>,
     modifier: Modifier = Modifier
@@ -1330,30 +1355,11 @@ private fun FloatingTopBar(
         social = true
     )
 
-    // Away only while nobody is aiming at it: the cursor climbs into the shelf from the
-    // grid, and it cannot land on something that is not there.
-    val away = dimmed && !barFocused
-    val shelfAlpha by animateFloatAsState(
-        targetValue = if (away) 0f else 1f,
-        animationSpec = tween(
-            durationMillis = if (away) SHELF_AWAY_MS else SHELF_BACK_MS,
-            easing = if (away) FastOutLinearInEasing else LinearOutSlowInEasing
-        ),
-        label = "shelf-away"
-    )
     // Its own height, measured: an alpha of zero still answers the finger, and a tap
     // in the empty band opened the search on a shelf nobody could see. Carried off the
     // top, its hit area leaves with it -- pointer input follows the layer's transform.
     var shelfHeight by remember { mutableStateOf(0.dp) }
     val shelfDensity = LocalDensity.current
-    val shelfLift by animateDpAsState(
-        targetValue = if (away) -(shelfHeight + 24.dp) else 0.dp,
-        animationSpec = tween(
-            durationMillis = if (away) SHELF_AWAY_MS else SHELF_BACK_MS,
-            easing = if (away) FastOutLinearInEasing else LinearOutSlowInEasing
-        ),
-        label = "shelf-lift"
-    )
 
     // One shelf, not two: the two sockets left the middle of the bar to the artwork
     // passing under it, and nothing said where you were.
@@ -1365,8 +1371,11 @@ private fun FloatingTopBar(
         // pourquoi : docs/decisions/bibliotheque.md § Leaving through the top is named, and depends on the column
         modifier = modifier
             .graphicsLayer {
-                alpha = shelfAlpha
-                translationY = shelfLift.toPx()
+                // Read here and nowhere higher: the value changes on every frame of a
+                // scroll, and this is a draw, not a recomposition.
+                val gone = away()
+                alpha = 1f - gone
+                translationY = -(shelfHeight + 24.dp).toPx() * gone
             }
             // The panel stops naming the game on leaving the grid, where its legend
             // began to lie. The resting face is laid over rather than published.

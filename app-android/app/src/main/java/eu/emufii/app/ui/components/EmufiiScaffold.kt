@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -236,41 +238,73 @@ fun WallpaperVeil(
     modifier: Modifier = Modifier,
     fromTop: Boolean = true,
     fade: Dp = FADE_HEIGHT
+) = WallpaperVeil({ band }, dark, modifier, fromTop, fade)
+
+/**
+ * The band as a lambda, for a veil that has to follow a scroll: read at composition it
+ * would recompose the wallpaper on every frame, read in the draw it only repaints.
+ * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
+ */
+@Composable
+fun WallpaperVeil(
+    band: () -> Dp,
+    dark: Boolean,
+    modifier: Modifier = Modifier,
+    fromTop: Boolean = true,
+    fade: Dp = FADE_HEIGHT
 ) {
-    TrayBackdrop(
-        modifier = modifier
-            .fillMaxSize()
-            // DstIn only sees what the layer holds: without an offscreen layer the mask
-            // punches through to the content below instead.
-            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-            .drawWithContent {
-                drawContent()
-                // Starting the fade inside the band left a ghost line of text on the
-                // title's baseline.
-                val solid = band.toPx() / size.height
-                val clear = (band + fade).toPx() / size.height
-                val stops = if (fromTop) {
-                    arrayOf(
-                        0f to Color.Black,
-                        solid to Color.Black,
-                        clear.coerceAtMost(1f) to Color.Transparent,
-                        1f to Color.Transparent
-                    )
-                } else {
-                    arrayOf(
-                        0f to Color.Transparent,
-                        (1f - clear).coerceAtLeast(0f) to Color.Transparent,
-                        (1f - solid).coerceAtLeast(0f) to Color.Black,
-                        1f to Color.Black
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val full = maxHeight
+        // The strip is as tall as the band plus its fade, and not the screen. The layer
+        // below is offscreen -- a real buffer, allocated and flushed every frame -- and
+        // at full height it was 1920x1080 of it to show 130 dp. Measured on the Thor,
+        // 2026-09-10: `flush layers` was 3.7 ms a frame with two veils up.
+        // pourquoi : docs/decisions/performance-rendu.md § An offscreen layer is not a drawing setting
+        val strip = (band() + fade).coerceIn(0.dp, full)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(strip)
+                .align(if (fromTop) Alignment.TopStart else Alignment.BottomStart)
+                // DstIn only sees what the layer holds: without an offscreen layer the
+                // mask punches through to the content below instead.
+                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                .drawWithContent {
+                    drawContent()
+                    // Starting the fade inside the band left a ghost line of text on the
+                    // title's baseline. The stops are read against the strip now, not the
+                    // screen, which is the same place in the same pixels.
+                    val solid = if (size.height > 0f) band().toPx() / size.height else 0f
+                    val stops = if (fromTop) {
+                        arrayOf(
+                            0f to Color.Black,
+                            solid.coerceIn(0f, 1f) to Color.Black,
+                            1f to Color.Transparent
+                        )
+                    } else {
+                        arrayOf(
+                            0f to Color.Transparent,
+                            (1f - solid).coerceIn(0f, 1f) to Color.Black,
+                            1f to Color.Black
+                        )
+                    }
+                    drawRect(
+                        brush = Brush.verticalGradient(colorStops = stops),
+                        blendMode = BlendMode.DstIn
                     )
                 }
-                drawRect(
-                    brush = Brush.verticalGradient(colorStops = stops),
-                    blendMode = BlendMode.DstIn
-                )
-            },
-        dark = dark
-    )
+        ) {
+            // Full height inside the strip, and hung so that the wallpaper lands exactly
+            // where the screen's own does: the band shows the tray, not a squeezed copy.
+            TrayBackdrop(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(full)
+                    .offset(y = if (fromTop) 0.dp else -(full - strip)),
+                dark = dark
+            )
+        }
+    }
 }
 
 /**

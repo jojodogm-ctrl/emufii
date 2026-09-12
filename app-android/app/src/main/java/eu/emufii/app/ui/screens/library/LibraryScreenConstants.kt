@@ -62,15 +62,3 @@ internal const val ENTRANCE_WINDOW_MS = 900L
 internal val BADGE_INSET = 9.dp
 
 internal val TILE_RISE = 2.5.dp
-
-/**
- * How fast the shelf leaves and comes back. Short on purpose: it moves because the grid
- * moved, so anything slower reads as lagging behind the thumb rather than answering it.
- * The veil's band rides the same two numbers -- animated apart, the two drifted and the
- * wallpaper stayed high after the shelf had gone.
- * pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
- */
-internal const val SHELF_AWAY_MS = 130
-
-internal const val SHELF_BACK_MS = 90
-
