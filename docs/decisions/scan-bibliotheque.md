@@ -71,6 +71,28 @@ For those two containers the file must prove it is a PSP game, a `PSP_GAME` in
 its table of contents, failing which it is not listed. `.pbp` and `.cso` are
 still admitted on extension alone: they belong to the PSP only.
 
+## A zipped cartridge stays zipped
+
+Only the DS. melonDS is the one backend of ours that takes an archive: its
+`RomFileProcessorFactory` maps `zip` and `7z` to their own processors next to
+`nds`, `dsi` and `ids`, it finds the cartridge inside on its own, extracts it to
+its cache and boots that. Read off the 2.0.1 APK and confirmed in the source of
+the WatermelonDS fork, 2026-09-12. So Emufii hands over the `.zip` untouched and
+extracts nothing.
+
+Azahar and Dolphin take no archive, so listing a zipped 3DS or GameCube game
+would put a tile in the grid that no launch can honour. An archive is therefore
+a DS game or it is not listed.
+
+A zip belongs to no console by its name, which is why it is not in the extension
+table: that table is a map with one owner per key, and a zip holds whatever
+someone put in it. It is the first `nds`, `dsi` or `ids` entry inside that makes
+it a DS game, the same entry melonDS would pick, and an archive holding none is
+not listed.
+
+`7z` is left out for now: reading its table of contents needs a library we do not
+otherwise carry, and the zip covers what was asked for.
+
 ## What we open, and what we cannot open
 
 3DS and DS are opened, because both carry their real title and their icon inside,

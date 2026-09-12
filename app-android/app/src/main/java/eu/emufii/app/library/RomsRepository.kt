@@ -245,20 +245,25 @@ class RomsRepository private constructor(private val context: Context) {
                         continue
                     }
 
-                    val ext = name.substringAfterLast('.', "")
-                    val byName = Console.forExtension(ext) ?: continue
+                    val extLower = name.substringAfterLast('.', "").lowercase()
                     val uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, docId)
                     // Cheapest truth first: folder name, extension, then bytes.
                     // pourquoi : docs/decisions/scan-bibliotheque.md § A decision chain, cheapest first
-                    val extLower = ext.lowercase()
-                    val folderConsole = Console.forFolder(folderName)
-                    val console = when {
-                        folderConsole != null -> folderConsole
-                        extLower in DiscImage.AMBIGUOUS_EXTENSIONS ->
-                            discImages.identify(uri) ?: continue
-                        extLower in DiscImage.SNIFFED_EXTENSIONS ->
-                            discImages.identify(uri) ?: byName
-                        else -> byName
+                    val console = if (extLower == NdsArchive.EXTENSION) {
+                        // An archive is a DS game or nothing: no other backend of ours opens one.
+                        // pourquoi : docs/decisions/scan-bibliotheque.md § A zipped cartridge stays zipped
+                        if (holdsDsRom(uri)) Console.DS else continue
+                    } else {
+                        val byName = Console.forExtension(extLower) ?: continue
+                        val folderConsole = Console.forFolder(folderName)
+                        when {
+                            folderConsole != null -> folderConsole
+                            extLower in DiscImage.AMBIGUOUS_EXTENSIONS ->
+                                discImages.identify(uri) ?: continue
+                            extLower in DiscImage.SNIFFED_EXTENSIONS ->
+                                discImages.identify(uri) ?: byName
+                            else -> byName
+                        }
                     }
                     out += Candidate(
                         uri = uri,
@@ -278,6 +283,10 @@ class RomsRepository private constructor(private val context: Context) {
         }
         return out
     }
+
+    private fun holdsDsRom(uri: Uri): Boolean = runCatching {
+        context.contentResolver.openInputStream(uri)?.use { NdsArchive.openRom(it) != null }
+    }.onFailure { Log.w(TAG, "cannot read archive $uri", it) }.getOrNull() ?: false
 
     /**
      * 3DS and DS files get opened; a disc image takes its title from the filename and
@@ -405,7 +414,7 @@ class RomsRepository private constructor(private val context: Context) {
             }
         }
 
-        val data = ndsReader.read(uri)
+        val data = if (NdsArchive.isArchive(name)) ndsReader.readArchived(uri) else ndsReader.read(uri)
         val cacheKey = data.cacheKey ?: return fallback
         ndsKeyCache[uri.toString()] = cacheKey
 

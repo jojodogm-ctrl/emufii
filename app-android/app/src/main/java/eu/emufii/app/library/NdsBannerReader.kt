@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import java.io.FileInputStream
+import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
@@ -27,27 +28,45 @@ class NdsBannerReader(private val context: Context) {
                 if (readAt(channel, 0, header) < HEADER_SIZE) return@use NdsData(null, null, null)
                 val headerBytes = header.array()
 
-                val key = NdsBanner.cacheKey(headerBytes)
                 val bannerOffset = NdsBanner.bannerOffset(headerBytes)
-                    ?: return@use NdsData(null, NdsBanner.internalTitle(headerBytes), key)
+                    ?: return@use decode(headerBytes, null)
 
                 val banner = ByteBuffer.allocate(BANNER_READ_SIZE)
                 val read = readAt(channel, bannerOffset, banner)
-                if (read < NdsBanner.MIN_BANNER_SIZE) {
-                    return@use NdsData(null, NdsBanner.internalTitle(headerBytes), key)
-                }
-                val bannerBytes = banner.array().copyOf(read)
-
-                val pixels = NdsBanner.decodeIcon(bannerBytes)
-                val bitmap = pixels?.let {
-                    Bitmap.createBitmap(it, NdsBanner.ICON_DIM, NdsBanner.ICON_DIM, Bitmap.Config.ARGB_8888)
-                }
-                val title = NdsBanner.pickTitle(bannerBytes) ?: NdsBanner.internalTitle(headerBytes)
-
-                NdsData(bitmap, title, key)
+                decode(headerBytes, banner.array().copyOf(read))
             }
         } ?: NdsData(null, null, null)
     }.getOrElse { NdsData(null, null, null) }
+
+    /** The same banner, read in one pass: an archive entry cannot be seeked. */
+    fun readArchived(uri: Uri): NdsData = runCatching {
+        context.contentResolver.openInputStream(uri)?.use { file ->
+            val rom = NdsArchive.openRom(file) ?: return@use NdsData(null, null, null)
+            val headerBytes = readAtMost(rom, HEADER_SIZE)
+            if (headerBytes.size < HEADER_SIZE) return@use NdsData(null, null, null)
+
+            val bannerOffset = NdsBanner.bannerOffset(headerBytes)
+            if (bannerOffset == null || bannerOffset < HEADER_SIZE) {
+                return@use decode(headerBytes, null)
+            }
+            if (!skipFully(rom, bannerOffset - HEADER_SIZE)) return@use decode(headerBytes, null)
+
+            decode(headerBytes, readAtMost(rom, BANNER_READ_SIZE))
+        } ?: NdsData(null, null, null)
+    }.getOrElse { NdsData(null, null, null) }
+
+    private fun decode(header: ByteArray, banner: ByteArray?): NdsData {
+        val key = NdsBanner.cacheKey(header)
+        val internalTitle = NdsBanner.internalTitle(header)
+        if (banner == null || banner.size < NdsBanner.MIN_BANNER_SIZE) {
+            return NdsData(null, internalTitle, key)
+        }
+
+        val icon = NdsBanner.decodeIcon(banner)?.let {
+            Bitmap.createBitmap(it, NdsBanner.ICON_DIM, NdsBanner.ICON_DIM, Bitmap.Config.ARGB_8888)
+        }
+        return NdsData(icon, NdsBanner.pickTitle(banner) ?: internalTitle, key)
+    }
 
     private fun readAt(channel: FileChannel, position: Long, buffer: ByteBuffer): Int {
         channel.position(position)
@@ -59,4 +78,32 @@ class NdsBannerReader(private val context: Context) {
         }
         return total
     }
+}
+
+/** At most [count] bytes, short only at the end of [stream]. */
+internal fun readAtMost(stream: InputStream, count: Int): ByteArray {
+    val buffer = ByteArray(count)
+    var total = 0
+    while (total < count) {
+        val read = stream.read(buffer, total, count - total)
+        if (read < 0) break
+        total += read
+    }
+    return buffer.copyOf(total)
+}
+
+/** False if [stream] ends before [count] bytes have been passed over. */
+internal fun skipFully(stream: InputStream, count: Long): Boolean {
+    var left = count
+    while (left > 0) {
+        val skipped = stream.skip(left)
+        if (skipped > 0) {
+            left -= skipped
+            continue
+        }
+        // Skipping nothing does not mean the end of the stream; a read tells.
+        if (stream.read() < 0) return false
+        left--
+    }
+    return true
 }

@@ -30,7 +30,7 @@ enum class Console(
 
     DS(
         label = "DS",
-        extensions = setOf("nds", "dsi", "srl"),
+        extensions = setOf("nds", "dsi", "ids", "srl"),
         backend = Backend.MELONDS_WFC
     ),
 
