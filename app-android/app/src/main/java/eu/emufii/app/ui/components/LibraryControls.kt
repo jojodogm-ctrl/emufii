@@ -78,8 +78,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.ui.graphics.SolidColor
 import eu.emufii.app.ui.theme.PillShape
-import eu.emufii.app.ui.theme.socket
+import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
+import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.LocalGlassPane
+import eu.emufii.app.ui.glass
+import eu.emufii.app.ui.theme.shelfFill
 import eu.emufii.app.ui.tap
+import eu.emufii.app.ui.focusRing
+import eu.emufii.app.ui.theme.edgeColor
 
 /**
  * The glyph shows the state, not the function.
@@ -95,7 +101,7 @@ fun LayoutChip(
     var open by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        TopBarChip(onClick = { open = true }, onFocused = onFocused) {
+        BankCell(onClick = { open = true }, onFocused = onFocused) {
             val tint = MaterialTheme.colorScheme.onSurface
             Canvas(Modifier.size(21.dp)) { drawLayoutGlyph(current, tint) }
         }
@@ -133,7 +139,7 @@ fun SortChip(
     var open by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        TopBarChip(onClick = { open = true }, onFocused = onFocused) {
+        BankCell(onClick = { open = true }, onFocused = onFocused) {
             val tint = MaterialTheme.colorScheme.onSurface
             Canvas(Modifier.size(21.dp)) { drawSortGlyph(current, tint) }
         }
@@ -411,13 +417,16 @@ private fun DrawScope.drawSortGlyph(sort: LibrarySort, color: Color) {
  * The glyph is the field's magnifier: button and field are one control in two states.
  * pourquoi : docs/decisions/bibliotheque.md § Search, and the cross that closes it
  */
+/** What the bar opens out to. Read by the header's size transition as well. */
+val SEARCH_WIDTH = 430.dp
+
 @Composable
 fun SearchChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFocused: (Boolean) -> Unit = {}
 ) {
-    TopBarChip(onClick = onClick, modifier = modifier, onFocused = onFocused) {
+    BankCell(onClick = onClick, modifier = modifier, onFocused = onFocused) {
         val tint = MaterialTheme.colorScheme.onSurface
         LensMark(size = 21.dp, color = tint)
     }
@@ -443,13 +452,34 @@ fun SearchField(
         runCatching { field.requestFocus() }
         keyboard?.show()
     }
+    val pane = LocalGlassPane.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
-            .height(36.dp)
-            .socket(PillShape, dark)
-            .padding(horizontal = 12.dp)
+            .height(40.dp)
+            // The room the search takes when it opens: wide enough for a game's name,
+            // and the spacer on its left gives way, so the bar reads as stretching out
+            // of the tool bank rather than appearing beside it.
+            // pourquoi : docs/decisions/bibliotheque.md § Search takes the shelf, and the two states do not cross
+            .width(SEARCH_WIDTH)
+            // Glass, like everything else standing on the header. A plate here was the
+            // one opaque object left on the pebble.
+            .then(
+                if (pane != null) {
+                    Modifier.glass(pane, PillShape, dark, thickness = 0.35f, lift = 3.dp)
+                } else {
+                    Modifier.plate(
+                        PillShape,
+                        dark,
+                        LocalEmufiiOledTheme.current,
+                        lift = 3.dp,
+                        bevel = false,
+                        fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark)
+                    )
+                }
+            )
+            .padding(start = 14.dp, end = 6.dp)
     ) {
         val tint = MaterialTheme.colorScheme.onSurface
         val raise = Modifier.tap(
@@ -461,7 +491,7 @@ fun SearchField(
                 onTap()
             }
         )
-        LensMark(size = 18.dp, color = tint, modifier = raise)
+        LensMark(size = 19.dp, color = tint, modifier = raise)
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -471,7 +501,7 @@ fun SearchField(
             keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
             textStyle = MaterialTheme.typography.bodyMedium.copy(color = tint),
             cursorBrush = SolidColor(tint),
-            modifier = Modifier.width(170.dp).focusRequester(field).then(raise)
+            modifier = Modifier.weight(1f).focusRequester(field).then(raise)
         ) {
             if (value.isEmpty()) {
                 Text(
@@ -498,3 +528,106 @@ fun SearchField(
         }
     }
 }
+
+/**
+ * The three library settings as one piece with three cells, the way a console puts its
+ * switches on one plate. Each cell shows its own state; the separators are hairlines
+ * that stop short of the edges, or the bank reads as three buttons again.
+ * pourquoi : docs/decisions/bibliotheque.md § The tools are one bank, the people are discs
+ */
+@Composable
+fun ToolBank(content: @Composable () -> Unit) {
+    val dark = LocalEmufiiDarkTheme.current
+    // Glass when it stands on glass, plastic everywhere else: the bank is used outside
+    // the library's header too, where there is no pane to refract.
+    val pane = LocalGlassPane.current
+    Row(
+        modifier = Modifier
+            .then(
+                if (pane != null) {
+                    // A third of the header's bend: the same figures on a shape this
+                    // small read as a much thicker glass.
+                    Modifier.glass(pane, PillShape, dark, thickness = 0.35f, lift = 3.dp)
+                } else {
+                    Modifier.plate(
+                        shape = PillShape,
+                        dark = dark,
+                        oled = LocalEmufiiOledTheme.current,
+                        lift = 3.dp,
+                        bevel = false,
+                        fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark)
+                    )
+                }
+            )
+            // The plate clips: without this margin a cell touches the contour and the
+            // cursor's glow is cut off square along it.
+            .padding(BANK_MARGIN),
+        verticalAlignment = Alignment.CenterVertically
+    ) { content() }
+}
+
+/** Between two cells, never at the ends. */
+@Composable
+fun BankSeam() {
+    Box(
+        modifier = Modifier
+            .width(1.dp)
+            .height(22.dp)
+            .background(edgeColor(LocalEmufiiDarkTheme.current, LocalEmufiiOledTheme.current))
+    )
+}
+
+/**
+ * A cell does not scale under the thumb: it sits in a plate that would have to scale
+ * with it. It darkens instead.
+ */
+@Composable
+private fun BankCell(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onFocused: (Boolean) -> Unit = {},
+    content: @Composable () -> Unit
+) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val focused by interaction.collectIsFocusedAsState()
+    LaunchedEffect(focused) { onFocused(focused) }
+
+    Box(
+        modifier = modifier
+            .size(width = CELL_WIDTH, height = CELL_HEIGHT)
+            .tap(interactionSource = interaction, indication = null, onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .padding(CURSOR_INSET)
+                .focusRing(focused, CellShape, width = 2.dp, glowRadius = 4.dp)
+                .clip(CellShape)
+                .then(
+                    if (pressed) {
+                        Modifier.background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.09f))
+                    } else {
+                        Modifier
+                    }
+                ),
+            contentAlignment = Alignment.Center
+        ) { content() }
+    }
+}
+
+private val CELL_WIDTH = 54.dp
+private val CELL_HEIGHT = 44.dp
+
+/**
+ * What the bank keeps clear inside its contour: the plate clips, so this has to cover
+ * the cursor's glow whole or the halo comes out cut off square along the pill.
+ */
+private val BANK_MARGIN = 6.dp
+
+/** The cursor stays off the bank's contour: drawn on it, it cuts the piece in three. */
+private val CURSOR_INSET = 1.dp
+
+/** One cursor for the three cells, and it is the pill the rest of the header wears. */
+private val CellShape = RoundedCornerShape(percent = 50)

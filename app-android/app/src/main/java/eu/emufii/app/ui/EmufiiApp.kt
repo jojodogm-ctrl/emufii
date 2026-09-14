@@ -782,6 +782,7 @@ fun EmufiiApp(settings: SettingsStore) {
         when (s) {
             Screen.Library -> LibraryScreen(
                 profile = profile,
+                onlineFriends = friendStatuses.values.count { it.online },
                 onOpenProfile = { onProfilePage = true; screen = Screen.ProfileAndSettings },
                 onOpenFriends = { screen = Screen.Friends },
                 onOpenFinder = { screen = Screen.Finder },

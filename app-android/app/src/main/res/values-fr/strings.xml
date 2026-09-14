@@ -507,23 +507,28 @@
     <string name="settings_notify_open_android">Ouvrir les réglages Android</string>
 
     <!-- Second ecran : ce que fait Emufii sur chaque machine, quand le curseur est sur son dossier -->
-    <string name="brief_console_title">%1$s · jouer ensemble</string>
-    <string name="brief_3ds_1">Azahar lance le jeu. Emufii monte le tunnel, ouvre son salon et le remplit à ta place.</string>
-    <string name="brief_3ds_2">Un code de session suffit à ton ami : sa console voit la tienne comme en Wi-Fi local.</string>
-    <string name="brief_3ds_warning">Il faut une pre-release d\'Azahar : sa dernière version stable n\'a pas d\'écran multijoueur.</string>
-    <string name="brief_switch_1">Eden lance le jeu, et le salon est levé sur le serveur d\'Emufii : personne n\'héberge sur sa console.</string>
-    <string name="brief_switch_2">Vous le rejoignez tous les deux, et le code de session en est le mot de passe.</string>
-    <string name="brief_psp_1">PPSSPP cherche un serveur ad hoc à une adresse fixe ; le relais le redirige vers l\'hôte de la session.</string>
-    <string name="brief_psp_2">Le jeu en ligne public, lui, ne passe pas par Emufii : PPSSPP s\'y connecte seul, sans session ni tunnel.</string>
-    <string name="brief_ds_1">Les serveurs de Nintendo sont éteints depuis 2014 : melonDS passe donc par Kaeru WFC, qui les réimplémente.</string>
-    <string name="brief_ds_2">Ni session ni code : Emufii redirige les requêtes du jeu, et tu retrouves les joueurs déjà connectés.</string>
-    <string name="brief_ds_warning">Sans la redirection active, la console appelle les serveurs éteints et ne trouve personne.</string>
-    <string name="brief_ps2_1">ARMSX2 lance le jeu. Emufii ouvre la session, puis te donne l\'adresse et le port à saisir dans le menu réseau du jeu.</string>
-    <string name="brief_ps2_2">Le profil réseau tient sur une carte mémoire en emplacement 1 : Emufii la prépare et y ramène tes sauvegardes.</string>
-    <string name="brief_ps2_warning">Sans ce profil, aucun jeu LAN de PS2 n\'ouvre son menu local.</string>
-    <string name="brief_dolphin_1">Dolphin lance le jeu, et c\'est son propre Netplay qui fait la partie.</string>
-    <string name="brief_dolphin_2">Emufii monte le tunnel et vous réunit dans le même salon ; ton ami n\'a que le code de session à saisir.</string>
-    <string name="brief_dolphin_warning">Les deux joueurs doivent lancer exactement le même dump, sinon Dolphin refuse la partie.</string>
+    <string name="brief_3ds_lead">Azahar, son salon rempli à ta place</string>
+    <string name="brief_3ds_1">*Azahar* fait tourner le jeu. Emufii ouvre le tunnel et remplit son salon à ta place.</string>
+    <string name="brief_3ds_2">Ton ami saisit le *code de session* : sa console voit la tienne comme sur le même *Wi-Fi*.</string>
+    <string name="brief_3ds_warning">Il faut une *pre-release* d\'Azahar : la version stable n\'a pas d\'écran multijoueur.</string>
+    <string name="brief_switch_lead">Eden, dans un salon hébergé par Emufii</string>
+    <string name="brief_switch_1">*Eden* fait tourner le jeu. Le salon vit sur le *serveur d\'Emufii*, pas sur vos consoles.</string>
+    <string name="brief_switch_2">Vous le rejoignez tous les deux, et le *code de session* en est le mot de passe.</string>
+    <string name="brief_psp_lead">PPSSPP, son serveur ad hoc redirigé</string>
+    <string name="brief_psp_1">*PPSSPP* cherche un serveur ad hoc à une adresse fixe. Le *relais* d\'Emufii y répond.</string>
+    <string name="brief_psp_2">Le *jeu en ligne public* est différent : PPSSPP s\'y connecte seul, sans session ni tunnel.</string>
+    <string name="brief_ds_lead">melonDS, sur des serveurs refaits par des fans</string>
+    <string name="brief_ds_1">Nintendo a éteint ses serveurs en *2014*. melonDS passe par *Kaeru WFC*, refait par des fans.</string>
+    <string name="brief_ds_2">*Ni session ni code* : Emufii redirige le jeu et tu rejoins les joueurs déjà présents.</string>
+    <string name="brief_ds_warning">Sans la *redirection*, le jeu appelle les serveurs éteints et ne trouve personne.</string>
+    <string name="brief_ps2_lead">ARMSX2, avec une adresse à saisir</string>
+    <string name="brief_ps2_1">*ARMSX2* fait tourner le jeu. Emufii ouvre la session et te donne une *adresse et un port*.</string>
+    <string name="brief_ps2_2">Le menu réseau du jeu réclame un *profil* sur une carte en *emplacement 1* ; Emufii la prépare.</string>
+    <string name="brief_ps2_warning">Sans ce profil, un jeu LAN PS2 n\'ouvre *même pas* son menu local.</string>
+    <string name="brief_dolphin_lead">Dolphin, sur son propre Netplay</string>
+    <string name="brief_dolphin_1">*Dolphin* fait tourner le jeu, et c\'est son propre *Netplay* qui porte la partie.</string>
+    <string name="brief_dolphin_2">Emufii ouvre le tunnel et vous met dans le même salon ; ton ami saisit le *code de session*.</string>
+    <string name="brief_dolphin_warning">Les deux joueurs doivent lancer *exactement le même dump*, sinon Dolphin refuse la partie.</string>
     <!-- Settings: the setup steps, split out of the two paragraph walls -->
     <string name="settings_ppsspp_step1">Choisis la racine de la Memory Stick de PPSSPP : le dossier qui contient PSP/SYSTEM/ppsspp.ini. Android ne donne accès qu\'à celui-là.</string>
     <string name="settings_ppsspp_step2">Avant une session privée, Emufii écrit les réglages réseau par jeu que PPSSPP reconnaît.</string>
@@ -663,4 +668,7 @@
     <string name="crash_logs_empty_title">Rien à afficher</string>
     <string name="crash_logs_empty_description">Emufii n\'a pas planté récemment. Les rapports apparaîtront ici sinon.</string>
     <string name="crash_logs_test_crash">Déclencher un plantage de test</string>
+    <string name="lib_online_one">1 ami en ligne</string>
+    <string name="lib_online">%1$d amis en ligne</string>
+    <string name="lib_online_none">Aucun ami en ligne</string>
 </resources>

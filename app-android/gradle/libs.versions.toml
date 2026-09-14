@@ -11,6 +11,7 @@ composeBom = "2026.08.00"
 coil = "3.5.0"
 documentfile = "1.1.0"
 haze = "1.7.2"
+backdrop = "2.0.1"
 wireguard = "1.0.20260102"
 xz = "1.10"
 aircompressor = "2.0.3"
@@ -36,6 +37,7 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 haze = { group = "dev.chrisbanes.haze", name = "haze", version.ref = "haze" }
+backdrop = { group = "io.github.kyant0", name = "backdrop", version.ref = "backdrop" }
 haze-materials = { group = "dev.chrisbanes.haze", name = "haze-materials", version.ref = "haze" }
 wireguard-tunnel = { group = "com.wireguard.android", name = "tunnel", version.ref = "wireguard" }
 # Public domain, no transitive dependencies: the only LZMA decoder Android does

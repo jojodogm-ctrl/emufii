@@ -288,6 +288,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.haze)
+    implementation(libs.backdrop)
     implementation(libs.haze.materials)
     implementation(libs.wireguard.tunnel)
     implementation(libs.xz)

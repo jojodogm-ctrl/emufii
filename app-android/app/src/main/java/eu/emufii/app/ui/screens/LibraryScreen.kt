@@ -98,6 +98,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import dev.chrisbanes.haze.hazeSource
+import eu.emufii.app.ui.LocalGlassPane
+import eu.emufii.app.ui.glass
+import com.kyant.backdrop.effects.vibrancy
+import com.kyant.backdrop.highlight.Highlight
+import com.kyant.backdrop.shadow.Shadow
+import com.kyant.backdrop.effects.lens
+import com.kyant.backdrop.effects.blur
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import com.kyant.backdrop.Backdrop
 import dev.chrisbanes.haze.rememberHazeState
 import eu.emufii.app.R
 import eu.emufii.app.artwork.rememberTileArt
@@ -117,6 +128,8 @@ import eu.emufii.app.secondscreen.rememberPresentationDisplay
 import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.LocalRingTone
 import eu.emufii.app.ui.RingTone
+import eu.emufii.app.ui.components.ToolBank
+import eu.emufii.app.ui.components.BankSeam
 import eu.emufii.app.ui.components.ChevronLeft
 import eu.emufii.app.ui.components.CompatBadge
 import eu.emufii.app.ui.components.FolderMark
@@ -158,7 +171,6 @@ import eu.emufii.app.ui.screens.library.PlaceholderArtwork
 import eu.emufii.app.ui.screens.library.PublishHovered
 import eu.emufii.app.ui.screens.library.RomTile
 import eu.emufii.app.ui.screens.library.RomsCarousel
-import eu.emufii.app.ui.screens.library.SHELF_INSET
 import eu.emufii.app.ui.screens.library.TILE_MIN_WIDTH_DP
 import eu.emufii.app.ui.screens.library.TILE_TITLE_ROOM
 import eu.emufii.app.ui.screens.library.TILE_TITLE_DROP
@@ -174,9 +186,11 @@ import eu.emufii.app.ui.theme.ArtworkShape
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.PillShape
+import eu.emufii.app.ui.theme.Coral
 import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.theme.TileShape
 import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.theme.shelf
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.wallpaper.TrayBackdrop
 import kotlinx.coroutines.delay
@@ -189,6 +203,8 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun LibraryScreen(
     profile: Profile,
+    /** How many friends are online; presence is polled once for the whole app. */
+    onlineFriends: Int = 0,
     onOpenProfile: () -> Unit,
     onOpenFriends: () -> Unit,
     onOpenFinder: () -> Unit,
@@ -286,10 +302,16 @@ fun LibraryScreen(
         LaunchedEffect(ui.openConsole, ui.revision, ui.layout) { gridScrolled.floatValue = 0f }
         val density = LocalDensity.current
 
+        // What the header refracts: the tray and the grid, captured as a layer. The header
+        // is their sibling, so it cannot read them without one.
+        // pourquoi : docs/decisions/bibliotheque.md § The header is a pebble, and the game colours it
+        val glass = rememberLayerBackdrop()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .then(if (ui.searchOpen) Modifier.hazeSource(hazeState) else Modifier)
+                .layerBackdrop(glass)
         ) {
             TrayBackdrop(modifier = Modifier.fillMaxSize(), dark = dark)
 
@@ -315,15 +337,16 @@ fun LibraryScreen(
             // covers was sliced in half under the chrome. And it travels with the
             // shelf: held at full height once the shelf had gone, it was a dead strip.
             // pourquoi : docs/decisions/bibliotheque.md § The veils, and why the launch card is where it is
-            val fullBand = shelfBottom.takeIf { it > 0.dp } ?: (topInset + 60.dp)
-            val bare = topInset + 8.dp
-            WallpaperVeil(band = { lerp(fullBand, bare, shelfAway()) }, dark = dark)
-            // Just enough that the last row does not touch the screen edge while scrolling.
-            WallpaperVeil(band = bottomInset + 14.dp, dark = dark, fromTop = false)
+            // Only the status bar, never the header's own band: the header is glass now and
+            // has to see the grid to refract it. A band that reached under it would hand the
+            // lens a flat colour and the effect would vanish where it matters most.
+            WallpaperVeil(band = { topInset + 8.dp }, dark = dark)
         }
 
         FloatingTopBar(
+            glass = glass,
             profile = profile,
+            onlineFriends = onlineFriends,
             layout = ui.layout,
             onPickLayout = settings::setLibraryLayout,
             sort = ui.sort,
@@ -353,7 +376,6 @@ fun LibraryScreen(
             // Down from the header leads to the grid: the keypad is the system's and is
             // not a cursor stop.
             onLeaveDown = { runCatching { gridFocus.requestFocus() } },
-            away = shelfAway,
             barCursor = barCursor,
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -1169,6 +1191,14 @@ internal fun consolePlate(console: Console): Brush {
     return Brush.linearGradient(colors = listOf(c1, c2), start = Offset.Zero, end = Offset.Infinite)
 }
 
+/** Who is around, which is the one thing worth saying above the library's name. */
+@Composable
+private fun onlineLine(online: Int): String = when (online) {
+    0 -> stringResource(R.string.lib_online_none)
+    1 -> stringResource(R.string.lib_online_one)
+    else -> stringResource(R.string.lib_online, online)
+}
+
 @Composable
 internal fun gameCount(n: Int): String =
     if (n == 1) stringResource(R.string.lib_folder_count_one)
@@ -1181,8 +1211,6 @@ internal fun gameCount(n: Int): String =
 
 @Composable
 private fun FolderHeader(
-    console: Console,
-    count: Int,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1190,11 +1218,24 @@ private fun FolderHeader(
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val shape = CircleShape
+    val pane = LocalGlassPane.current
 
     Box(
         modifier = modifier
             .focusRing(focused, shape)
-            .plate(shape = shape, dark = dark, oled = LocalEmufiiOledTheme.current, lift = 5.dp)
+            .then(
+                if (pane != null) {
+                    Modifier.glass(pane, shape, dark, thickness = 0.35f, lift = 3.dp)
+                } else {
+                    Modifier.plate(
+                        shape = shape,
+                        dark = dark,
+                        oled = LocalEmufiiOledTheme.current,
+                        lift = 3.dp,
+                        bevel = false
+                    )
+                }
+            )
             .tap(interactionSource = interaction, indication = null, onClick = onBack)
     ) {
         Row(
@@ -1203,16 +1244,14 @@ private fun FolderHeader(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
         ) {
             ChevronLeft(size = 18.dp, color = MaterialTheme.colorScheme.onSurface)
+            // Where it goes, not where you are: the title beside it already says the
+            // console and counts its games, and the button repeated both word for word.
+            // A back control names its destination.
             Text(
-                console.label,
+                stringResource(R.string.bar_root),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                gameCount(count),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -1224,7 +1263,10 @@ private fun FolderHeader(
  */
 @Composable
 private fun FloatingTopBar(
+    /** The tray and the grid, for the header to refract. */
+    glass: Backdrop,
     profile: Profile,
+    onlineFriends: Int,
     layout: LibraryLayout,
     onPickLayout: (LibraryLayout) -> Unit,
     sort: LibrarySort,
@@ -1245,14 +1287,7 @@ private fun FloatingTopBar(
     /** The way back out of a folder: where the cursor lands when it climbs out of the grid. */
     folderFocus: FocusRequester,
     onLeaveDown: () -> Unit,
-    /**
-     * How far the grid has pushed the shelf out of the way, 0 to 1, read on every frame
-     * it draws. It follows the thumb rather than playing a duration of its own: a timed
-     * exit is never in step with a scroll, however short it is made.
-     * pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
-     */
-    away: () -> Float,
-    /** Hoisted: the veil steps back with the shelf, so it needs the same signal. */
+    /** Hoisted: the panel needs to know when the cursor sits in the header. */
     barCursor: MutableState<Boolean>,
     modifier: Modifier = Modifier
 ) {
@@ -1355,28 +1390,17 @@ private fun FloatingTopBar(
         social = true
     )
 
-    // Its own height, measured: an alpha of zero still answers the finger, and a tap
-    // in the empty band opened the search on a shelf nobody could see. Carried off the
-    // top, its hit area leaves with it -- pointer input follows the layer's transform.
-    var shelfHeight by remember { mutableStateOf(0.dp) }
-    val shelfDensity = LocalDensity.current
-
-    // One shelf, not two: the two sockets left the middle of the bar to the artwork
-    // passing under it, and nothing said where you were.
-    // pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
+    // One piece again, but posed and light, and it opens on who you are rather than on
+    // a title: identity, then state, then the tools, then the one thing to do.
+    // pourquoi : docs/decisions/bibliotheque.md § The header is a pebble, and the game colours it
     val shelfDark = LocalEmufiiDarkTheme.current
-    Row(
+    // The header's own rendering, for the pills standing on it.
+    val headerGlass = rememberLayerBackdrop()
+    Box(
         // Named, like going up, and on the whole row: the left corner carries
         // buttons now, so one must be able to come down from there too.
         // pourquoi : docs/decisions/bibliotheque.md § Leaving through the top is named, and depends on the column
         modifier = modifier
-            .graphicsLayer {
-                // Read here and nowhere higher: the value changes on every frame of a
-                // scroll, and this is a draw, not a recomposition.
-                val gone = away()
-                alpha = 1f - gone
-                translationY = -(shelfHeight + 24.dp).toPx() * gone
-            }
             // The panel stops naming the game on leaving the grid, where its legend
             // began to lie. The resting face is laid over rather than published.
             // pourquoi : docs/decisions/bibliotheque.md § The panel stops talking about the game when you leave the grid
@@ -1389,114 +1413,72 @@ private fun FloatingTopBar(
                     false
                 }
             }
-            .socket(PillShape, shelfDark)
-            .animateContentSize()
-            .onGloballyPositioned {
-                shelfHeight = with(shelfDensity) { it.size.height.toDp() }
-            }
-            .padding(SHELF_INSET),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .fillMaxWidth()
+            // Glass, not plastic: the lens bends the covers passing underneath and the rim
+            // catches the light. It exports its own pane, so the controls it carries refract
+            // the header rather than the grid two layers down.
+            // pourquoi : docs/decisions/bibliotheque.md § The header is a pebble, and the game colours it
+            .glass(
+                backdrop = glass,
+                shape = PillShape,
+                dark = shelfDark,
+                exported = headerGlass
+            )
     ) {
-        // pourquoi : docs/decisions/bibliotheque.md § Search takes the shelf, and the two states do not cross
-        androidx.compose.animation.AnimatedContent(
-            targetState = searchOpen,
-            transitionSpec = {
-                androidx.compose.animation.fadeIn(
-                    tween(
-                        durationMillis = 120,
-                        delayMillis = 100,
-                        easing = androidx.compose.animation.core.LinearOutSlowInEasing
-                    )
-                ).togetherWith(
-                    androidx.compose.animation.fadeOut(
-                        tween(
-                            durationMillis = 100,
-                            easing = androidx.compose.animation.core.FastOutLinearInEasing
-                        )
-                    )
-                ).using(
-                    androidx.compose.animation.SizeTransform(clip = false) { _, _ ->
-                        androidx.compose.animation.core.snap()
-                    }
-                )
-            },
-            label = "shelf-search-swap"
-            // No weight here: a weight hands down *exact* constraints, `AnimatedContent`
-            // passes them straight to its content, and the field was stretched the whole
-            // width of the shelf -- a trough with a caret lost in it. It wraps, and the
-            // spacer below holds the slack instead.
-        ) { open ->
-            if (open) {
-                SearchField(
-                    value = query,
-                    onValueChange = onQueryChange,
-                    onClose = onSearchClose,
-                    modifier = Modifier.focusRequester(topBarLeftFocus)
-                )
-            } else {
-                // The 10.dp the right-hand shelf uses: with no arrangement, three
-                // pills sat touching while their opposite numbers breathed.
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SearchChip(onClick = onSearchOpen, onFocused = follow(searchFace))
-                    LayoutChip(
-                        current = layout,
-                        onPick = onPickLayout,
-                        modifier = Modifier.focusRequester(topBarLeftFocus),
-                        onFocused = follow(layoutFace)
-                    )
-                    SortChip(
-                        current = sort,
-                        onPick = onPickSort,
-                        onFocused = follow(sortFace)
-                    )
-                }
-            }
-        }
+      CompositionLocalProvider(LocalGlassPane provides headerGlass) {
+        Row(
+            // The grid sizes its tiles to fit four rows under this: every dp taken here
+            // is taken out of the artwork.
+            // pourquoi : docs/decisions/bibliotheque.md § Whole rows, or nothing
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Identity first: the app opens on who you are, and the avatar is the way
+            // into the profile it used to reach from the far corner.
+            ProfileChip(
+                profile = profile,
+                onClick = onOpenProfile,
+                modifier = if (searchOpen) Modifier else Modifier.focusRequester(topBarLeftFocus),
+                onFocused = follow(profileFace)
+            )
 
-        // The middle says where you are. It was the one thing six pills never told you.
-        // Searching, the same room becomes plain slack: the right-hand group stays put
-        // rather than sliding left behind the field.
-        // pourquoi : docs/decisions/bibliotheque.md § The console folders
-        if (searchOpen) {
-            Spacer(Modifier.weight(1f))
-        } else {
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                if (openConsole != null) {
-                    // In a folder the marker is also the way out, so it is a plate in the
-                    // hollow: a raised thing reads as pressable, a flat one does not.
-                    FolderHeader(
-                        console = openConsole,
-                        count = openConsoleCount,
-                        onBack = onLeaveFolder,
-                        modifier = Modifier.focusRequester(folderFocus)
+            // Two lines, weak over strong: what is going on, then where you are.
+            if (!searchOpen) {
+                // Bounded, not weighted. A weight here would compete with the spacer that
+                // pushes the controls to the far end, and the free room would be split
+                // between them instead of all going to the spacer -- the row then stopped
+                // short and the last disc sat in from the edge. A ceiling keeps the title
+                // from driving that disc off the pebble without taking the spacer's job:
+                // the longest line here is "No friends online", well inside it.
+                Column(
+                    modifier = Modifier.widthIn(max = 420.dp),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    Text(
+                        onlineLine(onlineFriends),
+                        style = MaterialTheme.typography.labelMedium,
+                        // Not `onSurfaceVariant`: a mid grey needs a settled colour behind
+                        // it, and glass has none. The rank is carried by the alpha and the
+                        // weight instead, over the same ink as the title.
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                } else {
-                    // The name carries the weight, the count sits in a notch beside it:
-                    // a lower tint rather than a second heading, so one reading order
-                    // and not two things shouting at the same size.
-                    // pourquoi : docs/decisions/theme-duotone-shelves.md § Hollows become notches
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            root,
+                            if (openConsole != null) openConsole.label else root,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        // On the teal axis, not in a notch: `surfaceVariant` is the
-                        // socket's own family and the notch was invisible on it. Colour
-                        // says *game* here, which is exactly what is being counted.
+                        // On the teal axis: colour says *game* here, which is exactly
+                        // what is being counted.
                         // pourquoi : docs/decisions/theme-duotone-shelves.md § Two semantic axes
                         Text(
                             gameCount(openConsoleCount),
@@ -1507,37 +1489,110 @@ private fun FloatingTopBar(
                         )
                     }
                 }
+                // The way out of a folder keeps its own control: a line of text that
+                // also navigates is a line nobody presses.
+                if (openConsole != null) {
+                    FolderHeader(
+                        onBack = onLeaveFolder,
+                        modifier = Modifier.focusRequester(folderFocus)
+                    )
+                }
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            // Hidden while the rear panel is lit: the only thing the two screens would
+            // say word for word, a foot apart.
+            // pourquoi : docs/decisions/bibliotheque.md § The service lamp goes out when the panel is lit
+            if (!searchOpen && !panelLive) VpsLamp(dotSize = 10.dp)
+
+            // The bar grows out of the bank rather than replacing it. The width is what
+            // carries the movement, so it is the width that is animated: this used to
+            // `snap()`, which put the whole bar there in one frame and left the crossfade
+            // looking like a glitch. The two contents still cross quickly -- what travels
+            // is the shape, not the text.
+            // pourquoi : docs/decisions/bibliotheque.md § Search takes the shelf, and the two states do not cross
+            androidx.compose.animation.AnimatedContent(
+                targetState = searchOpen,
+                transitionSpec = {
+                    androidx.compose.animation.fadeIn(
+                        tween(
+                            durationMillis = 130,
+                            delayMillis = 110,
+                            easing = androidx.compose.animation.core.LinearOutSlowInEasing
+                        )
+                    ).togetherWith(
+                        androidx.compose.animation.fadeOut(
+                            tween(
+                                durationMillis = 90,
+                                easing = androidx.compose.animation.core.FastOutLinearInEasing
+                            )
+                        )
+                    ).using(
+                        // Clipped, so the bar is revealed as it opens instead of its far
+                        // end hanging in the air over the title.
+                        androidx.compose.animation.SizeTransform(clip = true) { _, _ ->
+                            androidx.compose.animation.core.spring(
+                                dampingRatio = 0.86f,
+                                stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+                            )
+                        }
+                    )
+                },
+                label = "shelf-search-swap"
+            ) { open ->
+                if (open) {
+                    SearchField(
+                        value = query,
+                        onValueChange = onQueryChange,
+                        onClose = onSearchClose,
+                        modifier = Modifier.focusRequester(topBarLeftFocus)
+                    )
+                } else {
+                    ToolBank {
+                        SearchChip(onClick = onSearchOpen, onFocused = follow(searchFace))
+                        BankSeam()
+                        LayoutChip(
+                            current = layout,
+                            onPick = onPickLayout,
+                            onFocused = follow(layoutFace)
+                        )
+                        BankSeam()
+                        SortChip(
+                            current = sort,
+                            onPick = onPickSort,
+                            onFocused = follow(sortFace)
+                        )
+                    }
+                }
+            }
+
+            // The cursor says the zone: every ring inside turns coral, the library's own
+            // controls staying on the teal axis.
+            // pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
+            CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    FriendsChip(onClick = onOpenFriends, onFocused = follow(friendsFace))
+                    // The one thing this app is for, and the only outlined control:
+                    // a filled one would fight the cover's colour behind it.
+                    // pourquoi : docs/decisions/bibliotheque.md § The header is a pebble, and the game colours it
+                    SessionsChip(
+                        onClick = onOpenFinder,
+                        modifier = Modifier.focusRequester(topBarFocus),
+                        onFocused = follow(sessionsFace),
+                        outlined = true
+                    )
+                }
             }
         }
-
-        // Hidden while the rear panel is lit: the only thing the two screens would
-        // say word for word, a foot apart.
-        // pourquoi : docs/decisions/bibliotheque.md § The service lamp goes out when the panel is lit
-        if (!searchOpen && !panelLive) VpsLamp(dotSize = 10.dp)
-
-        // The cursor says the zone: every ring inside turns coral, the library's own
-        // controls staying on the teal axis.
-        // pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
-        CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                SessionsChip(
-                    onClick = onOpenFinder,
-                    modifier = Modifier.focusRequester(topBarFocus),
-                    onFocused = follow(sessionsFace)
-                )
-                FriendsChip(onClick = onOpenFriends, onFocused = follow(friendsFace))
-                ProfileChip(
-                    profile = profile,
-                    onClick = onOpenProfile,
-                    onFocused = follow(profileFace)
-                )
-            }
-        }
+      }
     }
 }
+
+
 
 /**
  * One destination, one pill.

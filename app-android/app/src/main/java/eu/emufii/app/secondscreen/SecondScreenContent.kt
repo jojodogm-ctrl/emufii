@@ -80,6 +80,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.AnnotatedString
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import eu.emufii.app.BuildConfig
@@ -128,6 +132,10 @@ import eu.emufii.app.ui.theme.plate
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.theme.tilePlateBrush
 import eu.emufii.app.ui.wallpaper.TrayBackdrop
+import eu.emufii.app.ui.glass
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import com.kyant.backdrop.Backdrop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -149,6 +157,9 @@ fun SecondScreenContent(model: SecondScreenModel) {
     val keys = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { keys.requestFocus() } }
 
+    // The tray this panel paints, for the faces standing on it to refract.
+    val panelGlass = rememberLayerBackdrop()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -167,7 +178,7 @@ fun SecondScreenContent(model: SecondScreenModel) {
     ) {
         // This window has no wallpaper behind it, so the tray is painted rather
         // than shown through.
-        TrayBackdrop(modifier = Modifier.fillMaxSize(), dark = dark)
+        TrayBackdrop(modifier = Modifier.fillMaxSize().layerBackdrop(panelGlass), dark = dark)
 
         // Every face centres in the same place: a crossfade tolerates only one
         // geometry.
@@ -217,7 +228,8 @@ fun SecondScreenContent(model: SecondScreenModel) {
                             // pourquoi : docs/decisions/second-ecran.md § The console is read live, the other faces are frozen
                             is SecondScreenModel.ConsoleFolder -> ConsoleCard(
                                 (model as? SecondScreenModel.ConsoleFolder)?.console
-                                    ?: shown.console
+                                    ?: shown.console,
+                                pane = panelGlass
                             )
                             is SecondScreenModel.Browsing -> BrowsingPages(shown, shownPage)
                             // Live, like the console card: every entry shares one face
@@ -380,9 +392,8 @@ private fun Idle() {
  * pourquoi : docs/decisions/second-ecran.md § The console card: what it says, and what it does not
  */
 @Composable
-private fun ConsoleCard(console: Console) {
+private fun ConsoleCard(console: Console, pane: Backdrop) {
     val dark = LocalEmufiiDarkTheme.current
-    val oled = LocalEmufiiOledTheme.current
 
     // One plate that stays and is resized, never replaced. Centred, so it
     // opens from its middle in both directions.
@@ -396,53 +407,102 @@ private fun ConsoleCard(console: Console) {
         label = "console-card",
         modifier = Modifier
             .fillMaxWidth(0.86f)
-            .plate(CardShape, dark = dark, oled = oled, lift = 8.dp)
+            .glass(pane, CardShape, dark = dark, lift = 8.dp)
     ) { shown ->
         val brief = remember(shown) { consoleBrief(shown) }
+        val accent = if (dark) Teal.darkBright else Teal.deep
+        val alarm = if (dark) Coral.darkBright else Coral.deep
         Column(
+            // Measured against the panel, not chosen: its middle band is about 370 dp
+            // tall, and a three-line paragraph plus a warning ran past the card's bottom
+            // edge. Two lines a paragraph is the ceiling the brief already promised.
             verticalArrangement = Arrangement.spacedBy(15.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 34.dp, vertical = 26.dp)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 24.dp)
         ) {
+            // The machine's name, and under it the one thing that sets it apart. It used to
+            // read "<name> · playing together", which told a person who had opened Emufii
+            // exactly what they already knew.
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    shown.label,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    stringResource(brief.lead),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = accent
+                )
+            }
             Text(
-                stringResource(R.string.brief_console_title, shown.label),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+                accented(stringResource(brief.first), accent),
+                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 26.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                stringResource(brief.first),
+                accented(stringResource(brief.second), accent),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                stringResource(brief.second),
-                style = MaterialTheme.typography.bodyLarge,
+                lineHeight = 26.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
             brief.warning?.let { warning ->
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalAlignment = Alignment.Top
                 ) {
-                    // A bar, never a warning triangle: this panel does not shout.
+                    // A bar, never a warning triangle: this panel does not shout. Coral,
+                    // though -- grey on glass reads as a line that failed to load, and the
+                    // one thing that can spoil the evening deserves to be seen.
                     // pourquoi : docs/decisions/second-ecran.md § The panel does not shout
                     Box(
                         modifier = Modifier
                             .width(3.dp)
-                            .height(34.dp)
+                            .height(38.dp)
                             .clip(PillShape)
-                            .background(MaterialTheme.colorScheme.onSurfaceVariant)
+                            .background(alarm)
                     )
                     Text(
-                        stringResource(warning),
+                        // Its own words carry the coral, so the warning reads on its own
+                        // axis and not on the one the explanation above uses.
+                        accented(stringResource(warning), alarm),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        lineHeight = 22.sp,
+                        // Same ink as the body, stepped back by alpha: a mid grey has no
+                        // settled colour behind it once the card is glass.
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.76f)
                     )
                 }
             }
         }
     }
 }
+
+/**
+ * Lifts the two or three words that carry the sentence. The source marks them itself,
+ * `*like this*`, rather than the code counting characters: a translator moves the marks
+ * with the words, and the string stays readable in the XML.
+ * pourquoi : docs/decisions/second-ecran.md § A console card fits in two lines and a warning
+ */
+@Composable
+private fun accented(raw: String, accent: Color): AnnotatedString =
+    remember(raw, accent) {
+        buildAnnotatedString {
+            raw.split('*').forEachIndexed { index, part ->
+                if (part.isEmpty()) return@forEachIndexed
+                // Odd pieces are the ones between a pair of marks.
+                if (index % 2 == 1) {
+                    withStyle(SpanStyle(color = accent, fontWeight = FontWeight.Bold)) {
+                        append(part)
+                    }
+                } else {
+                    append(part)
+                }
+            }
+        }
+    }
 
 /**
  * The settings hub's tile, shown large. The panel completes, it takes nothing away.

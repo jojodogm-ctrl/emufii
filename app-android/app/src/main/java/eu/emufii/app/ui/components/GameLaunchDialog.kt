@@ -362,6 +362,12 @@ fun GameLaunchDialog(
                 }
             )
 
+            // Only the DS gets the tall cover with the title moved across: its right
+            // column is short. Every other console stacks a mode switch, the steps, a
+            // privacy toggle and two buttons in there, and the moved title left that
+            // column no room -- labels clipped, and steps you had to scroll to read.
+            val dsCard = rom.console == Console.DS
+
             if (wide) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(24.dp),
@@ -373,17 +379,21 @@ fun GameLaunchDialog(
                     // pourquoi : docs/decisions/lancement-et-navigation.md § What gives way, and in what order
                     Column(
                         modifier = Modifier
-                            .width(150.dp)
+                            .width(if (dsCard) 150.dp else 186.dp)
                             .align(Alignment.CenterVertically),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(if (dsCard) 12.dp else 14.dp)
                     ) {
-                        RomArtwork(rom, size = 134.dp)
+                        RomArtwork(rom, size = if (dsCard) 134.dp else 120.dp)
                         // The tile is scanned, this card is read: here there is room for
                         // what the mark means.
                         // pourquoi : docs/decisions/lancement-et-navigation.md § The compatibility verdict, where the decision is made
-                        LocalCompatDb.current.ratingFor(rom.compatKeys())?.let { known ->
-                            CompatNote(known)
+                        if (dsCard) {
+                            LocalCompatDb.current.ratingFor(rom.compatKeys())?.let { known ->
+                                CompatNote(known)
+                            }
+                        } else {
+                            TitleBlock(rom, online)
                         }
                     }
 
@@ -395,29 +405,31 @@ fun GameLaunchDialog(
                         modifier = Modifier
                             .weight(1f)
                             .align(Alignment.CenterVertically),
-                        verticalArrangement = Arrangement.spacedBy(18.dp)
+                        verticalArrangement = Arrangement.spacedBy(if (dsCard) 18.dp else 14.dp)
                     ) {
                         // Tight against its own label, generous from what follows: the
                         // name and the mode are one thing.
-                        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                            Text(
-                                rom.displayName,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                stringResource(
-                                    if (online) R.string.launch_mode_online
-                                    else R.string.launch_mode_session,
-                                    // The full label: "GC/Wii" only makes sense squeezed
-                                    // into a badge.
-                                    rom.console.label
-                                ),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                        if (dsCard) {
+                            Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Text(
+                                    rom.displayName,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    stringResource(
+                                        if (online) R.string.launch_mode_online
+                                        else R.string.launch_mode_session,
+                                        // The full label: "GC/Wii" only makes sense squeezed
+                                        // into a badge.
+                                        rom.console.label
+                                    ),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
 
                         // A selector rather than a link: it rewrites the card, it does not act.

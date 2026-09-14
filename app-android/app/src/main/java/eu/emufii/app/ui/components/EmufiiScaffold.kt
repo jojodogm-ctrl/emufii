@@ -3,6 +3,13 @@ package eu.emufii.app.ui.components
 import eu.emufii.app.ui.Motion
 import eu.emufii.app.ui.sounded
 import androidx.compose.foundation.BorderStroke
+import eu.emufii.app.ui.theme.ShellOled
+import eu.emufii.app.ui.theme.ShellLightLow
+import eu.emufii.app.ui.theme.ShellLight
+import eu.emufii.app.ui.theme.ShellDark
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.Canvas
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
@@ -18,9 +25,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,11 +65,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -253,57 +257,41 @@ fun WallpaperVeil(
     fromTop: Boolean = true,
     fade: Dp = FADE_HEIGHT
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
-        val full = maxHeight
-        // The strip is as tall as the band plus its fade, and not the screen. The layer
-        // below is offscreen -- a real buffer, allocated and flushed every frame -- and
-        // at full height it was 1920x1080 of it to show 130 dp. Measured on the Thor,
-        // 2026-09-10: `flush layers` was 3.7 ms a frame with two veils up.
-        // pourquoi : docs/decisions/performance-rendu.md § An offscreen layer is not a drawing setting
-        val strip = (band() + fade).coerceIn(0.dp, full)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(strip)
-                .align(if (fromTop) Alignment.TopStart else Alignment.BottomStart)
-                // DstIn only sees what the layer holds: without an offscreen layer the
-                // mask punches through to the content below instead.
-                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                .drawWithContent {
-                    drawContent()
-                    // Starting the fade inside the band left a ghost line of text on the
-                    // title's baseline. The stops are read against the strip now, not the
-                    // screen, which is the same place in the same pixels.
-                    val solid = if (size.height > 0f) band().toPx() / size.height else 0f
-                    val stops = if (fromTop) {
-                        arrayOf(
-                            0f to Color.Black,
-                            solid.coerceIn(0f, 1f) to Color.Black,
-                            1f to Color.Transparent
-                        )
-                    } else {
-                        arrayOf(
-                            0f to Color.Transparent,
-                            (1f - solid).coerceIn(0f, 1f) to Color.Black,
-                            1f to Color.Black
-                        )
-                    }
-                    drawRect(
-                        brush = Brush.verticalGradient(colorStops = stops),
-                        blendMode = BlendMode.DstIn
-                    )
-                }
-        ) {
-            // Full height inside the strip, and hung so that the wallpaper lands exactly
-            // where the screen's own does: the band shows the tray, not a squeezed copy.
-            TrayBackdrop(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(full)
-                    .offset(y = if (fromTop) 0.dp else -(full - strip)),
-                dark = dark
-            )
+    val oled = LocalEmufiiOledTheme.current
+    // The tray's own ground at that edge, so the band reads as the wallpaper carrying on
+    // rather than as a panel laid over it.
+    val ground = when {
+        oled -> ShellOled
+        fromTop -> if (dark) ShellDark else ShellLight
+        else -> if (dark) ShellDarkLow else ShellLightLow
+    }
+    // A flat gradient, not a second copy of the wallpaper. Redrawing the tray meant a
+    // second set of shelves, waves and halos to line up with the ones already on screen,
+    // and they did not: the band showed the same shapes twice. The band only ever had to
+    // hide what scrolls under the chrome, and a ground colour hides it just as well --
+    // with nothing in it that can be drawn out of step. It also drops the offscreen layer
+    // this used to need, measured at 3.7 ms a frame with two veils up on 2026-09-10.
+    // pourquoi : docs/decisions/coquille-ecrans.md § The header floats, and what that costs
+    Canvas(modifier = modifier.fillMaxSize()) {
+        val solid = band().toPx().coerceAtLeast(0f)
+        val total = (solid + fade.toPx()).coerceAtMost(size.height)
+        if (total <= 0f) return@Canvas
+        val cut = (solid / total).coerceIn(0f, 1f)
+        val stops = if (fromTop) {
+            arrayOf(0f to ground, cut to ground, 1f to Color.Transparent)
+        } else {
+            arrayOf(0f to Color.Transparent, (1f - cut) to ground, 1f to ground)
         }
+        val originY = if (fromTop) 0f else size.height - total
+        drawRect(
+            brush = Brush.verticalGradient(
+                colorStops = stops,
+                startY = originY,
+                endY = originY + total
+            ),
+            topLeft = Offset(0f, originY),
+            size = Size(size.width, total)
+        )
     }
 }
 

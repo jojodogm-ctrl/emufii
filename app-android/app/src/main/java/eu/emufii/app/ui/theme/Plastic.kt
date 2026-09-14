@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -99,9 +100,11 @@ fun Modifier.plate(
     lift: Dp = 4.dp,
     bevel: Boolean = true,
     /** The tile sinks and flips its light: the lit lip becomes the shaded one. */
-    pressed: Boolean = false
+    pressed: Boolean = false,
+    /** A control that has to read as cut out of what it sits on takes that colour. */
+    fill: Color? = null
 ): Modifier {
-    val brush = plateBrush(dark, oled)
+    val brush = fill?.let { SolidColor(it) } ?: plateBrush(dark, oled)
     val edge = edgeColor(dark, oled)
     val elevation = if (pressed) (lift / 3) else lift
     // A wider lip on the highest surfaces, so a dialog does not carry a chip's rim.
@@ -185,6 +188,35 @@ fun Modifier.dashedSlot(shape: Shape, color: Color, corner: Dp = 20.dp): Modifie
             )
         )
     }
+
+/**
+ * A bed for the chrome: halfway between the shell it lies on and the plate's low tint,
+ * so a piece as wide as the screen stops reading as a slab. Its contour separates it,
+ * not its brightness — the rule a 46 dp chip needs does not hold at this size.
+ * pourquoi : docs/decisions/bibliotheque.md § The header is a pebble, and it keeps the wallpaper's luminance
+ */
+fun shelfFill(dark: Boolean, oled: Boolean): Color = when {
+    oled -> ShellOled
+    dark -> lerp(ShellDark, PlateDarkLow, 0.45f)
+    else -> lerp(ShellLight, PlateLightLow, 0.45f)
+}
+
+@Composable
+fun Modifier.shelf(shape: Shape, dark: Boolean, lift: Dp = 6.dp): Modifier {
+    val oled = LocalEmufiiOledTheme.current && dark
+    val fill = shelfFill(dark, oled)
+    return this
+        .shadow(
+            elevation = if (oled) 0.dp else lift,
+            shape = shape,
+            clip = false,
+            ambientColor = ShadowInk.copy(alpha = if (dark) 0.55f else 0.18f),
+            spotColor = ShadowInk.copy(alpha = if (dark) 0.62f else 0.24f)
+        )
+        .clip(shape)
+        .background(fill)
+        .border(1.dp, edgeColor(dark, oled), shape)
+}
 
 /**
  * The plate's low tint with the moulding run backwards.

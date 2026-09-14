@@ -85,7 +85,8 @@ fun VpsLamp(modifier: Modifier = Modifier, dotSize: Dp = 15.dp) {
                     }
                 ),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                // The lamp sits on the library's glass header, where a mid grey washes out.
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.78f)
             )
         }
     }

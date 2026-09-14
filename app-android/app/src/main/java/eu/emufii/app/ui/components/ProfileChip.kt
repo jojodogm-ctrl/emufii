@@ -36,23 +36,32 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.profile.Profile
 import eu.emufii.app.profile.playerDisplayName
 import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.LocalGlassPane
+import eu.emufii.app.ui.glass
+import eu.emufii.app.ui.theme.shelfFill
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.LocalAccent
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
+import eu.emufii.app.ui.theme.Coral
 import eu.emufii.app.ui.theme.PlateDark
 import eu.emufii.app.ui.theme.PlateLight
 import eu.emufii.app.ui.tap
 
 /**
- * The top bar's buttons all share one size, or the row reads as misaligned.
+ * The glyph chips. The two ends of the header are anchors at [ANCHOR_SIZE], the avatar
+ * opening it and the session button closing it; what sits between them stays a chip.
  * pourquoi : docs/decisions/direction-visuelle.md § The top bar's chips are one family
  */
 private val CHIP_SIZE = 46.dp
+
+/** You are not a third glyph: the avatar anchors the row's far end. */
+private val ANCHOR_SIZE = 52.dp
 
 /**
  * No Material indication: its state layer also covers focus, which a gamepad grants
@@ -63,6 +72,7 @@ private val CHIP_SIZE = 46.dp
 fun TopBarChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    size: Dp = CHIP_SIZE,
     /**
      * How the rear panel learns what is aimed at.
      * pourquoi : docs/decisions/second-ecran.md § What travels to the panel
@@ -84,17 +94,34 @@ fun TopBarChip(
     val focused by interaction.collectIsFocusedAsState()
     LaunchedEffect(focused) { onFocused(focused) }
 
+    val pane = LocalGlassPane.current
+
     Box(
         modifier = modifier
-            .size(CHIP_SIZE)
+            .size(size)
             .scale(scale)
             .focusRing(focused, CircleShape, width = 2.5.dp, glowRadius = 10.dp)
-            .plate(
-                shape = CircleShape,
-                dark = dark,
-                oled = LocalEmufiiOledTheme.current,
-                lift = 5.dp,
-                pressed = pressed
+            .then(
+                // Glass on glass, plastic elsewhere: the disc is the header's family, and
+                // the header is the only surface that hands one down.
+                if (pane != null) {
+                    Modifier.glass(pane, CircleShape, dark, thickness = 0.35f, lift = 3.dp)
+                } else {
+                    Modifier.plate(
+                        shape = CircleShape,
+                        dark = dark,
+                        oled = LocalEmufiiOledTheme.current,
+                        lift = 3.dp,
+                        // The same face as the shelf it sits on: what separates it is its
+                        // contour and its shadow, not a lighter fill.
+                        fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark),
+                        // The shelf it sits on carries the volume; a moulded lip on a 46 dp
+                        // disc reads as a dome and brings the old world back.
+                        // pourquoi : docs/decisions/theme-duotone-shelves.md § The shelf is posed, never carved
+                        bevel = false,
+                        pressed = pressed
+                    )
+                }
             )
             .tap(interactionSource = interaction, indication = null, onClick = onClick),
         contentAlignment = Alignment.Center
@@ -112,12 +139,12 @@ fun ProfileChip(
     modifier: Modifier = Modifier,
     onFocused: (Boolean) -> Unit = {}
 ) {
-    TopBarChip(onClick = onClick, modifier = modifier, onFocused = onFocused) {
+    TopBarChip(onClick = onClick, modifier = modifier, size = ANCHOR_SIZE, onFocused = onFocused) {
         Box(modifier = Modifier.padding(3.dp)) {
             Avatar(
                 name = playerDisplayName(profile.name),
                 imageFile = profile.avatarFile,
-                size = 40.dp,
+                size = 46.dp,
                 ring = Color.White.copy(alpha = 0.85f),
                 modifier = Modifier.clip(CircleShape)
             )
@@ -147,11 +174,23 @@ fun FriendsChip(
 fun SessionsChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onFocused: (Boolean) -> Unit = {}
+    onFocused: (Boolean) -> Unit = {},
+    /** Coral contour and coral glyph: what the app is for, named without being filled. */
+    outlined: Boolean = false
 ) {
-    val tint = MaterialTheme.colorScheme.onSurface
-    TopBarChip(onClick = onClick, modifier = modifier, onFocused = onFocused) {
-        Canvas(Modifier.size(23.dp)) {
+    val dark = LocalEmufiiDarkTheme.current
+    val coral = if (dark) Coral.darkBright else Coral.deep
+    val tint = if (outlined) coral else MaterialTheme.colorScheme.onSurface
+    TopBarChip(
+        onClick = onClick,
+        modifier = if (outlined) modifier.border(2.dp, coral, CircleShape) else modifier,
+        // The far end of the header, and it answers the avatar at the near end: the two
+        // were 52 and 46 dp, so the row ended on a smaller disc set further in than the
+        // one it started on, and the header read as unfinished on the right.
+        size = ANCHOR_SIZE,
+        onFocused = onFocused
+    ) {
+        Canvas(Modifier.size(26.dp)) {
             val w = size.width
             val h = size.height
             val screenW = w * 0.46f

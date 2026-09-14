@@ -3,7 +3,6 @@ package eu.emufii.app.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.remember
 import kotlinx.coroutines.delay
 
 /**
@@ -15,23 +14,32 @@ import kotlinx.coroutines.delay
 @Composable
 fun rememberSlowMillis(): Double {
     val running = rememberAnimationsEnabled()
-    val millis = remember { mutableDoubleStateOf(FROZEN_MS) }
     LaunchedEffect(running) {
         if (!running) {
-            millis.doubleValue = FROZEN_MS
+            slowMillis.doubleValue = FROZEN_MS
             return@LaunchedEffect
         }
         // `delay`, not `withInfiniteAnimationFrameNanos`: the latter calls back on every
         // display frame (120 Hz on the Thor) and keeps the frame loop awake, so lowering
         // the beat from 30 to 12 changed nothing. Measured twice, 30 % both times.
-        val origin = System.nanoTime()
         while (true) {
-            millis.doubleValue = ((System.nanoTime() - origin) / 1_000_000).toDouble()
+            slowMillis.doubleValue = ((System.nanoTime() - ORIGIN_NANOS) / 1_000_000).toDouble()
             delay(FRAME_INTERVAL_MS)
         }
     }
-    return millis.doubleValue
+    return slowMillis.doubleValue
 }
+
+/**
+ * The reading and its origin are shared, not remembered per caller: the wallpaper and the
+ * two veils that redraw it each counted from the moment they first composed, and the veil
+ * over the header waits on a measurement, so it started later. Its waves then ran at
+ * another phase than the ones below it -- the same shapes, drawn twice, side by side.
+ * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
+ */
+private val slowMillis = mutableDoubleStateOf(FROZEN_MS)
+
+private val ORIGIN_NANOS = System.nanoTime()
 
 /**
  * The background cycle runs nineteen seconds, a wave thirty-five, the cursor gradient
