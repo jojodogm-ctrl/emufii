@@ -147,8 +147,8 @@ android {
         // previous session's room code and role while the launch reported
         // success. Two players spent an afternoon with no host. A launch that
         // cannot be configured now names what is missing and refuses.
-        versionCode = 49
-        versionName = "1.12.10"
+        versionCode = 50
+        versionName = "1.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
