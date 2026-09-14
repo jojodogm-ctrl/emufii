@@ -33,6 +33,11 @@ jobs:
 
       - name: SDK Android
         uses: android-actions/setup-android@v4
+        with:
+          # Rien a installer d'avance : par defaut l'action demande le paquet
+          # `tools`, retire du depot Google, et elle echoue avant meme de compiler.
+          # Gradle telecharge lui-meme le SDK dont le projet a besoin.
+          packages: ''
 
       - name: Gradle
         uses: gradle/actions/setup-gradle@v6
