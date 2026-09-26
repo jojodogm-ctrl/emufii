@@ -54,7 +54,7 @@ import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.tap
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
-import eu.emufii.app.ui.theme.edgeColor
+import eu.emufii.app.ui.theme.liftShadow
 import eu.emufii.app.ui.theme.plateColors
 
 /**
@@ -195,6 +195,7 @@ private fun RowScope.Key(
                 width = 3.dp,
                 glowRadius = 16.dp
             )
+            .liftShadow(shape, 2.dp, dark, oled)
             .clip(shape)
             .background(face)
             // A press darkens the face rather than sinking it: a tile's scale would make
@@ -203,7 +204,6 @@ private fun RowScope.Key(
                 if (pressed) Modifier.background(PressInk.copy(alpha = if (dark) 0.24f else 0.10f))
                 else Modifier
             )
-            .border(1.dp, edgeColor(dark, oled), shape)
             // `clickable` makes a node focusable by default, doubling the keypad's cursor.
             .tap(interactionSource = interaction, indication = null, onClick = onClick)
             .focusProperties { canFocus = false }

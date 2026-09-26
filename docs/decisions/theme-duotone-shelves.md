@@ -106,6 +106,11 @@ decorative: it encodes play or link.
 
 ## MATERIAL (replaces Plastic.kt)
 
+Superseded for plates, hollows, the header and the shelves' outline by
+`matiere-et-mouvement-trailer.md` (September 2026): flat plates, two drop shadows, no
+contour, no moulding. What follows is kept as the record of what it replaced.
+
+
 - `plate()`: micro-gradient plus 1 dp edge plus moulding plus ambient shadow. The
   lip widens with elevation (1.5 dp, 2 dp beyond 10 dp of lift): a dialog does not
   carry the same rim as a chip. `pressed`: the tile sinks (scale 0.98, shadow at a

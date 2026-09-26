@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.LEGACY_AMBIENT
+import eu.emufii.app.ui.LEGACY_SPOT
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,8 +66,8 @@ fun VpsLamp(modifier: Modifier = Modifier, dotSize: Dp = 15.dp) {
                     elevation = if (state == VpsState.UNKNOWN) 0.dp else 12.dp,
                     shape = CircleShape,
                     clip = false,
-                    ambientColor = tone,
-                    spotColor = tone
+                    ambientColor = tone.copy(alpha = LEGACY_AMBIENT),
+                    spotColor = tone.copy(alpha = LEGACY_SPOT)
                 )
                 .clip(CircleShape)
                 .background(tone)

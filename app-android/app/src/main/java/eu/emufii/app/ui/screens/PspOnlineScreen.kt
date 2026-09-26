@@ -54,7 +54,6 @@ import eu.emufii.app.psp.PpssppLauncher
 import eu.emufii.app.ui.components.EmufiiScaffold
 import eu.emufii.app.ui.components.SectionHeader
 import eu.emufii.app.ui.components.SoftCard
-import eu.emufii.app.ui.components.waitTrim
 import eu.emufii.app.ui.components.padEntry
 import eu.emufii.app.ui.theme.Coral
 import eu.emufii.app.ui.theme.GoodDark
@@ -124,7 +123,7 @@ fun PspOnlineScreen(
                 modifier = Modifier
                     .widthIn(max = 800.dp)
                     .heightIn(max = LocalConfiguration.current.screenHeightDp.dp - 24.dp)
-                    .waitTrim()
+                    
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(18.dp),

@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.screens.library
 
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import eu.emufii.app.ui.Motion
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -29,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -52,7 +53,7 @@ import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.TileShape
-import eu.emufii.app.ui.theme.moldedRim
+import eu.emufii.app.ui.theme.liftShadow
 
 /**
  * pourquoi : docs/decisions/bibliotheque.md § The console folders
@@ -69,6 +70,8 @@ internal fun FolderTile(
      * grid is made of these, and they wore a tube twice the width of their neighbours'.
      */
     band: Float = TILE_BAND,
+    /** As on the game tile: the carousel's recession, applied inside. */
+    rest: () -> Float = { 1f },
     modifier: Modifier = Modifier,
 ) {
     val interaction = remember { MutableInteractionSource() }
@@ -77,7 +80,7 @@ internal fun FolderTile(
     // Same clock as the ring, and gone the instant the cursor leaves; see the ROM tile.
     val mark by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
-        animationSpec = tween(if (selected) RING_IN_MS else 0),
+        animationSpec = if (selected) Motion.morph() else Motion.exit(),
         label = "folder-mark"
     )
     val focusScale = 1f + 0.07f * mark
@@ -101,23 +104,23 @@ internal fun FolderTile(
                 .fillMaxWidth()
                 .offset(x = -riseX, y = -riseY)
                 .aspectRatio(1f)
-                .scale(scale * focusScale)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = TileShape,
-                    // Never clips, for the same reason as the game tile.
-                    clip = false,
-                    spotColor = if (selected) ringColor() else InkText.copy(alpha = 0.30f),
-                    ambientColor = InkText.copy(alpha = 0.22f)
+                .graphicsLayer {
+                    val s = scale * focusScale * rest()
+                    scaleX = s
+                    scaleY = s
+                }
+                .liftShadow(
+                    TileShape,
+                    lift = if (selected) 10.dp else 4.dp,
+                    dark = LocalEmufiiDarkTheme.current,
+                    oled = LocalEmufiiOledTheme.current,
+                    // The console's own colour, like a game's cover.
+                    tint = paletteFor(folder.console.name).first,
+                    tinted = { mark }
                 )
                 .focusRing(selected, TileShape, bandFraction = band)
                 .clip(TileShape)
                 .background(consolePlate(folder.console))
-                .moldedRim(
-                    TileShape,
-                    dark = LocalEmufiiDarkTheme.current,
-                    oled = LocalEmufiiOledTheme.current
-                )
                 .focusProperties { canFocus = false }
                 .tap(interactionSource = interaction, indication = null, onClick = onClick)
                 .gamepadClick(interaction, onClick = onClick),

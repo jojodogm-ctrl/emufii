@@ -1,5 +1,8 @@
 package eu.emufii.app.ui.screens.library
 
+import androidx.compose.ui.draw.shadow
+import eu.emufii.app.ui.LEGACY_AMBIENT
+import eu.emufii.app.ui.LEGACY_SPOT
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -40,50 +43,21 @@ import eu.emufii.app.ui.theme.InkText
  */
 @Composable
 internal fun TileTitle(title: String, modifier: Modifier = Modifier) {
-    val style = MaterialTheme.typography.labelMedium
-    val boxHeight = TILE_TITLE_ROOM
-
-    // Applied to every title it made a name that fitted look truncated, "Crash of the
-    // Titans" losing "Titans".
-    var overflows by remember(title) { mutableStateOf(false) }
-
+    // Two lines and an ellipsis. The fade over a third line left "Spyro: Dawn of" reading
+    // as a whole title, and cost an offscreen layer on every tile that overflowed.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(boxHeight)
-            // The gradient applies to the text's rendering, hence the `DstIn` on a layer.
-            // pourquoi : docs/decisions/performance-rendu.md § An offscreen layer is not a drawing setting
-            .then(
-                if (overflows) {
-                    Modifier.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                } else {
-                    Modifier
-                }
-            )
-            .drawWithContent {
-                drawContent()
-                if (overflows) {
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            0.55f to Color.Black,
-                            1f to Color.Transparent
-                        ),
-                        blendMode = BlendMode.DstIn
-                    )
-                }
-            }
+            .height(TILE_TITLE_ROOM)
     ) {
         Text(
             title,
-            style = style,
-            // Three lines in a box showing two, so an over-long title fades downwards
-            // instead of stopping dead.
-            maxLines = 3,
-            // No Ellipsis: the dots eat three characters, and the fade already says it.
-            overflow = TextOverflow.Clip,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground,
-            onTextLayout = { overflows = it.lineCount > 2 },
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -97,8 +71,12 @@ internal fun ConsoleBadge(console: Console, modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(9.dp),
         color = InkText,
         border = BorderStroke(1.5.dp, Color.White),
-        shadowElevation = 2.dp,
-        modifier = modifier
+        modifier = modifier.shadow(
+            2.dp,
+            RoundedCornerShape(9.dp),
+            ambientColor = Color.Black.copy(alpha = LEGACY_AMBIENT),
+            spotColor = Color.Black.copy(alpha = LEGACY_SPOT)
+        )
     ) {
         Text(
             console.shortLabel,

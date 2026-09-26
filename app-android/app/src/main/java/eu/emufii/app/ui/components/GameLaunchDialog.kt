@@ -1,5 +1,13 @@
 package eu.emufii.app.ui.components
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import eu.emufii.app.ui.theme.ErrorLight
+import eu.emufii.app.ui.theme.ErrorDark
+import eu.emufii.app.compat.CompatRating
+import eu.emufii.app.ui.ShadowsFollow
+import androidx.compose.ui.graphics.CompositingStrategy
 import eu.emufii.app.ui.sounded
 import androidx.activity.BackEventCompat
 import androidx.activity.compose.PredictiveBackHandler
@@ -37,7 +45,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -84,6 +91,12 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import eu.emufii.app.R
+import eu.emufii.app.ui.Sfx
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.layout.layout
+import eu.emufii.app.ui.rememberAppear
+import eu.emufii.app.ui.bloom
+import eu.emufii.app.ui.TrailerSpinner
 import eu.emufii.app.compat.CompatEntry
 import eu.emufii.app.compat.LocalCompatDb
 import eu.emufii.app.library.Backend
@@ -108,7 +121,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.platform.LocalConfiguration
 import eu.emufii.app.ui.tap
 
-private const val TILE_HUE_MS = 7000
 
 /**
  * The game, what is about to happen to it, and the one button that starts it.
@@ -158,7 +170,12 @@ fun GameLaunchDialog(
      * pourquoi : docs/decisions/lancement-et-navigation.md § What replaces the buttons when a prerequisite is missing
      */
     val pspBlocked = rom.console == Console.PSP && !online && !rememberPpssppReady()
-    val setupBlocked = ps2Blocked || pspBlocked
+    // A game rated broken gets no way in: a session for it would only fail, later and
+    // without saying why.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
+    val incompatible =
+        LocalCompatDb.current.ratingFor(rom.compatKeys())?.rating == CompatRating.BROKEN
+    val setupBlocked = ps2Blocked || pspBlocked || incompatible
 
     // A fixed beat, not a measurement: what follows has its own progress screen.
     LaunchedEffect(starting) {
@@ -282,24 +299,13 @@ fun GameLaunchDialog(
             ),
         contentAlignment = Alignment.Center
     ) {
-        // The two axes on the card's contour, replacing a tile laid behind it.
-        // pourquoi : docs/decisions/theme-duotone-shelves.md § Game card (dialog)
-        val blend = if (rememberAnimationsEnabled()) {
-            rememberInfiniteTransition(label = "tile-hue").animateFloat(
-                initialValue = 0f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(TILE_HUE_MS, easing = LinearEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "tile-hue"
-            ).value
-        } else {
-            // Animations off: a blend of both axes, neither being the right one.
-            0.5f
-        }
-
+        // Lift 16, the launch card's: it stands over the grid, and the trailer's cards
+        // carry no coloured rim, only their shadow.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Flat plates, dropped shadows
+        // The card's shadow fades with the card: a shadow takes only its own layer's opacity.
+        ShadowsFollow({ (entrance * 3f).coerceAtMost(1f) * (1f - 0.45f * back.value) }) {
         SoftCard(
+            lift = 16.dp,
             modifier = Modifier
                 .focusRequester(cardRoot)
                 .onFocusEvent { rootHasCursor = it.isFocused }
@@ -340,12 +346,14 @@ fun GameLaunchDialog(
                     // made the trip invisible -- the grid showed a hole, then the card
                     // appeared with the cover already home.
                     alpha = (entrance * 3f).coerceAtMost(1f) * (1f - 0.45f * leaving)
+                    // Per draw, or the card's shadow is cut square by the fade's buffer.
+                    compositingStrategy = CompositingStrategy.ModulateAlpha
                     translationX =
                         (if (backEdge == BackEventCompat.EDGE_LEFT) 1f else -1f) *
                             24.dp.toPx() * leaving
                 }
                 // Here, not at the head of the chain: `drawWithContent` takes the wrapped size.
-                .waitTrim(blend)
+                
                 // Taps only; `canFocus = false` here would disable the whole subtree.
                 // pourquoi : docs/decisions/lancement-et-navigation.md § The cursor has to enter the card, and not leave it again
                 .clickable(
@@ -370,7 +378,12 @@ fun GameLaunchDialog(
 
             if (wide) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        // Incompatible, the right column spans the card's height so its
+                        // notice can centre in it; otherwise the columns keep their own.
+                        .then(if (incompatible) Modifier.height(IntrinsicSize.Min) else Modifier)
+                        .padding(24.dp),
                     horizontalArrangement = Arrangement.spacedBy(26.dp)
                 ) {
                     // The game as an object: the cover, and the verdict stamped under
@@ -404,7 +417,10 @@ fun GameLaunchDialog(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .align(Alignment.CenterVertically),
+                            .then(
+                                if (incompatible) Modifier.fillMaxHeight()
+                                else Modifier.align(Alignment.CenterVertically)
+                            ),
                         verticalArrangement = Arrangement.spacedBy(if (dsCard) 18.dp else 14.dp)
                     ) {
                         // Tight against its own label, generous from what follows: the
@@ -432,6 +448,22 @@ fun GameLaunchDialog(
                             }
                         }
 
+                        // Centred in the room actually left: between the title (DS) or the top
+                        // of the column and the card's bottom, with no empty steps column
+                        // or spacing slot pushing it down.
+                        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Incompatible games
+                        if (incompatible) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                                    // On the DS card the title above weighs more than the
+                                    // card's edge below: centred on the bare gap the notice
+                                    // read low (the user, 2026-09-26). Half this higher.
+                                    .padding(bottom = if (dsCard) 16.dp else 0.dp),
+                                contentAlignment = Alignment.Center
+                            ) { IncompatibleNotice() }
+                        } else {
                         // A selector rather than a link: it rewrites the card, it does not act.
                         // pourquoi : docs/decisions/lancement-et-navigation.md § The choice of world comes first, not last
                         if (onPlayOnline != null) {
@@ -455,14 +487,14 @@ fun GameLaunchDialog(
                                 .verticalScroll(rememberScrollState()),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            steps.forEachIndexed { index, text -> Step(index + 1, text) }
+                            if (!incompatible) steps.forEachIndexed { index, text -> Step(index + 1, text) }
                         }
 
                         // The actions are one group: tighter among themselves than the
                         // gap that separates them from what they act on.
                         // pourquoi : docs/decisions/lancement-et-navigation.md § The buttons are stacked, and it is a trap avoided
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            if (!online) {
+                            if (!online && !incompatible) {
                                 CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
                                     PrivacyToggle(
                                         checked = isPrivate,
@@ -471,7 +503,9 @@ fun GameLaunchDialog(
                                     )
                                 }
                             }
-                            if (ps2Blocked) {
+                            if (incompatible) {
+                                IncompatibleNotice()
+                            } else if (ps2Blocked) {
                                 Ps2ProfileMissing()
                             } else if (pspBlocked) {
                                 PpssppSetupMissing()
@@ -490,13 +524,14 @@ fun GameLaunchDialog(
                                         enabled = !starting,
                                         shape = PillShape,
                                         colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = if (dark) Coral.darkBright else Coral.deep
+                                            contentColor = if (dark) Teal.darkBright else Teal.deep
                                         ),
                                         modifier = Modifier.fillMaxWidth().height(52.dp)
                                             .controlRing(PillShape)
                                     ) { Text(stringResource(R.string.lib_join_by_code)) }
                                 }
                             }
+                        }
                         }
                     }
                 }
@@ -537,11 +572,11 @@ fun GameLaunchDialog(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        steps.forEachIndexed { index, text -> Step(index + 1, text, compact) }
+                        if (!incompatible) steps.forEachIndexed { index, text -> Step(index + 1, text, compact) }
                     }
                 }
 
-                if (!online) {
+                if (!online && !incompatible) {
                     CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
                         PrivacyToggle(
                             checked = isPrivate,
@@ -551,7 +586,9 @@ fun GameLaunchDialog(
                     }
                 }
 
-                if (ps2Blocked) {
+                if (incompatible) {
+                    IncompatibleNotice()
+                } else if (ps2Blocked) {
                     Ps2ProfileMissing()
                 } else if (pspBlocked) {
                     PpssppSetupMissing()
@@ -572,7 +609,7 @@ fun GameLaunchDialog(
                             enabled = !starting,
                             shape = PillShape,
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = if (dark) Coral.darkBright else Coral.deep
+                                contentColor = if (dark) Teal.darkBright else Teal.deep
                             ),
                             modifier = Modifier.fillMaxWidth().height(52.dp)
                                 .controlRing(PillShape)
@@ -581,6 +618,7 @@ fun GameLaunchDialog(
                 }
 
             }
+        }
         }
     }
 }
@@ -666,7 +704,7 @@ private fun PrivacyToggle(
             .fillMaxWidth()
             .controlRing(PillShape)
             .clip(PillShape)
-            .tap(enabled = enabled) { onChange(!checked) }
+            .tap(enabled = enabled, sound = Sfx::toggle) { onChange(!checked) }
             .padding(horizontal = 14.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -784,6 +822,30 @@ private fun Ps2ProfileMissing() {
     )
 }
 
+/** Red and final, in place of the buttons: there is nothing to do but know it. */
+@Composable
+private fun IncompatibleNotice() {
+    val dark = LocalEmufiiDarkTheme.current
+    val red = if (dark) ErrorDark else ErrorLight
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(red)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+    ) {
+        CrossIcon(size = 18.dp, color = Color.White)
+        Text(
+            stringResource(R.string.launch_incompatible),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White
+        )
+    }
+}
+
 /** As [Ps2ProfileMissing]: the prerequisite, where to settle it, nothing else. */
 @Composable
 private fun PpssppSetupMissing() {
@@ -806,6 +868,16 @@ private fun PrimaryAction(
     // pourquoi : docs/decisions/theme-duotone-shelves.md § Game card (dialog)
     val container = if (dark) Teal.darkBright else Teal.deep
     val ink = if (dark) Teal.ink else Color.White
+    // The trailer's button: pressed, it closes into a round pill holding the spinner, and
+    // opens back if the start fails. Width and corners move together, a pill at every
+    // width, so the radius never jumps.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Objects transform, screens do not replace each other
+    val shrink by animateFloatAsState(
+        targetValue = if (starting) 1f else 0f,
+        animationSpec = Motion.morph(),
+        label = "launch-shrink"
+    )
+    Box(modifier, contentAlignment = Alignment.Center) {
     Button(
         onClick = sounded(onClick),
         enabled = !starting,
@@ -816,21 +888,40 @@ private fun PrimaryAction(
             disabledContainerColor = container,
             disabledContentColor = ink
         ),
-        modifier = modifier.height(52.dp).controlRing(PillShape)
-
+        contentPadding = PaddingValues(horizontal = 24.dp * (1f - shrink).coerceIn(0f, 1f)),
+        modifier = Modifier
+            .height(52.dp)
+            .layout { measurable, constraints ->
+                val full = constraints.maxWidth
+                val round = 52.dp.roundToPx()
+                val width = (full + (round - full) * shrink).toInt().coerceIn(round, full.coerceAtLeast(round))
+                val placeable = measurable.measure(constraints.copy(minWidth = width, maxWidth = width))
+                layout(full, placeable.height) {
+                    placeable.place((full - width) / 2, 0)
+                }
+            }
+            .controlRing(PillShape)
     ) {
         if (starting) {
             // In the button, not replacing it, so nothing jumps while the pause runs.
-            CircularProgressIndicator(
-                modifier = Modifier.size(22.dp),
-                strokeWidth = 2.5.dp,
-                color = MaterialTheme.colorScheme.onPrimary
+            TrailerSpinner(
+                color = ink,
+                size = 22.dp,
+                stroke = 2.5.dp,
+                modifier = Modifier.bloom(rememberAppear()::value)
             )
         } else {
             // No maxLines: capping at one clipped "Créer une session" silently.
             // pourquoi : docs/decisions/lancement-et-navigation.md § The buttons are stacked, and it is a trap avoided
-            Text(label, style = MaterialTheme.typography.titleMedium)
+            Text(
+                label,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = if (shrink > 0.01f) 1 else Int.MAX_VALUE,
+                softWrap = shrink <= 0.01f,
+                modifier = Modifier.bloom(rememberAppear()::value)
+            )
         }
+    }
     }
 }
 

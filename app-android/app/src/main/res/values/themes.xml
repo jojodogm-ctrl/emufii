@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Emufii" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Shadow strength is set by each shadow's own colour, not by the theme's 0.19 / 0.039
+         cap: the trailer's cards need 60% on dark, out of reach under that cap.
+         pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Flat plates, dropped shadows -->
+    <style name="Theme.Emufii" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:spotShadowAlpha">1</item>
+        <item name="android:ambientShadowAlpha">1</item>
+    </style>
 </resources>

@@ -1,5 +1,6 @@
 package eu.emufii.app
 
+import eu.emufii.app.artwork.CoverTone
 import android.app.Application
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -15,6 +16,9 @@ class EmufiiApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         CrashLogger.initialize(this)
+        // Its state has to exist before the first composition.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Cover tones
+        CoverTone.warm()
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader =

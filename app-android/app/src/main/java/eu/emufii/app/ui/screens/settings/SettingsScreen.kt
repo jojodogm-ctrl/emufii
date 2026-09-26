@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.settings
 
+import eu.emufii.app.ui.ShadowsFollow
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -27,6 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.BuildConfig
 import eu.emufii.app.R
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import eu.emufii.app.ui.Cascade
+import eu.emufii.app.ui.bloom
+import eu.emufii.app.ui.rememberAppear
+import eu.emufii.app.ui.LocalScreenOpenedAt
+import androidx.compose.runtime.key
+import android.os.SystemClock
 import eu.emufii.app.azahar.AzaharLauncher
 import eu.emufii.app.library.Console
 import eu.emufii.app.library.HiddenRoms
@@ -175,6 +184,14 @@ fun SettingsScreen(
 
     val toHub = { page = SettingsPageId.HUB }
 
+    // A page blooms in and its blocks rise one by one, as each app screen does.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
+    key(page) {
+    val openedAt = remember { SystemClock.uptimeMillis() }
+    val appear by rememberAppear()
+    CompositionLocalProvider(LocalScreenOpenedAt provides openedAt) {
+    ShadowsFollow({ appear }) {
+    Box(Modifier.fillMaxSize().bloom({ appear }, blur = 0.dp)) {
     when (page) {
         SettingsPageId.HUB -> SettingsHub(
             profile = profile,
@@ -267,6 +284,10 @@ fun SettingsScreen(
         SettingsPageId.ABOUT -> AboutPage(onBack = toHub, modifier = modifier)
 
         SettingsPageId.CRASH_LOGS -> CrashLogsPage(onBack = toHub, modifier = modifier)
+    }
+    }
+    }
+    }
     }
 
     if (confirmingReset) {
@@ -586,10 +607,12 @@ private fun HubGrid(entries: List<@Composable (Boolean, Modifier) -> Unit>) {
         entries.chunked(HUB_COLUMNS).forEachIndexed { row, chunk ->
             Row(horizontalArrangement = Arrangement.spacedBy(HUB_GAP)) {
                 chunk.forEachIndexed { column, entry ->
-                    entry(
-                        row == 0 && column == 0,
+                    Cascade(
+                        row * HUB_COLUMNS + column,
                         Modifier.weight(1f).height(HUB_TILE_HEIGHT)
-                    )
+                    ) {
+                        entry(row == 0 && column == 0, Modifier.fillMaxSize())
+                    }
                 }
                 // The incomplete row keeps its missing places: without them the last tile
                 // stretches over two widths and reads as more important.

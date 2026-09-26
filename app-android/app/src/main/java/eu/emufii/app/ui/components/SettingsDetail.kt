@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.LEGACY_AMBIENT
+import eu.emufii.app.ui.LEGACY_SPOT
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -25,9 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
-import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.socket
-import eu.emufii.app.ui.theme.EdgeOled
 import eu.emufii.app.ui.theme.GoodLight
 import eu.emufii.app.ui.theme.GoodDark
 import eu.emufii.app.ui.theme.InfoLight
@@ -87,15 +87,11 @@ fun DetailStatus(
     caveat: String? = null,
 ) {
     val dark = LocalEmufiiDarkTheme.current
-    val oled = LocalEmufiiOledTheme.current
     val shape = RoundedCornerShape(16.dp)
     Column(
         modifier = modifier
             .fillMaxWidth()
             .socket(shape, dark)
-            // On OLED the tray is truly off, so the gradient that carves the hole lands on
-            // black and vanishes; the edge does the whole job there.
-            .then(if (oled) Modifier.border(1.dp, EdgeOled, shape) else Modifier)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -159,7 +155,12 @@ fun StateBead(tone: DetailTone, size: Dp = 14.dp) {
     }
     Box(
         modifier = Modifier
-            .shadow(3.dp, CircleShape)
+            .shadow(
+                3.dp,
+                CircleShape,
+                ambientColor = Color.Black.copy(alpha = LEGACY_AMBIENT),
+                spotColor = Color.Black.copy(alpha = LEGACY_SPOT)
+            )
             .clip(CircleShape)
             .background(fill)
             .border(1.5.dp, Color.White, CircleShape)

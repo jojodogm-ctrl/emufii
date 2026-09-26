@@ -260,6 +260,16 @@ android {
             buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
             buildConfigField("boolean", "TREE_DUMP", "$treeDump")
         }
+        // The release's code, installed beside the real one: a debug build is interpreted
+        // and says nothing about smoothness (CLAUDE.md), and a release would overwrite
+        // the Thor's signed install. Debug key, its own package, never published.
+        create("preview") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".preview"
+            versionNameSuffix = "-preview"
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

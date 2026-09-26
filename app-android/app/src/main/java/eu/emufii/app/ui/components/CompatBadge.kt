@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.LEGACY_AMBIENT
+import eu.emufii.app.ui.LEGACY_SPOT
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -45,7 +47,12 @@ fun CompatBadge(rating: CompatRating, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .semantics { contentDescription = description }
-            .shadow(3.dp, CircleShape)
+            .shadow(
+                3.dp,
+                CircleShape,
+                ambientColor = Color.Black.copy(alpha = LEGACY_AMBIENT),
+                spotColor = Color.Black.copy(alpha = LEGACY_SPOT)
+            )
             .clip(CircleShape)
             .background(Brush.verticalGradient(fill))
             // Inside the clip: otherwise the rim is a square around the bead.

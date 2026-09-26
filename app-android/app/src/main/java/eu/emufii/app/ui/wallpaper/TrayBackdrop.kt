@@ -20,6 +20,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -138,11 +141,6 @@ private fun DrawScope.drawStillTray(
         dark -> Shelf.fillDark
         else -> Shelf.fillLight
     }
-    val stroke = when {
-        oled -> Shelf.edgeOled
-        dark -> Shelf.edgeDark
-        else -> Shelf.edgeLight
-    }
     val glowAlpha = when {
         oled -> 0.075f
         dark -> 0.110f
@@ -157,6 +155,27 @@ private fun DrawScope.drawStillTray(
         ground: Color,
     ) {
         val path = Path().apply { addRoundRect(rect) }
+        // No contour any more: a very diffuse shadow lifts the shelf, like every plate.
+        // Blurred in software, which is free here, this bitmap being baked once.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Flat plates, dropped shadows
+        if (!oled) {
+            drawIntoCanvas { canvas ->
+                val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                    color = android.graphics.Color.argb(
+                        ((if (dark) 0.40f else 0.10f) * 255).toInt(), 36, 22, 16
+                    )
+                    maskFilter = android.graphics.BlurMaskFilter(
+                        geometry.side * 0.06f,
+                        android.graphics.BlurMaskFilter.Blur.NORMAL
+                    )
+                }
+                val shadow = Path().apply {
+                    addRoundRect(rect)
+                    translate(Offset(0f, geometry.side * 0.025f))
+                }
+                canvas.nativeCanvas.drawPath(shadow.asAndroidPath(), paint)
+            }
+        }
         // A flat fill made the tile look printed rather than moulded.
         drawPath(
             path,
@@ -169,7 +188,6 @@ private fun DrawScope.drawStillTray(
                 endY = rect.bottom
             )
         )
-        drawPath(path, color = axisBright.copy(alpha = stroke), style = Stroke(width = 2.dp.toPx()))
 
         // Dissolves the long sides, not the corner: a shelf shows one sharp corner and
         // two edges running off screen.

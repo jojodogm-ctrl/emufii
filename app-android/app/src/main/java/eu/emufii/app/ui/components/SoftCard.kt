@@ -10,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.theme.CardShape
@@ -65,6 +66,8 @@ fun SoftCard(
      * ceiling; those pass a smaller share rather than let the ring become the subject.
      */
     bandFraction: Float = 0.12f,
+    /** 4 dp a card at rest, 16 dp the launch card and dialogs. */
+    lift: Dp = 4.dp,
     content: @Composable () -> Unit
 ) {
     val shape = CardShape
@@ -81,7 +84,7 @@ fun SoftCard(
                 if (onClick != null) Modifier.controlRing(shape, bandFraction = bandFraction)
                 else Modifier
             )
-            .plate(shape = shape, dark = dark, oled = oled, lift = 6.dp)
+            .plate(shape = shape, dark = dark, oled = oled, lift = lift)
             .then(if (onClick != null) Modifier.tap(onClick = onClick) else Modifier)
     ) {
         // A Box provides no content colour: a Text that names none falls back to black,

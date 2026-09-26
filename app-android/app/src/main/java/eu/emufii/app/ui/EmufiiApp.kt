@@ -1,6 +1,7 @@
 package eu.emufii.app.ui
 
 import android.net.Uri
+import android.os.SystemClock
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.SizeTransform
@@ -61,10 +62,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.ui.unit.IntOffset
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.ShellDark
@@ -758,27 +758,27 @@ fun EmufiiApp(settings: SettingsStore) {
 
         // Read here: `transitionSpec` is a lambda, not a composable scope, and the specs
         // have to ask whether animations are on.
-        val slideIn: FiniteAnimationSpec<IntOffset> = motionTween(Motion.SCREEN_IN_MS)
-        val slideOut: FiniteAnimationSpec<IntOffset> = motionTween(Motion.SCREEN_OUT_MS)
-        val veilIn: FiniteAnimationSpec<Float> = motionTween(Motion.SCREEN_IN_MS)
-        val veilOut: FiniteAnimationSpec<Float> = motionTween(Motion.SCREEN_OUT_MS)
+        val bloomIn: FiniteAnimationSpec<Float> = Motion.enter()
+        val bloomOut: FiniteAnimationSpec<Float> = Motion.exit()
         AnimatedContent(
             targetState = screen,
             transitionSpec = {
-                val forward = targetState.depth >= initialState.depth
-                fun shift(full: Int) = (full * 0.12f).toInt()
-                val enter = slideInHorizontally(slideIn) { full ->
-                    if (forward) shift(full) else -shift(full)
-                } + fadeIn(veilIn)
-                val exit = slideOutHorizontally(slideOut) { full ->
-                    if (forward) -shift(full) else shift(full)
-                } + fadeOut(veilOut)
+                // The trailer never slides a screen in: the arriving one grows out of
+                // 96.5% as it fades in, over the leaving one fading the same way, faster.
+                // No blur at this size: two full-screen blurred layers per frame were what
+                // made every page change drag on the Thor.
+                // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Screens bloom, they do not slide
+                val enter = fadeIn(bloomIn) + scaleIn(bloomIn, initialScale = 0.965f)
+                val exit = fadeOut(bloomOut) + scaleOut(bloomOut, targetScale = 0.965f)
                 // No size transform: every screen is full-bleed, and animating a size
                 // that never changes only gives the crossing a jump to chew on.
                 (enter togetherWith exit).using(SizeTransform(clip = false))
             },
             label = "screen"
         ) { s ->
+        val openedAt = remember { SystemClock.uptimeMillis() }
+        CompositionLocalProvider(LocalScreenOpenedAt provides openedAt) {
+        Box(Modifier.fillMaxSize()) {
         when (s) {
             Screen.Library -> LibraryScreen(
                 profile = profile,
@@ -903,7 +903,9 @@ fun EmufiiApp(settings: SettingsStore) {
                 }
             )
         }
+                }
         }
+}
     }
 
     // Last in source order, so it covers everything.

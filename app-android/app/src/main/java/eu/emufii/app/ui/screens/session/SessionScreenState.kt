@@ -118,6 +118,14 @@ internal class SessionScreenState(
     )
     private val _returns = MutableStateFlow(0)
 
+    /**
+     * The automation is driving the emulator's netplay form right now: the button shows it
+     * working instead of sitting still between the press and the tick.
+     * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The auto-setup button, host and guest
+     */
+    private val _netplayBusy = MutableStateFlow(false)
+    val netplayBusy: StateFlow<Boolean> = _netplayBusy
+
     val uiState: StateFlow<SessionUiState> = combineAll(
         _status,
         _members,
@@ -170,6 +178,11 @@ internal class SessionScreenState(
         scope.launch {
             NetplayAutomation.progress.collect { p ->
                 if (p is NetplayProgress.Done) _netplayDone.value = true
+                _netplayBusy.value = when (p) {
+                    NetplayProgress.OpeningMenu, NetplayProgress.ChoosingMode,
+                    NetplayProgress.FillingForm, NetplayProgress.Confirming -> true
+                    else -> false
+                }
             }
         }
 
@@ -277,6 +290,15 @@ internal class SessionScreenState(
         val msg = runPrepareNetplay(profile.name)
         _status.value = msg
         if (msg == null) _netplayPrepared.value = true
+        // Busy from the press, before the automation's first report arrives; a run that
+        // never reports (automation off, a manual fallback) is let go after a minute.
+        if (msg == null && _automationOn.value) {
+            _netplayBusy.value = true
+            scope.launch {
+                delay(BUSY_GIVE_UP_MS)
+                if (!_netplayDone.value) _netplayBusy.value = false
+            }
+        }
     }
 
     /** ARMSX2's direct path performs its former two steps behind one launch. */
@@ -467,3 +489,5 @@ internal fun rememberSessionScreenState(
         )
     }
 }
+
+private const val BUSY_GIVE_UP_MS = 60_000L

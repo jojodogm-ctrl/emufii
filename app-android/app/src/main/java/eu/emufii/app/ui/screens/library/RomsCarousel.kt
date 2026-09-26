@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.library
 
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -27,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
+import eu.emufii.app.ui.Motion
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -75,10 +78,12 @@ internal fun RomsCarousel(
     canGoBack: Boolean,
     gridFocus: FocusRequester,
     contentPadding: PaddingValues,
+    /** Where the cursor starts: the first game in a folder, the folder you left outside. */
+    startAt: Int = 0,
 ) {
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = startAt)
     val scope = rememberCoroutineScope()
-    val cursorState = rememberSaveable { mutableIntStateOf(0) }
+    val cursorState = rememberSaveable { mutableIntStateOf(startAt) }
     var cursor by cursorState
     val padFocusedState = remember { mutableStateOf(false) }
     var padFocused by padFocusedState
@@ -250,17 +255,15 @@ internal fun RomsCarousel(
                 val active by remember(i) { derivedStateOf { i == cursorState.intValue } }
                 // Equally-sized cards read as a one-line grid, nothing pointing at the
                 // one about to be launched.
+                // Neighbours shrink on the morph spring, and keep their colour: greyed,
+                // they read as unavailable, which they are not.
+                // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
                 val recede by animateFloatAsState(
                     targetValue = if (active) 1f else 0.86f,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                    animationSpec = Motion.morph(),
                     label = "carousel-recede"
                 )
-                Box(
-                    modifier = Modifier
-                        .width(cardSize)
-                        .scale(recede)
-                        .alpha(if (active) 1f else 0.62f)
-                ) {
+                Box(modifier = Modifier.width(cardSize)) {
                     // pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
                     val onTap = { if (active) onSelect(entry) else moveTo(i); Unit }
                     when (entry) {
@@ -269,7 +272,8 @@ internal fun RomsCarousel(
                             onClick = onTap,
                             selected = padFocused && active,
                             padHeld = hold.down && active,
-                            band = CAROUSEL_TILE_BAND
+                            band = CAROUSEL_TILE_BAND,
+                            rest = { recede }
                         )
 
                         is Entry.Game -> RomTile(
@@ -284,7 +288,8 @@ internal fun RomsCarousel(
                             onHide = { onMenuAction(entry.rom, TileAction.HIDE) },
                             onDismissMenu = onDismissMenu,
                             titleDrop = CAROUSEL_TITLE_DROP,
-                            band = CAROUSEL_TILE_BAND
+                            band = CAROUSEL_TILE_BAND,
+                            rest = { recede }
                         )
                     }
                 }

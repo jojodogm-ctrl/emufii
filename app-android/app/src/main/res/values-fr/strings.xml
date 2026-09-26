@@ -40,8 +40,8 @@
     <string name="lib_create_session">Créer une session</string>
     <string name="lib_open_session">Session ouverte</string>
     <string name="lib_private_session">Session privée</string>
-    <string name="lib_private_session_on">Elle n\'apparaîtra pas dans la liste des sessions : il faudra ton code pour entrer.</string>
-    <string name="lib_private_session_off">Elle apparaîtra dans la liste des sessions, où n\'importe qui peut la rejoindre.</string>
+    <string name="lib_private_session_on">Absente de la liste des sessions. Ton code suffit pour entrer.</string>
+    <string name="lib_private_session_off">Visible dans la liste des sessions. Tout le monde peut rejoindre.</string>
     <string name="lib_join_by_code">Rejoindre par code</string>
     <string name="launch_mode_online">%1$s · jeu en ligne</string>
     <string name="launch_mode_session">%1$s · session à plusieurs</string>
@@ -72,6 +72,7 @@
     <!-- Session -->
     <string name="session_mine">Ta session</string>
     <string name="session_joined">Session rejointe</string>
+    <string name="session_player_joined">%1$s a rejoint ta session</string>
     <string name="session_code_label">Code de session</string>
     <string name="session_code_hint">Partage-le, ou laisse tes amis te trouver dans les sessions ouvertes.</string>
     <string name="session_members_label">Dans la session</string>
@@ -100,6 +101,7 @@
     <string name="session_netplay_open">1. Paramétrage automatique de %1$s</string>
     <string name="session_netplay_manual_open">Paramétrage manuel</string>
     <string name="session_netplay_waiting_host">1. En attente de l\'hôte…</string>
+    <string name="session_netplay_busy">1. Paramétrage de %1$s…</string>
     <string name="session_netplay_again">1. Refaire le paramétrage de %1$s</string>
     <string name="session_netplay_done">1. %1$s est paramétré</string>
     <string name="session_netplay_no_address">Adresse de session indisponible.</string>
@@ -155,7 +157,7 @@
     <string name="session_psp_setup">Paramétrage manuel (obligatoire)</string>
     <string name="session_psp_setup_again">Rouvrir PPSSPP</string>
     <string name="hint_psp_why">Cette adresse ne change jamais : le relais l\'envoie vers l\'hôte de la session en cours, quelle que soit la partie.</string>
-    <string name="hint_same_version">Tu dois avoir exactement la même version du jeu que les autres, mises à jour et DLC compris. Une version qui diffère d\'un côté empêche la partie, souvent sans rien dire : le salon se rejoint, puis rien ne démarre.</string>
+    <string name="hint_same_version">Même version du jeu des deux côtés, mises à jour et DLC compris. Sinon le salon se forme et la partie ne démarre jamais.</string>
     <string name="hint_eden_title">Dans Eden</string>
     <string name="hint_eden_host">Le multijoueur d\'Eden est dans ses réglages, pas dans le jeu : ⚙ Réglages → Multiplayer → « Create ». Tu peux l\'ouvrir avant ou pendant la partie.</string>
     <string name="hint_eden_guest">Le multijoueur d\'Eden est dans ses réglages, pas dans le jeu : ⚙ Réglages → Multiplayer → « Join ». Tu peux l\'ouvrir avant ou pendant la partie.</string>
@@ -345,11 +347,11 @@
     <string name="friends_add">Ajouter un ami</string>
     <string name="friends_add_hint">E7K2-9QM4-XR8T</string>
     <string name="friends_add_action">Ajouter</string>
-    <string name="friends_error_invalid">Ce code n\'est pas valide. Vérifie que tu l\'as recopié en entier.</string>
-    <string name="friends_error_duplicate">Cet ami est déjà dans ta liste.</string>
+    <string name="friends_error_invalid">Code invalide.</string>
+    <string name="friends_error_duplicate">Déjà dans ta liste.</string>
     <string name="friends_error_self">C\'est ton propre code.</string>
     <string name="friends_none_title">Personne pour l\'instant</string>
-    <string name="friends_none_body">Échange ton code avec quelqu\'un : tu verras ensuite quand il joue, et tu pourras le rejoindre d\'une touche.</string>
+    <string name="friends_none_body">Échange ton code pour voir qui joue.</string>
     <string name="friends_list">Ta liste</string>
     <string name="friends_offline">Hors ligne</string>
     <string name="friends_online">En ligne</string>
@@ -358,7 +360,7 @@
     <string name="friends_join">Rejoindre</string>
     <string name="friends_starting">démarrage…</string>
     <string name="friends_remove">Retirer</string>
-    <string name="friends_remove_confirm">Retirer %1$s de tes amis ? Il faudra son code pour l\'ajouter à nouveau.</string>
+    <string name="friends_remove_confirm">Retirer %1$s ?</string>
     <string name="friends_cancel">Annuler</string>
     <string name="friends_privacy_note">Ta liste d\'amis reste sur ton téléphone. Le serveur ne sait que qui est en ligne, et l\'oublie au bout de deux minutes.</string>
 
@@ -507,27 +509,7 @@
     <string name="settings_notify_open_android">Ouvrir les réglages Android</string>
 
     <!-- Second ecran : ce que fait Emufii sur chaque machine, quand le curseur est sur son dossier -->
-    <string name="brief_3ds_lead">Azahar, son salon rempli à ta place</string>
-    <string name="brief_3ds_1">*Azahar* fait tourner le jeu. Emufii ouvre le tunnel et remplit son salon à ta place.</string>
-    <string name="brief_3ds_2">Ton ami saisit le *code de session* : sa console voit la tienne comme sur le même *Wi-Fi*.</string>
     <string name="brief_3ds_warning">Il faut une *pre-release* d\'Azahar : la version stable n\'a pas d\'écran multijoueur.</string>
-    <string name="brief_switch_lead">Eden, dans un salon hébergé par Emufii</string>
-    <string name="brief_switch_1">*Eden* fait tourner le jeu. Le salon vit sur le *serveur d\'Emufii*, pas sur vos consoles.</string>
-    <string name="brief_switch_2">Vous le rejoignez tous les deux, et le *code de session* en est le mot de passe.</string>
-    <string name="brief_psp_lead">PPSSPP, son serveur ad hoc redirigé</string>
-    <string name="brief_psp_1">*PPSSPP* cherche un serveur ad hoc à une adresse fixe. Le *relais* d\'Emufii y répond.</string>
-    <string name="brief_psp_2">Le *jeu en ligne public* est différent : PPSSPP s\'y connecte seul, sans session ni tunnel.</string>
-    <string name="brief_ds_lead">melonDS, sur des serveurs refaits par des fans</string>
-    <string name="brief_ds_1">Nintendo a éteint ses serveurs en *2014*. melonDS passe par *Kaeru WFC*, refait par des fans.</string>
-    <string name="brief_ds_2">*Ni session ni code* : Emufii redirige le jeu et tu rejoins les joueurs déjà présents.</string>
-    <string name="brief_ds_warning">Sans la *redirection*, le jeu appelle les serveurs éteints et ne trouve personne.</string>
-    <string name="brief_ps2_lead">ARMSX2, avec une adresse à saisir</string>
-    <string name="brief_ps2_1">*ARMSX2* fait tourner le jeu. Emufii ouvre la session et te donne une *adresse et un port*.</string>
-    <string name="brief_ps2_2">Le menu réseau du jeu réclame un *profil* sur une carte en *emplacement 1* ; Emufii la prépare.</string>
-    <string name="brief_ps2_warning">Sans ce profil, un jeu LAN PS2 n\'ouvre *même pas* son menu local.</string>
-    <string name="brief_dolphin_lead">Dolphin, sur son propre Netplay</string>
-    <string name="brief_dolphin_1">*Dolphin* fait tourner le jeu, et c\'est son propre *Netplay* qui porte la partie.</string>
-    <string name="brief_dolphin_2">Emufii ouvre le tunnel et vous met dans le même salon ; ton ami saisit le *code de session*.</string>
     <string name="brief_dolphin_warning">Les deux joueurs doivent lancer *exactement le même dump*, sinon Dolphin refuse la partie.</string>
     <!-- Settings: the setup steps, split out of the two paragraph walls -->
     <string name="settings_ppsspp_step1">Choisis la racine de la Memory Stick de PPSSPP : le dossier qui contient PSP/SYSTEM/ppsspp.ini. Android ne donne accès qu\'à celui-là.</string>
@@ -567,12 +549,12 @@
     <string name="settings_sec_library">Bibliothèque et consoles</string>
     <string name="settings_sec_emulators">Avant de jouer</string>
     <string name="settings_sec_app">L\'application</string>
-    <string name="friends_on_panel">La liste d\'amis est sur le second écran</string>
+    <string name="friends_on_panel">Ta liste est sur l\'écran arrière</string>
     <plurals name="friends_count">
         <item quantity="one">%d ami</item>
         <item quantity="other">%d amis</item>
     </plurals>
-    <string name="friends_panel_title">Liste d\'amis</string>
+    <string name="friends_panel_title">Amis</string>
     <string name="friends_count_online">%1$d en ligne</string>
     <plurals name="join_code_remaining">
         <item quantity="one">Encore %d caractère</item>
@@ -671,4 +653,28 @@
     <string name="lib_online_one">1 ami en ligne</string>
     <string name="lib_online">%1$d amis en ligne</string>
     <string name="lib_online_none">Aucun ami en ligne</string>
+    <string name="launch_incompatible">Ce jeu est incompatible et ne fonctionnera donc pas avec Emufii.</string>
+    <string name="panel_screenshots">Captures d\'écran (%1$d)</string>
+    <string name="pad_hint_screenshots">Captures d\'écran</string>
+    <string name="pad_hint_browse">Parcourir</string>
+    <string name="pad_hint_close">Fermer</string>
+    <string name="console_sheet_mode">Multijoueur</string>
+    <string name="console_sheet_code">Code de session</string>
+    <string name="console_sheet_games">Jeux compatibles</string>
+    <string name="console_sheet_code_yes">À partager</string>
+    <string name="console_sheet_code_no">Aucun</string>
+    <string name="console_sheet_not_installed">Pas installé</string>
+    <string name="console_sheet_installed">Installé</string>
+    <string name="console_mode_3ds">Sans fil local</string>
+    <string name="console_mode_switch">Sans fil local (LDN)</string>
+    <string name="console_mode_psp">Ad hoc</string>
+    <string name="console_mode_ds">Nintendo WFC</string>
+    <string name="console_mode_ps2">LAN (Local Link)</string>
+    <string name="console_mode_dolphin">Netplay Dolphin</string>
+    <string name="console_games_3ds">Les jeux au mode *sans fil local* : Mario Kart 7, Monster Hunter 4 Ultimate…</string>
+    <string name="console_games_switch">Les jeux au mode *sans fil local* : Mario Kart 8 Deluxe, Smash Bros. Ultimate…</string>
+    <string name="console_games_psp">Les jeux au mode *ad hoc* : Monster Hunter, Tekken…</string>
+    <string name="console_games_ds">Les jeux *Nintendo Wi-Fi Connection* : Mario Kart DS, Pokémon…</string>
+    <string name="console_games_ps2">La *soixantaine* de jeux au mode LAN</string>
+    <string name="console_games_dolphin">Tous les jeux *multijoueur en local* : Smash Bros. Brawl, Mario Kart…</string>
 </resources>

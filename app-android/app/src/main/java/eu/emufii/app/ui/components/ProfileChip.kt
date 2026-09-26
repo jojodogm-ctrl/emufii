@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.Motion
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,7 +43,6 @@ import eu.emufii.app.profile.Profile
 import eu.emufii.app.profile.playerDisplayName
 import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.theme.plate
-import eu.emufii.app.ui.LocalGlassPane
 import eu.emufii.app.ui.glass
 import eu.emufii.app.ui.theme.shelfFill
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
@@ -94,31 +94,24 @@ fun TopBarChip(
     val focused by interaction.collectIsFocusedAsState()
     LaunchedEffect(focused) { onFocused(focused) }
 
-    val pane = LocalGlassPane.current
-
     Box(
         modifier = modifier
             .size(size)
             .scale(scale)
             .focusRing(focused, CircleShape, width = 2.5.dp, glowRadius = 10.dp)
             .then(
-                // Glass on glass, plastic elsewhere: the disc is the header's family, and
-                // the header is the only surface that hands one down.
-                if (pane != null) {
-                    Modifier.glass(pane, CircleShape, dark, thickness = 0.35f, lift = 3.dp)
-                } else {
+                // A plate even on the frosted header: blurring a pane already blurred
+                // costs a layer and shows nothing.
+                // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Frosted header
+                run {
                     Modifier.plate(
                         shape = CircleShape,
                         dark = dark,
                         oled = LocalEmufiiOledTheme.current,
                         lift = 3.dp,
                         // The same face as the shelf it sits on: what separates it is its
-                        // contour and its shadow, not a lighter fill.
+                        // shadow, not a lighter fill.
                         fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark),
-                        // The shelf it sits on carries the volume; a moulded lip on a 46 dp
-                        // disc reads as a dome and brings the old world back.
-                        // pourquoi : docs/decisions/theme-duotone-shelves.md § The shelf is posed, never carved
-                        bevel = false,
                         pressed = pressed
                     )
                 }
@@ -179,7 +172,7 @@ fun SessionsChip(
     outlined: Boolean = false
 ) {
     val dark = LocalEmufiiDarkTheme.current
-    val coral = if (dark) Coral.darkBright else Coral.deep
+    val coral = if (dark) Teal.darkBright else Teal.deep
     val tint = if (outlined) coral else MaterialTheme.colorScheme.onSurface
     TopBarChip(
         onClick = onClick,

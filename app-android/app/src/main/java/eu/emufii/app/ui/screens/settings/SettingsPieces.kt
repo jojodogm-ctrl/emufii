@@ -1,6 +1,7 @@
 package eu.emufii.app.ui.screens.settings
 
 import androidx.compose.animation.animateContentSize
+import eu.emufii.app.ui.Cascade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -128,7 +129,7 @@ internal fun domainInk(domain: EntryDomain): Color {
     val dark = LocalEmufiiDarkTheme.current
     return when (domain) {
         EntryDomain.SYSTEM -> if (dark) Teal.darkBright else Teal.deep
-        EntryDomain.SOCIAL -> if (dark) Coral.darkBright else Coral.deep
+        EntryDomain.SOCIAL -> if (dark) Teal.darkBright else Teal.deep
     }
 }
 
@@ -218,7 +219,7 @@ internal fun SettingsColumns(vararg blocks: @Composable () -> Unit) {
                 Column(
                     modifier = Modifier.widthIn(max = ONE_COLUMN_MAX).fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) { blocks.forEach { it() } }
+                ) { blocks.forEachIndexed { index, block -> Cascade(index) { block() } } }
             }
         } else {
             Row(
@@ -231,7 +232,7 @@ internal fun SettingsColumns(vararg blocks: @Composable () -> Unit) {
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         blocks.forEachIndexed { index, block ->
-                            if (index % 2 == side) block()
+                            if (index % 2 == side) Cascade(index) { block() }
                         }
                     }
                 }
@@ -540,7 +541,7 @@ internal data class EntryState(val tone: DetailTone, val label: String)
 @Composable
 private fun IconSocket(icon: @Composable (Color) -> Unit, domain: EntryDomain) {
     val ink = domainInk(domain)
-    val axis: Color = if (domain == EntryDomain.SOCIAL) Coral.bright else Teal.bright
+    val axis: Color = if (domain == EntryDomain.SOCIAL) Teal.bright else Teal.bright
     Box(
         modifier = Modifier
             .size(34.dp)

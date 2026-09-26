@@ -73,8 +73,10 @@ private const val RING_OUT_MS = 0
 val CONFIRM_KEYS = setOf(Key.ButtonA, Key.DirectionCenter, Key.Enter, Key.NumPadEnter)
 
 /**
- * Teal for play and system, coral on the social zones: the cursor's colour names the zone.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
+ * Teal for play and system, coral on the social zones. It names the zone for what is
+ * drawn in the zone's colour; the cursor itself is teal everywhere, since a coral ring
+ * on a back button read as a second cursor.
+ * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § One cursor colour
  */
 enum class RingTone { TEAL, CORAL }
 
@@ -84,7 +86,9 @@ val LocalRingTone = compositionLocalOf { RingTone.TEAL }
 fun ringColor(tone: RingTone = LocalRingTone.current, dark: Boolean = LocalEmufiiDarkTheme.current): Color =
     when (tone) {
         RingTone.TEAL -> if (dark) Teal.darkBright else Teal.bright
-        RingTone.CORAL -> if (dark) Coral.darkBright else Coral.bright
+        // One cursor colour: teal on every screen, social ones included.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § One cursor colour
+        RingTone.CORAL -> if (dark) Teal.darkBright else Teal.bright
     }
 
 /** Sits next to a `clickable`, never replaces it; the shared [interactionSource] keeps the press animation. */
@@ -119,7 +123,7 @@ fun Modifier.gamepadClick(
 fun Modifier.focusRing(
     focused: Boolean,
     shape: Shape,
-    color: Color = ringColor(),
+    color: Color = ringColor(RingTone.TEAL),
     /**
      * Defaults are the tiles' (150 dp wide); small controls pass reduced values.
      * pourquoi : docs/decisions/navigation-manette.md § The ring keeps the same weight everywhere
@@ -178,7 +182,9 @@ fun Modifier.focusRing(
             // pourquoi : docs/decisions/navigation-manette.md § The ring surrounds, it does not clip
             clip = false,
             ambientColor = Color.Transparent,
-            spotColor = color
+            // The theme lifts the platform's 0.19 cap on spot shadows; this glow was tuned
+            // under it, so it carries the cap itself.
+            spotColor = color.copy(alpha = color.alpha * LEGACY_SPOT)
         )
         .border(ring, color.copy(alpha = glow), shape)
 }
@@ -396,3 +402,9 @@ fun Modifier.controlRing(
 
 @Composable
 fun MutableInteractionSource.isFocused(): State<Boolean> = collectIsFocusedAsState()
+
+/** Android's default `spotShadowAlpha`, which the app theme now sets to 1. */
+internal const val LEGACY_SPOT = 0.19f
+
+/** Android's default `ambientShadowAlpha`, likewise. */
+internal const val LEGACY_AMBIENT = 0.039f

@@ -10,6 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -98,7 +100,7 @@ fun PadKeyCap(hint: PadHint) {
                 pressed = hint.held
             )
     ) {
-        val glyph = hint.glyph
+        val glyph = hint.shownGlyph(rememberButtonsFlipped())
         if (glyph == null) DPadGlyph(tint) else CapLetter(glyph, tint)
     }
 }
@@ -160,3 +162,35 @@ private fun DPadGlyph(tint: Color) {
         )
     }
 }
+
+/**
+ * The Thor's button mode (Standard, Nintendo layout = 0, Xbox = 1), read live from
+ * `Settings.System.flip_button_layout`. Absent on other devices: Standard.
+ */
+@Composable
+fun rememberButtonsFlipped(): Boolean {
+    val resolver = LocalContext.current.applicationContext.contentResolver
+    fun read() = runCatching {
+        android.provider.Settings.System.getInt(resolver, FLIP_BUTTON_LAYOUT, 0) == 1
+    }.getOrDefault(false)
+    val flipped = remember { mutableStateOf(read()) }
+    DisposableEffect(resolver) {
+        val observer = object : android.database.ContentObserver(
+            android.os.Handler(android.os.Looper.getMainLooper())
+        ) {
+            override fun onChange(selfChange: Boolean) {
+                flipped.value = read()
+            }
+        }
+        runCatching {
+            resolver.registerContentObserver(
+                android.provider.Settings.System.getUriFor(FLIP_BUTTON_LAYOUT), false, observer
+            )
+        }
+        flipped.value = read()
+        onDispose { resolver.unregisterContentObserver(observer) }
+    }
+    return flipped.value
+}
+
+private const val FLIP_BUTTON_LAYOUT = "flip_button_layout"

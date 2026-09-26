@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.screens
 
+import androidx.compose.material3.MaterialTheme
+import eu.emufii.app.ui.screens.session.LocalNetplayBusy
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,6 +47,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import eu.emufii.app.R
+import eu.emufii.app.profile.playerDisplayName
+import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
+import eu.emufii.app.ui.theme.Coral
+import androidx.compose.foundation.layout.Box
+import eu.emufii.app.ui.components.EventToast
 import eu.emufii.app.library.Backend
 import eu.emufii.app.network.CoordinatorClient
 import eu.emufii.app.profile.Profile
@@ -164,10 +171,12 @@ fun SessionScreen(
     // pourquoi : docs/decisions/second-ecran.md § The panel takes the steps, because it is touch
     val showNetplayStep = session.backend.hasNetplay && !ps2Automatic
     val showPspStep = session.backend == Backend.PPSSPP && !pspAutomatic
+    val netplayBusy by state.netplayBusy.collectAsStateWithLifecycle()
     val netplayLabel = stringResource(
         when {
             waitingForHost -> R.string.session_netplay_waiting_host
             netplayDone -> R.string.session_netplay_done
+            netplayBusy -> R.string.session_netplay_busy
             netplayPrepared -> R.string.session_netplay_again
             else -> R.string.session_netplay_open
         },
@@ -192,6 +201,7 @@ fun SessionScreen(
         netplayDone = netplayDone,
         netplayPrepared = netplayPrepared,
         waitingForHost = waitingForHost,
+        netplayBusy = netplayBusy,
         onNetplayStep = onNetplayStep,
         showPspStep = showPspStep,
         pspLabel = pspLabel,
@@ -215,14 +225,37 @@ fun SessionScreen(
 
     // The social domain: the pad cursor turns coral here.
     // pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
-    CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
+    // Somebody arriving is the event of this screen: a pop and a passing note, never on
+    // the members already there when it opened.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
+    var joinedName by remember { mutableStateOf<String?>(null) }
+    var seenMembers by remember { mutableStateOf<Set<String>?>(null) }
+    val memberIds = others.map { it.id }.toSet()
+    LaunchedEffect(memberIds) {
+        val before = seenMembers
+        seenMembers = memberIds
+        if (before != null) {
+            others.firstOrNull { it.id !in before }?.let {
+                Sfx.pop()
+                joinedName = it.name
+            }
+        }
+    }
+
+    CompositionLocalProvider(
+        LocalRingTone provides RingTone.CORAL,
+        LocalNetplayBusy provides netplayBusy
+    ) {
+      Box(Modifier.fillMaxSize()) {
         EmufiiScaffold(
             title = if (session.role == Session.Role.HOST) stringResource(R.string.session_mine) else stringResource(
                 R.string.session_joined
             ),
             modifier = modifier,
             onBack = state::confirmLeave,
-            backIcon = { CrossIcon(size = 20.dp, color = danger()) },
+            // Neutral ink: the orange of an error read as a third accent.
+            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § One cursor colour
+            backIcon = { CrossIcon(size = 20.dp, color = MaterialTheme.colorScheme.onSurface) },
             // In landscape, leave moves into the header and the 60 dp go back to the left pane.
             // pourquoi : docs/decisions/session.md § What the panel carries, the front screen gives back in space
             trailing = if (landscape && !panelLive) {
@@ -434,6 +467,14 @@ fun SessionScreen(
             }
             }
         }
+    
+        val joinedShown = joinedName?.let { playerDisplayName(it) }
+        EventToast(
+            message = joinedShown?.let { stringResource(R.string.session_player_joined, it) },
+            who = joinedShown,
+            onGone = { joinedName = null }
+        )
+      }
     }
 
     if (confirmingLeave) {
@@ -486,6 +527,7 @@ private fun buildPanelSteps(
     netplayDone: Boolean,
     netplayPrepared: Boolean,
     waitingForHost: Boolean,
+    netplayBusy: Boolean,
     onNetplayStep: () -> Unit,
     showPspStep: Boolean,
     pspLabel: String,
@@ -502,8 +544,10 @@ private fun buildPanelSteps(
             PanelStep(
                 label = netplayLabel,
                 done = netplayDone,
-                enabled = session.rom != null && !waitingForHost,
-                onPress = onNetplayStep
+                enabled = session.rom != null && !waitingForHost && !netplayBusy,
+                onPress = onNetplayStep,
+                busy = netplayBusy && !netplayDone,
+                waiting = waitingForHost
             )
         )
     }

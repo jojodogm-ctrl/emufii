@@ -29,6 +29,13 @@ val LocalSharedMotion = compositionLocalOf<SharedTransitionScope?> { null }
 val LocalCardRom = compositionLocalOf<Uri?> { null }
 
 /**
+ * False in the library layout that is leaving, so the cover flies from its grid cell to
+ * its carousel card instead of both drawing it.
+ * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
+ */
+val LocalLayoutShown = compositionLocalOf { true }
+
+/**
  * The cover of one ROM, wherever it is drawn. Keyed on the ROM's uri and never on a
  * position in a list: a key built from an index matches the wrong tile the moment the
  * library is sorted differently.
@@ -37,6 +44,7 @@ val LocalCardRom = compositionLocalOf<Uri?> { null }
 @Composable
 fun Modifier.sharedCover(rom: Uri, mine: Boolean): Modifier {
     val scope = LocalSharedMotion.current ?: return this
+    val shown = LocalLayoutShown.current
     // `WithCallerManagedVisibility`, not the AnimatedVisibility flavour: the grid is not
     // inside an AnimatedVisibility and wrapping forty tiles in one to gain a transition
     // is the cost this screen has already refused once.
@@ -44,7 +52,7 @@ fun Modifier.sharedCover(rom: Uri, mine: Boolean): Modifier {
     return with(scope) {
         this@sharedCover.sharedElementWithCallerManagedVisibility(
             rememberSharedContentState(key = "cover:$rom"),
-            visible = mine,
+            visible = mine && shown,
             boundsTransform = CoverFlight
         )
     }

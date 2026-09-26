@@ -1,11 +1,11 @@
 package eu.emufii.app.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.core.tween
+import eu.emufii.app.ui.ShadowsFollow
+import eu.emufii.app.ui.Sfx
+import eu.emufii.app.ui.popIn
+import eu.emufii.app.ui.bloom
+import eu.emufii.app.ui.rememberAppear
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,17 +47,18 @@ fun FriendAlert(
 ) {
     LaunchedEffect(event) {
         if (event != null) {
+            Sfx.alert()
             delay(VISIBLE_MS)
             onDismiss()
         }
     }
 
+    // The trailer's toast: rises 30 dp into place, leaves on the faster exit spring. Not
+    // `AnimatedVisibility`, whose fade buffer cut the card's shadow square.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
+    val appear by rememberAppear(event != null)
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
-        AnimatedVisibility(
-            visible = event != null,
-            enter = slideInVertically(animationSpec = tween(220)) { -it } + fadeIn(tween(220)),
-            exit = slideOutVertically(animationSpec = tween(180)) { -it } + fadeOut(tween(180))
-        ) {
+        if (event != null || appear > 0.001f) ShadowsFollow({ appear }) {
             // Held across the exit animation: reading `event` directly blanks the text the
             // moment it goes null, and the card slides away empty.
             val shown = lastNonNull(event)
@@ -67,6 +68,7 @@ fun FriendAlert(
                 onClick = onOpen,
                 modifier = Modifier
                     .padding(WindowInsets.statusBars.asPaddingValues())
+                    .bloom({ appear }, blur = 0.dp, rise = 30.dp)
                     .padding(vertical = 8.dp)
                     // In the gap the top bar leaves, between the service lamp and the
                     // social shelf. Measured on the Thor 2026-09-02: free from 717 to
@@ -81,7 +83,7 @@ fun FriendAlert(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
                     val name = shown?.name ?: stringResource(R.string.notify_friend_unnamed)
-                    Avatar(name = name, size = 34.dp)
+                    Avatar(name = name, size = 34.dp, modifier = Modifier.popIn())
                     Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
                         Text(
                             name,

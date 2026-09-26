@@ -46,7 +46,6 @@ import eu.emufii.app.ui.components.EmufiiScaffold
 import eu.emufii.app.ui.components.RomArtwork
 import eu.emufii.app.ui.components.SoftCard
 import eu.emufii.app.ui.components.padEntry
-import eu.emufii.app.ui.components.waitTrim
 import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.sounded
 import eu.emufii.app.ui.theme.GoodDark
@@ -128,7 +127,7 @@ fun WfcScreen(
         ) {
         // A card, not a full-width column: on the Thor that came out 784 dp wide, one line
         // of text spanning the screen.
-        SoftCard(modifier = Modifier.widthIn(max = 648.dp).waitTrim()) {
+        SoftCard(modifier = Modifier.widthIn(max = 648.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(24.dp),
                 horizontalArrangement = Arrangement.spacedBy(26.dp)

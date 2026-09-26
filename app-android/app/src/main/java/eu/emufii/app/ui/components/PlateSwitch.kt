@@ -33,6 +33,9 @@ import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.plate
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.tap
+import androidx.compose.ui.unit.IntOffset
+import eu.emufii.app.ui.Sfx
+import eu.emufii.app.ui.rememberElastic
 
 /**
  * Not Material's `Switch`: its tinted track reads as a sticker on a moulded plate, and its
@@ -63,7 +66,7 @@ fun SwitchRow(
         modifier = modifier
             .fillMaxWidth()
             .focusProperties { canFocus = false }
-            .tap(role = Role.Switch) { onCheckedChange(!checked) }
+            .tap(role = Role.Switch, sound = Sfx::toggle) { onCheckedChange(!checked) }
             .padding(vertical = 4.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -83,7 +86,7 @@ fun SwitchRow(
         Box(
             modifier = Modifier
                 .controlRing(CircleShape)
-                .tap(role = Role.Switch) { onCheckedChange(!checked) }
+                .tap(role = Role.Switch, sound = Sfx::toggle) { onCheckedChange(!checked) }
         ) {
             SwitchFace(checked = checked)
         }
@@ -99,13 +102,16 @@ fun SwitchRow(
 fun SwitchFace(checked: Boolean) {
     val dark = LocalEmufiiDarkTheme.current
     val axis = ringColor()
-    val knob by animateDpAsState(
-        targetValue = if (checked) TRACK_WIDTH - KNOB - PAD else PAD,
-        animationSpec = Motion.press(),
-        label = "switch-row-knob"
+    // Elastic: the edge in the direction of travel leaves first, the other follows, so
+    // the thumb stretches into a pill and closes up again.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The elastic indicator
+    val knob = rememberElastic(
+        target = if (checked) TRACK_WIDTH - KNOB - PAD else PAD,
+        width = KNOB
     )
     val fill by animateColorAsState(
         targetValue = if (checked) axis.copy(alpha = 0.35f) else Color.Transparent,
+        animationSpec = Motion.tint(),
         label = "switch-row-track"
     )
     Box(
@@ -120,8 +126,8 @@ fun SwitchFace(checked: Boolean) {
         // pourquoi : docs/decisions/reglages-ecran.md § A setting with only two states is a switch
         Box(
             modifier = Modifier
-                .offset(x = knob)
-                .size(KNOB)
+                .offset { IntOffset(knob.start.roundToPx(), 0) }
+                .size(width = knob.length, height = KNOB)
                 .plate(shape = CircleShape, dark = false, oled = false, lift = 2.dp)
         )
     }

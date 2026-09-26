@@ -1,5 +1,11 @@
 package eu.emufii.app.ui.components
 
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.runtime.key
+import eu.emufii.app.ui.rememberPartOfOpening
+import eu.emufii.app.ui.popIn
 import eu.emufii.app.ui.Motion
 import eu.emufii.app.ui.sounded
 import androidx.compose.foundation.BorderStroke
@@ -107,6 +113,24 @@ fun Modifier.padEntry(): Modifier {
                 false
             }
         }
+}
+
+/**
+ * On a control of the content's top row that is not its first: up goes to the header.
+ * Spatial search would otherwise pick whatever sits higher on screen, a field in the next
+ * column, before the header it cannot see.
+ * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Where the cursor goes
+ */
+@Composable
+fun Modifier.upToHeader(): Modifier {
+    val focus = LocalScaffoldFocus.current ?: return this
+    return this.onPreviewKeyEvent { event ->
+        if (event.type == KeyEventType.KeyDown && event.key == Key.DirectionUp) {
+            runCatching { focus.header.requestFocus() }.isSuccess
+        } else {
+            false
+        }
+    }
 }
 
 /**
@@ -220,7 +244,25 @@ fun EmufiiScaffold(
             // What the header covers: the cursor reads it so as never to stop underneath.
             LocalScaffoldBand provides if (contentScrolls) band + FADE_HEIGHT else band
         ) {
-            content(if (contentScrolls) band + FADE_HEIGHT else band)
+            // Up with nothing above inside the content goes to the header, from any
+            // control: before, only the first control knew the way, and the others stayed
+            // stuck or jumped sideways.
+            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Where the cursor goes
+            val focusManager = LocalFocusManager.current
+            Box(
+                Modifier.fillMaxSize().onKeyEvent { event ->
+                    if (event.type != KeyEventType.KeyDown || event.key != Key.DirectionUp) {
+                        return@onKeyEvent false
+                    }
+                    // Consumed either way: the move is done here, not a second time after.
+                    if (!focusManager.moveFocus(FocusDirection.Up)) {
+                        runCatching { scaffoldFocus.header.requestFocus() }
+                    }
+                    true
+                }
+            ) {
+                content(if (contentScrolls) band + FADE_HEIGHT else band)
+            }
         }
 
         if (contentScrolls) WallpaperVeil(band = band, dark = dark)
@@ -442,14 +484,18 @@ fun AvatarStack(
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         shown.forEachIndexed { i, name ->
-            Avatar(
-                name = name,
-                size = size,
-                ring = ring,
-                modifier = Modifier
-                    .offset(x = -overlap * i)
-                    .zIndex((shown.size - i).toFloat())
-            )
+            // Keyed on the name: a player joining pops in, the others stay where they are.
+            key(name) {
+                Avatar(
+                    name = name,
+                    size = size,
+                    ring = ring,
+                    modifier = Modifier
+                        .offset(x = -overlap * i)
+                        .zIndex((shown.size - i).toFloat())
+                        .popIn(settled = rememberPartOfOpening())
+                )
+            }
         }
         if (extra > 0) {
             Box(

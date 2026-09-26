@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +42,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import coil3.compose.AsyncImage
 import eu.emufii.app.R
+import eu.emufii.app.ui.TrailerSpinner
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import eu.emufii.app.ui.controlRing
@@ -162,7 +162,7 @@ fun IconPickerDialog(
                     searching || loadingIcons -> Box(
                         modifier = Modifier.fillMaxWidth().height(140.dp),
                         contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+                    ) { TrailerSpinner(color = MaterialTheme.colorScheme.primary) }
 
                     icons.isEmpty() -> Box(
                         modifier = Modifier.fillMaxWidth().height(140.dp),

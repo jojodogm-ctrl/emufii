@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens
 
+import eu.emufii.app.ui.theme.Teal
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,6 +56,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import eu.emufii.app.R
+import androidx.compose.foundation.lazy.itemsIndexed
+import eu.emufii.app.ui.Cascade
+import eu.emufii.app.ui.TrailerSpinner
 import eu.emufii.app.profile.playerDisplayName
 import eu.emufii.app.network.CoordinatorClient
 import androidx.compose.ui.platform.LocalContext
@@ -154,7 +157,7 @@ fun SessionFinderScreen(
         Box(Modifier.fillMaxSize()) {
         when {
             loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                TrailerSpinner(color = MaterialTheme.colorScheme.primary)
             }
 
             error != null -> FinderMessage(
@@ -203,14 +206,16 @@ fun SessionFinderScreen(
                         )
                     }
                 }
-                items(shown, key = { it.code }) { session ->
-                    SessionCard(
-                        session = session,
-                        rom = library.firstOrNull { rom ->
-                            rom.displayName.equals(session.romTitle, ignoreCase = true)
-                        },
-                        onJoin = { onJoin(session) }
-                    )
+                itemsIndexed(shown, key = { _, it -> it.code }) { index, session ->
+                    Cascade(index) {
+                        SessionCard(
+                            session = session,
+                            rom = library.firstOrNull { rom ->
+                                rom.displayName.equals(session.romTitle, ignoreCase = true)
+                            },
+                            onJoin = { onJoin(session) }
+                        )
+                    }
                 }
             }
         }
@@ -277,7 +282,12 @@ private fun SearchField(
 }
 
 @Composable
-private fun SessionCard(session: OpenSession, rom: Rom?, onJoin: () -> Unit) {
+private fun SessionCard(
+    session: OpenSession,
+    rom: Rom?,
+    onJoin: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val dark = LocalEmufiiDarkTheme.current
     val host = session.hostName?.let { playerDisplayName(it) }
         ?: stringResource(R.string.finder_host)
@@ -292,7 +302,7 @@ private fun SessionCard(session: OpenSession, rom: Rom?, onJoin: () -> Unit) {
     // No `padEntry` here: a `FocusRequester` shared between twelve nodes points at
     // nothing.
     // pourquoi : docs/decisions/lancement-et-navigation.md § One named destination per screen
-    SoftCard(onClick = onJoin) {
+    SoftCard(onClick = onJoin, modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -459,7 +469,7 @@ private fun MetaChip(text: String, highlight: Boolean = false) {
     Text(
         text,
         style = MaterialTheme.typography.labelSmall,
-        color = if (highlight) (if (dark) Coral.darkBright else Coral.ink)
+        color = if (highlight) (if (dark) Teal.darkBright else Teal.ink)
                 else MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = 1,
         // An ellipsis rather than the default hard clip: a word sliced mid-glyph
@@ -468,7 +478,7 @@ private fun MetaChip(text: String, highlight: Boolean = false) {
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(
-                if (highlight) Coral.soft
+                if (highlight) Teal.soft
                 else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
             )
             .padding(horizontal = 8.dp, vertical = 3.dp)

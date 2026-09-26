@@ -61,6 +61,12 @@ import eu.emufii.app.ui.theme.ShellLightLow
 import eu.emufii.app.ui.theme.ShellOled
 import eu.emufii.app.ui.theme.TealCuts
 import eu.emufii.app.ui.tap
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.BoxWithConstraints
+import eu.emufii.app.ui.rememberElastic
+import eu.emufii.app.ui.Motion
+import eu.emufii.app.ui.DrawnCheck
 
 /**
  * Four trays to compare, in place of nine named lines the settings had to scroll past.
@@ -76,22 +82,41 @@ fun ThemeSwatches(
 ) {
     // Hardcoded: there is no configurable accent any more.
     val cuts = TealCuts
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        AppTheme.entries.forEachIndexed { index, option ->
-            ThemeSwatch(
-                theme = option,
-                accent = cuts,
-                selected = option == theme,
-                onClick = { onTheme(option) },
-                entry = firstIsEntry && index == 0,
-                modifier = Modifier.weight(1f)
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val count = AppTheme.entries.size
+        val cell = (maxWidth - SWATCH_GAP * (count - 1)) / count
+        // Under the names, a bar that stretches from one theme to the next and closes up.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The elastic indicator
+        val bar = rememberElastic(
+            target = (cell + SWATCH_GAP) * AppTheme.entries.indexOf(theme) + cell * 0.3f,
+            width = cell * 0.4f
+        )
+        Column {
+            Row(horizontalArrangement = Arrangement.spacedBy(SWATCH_GAP)) {
+                AppTheme.entries.forEachIndexed { index, option ->
+                    ThemeSwatch(
+                        theme = option,
+                        accent = cuts,
+                        selected = option == theme,
+                        onClick = { onTheme(option) },
+                        entry = firstIsEntry && index == 0,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+            Box(
+                Modifier
+                    .padding(top = 6.dp)
+                    .offset { IntOffset(bar.start.roundToPx(), 0) }
+                    .size(width = bar.length, height = 4.dp)
+                    .clip(CircleShape)
+                    .background(cuts.bright)
             )
         }
     }
 }
+
+private val SWATCH_GAP = 10.dp
 
 @Composable
 private fun ThemeSwatch(
@@ -112,6 +137,7 @@ private fun ThemeSwatch(
     var ringed by remember { mutableStateOf(false) }
     val mark by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
+        animationSpec = Motion.morph(),
         label = "theme-swatch-mark"
     )
     Column(
@@ -172,21 +198,17 @@ private fun ThemeSwatch(
             )
             // It grows as it settles: choosing a theme repaints the whole panel behind
             // it, and a mark appearing at once would read as a second event.
-            if (mark > 0f) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(6.dp)
-                        .scale(mark)
-                        .size(20.dp)
-                        .shadow(3.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(accent.bright),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CheckIcon(size = 13.dp, color = accent.ink)
-                }
-            }
+            // The disc pops and the tick draws itself; silent, a theme is not a step done.
+            DrawnCheck(
+                done = selected,
+                disc = accent.bright,
+                ink = accent.ink,
+                size = 20.dp,
+                sound = false,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
+            )
         }
         Text(
             stringResource(theme.labelShortRes),

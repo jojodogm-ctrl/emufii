@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens
 
+import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.sounded
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eu.emufii.app.ui.controlRing
 import eu.emufii.app.R
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.runtime.key
+import eu.emufii.app.ui.CodeGlyph
 import eu.emufii.app.network.CoordinatorClient
 import eu.emufii.app.session.RomRef
 import eu.emufii.app.session.SessionCodes
@@ -65,7 +69,7 @@ import eu.emufii.app.ui.ringColor
 
 private const val CODE_LENGTH = 6
 
-private fun coralCut(dark: Boolean) = if (dark) Coral.darkBright else Coral.deep
+private fun coralCut(dark: Boolean) = if (dark) Teal.darkBright else Teal.deep
 
 /**
  * Six boxes rather than a form. The app's own keypad replaces the invisible field.
@@ -155,8 +159,8 @@ fun JoinScreen(
                     // Joining is a link: a coral pill, the deep cut on light, the bright one on dark.
                     // pourquoi : docs/decisions/theme-duotone-shelves.md § Two semantic axes
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (dark) Coral.bright else Coral.deep,
-                        contentColor = if (dark) Coral.ink else Color.White,
+                        containerColor = if (dark) Teal.bright else Teal.deep,
+                        contentColor = if (dark) Teal.ink else Color.White,
                         disabledContainerColor = coralCut(dark).copy(alpha = 0.16f),
                         disabledContentColor = coralCut(dark).copy(alpha = 0.55f)
                     ),
@@ -202,17 +206,19 @@ private fun CodeSlot(char: Char?, active: Boolean) {
             .focusRing(active, shape, width = 3.dp, glowRadius = 16.dp)
             .socket(shape, dark)
             .then(
-                if (active) Modifier.background(Coral.soft, shape) else Modifier
+                if (active) Modifier.background(Teal.soft, shape) else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
         if (char != null) {
-            Text(
-                char.toString(),
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            // Keyed on the character, so a correction drops the new one in again.
+            key(char) {
+                CodeGlyph(
+                    char.toString(),
+                    style = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         } else if (active) {
             // The empty active slot used to paint a pale block the size of a glyph.
             Caret()

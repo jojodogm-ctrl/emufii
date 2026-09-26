@@ -10,7 +10,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 
 /**
  * False when the system has turned animations off (`ANIMATOR_DURATION_SCALE` at zero),
@@ -40,14 +39,6 @@ fun rememberAnimationsEnabled(): Boolean {
  */
 object Motion {
 
-    /** A screen replacing another: long enough to read as a move, short enough to obey. */
-    const val SCREEN_IN_MS = 260
-
-    const val SCREEN_OUT_MS = 160
-
-    /** How far a screen travels while it fades. A hint of direction, never a full slide. */
-    val SCREEN_SHIFT = 28.dp
-
     /** Chrome stepping aside for content, and coming back. */
     const val AWAY_MS = 130
 
@@ -62,6 +53,53 @@ object Motion {
     fun <T> press(): FiniteAnimationSpec<T> = spec(
         spring(dampingRatio = 0.72f, stiffness = Spring.StiffnessMediumLow)
     )
+
+    /*
+     * The trailer's springs. It gives each as a pulsation `w` (rad/s) and a damping `z`;
+     * Compose takes the same spring as `stiffness = w²`. A screen no longer slides in: it
+     * blooms, see [bloom].
+     * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Springs, taken from the trailer
+     */
+
+    /** A surface changing size, shape or place. w 19, z 0.80. */
+    @Composable
+    fun <T> morph(): FiniteAnimationSpec<T> = spec(spring(0.80f, 360f))
+
+    /** Opacity and blur of something appearing. w 30, z 0.99. */
+    @Composable
+    fun <T> enter(): FiniteAnimationSpec<T> = spec(spring(1f, 900f))
+
+    /** Opacity and blur of something leaving: faster than it came. w 42, z 0.99. */
+    @Composable
+    fun <T> exit(): FiniteAnimationSpec<T> = spec(spring(1f, 1760f))
+
+    /** Rows, lines of text, buttons, coming up into place. w 28, z 0.99. */
+    @Composable
+    fun <T> rise(): FiniteAnimationSpec<T> = spec(spring(1f, 784f))
+
+    /** Avatar, badge, dot: overshoots once, then settles. w 20, z 0.70. */
+    @Composable
+    fun <T> pop(): FiniteAnimationSpec<T> = spec(spring(0.70f, 400f))
+
+    /** A code character or a key landing. w 32, z 0.88. */
+    @Composable
+    fun <T> snapIn(): FiniteAnimationSpec<T> = spec(spring(0.88f, 1024f))
+
+    /** A whole view zooming or travelling. w 12, z 0.88. */
+    @Composable
+    fun <T> camera(): FiniteAnimationSpec<T> = spec(spring(0.88f, 144f))
+
+    /** The focus ring moving between cells. w 16, z 0.90. */
+    @Composable
+    fun <T> cursor(): FiniteAnimationSpec<T> = spec(spring(0.90f, 256f))
+
+    /** Any colour change: never a hard cut between two colours. w 18, z 0.95. */
+    @Composable
+    fun <T> tint(): FiniteAnimationSpec<T> = spec(spring(0.95f, 324f))
+
+    /** A tick being drawn. w 22, z 0.99. */
+    @Composable
+    fun <T> draw(): FiniteAnimationSpec<T> = spec(spring(1f, 484f))
 
     /** A thing arriving on screen: softer, and it may overshoot. */
     @Composable
@@ -80,7 +118,7 @@ object Motion {
 
     /** Animations off: the value jumps, and the frame after is the finished one. */
     @Composable
-    private fun <T> spec(wanted: FiniteAnimationSpec<T>): FiniteAnimationSpec<T> =
+    fun <T> spec(wanted: FiniteAnimationSpec<T>): FiniteAnimationSpec<T> =
         if (rememberAnimationsEnabled()) wanted else snap()
 }
 

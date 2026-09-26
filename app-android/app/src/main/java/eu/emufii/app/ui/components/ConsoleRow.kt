@@ -36,6 +36,7 @@ import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.tap
+import eu.emufii.app.ui.Sfx
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -133,7 +134,7 @@ fun ConsoleRow(
                     bandFraction = 0.165f
                 )
                 .then(if (entry) Modifier.padEntry() else Modifier)
-                .tap(role = Role.Switch) { onSetVisible(!visible) }
+                .tap(role = Role.Switch, sound = Sfx::toggle) { onSetVisible(!visible) }
         ) {
             SwitchFace(checked = visible)
         }

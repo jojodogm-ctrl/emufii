@@ -1,5 +1,20 @@
 package eu.emufii.app.ui.screens.session
 
+import kotlinx.coroutines.delay
+import eu.emufii.app.ui.awaitSeen
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import eu.emufii.app.ui.theme.Teal
+import eu.emufii.app.ui.rememberAnimationsEnabled
+import eu.emufii.app.ui.rememberAppear
+import eu.emufii.app.ui.bloom
+import eu.emufii.app.ui.TrailerSpinner
+import eu.emufii.app.ui.Sfx
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.animation.core.Animatable
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -43,6 +58,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eu.emufii.app.R
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import eu.emufii.app.ui.Motion
+import eu.emufii.app.ui.DrawnCheck
+import androidx.compose.ui.text.TextStyle
+import eu.emufii.app.ui.theme.liftShadow
+import eu.emufii.app.ui.RevealCode
 import eu.emufii.app.library.Backend
 import eu.emufii.app.session.Session
 import eu.emufii.app.ui.ActionShape
@@ -118,40 +146,133 @@ private fun NetplayButtonContainer(
     onClick: () -> Unit,
 ) {
     val enabled = session.rom != null && !waitingForHost
+    val busy = LocalNetplayBusy.current && !netplayDone && !waitingForHost
+    val primary = MaterialTheme.colorScheme.primary
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
+    // Three looks, all on the tint spring: greyed while the guest waits, the axis while
+    // there is something to do, green once the room exists.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The auto-setup button, host and guest
+    val container by animateColorAsState(
+        when {
+            netplayDone -> good()
+            waitingForHost -> primary.copy(alpha = 0.16f)
+            else -> primary
+        },
+        Motion.tint(),
+        label = "netplay-container"
+    )
+    val content by animateColorAsState(
+        if (waitingForHost) primary.copy(alpha = 0.55f) else onPrimary,
+        Motion.tint(),
+        label = "netplay-content"
+    )
+
+    // The guest's own moment: the host has finished, and the greyed button wakes up with a
+    // pop and its sound. Only a change seen on this screen; a button already awake when the
+    // screen opens is simply awake.
+    val on = rememberAnimationsEnabled()
+    val wake = remember { Animatable(1f) }
+    var wasWaiting by remember { mutableStateOf(waitingForHost) }
+    val pop = Motion.pop<Float>()
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(waitingForHost) {
+        if (wasWaiting && !waitingForHost) {
+            awaitSeen(lifecycle)
+            Sfx.pop()
+            if (on) {
+                wake.snapTo(WAKE_FROM)
+                wake.animateTo(1f, pop)
+            }
+        }
+        wasWaiting = waitingForHost
+    }
+
     Button(
         onClick = sounded(onClick),
-        enabled = enabled,
+        enabled = enabled && !busy,
         shape = ActionShape,
-        colors = if (netplayDone) {
-            ButtonDefaults.buttonColors(containerColor = good())
-        } else {
-            ButtonDefaults.buttonColors()
-        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = container,
+            contentColor = content,
+            disabledContainerColor = container,
+            disabledContentColor = content
+        ),
         modifier = modifier
             .height(56.dp)
+            .graphicsLayer {
+                scaleX = wake.value
+                scaleY = wake.value
+            }
             .controlRing(ActionShape)
             // Greyed out but still reachable: focus says where you are, not that a click lands.
             // pourquoi : docs/decisions/session.md § Down aims at the first button that answers
             .then(if (enabled) Modifier else Modifier.focusable())
     ) {
-        if (netplayDone) {
-            CheckMark(color = MaterialTheme.colorScheme.onPrimary)
-            Spacer(Modifier.width(10.dp))
+        // Host: the spinner while the automation drives the emulator, then the disc pops
+        // and the tick draws itself with the confirm sound. Guest: a quiet spinner in the
+        // greyed button while the host works.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The auto-setup button, host and guest
+        when {
+            netplayDone -> {
+                DrawnCheck(
+                    done = true,
+                    disc = onPrimary.copy(alpha = 0.22f),
+                    ink = onPrimary
+                )
+                Spacer(Modifier.width(10.dp))
+            }
+            busy || waitingForHost -> {
+                TrailerSpinner(
+                    color = content,
+                    size = 18.dp,
+                    stroke = 2.5.dp,
+                    // A guest may wait minutes on this.
+                    fps = if (waitingForHost) 30 else 60,
+                    modifier = Modifier.bloom(rememberAppear()::value, blur = 0.dp)
+                )
+                Spacer(Modifier.width(10.dp))
+            }
         }
-        Text(
+        CrossLabel(
             stringResource(
                 when {
                     waitingForHost -> R.string.session_netplay_waiting_host
                     netplayDone -> R.string.session_netplay_done
+                    busy -> R.string.session_netplay_busy
                     netplayPrepared -> R.string.session_netplay_again
                     else -> netPlayReadyStrRes
                 },
                 // The emulator this session drives: "Azahar" was hard-coded in the string, so a
                 // Switch session announced the wrong program by name.
                 session.backend.emulatorName
-            ),
-            style = MaterialTheme.typography.titleMedium
+            )
         )
+    }
+}
+
+/** Step 2 wakes once step 1's tick has drawn. */
+private const val WAKE_AFTER_TICK_MS = 380L
+
+/** Where the guest's button starts its wake-up pop: a small dip, then the overshoot. */
+private const val WAKE_FROM = 0.92f
+
+/** True while the automation fills the emulator's netplay form. */
+internal val LocalNetplayBusy = compositionLocalOf { false }
+
+/** A button's label changing: the old one blurs out as the new one blooms in. */
+@Composable
+private fun CrossLabel(text: String) {
+    val enter: FiniteAnimationSpec<Float> = Motion.enter()
+    val exit: FiniteAnimationSpec<Float> = Motion.exit()
+    AnimatedContent(
+        targetState = text,
+        transitionSpec = {
+            (fadeIn(enter) + scaleIn(enter, initialScale = 0.965f)) togetherWith
+                (fadeOut(exit) + scaleOut(exit, targetScale = 0.965f))
+        },
+        label = "button-label"
+    ) { label ->
+        Text(label, style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -168,26 +289,31 @@ internal fun PspSetupButton(
     Button(
         onClick = sounded(onClick),
         shape = ActionShape,
-        colors = if (pspOpened) {
-            ButtonDefaults.buttonColors(containerColor = good())
-        } else {
-            ButtonDefaults.buttonColors()
-        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = animateColorAsState(
+                if (pspOpened) good() else MaterialTheme.colorScheme.primary,
+                Motion.tint(),
+                label = "psp-container"
+            ).value
+        ),
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
             .controlRing(ActionShape)
     ) {
         if (pspOpened) {
-            CheckMark(color = MaterialTheme.colorScheme.onPrimary)
+            DrawnCheck(
+                done = true,
+                disc = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.22f),
+                ink = MaterialTheme.colorScheme.onPrimary
+            )
             Spacer(Modifier.width(10.dp))
         }
-        Text(
+        CrossLabel(
             stringResource(
                 if (pspOpened) R.string.session_psp_setup_again
                 else R.string.session_psp_setup
-            ),
-            style = MaterialTheme.typography.titleMedium
+            )
         )
     }
 }
@@ -201,18 +327,56 @@ internal fun LaunchButton(
     waitingForHost: Boolean = false,
     onClick: () -> Unit
 ) {
+    val enabled = launchEnabled(session, netplayPrepared, directPs2, waitingForHost)
+    // Lights up once step 1 is done rather than switching: the colour runs on the tint
+    // spring, so the eye goes from the tick to this button.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Colours
+    val primary = MaterialTheme.colorScheme.primary
+    val container by animateColorAsState(
+        if (enabled) primary else primary.copy(alpha = 0.16f),
+        Motion.tint(),
+        label = "launch-container"
+    )
+    val content by animateColorAsState(
+        if (enabled) MaterialTheme.colorScheme.onPrimary else primary.copy(alpha = 0.55f),
+        Motion.tint(),
+        label = "launch-content"
+    )
+    // Step 2 lights up as step 1's tick lands: the same wake as the guest's, silent, the
+    // tick having just sounded.
+    val on = rememberAnimationsEnabled()
+    val wake = remember { Animatable(1f) }
+    var wasEnabled by remember { mutableStateOf(enabled) }
+    val pop = Motion.pop<Float>()
+    val launchLifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(enabled) {
+        if (!wasEnabled && enabled && on) {
+            awaitSeen(launchLifecycle)
+            // After the tick of step 1 has drawn, not over it.
+            delay(WAKE_AFTER_TICK_MS)
+            wake.snapTo(WAKE_FROM)
+            wake.animateTo(1f, pop)
+        }
+        wasEnabled = enabled
+    }
     Button(
         onClick = sounded(onClick),
-        enabled = launchEnabled(session, netplayPrepared, directPs2, waitingForHost),
+        enabled = enabled,
         shape = ActionShape,
         // Material's grey-on-grey slab read as an absence rather than a button waiting for step 1.
         colors = ButtonDefaults.buttonColors(
-            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
-            disabledContentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.55f)
+            containerColor = container,
+            contentColor = content,
+            disabledContainerColor = container,
+            disabledContentColor = content
         ),
         modifier = modifier
             .fillMaxWidth()
             .height(56.dp)
+            .graphicsLayer {
+                scaleX = wake.value
+                scaleY = wake.value
+            }
             .controlRing(ActionShape)
     ) {
         Text(
@@ -277,10 +441,10 @@ internal fun SessionCodeChip(code: String, onCopy: () -> Unit) {
     Surface(
         onClick = sounded(onCopy),
         shape = CircleShape,
-        color = if (dark) Coral.bright else Coral.deep,
-        border = BorderStroke(1.dp, edgeColor(dark, oled = false)),
-        shadowElevation = 4.dp,
-        modifier = Modifier.controlRing(CircleShape)
+        color = if (dark) Teal.bright else Teal.deep,
+        modifier = Modifier
+            .controlRing(CircleShape)
+            .liftShadow(CircleShape, 2.dp, dark, LocalEmufiiOledTheme.current && dark)
     ) {
         Row(
             modifier = Modifier
@@ -292,17 +456,20 @@ internal fun SessionCodeChip(code: String, onCopy: () -> Unit) {
             Text(
                 stringResource(R.string.session_code_label).uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = if (dark) Coral.ink else Color.White.copy(alpha = 0.80f),
+                color = if (dark) Teal.ink else Color.White.copy(alpha = 0.80f),
                 letterSpacing = 1.sp
             )
-            Text(
-                code.ifBlank { "—" },
+            val ink = if (dark) Teal.ink else Color.White
+            val style = TextStyle(
                 fontSize = 20.sp,
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp,
-                color = if (dark) Coral.ink else Color.White
+                letterSpacing = 2.sp
             )
+            // Writes itself once, the first time the session has a code.
+            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The session code writes itself
+            if (code.isBlank()) Text("—", style = style, color = ink)
+            else RevealCode(code, style = style, color = ink)
         }
     }
 }

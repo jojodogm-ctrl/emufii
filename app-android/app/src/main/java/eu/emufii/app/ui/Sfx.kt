@@ -18,7 +18,7 @@ import androidx.compose.ui.semantics.Role
 import eu.emufii.app.R
 
 /**
- * The interface's two sounds: the cursor landing, and the press. `SoundPool` rather
+ * The interface's sounds: the cursor landing and the press, plus the trailer's five. `SoundPool` rather
  * than `MediaPlayer`: these last 96 and 144 ms and must fire without latency. They sit
  * behind Android's own interface-sound setting rather than inventing a second one.
  * pourquoi : docs/decisions/sons.md § Two sounds, one family
@@ -31,6 +31,11 @@ object Sfx {
     private var pool: SoundPool? = null
     private var hoverId = 0
     private var clickId = 0
+    private var confirmId = 0
+    private var popId = 0
+    private var notifyId = 0
+    private var toggleId = 0
+    private var tickId = 0
 
     /** What is decoded: playing an id that is not ready yet does nothing. */
     private val loaded = mutableSetOf<Int>()
@@ -51,12 +56,37 @@ object Sfx {
         p.setOnLoadCompleteListener { _, id, status -> if (status == 0) loaded += id }
         hoverId = p.load(context.applicationContext, R.raw.sfx_hover, 1)
         clickId = p.load(context.applicationContext, R.raw.sfx_click, 1)
+        confirmId = p.load(context.applicationContext, R.raw.sfx_confirm, 1)
+        popId = p.load(context.applicationContext, R.raw.sfx_pop, 1)
+        notifyId = p.load(context.applicationContext, R.raw.sfx_notify, 1)
+        toggleId = p.load(context.applicationContext, R.raw.sfx_toggle, 1)
+        tickId = p.load(context.applicationContext, R.raw.sfx_tick, 1)
         pool = p
     }
 
     fun hover() = play(hoverId, HOVER_VOLUME)
 
     fun click() = play(clickId, CLICK_VOLUME)
+
+    /*
+     * The trailer's four, plus the code tick. Same pool, same system setting.
+     * pourquoi : docs/decisions/sons.md § The trailer's sounds
+     */
+
+    /** Two rising notes: a step done, a friend added. */
+    fun confirm() = play(confirmId, CONFIRM_VOLUME)
+
+    /** A player joining, a friend appearing. */
+    fun pop() = play(popId, POP_VOLUME)
+
+    /** An in-app alert arriving. */
+    fun alert() = play(notifyId, NOTIFY_VOLUME)
+
+    /** A switch changing side: replaces the click there, never adds to it. */
+    fun toggle() = play(toggleId, CLICK_VOLUME)
+
+    /** A code character landing, typed or written; distinct from the cursor's hover. */
+    fun tick() = play(tickId, HOVER_VOLUME)
 
     private fun play(id: Int, volume: Float) {
         val context = app ?: return
@@ -71,12 +101,15 @@ object Sfx {
         if (on) pool?.play(id, volume, volume, 1, 0, 1f)
     }
 
-    /** Four: the cursor can slide while a press is still ringing. */
-    private const val MAX_STREAMS = 4
+    /** Six: a code writing itself ticks every 115 ms while a press may still ring. */
+    private const val MAX_STREAMS = 6
 
     /** Below the press: hover fires on every cell crossed, and a move as loud as an action suggests something happened. */
     private const val HOVER_VOLUME = 0.55f
     private const val CLICK_VOLUME = 1.0f
+    private const val CONFIRM_VOLUME = 0.85f
+    private const val POP_VOLUME = 0.7f
+    private const val NOTIFY_VOLUME = 0.8f
 }
 
 /**
@@ -95,9 +128,11 @@ fun sounded(onClick: () -> Unit): () -> Unit = { Sfx.click(); onClick() }
 fun Modifier.tap(
     enabled: Boolean = true,
     role: Role? = null,
+    /** A switch says `toggle`: the trailer gives it its own sound. */
+    sound: () -> Unit = Sfx::click,
     onClick: () -> Unit
 ): Modifier {
-    return this.clickable(enabled = enabled, role = role) { Sfx.click(); onClick() }
+    return this.clickable(enabled = enabled, role = role) { sound(); onClick() }
 }
 
 @Composable

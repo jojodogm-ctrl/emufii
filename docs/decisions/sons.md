@@ -1,4 +1,4 @@
-# The two interface sounds
+# The interface sounds
 
 Added on 2026-08-29, at the user's request, who supplied both files. The
 headings are anchors cited from the code.
@@ -117,3 +117,22 @@ It has to be placed once per window, and a window is not a screen:
 - the rear panel, which is a `Presentation`.
 
 A `Dialog` added later without this call will bring both sounds back together.
+
+## The trailer's sounds
+
+Added in September 2026 with the trailer's material and motion, same `SoundPool`, same
+`SOUND_EFFECTS_ENABLED`, same media usage. Six streams instead of four: a code writing
+itself ticks every 115 ms while a press may still ring.
+
+| File | When |
+|---|---|
+| `sfx_confirm` | a step done (the tick drawing itself), a friend added |
+| `sfx_pop` | a player joining the session |
+| `sfx_notify` | an in-app alert arriving (`Sfx.alert`, `notify` being `Object`'s) |
+| `sfx_toggle` | a switch changing side, in place of the click, never on top of it |
+| `sfx_tick` | a session code character landing |
+
+`tap` takes the sound as a parameter so a switch can say `toggle` and stay one call. The
+trailer's `clic` was not taken: the app's own press sound stays. No "update verified"
+sound: updates have gone through GitHub releases only since 1.13, nothing in the app
+verifies one.

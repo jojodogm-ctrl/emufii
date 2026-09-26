@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.screens.session
 
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.offset
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -77,7 +81,11 @@ internal fun SessionLandscapeLayout(
             .fillMaxSize()
             .padding(
                 top = topPadding,
-                bottom = bottomInset + 16.dp,
+                // With the panel live the columns centre; a bottom margin equal to the
+                // header's puts that centre on the screen's own, not on the room left under
+                // the header, which sat visibly low.
+                // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Session, two screens
+                bottom = if (panelLive) maxOf(topPadding, bottomInset + 16.dp) else bottomInset + 16.dp,
                 start = 20.dp,
                 end = 20.dp
             ),
@@ -86,9 +94,15 @@ internal fun SessionLandscapeLayout(
         // No `verticalScroll`: a state pane that can hide its state is not doing its job.
         // pourquoi : docs/decisions/session.md § The state panel does not scroll, so it has to fit
         // pourquoi : docs/decisions/session.md § What the panel carries, the front screen gives back in space
+        // With the panel carrying the steps, both columns centre in the height they have:
+        // pinned to the top they left the lower half of the screen empty.
+        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Session, two screens
+        val stack =
+            if (panelLive) Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+            else Arrangement.spacedBy(12.dp)
         Column(
-            modifier = Modifier.width(if (panelLive) 220.dp else 272.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.width(if (panelLive) 220.dp else 272.dp).fillMaxHeight(),
+            verticalArrangement = stack
         ) {
             // Presence gives way, never the address: the weight reverses Compose's measuring
             // order to guarantee it.
@@ -134,8 +148,9 @@ internal fun SessionLandscapeLayout(
         }
 
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            verticalArrangement = stack,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // The explanation gives way, never the buttons; the fade exists on one screen only.
             // pourquoi : docs/decisions/session.md § What the panel carries, the front screen gives back in space
@@ -145,8 +160,13 @@ internal fun SessionLandscapeLayout(
             CompositionLocalProvider(LocalEntryScroll provides pane) {
             Column(
                 modifier = Modifier
+                    // A readable measure when the text is alone in the pane.
+                    .then(if (panelLive) Modifier.widthIn(max = 640.dp) else Modifier)
                     .fillMaxWidth()
                     .weight(1f, fill = false)
+                    // A scroll clips at its bounds, and cut the cards' shadows top and
+                    // bottom: the viewport reaches past the pane, the content does not move.
+                    .shadowBleed(PANE_BLEED)
                     .then(
                         if (!fade) Modifier else Modifier
                             .graphicsLayer {
@@ -165,7 +185,8 @@ internal fun SessionLandscapeLayout(
                                 )
                             }
                     )
-                    .verticalScroll(paneScroll),
+                    .verticalScroll(paneScroll)
+                    .padding(vertical = PANE_BLEED),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 if (offline) OfflineCard()
@@ -242,4 +263,18 @@ internal fun SessionLandscapeLayout(
             status?.let { StatusLine(it) }
         }
     }
+}
+
+/** How far a card's shadow reaches: `plate`'s lift times its reach, with room to spare. */
+private val PANE_BLEED = 16.dp
+
+/**
+ * Grows the node by [bleed] above and below while keeping the size and place it reports,
+ * so a clip inside it (a scroll's) leaves room for what is drawn past the content.
+ */
+private fun Modifier.shadowBleed(bleed: Dp): Modifier = layout { measurable, constraints ->
+    val extra = bleed.roundToPx()
+    val placeable = measurable.measure(constraints.offset(vertical = 2 * extra))
+    val height = (placeable.height - 2 * extra).coerceAtLeast(0)
+    layout(placeable.width, height) { placeable.place(0, -extra) }
 }

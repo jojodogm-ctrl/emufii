@@ -33,31 +33,20 @@ val PlateDark = Color(0xFF272238)
 val PlateDarkLow = Color(0xFF1C1929)
 
 /**
- * Close to the ground, so the separation falls to the edge and the bevel: over an
- * exactly-off background a lighter plate (0xFF16131F) reads as grey on black.
+ * Lifted off black because nothing else separates it there: a shadow on black is not
+ * seen, and plates carry no contour.
+ * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § OLED
  */
-val PlateOled = Color(0xFF0C0A14)
-val PlateOledLow = Color(0xFF07060D)
+val PlateOled = Color(0xFF16131F)
+val PlateOledLow = Color(0xFF0F0D17)
 
 /**
- * Warm black, not blue-black: the edge draws the contour, the bevel the volume.
+ * Warm black, not blue-black. Hairlines, dividers and Material's outline; no plate.
  * pourquoi : docs/decisions/theme-duotone-shelves.md § Warm neutrals (light), the cream tile extended
  */
 val EdgeLight = Color(0x52241610)
 val EdgeDark = Color(0x2EFFFFFF)
-// Raised with the plates, since it now carries the separation.
 val EdgeOled = Color(0x52FFFFFF)
-
-/**
- * The moulding: one light source, high and slightly left, shared by every surface.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § MATERIAL (replaces Plastic.kt)
- */
-val BevelLight = Color(0xF2FFFFFF)
-val BevelDark = Color(0x33FFFFFF)
-
-/** The shade under the lip, warm and never blue. */
-val BevelShadeLight = Color(0x1F241610)
-val BevelShadeDark = Color(0x59000000)
 
 val InkText = Color(0xFF221B26)
 val InkTextMuted = Color(0xFF6E6475)
@@ -98,14 +87,6 @@ object Shelf {
     /** Higher than the other two: absolute black returns nothing, and at 8 % a
      * shelf lost its colour before naming its axis. */
     const val fillOled = 0.13f
-
-    /**
-     * Its contour, but only just: at 30 % it cuts a hard line through a row of game
-     * titles. Enough to find the corner, not enough to read as a rule.
-     */
-    const val edgeLight = 0.13f
-    const val edgeDark = 0.11f
-    const val edgeOled = 0.10f
 }
 
 val Violet = Color(0xFF6B72E0)

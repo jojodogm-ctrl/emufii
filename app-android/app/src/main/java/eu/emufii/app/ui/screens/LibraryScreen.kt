@@ -1,5 +1,12 @@
 package eu.emufii.app.ui.screens
 
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.EnterTransition
+import eu.emufii.app.ui.FadeInPlace
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -111,6 +118,12 @@ import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.kyant.backdrop.Backdrop
 import dev.chrisbanes.haze.rememberHazeState
 import eu.emufii.app.R
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.EnterExitState
+import eu.emufii.app.ui.LocalLayoutShown
 import eu.emufii.app.artwork.rememberTileArt
 import eu.emufii.app.compat.LocalCompatDb
 import eu.emufii.app.library.Backend
@@ -525,10 +538,48 @@ private fun HandleState(
                 arriving = false
             }
 
+            // Changing layout moves the covers rather than cutting: the leaving layout
+            // lets go of each cover and the arriving one catches it where it lands.
+            // Entering a console's folder zooms in, the root growing past you as the
+            // folder rises from below; leaving zooms back out. Each view is its own
+            // composition, so a folder opens on its first game and the root comes back on
+            // the folder you left, where the cursor used to keep its number across both.
+            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
+            val layoutIn: FiniteAnimationSpec<Float> = Motion.enter()
+            val layoutOut: FiniteAnimationSpec<Float> = Motion.exit()
+            val zoom: FiniteAnimationSpec<Float> = Motion.morph()
+            var lastFolder by remember { mutableStateOf<Console?>(null) }
+            LaunchedEffect(ui.openConsole) { ui.openConsole?.let { lastFolder = it } }
             CompositionLocalProvider(LocalTileEntrance provides arriving) {
-                when (ui.layout) {
+              androidx.compose.animation.AnimatedContent(
+                targetState = LibraryView(ui.layout, ui.openConsole, ui.entries),
+                contentKey = { it.layout to it.console },
+                transitionSpec = {
+                    val entering = initialState.console == null && targetState.console != null
+                    val leaving = initialState.console != null && targetState.console == null
+                    when {
+                        entering -> (fadeIn(layoutIn) + scaleIn(zoom, initialScale = 0.9f)) togetherWith
+                            (fadeOut(layoutOut) + scaleOut(zoom, targetScale = 1.08f))
+                        leaving -> (fadeIn(layoutIn) + scaleIn(zoom, initialScale = 1.08f)) togetherWith
+                            (fadeOut(layoutOut) + scaleOut(zoom, targetScale = 0.9f))
+                        else -> fadeIn(layoutIn) togetherWith fadeOut(layoutOut)
+                    }.using(SizeTransform(clip = false))
+                },
+                label = "library-layout"
+              ) { view ->
+                val layout = view.layout
+                val entries = view.entries
+                val startAt = remember {
+                    if (view.console != null) 0
+                    else entries.indexOfFirst { it is Entry.Folder && it.console == lastFolder }
+                        .coerceAtLeast(0)
+                }
+                CompositionLocalProvider(
+                    LocalLayoutShown provides (transition.targetState == EnterExitState.Visible)
+                ) {
+                when (layout) {
                     LibraryLayout.GRID -> RomsGrid(
-                        entries = ui.entries,
+                        entries = entries,
                         onSelect = onEntry,
                         onLongPress = { state.openMenu(it) },
                         menuFor = ui.menuFor,
@@ -539,11 +590,12 @@ private fun HandleState(
                         canGoBack = ui.openConsole != null,
                         gridFocus = gridFocus,
                         contentPadding = contentPadding,
-                        scrolled = scrolled
+                        scrolled = scrolled,
+                        startAt = startAt
                     )
 
                     LibraryLayout.CAROUSEL -> RomsCarousel(
-                        entries = ui.entries,
+                        entries = entries,
                         onSelect = onEntry,
                         onLongPress = { state.openMenu(it) },
                         menuFor = ui.menuFor,
@@ -553,14 +605,15 @@ private fun HandleState(
                         onBack = { state.closeFolder() },
                         canGoBack = ui.openConsole != null,
                         gridFocus = gridFocus,
-                        contentPadding = contentPadding
+                        contentPadding = contentPadding,
+                        startAt = startAt
                     ).also {
                         // A row that only moves sideways never hides the shelf.
                         LaunchedEffect(Unit) { scrolled.floatValue = 0f }
                     }
 
                     LibraryLayout.LIST -> RomsList(
-                        entries = ui.entries,
+                        entries = entries,
                         onSelect = onEntry,
                         onLongPress = { state.openMenu(it) },
                         menuFor = ui.menuFor,
@@ -571,9 +624,12 @@ private fun HandleState(
                         canGoBack = ui.openConsole != null,
                         gridFocus = gridFocus,
                         contentPadding = contentPadding,
-                        scrolled = scrolled
+                        scrolled = scrolled,
+                        startAt = startAt
                     )
                 }
+                }
+              }
             }
         }
     }
@@ -630,7 +686,9 @@ private fun RomsGrid(
      * of every scroll.
      * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
      */
-    scrolled: MutableFloatState
+    scrolled: MutableFloatState,
+    /** Where the cursor starts: the first game in a folder, the folder you left outside. */
+    startAt: Int = 0
 ) {
     val localWindowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -693,7 +751,7 @@ private fun RomsGrid(
         val totalRows = max(if (landscape) 2 else MIN_ROWS, rowsFromEntries + EXTRA_ROWS_AFTER)
         val totalSlots = totalRows * columns
 
-        val gridState = rememberLazyGridState()
+        val gridState = rememberLazyGridState(initialFirstVisibleItemIndex = startAt)
         // How far the shelf has been pushed away, 0 to 1, and not whether it should be:
         // a duration cannot be in step with a thumb. The travel is the shelf's own
         // height, so the shelf has finished leaving exactly when the first row reaches
@@ -716,7 +774,7 @@ private fun RomsGrid(
          */
         // The state, not its value: reading `cursor` in a composable body subscribes it.
         // pourquoi : docs/decisions/bibliotheque.md § What the tile reads must change only for it
-        val cursorState = rememberSaveable { mutableIntStateOf(0) }
+        val cursorState = rememberSaveable { mutableIntStateOf(startAt) }
         var cursor by cursorState
         val padFocusedState = remember { mutableStateOf(false) }
         var padFocused by padFocusedState
@@ -910,10 +968,12 @@ private fun RomsList(
      * of every scroll.
      * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
      */
-    scrolled: MutableFloatState
+    scrolled: MutableFloatState,
+    /** Where the cursor starts: the first game in a folder, the folder you left outside. */
+    startAt: Int = 0
 ) {
     val marginPx = marginPx()
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = startAt)
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     // The strip the bottom veil paints back over the list; layout does not know it.
@@ -921,7 +981,7 @@ private fun RomsList(
         (WindowInsets.navigationBarsIgnoringVisibility.asPaddingValues()
             .calculateBottomPadding() + 14.dp).roundToPx()
     }
-    val cursorState = rememberSaveable { mutableIntStateOf(0) }
+    val cursorState = rememberSaveable { mutableIntStateOf(startAt) }
     var cursor by cursorState
     val padFocusedState = remember { mutableStateOf(false) }
     var padFocused by padFocusedState
@@ -1218,21 +1278,16 @@ private fun FolderHeader(
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val shape = CircleShape
-    val pane = LocalGlassPane.current
-
     Box(
         modifier = modifier
             .focusRing(focused, shape)
             .then(
-                if (pane != null) {
-                    Modifier.glass(pane, shape, dark, thickness = 0.35f, lift = 3.dp)
-                } else {
+                run {
                     Modifier.plate(
                         shape = shape,
                         dark = dark,
                         oled = LocalEmufiiOledTheme.current,
-                        lift = 3.dp,
-                        bevel = false
+                        lift = 3.dp
                     )
                 }
             )
@@ -1414,10 +1469,10 @@ private fun FloatingTopBar(
                 }
             }
             .fillMaxWidth()
-            // Glass, not plastic: the lens bends the covers passing underneath and the rim
-            // catches the light. It exports its own pane, so the controls it carries refract
-            // the header rather than the grid two layers down.
-            // pourquoi : docs/decisions/bibliotheque.md § The header is a pebble, and the game colours it
+            // Frosted glass: the covers pass blurred under a plate at 82%, so the text on
+            // it stays legible over any artwork. The old lens split them into rainbow
+            // fringes right under "No friends online".
+            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Frosted header
             .glass(
                 backdrop = glass,
                 shape = PillShape,
@@ -1512,26 +1567,17 @@ private fun FloatingTopBar(
             // looking like a glitch. The two contents still cross quickly -- what travels
             // is the shape, not the text.
             // pourquoi : docs/decisions/bibliotheque.md § Search takes the shelf, and the two states do not cross
+            // The two contents cross through their own per-draw fade, shadows included,
+            // and nothing clips: a clipped crossing cut the plates' shadows square and
+            // let them snap back whole when it ended.
+            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Blur is paid only in flight
+            val searchIn = tween<Float>(durationMillis = 130, delayMillis = 110, easing = LinearOutSlowInEasing)
+            val searchOut = tween<Float>(durationMillis = 90, easing = FastOutLinearInEasing)
             androidx.compose.animation.AnimatedContent(
                 targetState = searchOpen,
                 transitionSpec = {
-                    androidx.compose.animation.fadeIn(
-                        tween(
-                            durationMillis = 130,
-                            delayMillis = 110,
-                            easing = androidx.compose.animation.core.LinearOutSlowInEasing
-                        )
-                    ).togetherWith(
-                        androidx.compose.animation.fadeOut(
-                            tween(
-                                durationMillis = 90,
-                                easing = androidx.compose.animation.core.FastOutLinearInEasing
-                            )
-                        )
-                    ).using(
-                        // Clipped, so the bar is revealed as it opens instead of its far
-                        // end hanging in the air over the title.
-                        androidx.compose.animation.SizeTransform(clip = true) { _, _ ->
+                    (EnterTransition.None togetherWith ExitTransition.None).using(
+                        androidx.compose.animation.SizeTransform(clip = false) { _, _ ->
                             androidx.compose.animation.core.spring(
                                 dampingRatio = 0.86f,
                                 stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
@@ -1541,6 +1587,7 @@ private fun FloatingTopBar(
                 },
                 label = "shelf-search-swap"
             ) { open ->
+              FadeInPlace(transition, searchIn, searchOut) {
                 if (open) {
                     SearchField(
                         value = query,
@@ -1565,6 +1612,7 @@ private fun FloatingTopBar(
                         )
                     }
                 }
+              }
             }
 
             // The cursor says the zone: every ring inside turns coral, the library's own
@@ -1671,3 +1719,10 @@ private fun EmptyState(
 
 /** Long enough to cover a focus handover between pills, which takes a frame. */
 private const val HEADER_RELEASE_MS = 120L
+
+/** What the library shows: a layout, a folder or the root, and that view's own entries. */
+private data class LibraryView(
+    val layout: LibraryLayout,
+    val console: Console?,
+    val entries: List<Entry>,
+)

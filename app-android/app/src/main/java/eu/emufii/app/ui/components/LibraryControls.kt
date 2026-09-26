@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -66,6 +67,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import eu.emufii.app.R
+import eu.emufii.app.ui.theme.liftShadow
+import eu.emufii.app.ui.Motion
 import eu.emufii.app.library.LibraryLayout
 import eu.emufii.app.library.LibrarySort
 import eu.emufii.app.ui.theme.CardShape
@@ -80,7 +83,6 @@ import androidx.compose.ui.graphics.SolidColor
 import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.plate
-import eu.emufii.app.ui.LocalGlassPane
 import eu.emufii.app.ui.glass
 import eu.emufii.app.ui.theme.shelfFill
 import eu.emufii.app.ui.tap
@@ -214,11 +216,11 @@ private fun ChipMenu(
         LaunchedEffect(Unit) { appeared = true }
         val opening = expanded && appeared
 
+        val openSpec = Motion.morph<Float>()
+        val closeSpec = Motion.exit<Float>()
         val reveal by animateFloatAsState(
             targetValue = if (opening) 1f else 0f,
-            animationSpec =
-                if (opening) spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessMediumLow)
-                else tween(130, easing = FastOutLinearInEasing),
+            animationSpec = if (opening) openSpec else closeSpec,
             finishedListener = { if (!opening) present = false },
             label = "chip-menu-reveal"
         )
@@ -234,6 +236,7 @@ private fun ChipMenu(
             modifier = Modifier
                 .graphicsLayer {
                     alpha = (reveal * 1.8f).coerceAtMost(1f)
+                    compositingStrategy = CompositingStrategy.ModulateAlpha
                     translationY = (1f - reveal) * (-10.dp.toPx())
                 }
                 // The drawing is clipped, not the layout: the window is placed on its
@@ -244,12 +247,9 @@ private fun ChipMenu(
                     }
                 }
                 .width(210.dp)
-                .shadow(
-                    elevation = if (dark) 0.dp else 26.dp,
-                    shape = shape,
-                    clip = false,
-                    ambientColor = InkText.copy(alpha = 0.10f),
-                    spotColor = InkText.copy(alpha = 0.14f)
+                .liftShadow(
+                    shape, 16.dp, dark, LocalEmufiiOledTheme.current && dark,
+                    fade = { (reveal * 1.8f).coerceAtMost(1f) }
                 )
                 .clip(shape)
                 .background(surface)
@@ -452,7 +452,6 @@ fun SearchField(
         runCatching { field.requestFocus() }
         keyboard?.show()
     }
-    val pane = LocalGlassPane.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -466,15 +465,12 @@ fun SearchField(
             // Glass, like everything else standing on the header. A plate here was the
             // one opaque object left on the pebble.
             .then(
-                if (pane != null) {
-                    Modifier.glass(pane, PillShape, dark, thickness = 0.35f, lift = 3.dp)
-                } else {
+                run {
                     Modifier.plate(
                         PillShape,
                         dark,
                         LocalEmufiiOledTheme.current,
                         lift = 3.dp,
-                        bevel = false,
                         fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark)
                     )
                 }
@@ -538,23 +534,15 @@ fun SearchField(
 @Composable
 fun ToolBank(content: @Composable () -> Unit) {
     val dark = LocalEmufiiDarkTheme.current
-    // Glass when it stands on glass, plastic everywhere else: the bank is used outside
-    // the library's header too, where there is no pane to refract.
-    val pane = LocalGlassPane.current
     Row(
         modifier = Modifier
             .then(
-                if (pane != null) {
-                    // A third of the header's bend: the same figures on a shape this
-                    // small read as a much thicker glass.
-                    Modifier.glass(pane, PillShape, dark, thickness = 0.35f, lift = 3.dp)
-                } else {
+                run {
                     Modifier.plate(
                         shape = PillShape,
                         dark = dark,
                         oled = LocalEmufiiOledTheme.current,
                         lift = 3.dp,
-                        bevel = false,
                         fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark)
                     )
                 }

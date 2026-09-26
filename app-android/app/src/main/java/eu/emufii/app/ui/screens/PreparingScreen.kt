@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,9 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.R
+import eu.emufii.app.ui.TrailerSpinner
 import kotlinx.coroutines.delay
 import eu.emufii.app.ui.components.SoftCard
-import eu.emufii.app.ui.components.waitTrim
 import eu.emufii.app.ui.wallpaper.TrayBackdrop
 import eu.emufii.app.ui.theme.CardShape
 import eu.emufii.app.ui.theme.Coral
@@ -83,7 +82,7 @@ fun PreparingScreen(
         modifier = Modifier.fillMaxSize().padding(24.dp).alpha(appearance),
         contentAlignment = Alignment.Center
     ) {
-        SoftCard(modifier = Modifier.widthIn(max = 360.dp).waitTrim()) {
+        SoftCard(modifier = Modifier.widthIn(max = 360.dp)) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,10 +90,10 @@ fun PreparingScreen(
             ) {
                 // Material's default 40 dp on a 4 dp stroke is sized for a spinner passing
                 // through a list corner; here it is stared at for ten seconds.
-                CircularProgressIndicator(
+                TrailerSpinner(
                     color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 5.dp,
-                    modifier = Modifier.size(54.dp)
+                    size = 54.dp,
+                    stroke = 5.dp
                 )
                 Text(
                     label,

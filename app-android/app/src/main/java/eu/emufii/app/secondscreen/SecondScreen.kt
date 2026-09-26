@@ -61,18 +61,53 @@ object SecondScreen {
         }
     }
 
-    /** Held here because the button that turns it is on the front screen. */
-    private val _page = MutableStateFlow(0)
-    val page: StateFlow<Int> = _page.asStateFlow()
+    /**
+     * Held here because the button that turns it is on the front screen. Tagged with
+     * the game it belongs to: the model and the page travel in two flows, and a face
+     * must never read another game's page.
+     */
+    private val _page = MutableStateFlow(PanelPage(null, 0))
+    val page: StateFlow<PanelPage> = _page.asStateFlow()
+
+    /**
+     * The screenshot viewer over the panel: null when closed, else the picture shown. Held
+     * here with the page, the pad that drives it being the front screen's.
+     * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The rear panel
+     */
+    private val _gallery = MutableStateFlow<Int?>(null)
+    val gallery: StateFlow<Int?> = _gallery.asStateFlow()
+
+    /** How many pictures the details page has; written by the panel, zero on other pages. */
+    @Volatile
+    var galleryCount: Int = 0
+
+    fun openGallery(): Boolean {
+        if (_page.value.index != 1 || galleryCount == 0 || _gallery.value != null) return false
+        _gallery.value = 0
+        return true
+    }
+
+    fun closeGallery() {
+        _gallery.value = null
+    }
+
+    fun moveGallery(step: Int) {
+        val at = _gallery.value ?: return
+        _gallery.value = (at + step).coerceIn(0, (galleryCount - 1).coerceAtLeast(0))
+    }
 
     fun publish(model: SecondScreenModel) {
-        if (!sameGame(_base.value, model)) _page.value = 0
+        if (!sameGame(_base.value, model)) {
+            _page.value = PanelPage((model as? SecondScreenModel.Browsing)?.rom?.uri?.toString(), 0)
+            _gallery.value = null
+        }
         _base.value = model
         refresh()
     }
 
     fun flipPage() {
-        if (_base.value is SecondScreenModel.Browsing) _page.value = 1 - _page.value
+        _gallery.value = null
+        if (_base.value is SecondScreenModel.Browsing) _page.value = _page.value.let { it.copy(index = 1 - it.index) }
     }
 
     /**
@@ -137,7 +172,7 @@ object SecondScreen {
     fun clear() {
         _base.value = SecondScreenModel.Idle
         refresh()
-        _page.value = 0
+        _page.value = PanelPage(null, 0)
         _steps.value = emptyList()
         _stepCursor.value = null
     }
@@ -182,6 +217,10 @@ data class PanelStep(
     val done: Boolean,
     val enabled: Boolean,
     val onPress: () -> Unit,
+    /** The automation is driving the emulator for this step right now. */
+    val busy: Boolean = false,
+    /** A guest's step, greyed until the host has done theirs. */
+    val waiting: Boolean = false,
 )
 
 /**
@@ -261,3 +300,6 @@ sealed interface SecondScreenModel {
         val port: String? = null,
     ) : SecondScreenModel
 }
+
+/** The rear page, and the game (its uri) it was turned for. */
+data class PanelPage(val rom: String?, val index: Int)

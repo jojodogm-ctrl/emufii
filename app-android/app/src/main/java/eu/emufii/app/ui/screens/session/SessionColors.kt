@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.session
 
+import eu.emufii.app.ui.theme.Teal
 import androidx.compose.runtime.Composable
 import eu.emufii.app.ui.theme.Coral
 import eu.emufii.app.ui.theme.ErrorDark
@@ -15,4 +16,4 @@ internal fun danger() = if (LocalEmufiiDarkTheme.current) ErrorDark else ErrorLi
 internal fun good() = if (LocalEmufiiDarkTheme.current) GoodDark else GoodLight
 
 @Composable
-internal fun coralText() = if (LocalEmufiiDarkTheme.current) Coral.darkBright else Coral.ink
+internal fun coralText() = if (LocalEmufiiDarkTheme.current) Teal.darkBright else Teal.ink

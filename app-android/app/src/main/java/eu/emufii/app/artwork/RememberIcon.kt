@@ -48,7 +48,13 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
     val folder by settings.frontendFolder.collectAsStateWithLifecycle()
     val frontend by settings.artworkFrontend.collectAsStateWithLifecycle()
     val revision by ArtworkStore.revision.collectAsStateWithLifecycle()
-    val state = remember(rom.uri) { mutableStateOf(TileArt(null, rom.iconFile)) }
+    // Starts from the last cover resolved for this game, not from its bare icon: the launch
+    // card composes its own copy of the cover, and for the frames before the lookup
+    // answered it showed the ROM's icon on white in the middle of the flight.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
+    val state = remember(rom.uri) {
+        mutableStateOf(resolvedArt[rom.uri] ?: TileArt(null, rom.iconFile))
+    }
 
     LaunchedEffect(rom.uri, apiKey, folder, frontend, revision) {
         // The frontend comes before the catalogue, and the player's own choice before the
@@ -74,7 +80,12 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
         // lookup or a manual pick against a local tree — and gets whole-image display.
         // SteamGridDB choices stay cropped.
         val fromFrontend = !remote.startsWith("http")
-        state.value = TileArt(remote, rom.iconFile, fromFrontend)
+        val art = TileArt(remote, rom.iconFile, fromFrontend)
+        resolvedArt[rom.uri] = art
+        state.value = art
     }
     return state
 }
+
+/** The last art resolved per game, so a second place showing it starts where the first ended. */
+private val resolvedArt = java.util.concurrent.ConcurrentHashMap<android.net.Uri, TileArt>()

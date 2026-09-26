@@ -73,7 +73,6 @@ import eu.emufii.app.ui.components.PrimaryButton
 import eu.emufii.app.ui.components.SignalMark
 import eu.emufii.app.ui.components.SoftCard
 import eu.emufii.app.ui.components.SteamGridDbMark
-import eu.emufii.app.ui.components.waitTrim
 import eu.emufii.app.ui.screens.settings.AutofillBlock
 import eu.emufii.app.ui.screens.settings.BlockFact
 import eu.emufii.app.ui.screens.settings.BlockNotice
@@ -414,7 +413,7 @@ private fun StepLayout(
 
     when {
         work == null -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            SoftCard(modifier = Modifier.waitTrim()) {
+            SoftCard(modifier = Modifier) {
                 Box(Modifier.fillMaxWidth().padding(26.dp)) { why(Modifier.fillMaxWidth()) }
             }
         }
@@ -491,7 +490,7 @@ private fun LogoMark(size: Dp = 96.dp) {
 /** Emulator pages lay the settings block here instead. */
 @Composable
 private fun WorkCard(content: @Composable () -> Unit) {
-    SoftCard(modifier = Modifier.waitTrim()) {
+    SoftCard(modifier = Modifier) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(22.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)

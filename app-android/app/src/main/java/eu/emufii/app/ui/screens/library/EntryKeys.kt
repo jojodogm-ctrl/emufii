@@ -24,6 +24,22 @@ internal fun entryKeys(
     hold: ConfirmHold,
     directions: (Key) -> Boolean?,
 ): (KeyEvent) -> Boolean = keys@{ event ->
+    // The panel's screenshot viewer, while open, takes the pad: left and right browse it,
+    // B or A closes it, and nothing reaches the grid underneath.
+    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The rear panel
+    if (SecondScreen.gallery.value != null) {
+        if (event.type == KeyEventType.KeyDown) {
+            when (event.key) {
+                Key.DirectionLeft -> { Sfx.hover(); SecondScreen.moveGallery(-1) }
+                Key.DirectionRight -> { Sfx.hover(); SecondScreen.moveGallery(1) }
+                Key.ButtonB, Key.Back, Key.ButtonX, Key.ButtonA, Key.Enter ->
+                    { Sfx.click(); SecondScreen.closeGallery() }
+                Key.ButtonR1 -> SecondScreen.flipPage()
+                else -> Unit
+            }
+        }
+        return@keys true
+    }
     // The one key read on the way up as well as down: that separates a press from a
     // hold, everything else being decided on KeyDown.
     if (event.key in CONFIRM_KEYS) {
@@ -68,6 +84,8 @@ internal fun entryKeys(
         Key.ButtonR1 -> {
             SecondScreen.flipPage(); true
         }
+        // X opens the screenshots of the details page, when it has any.
+        Key.ButtonX -> SecondScreen.openGallery().also { if (it) Sfx.click() }
 
         else -> false
     }

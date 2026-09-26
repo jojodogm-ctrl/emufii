@@ -1,5 +1,10 @@
 package eu.emufii.app.ui.components
 
+import eu.emufii.app.ui.theme.LocalShadowFade
+import eu.emufii.app.ui.ShadowsFollow
+import androidx.compose.ui.graphics.CompositingStrategy
+import eu.emufii.app.ui.theme.liftShadow
+import eu.emufii.app.ui.Motion
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -96,18 +101,15 @@ fun TileMenu(
         LaunchedEffect(Unit) { appeared = true }
         val opening = expanded && appeared
 
+        val openSpec = Motion.morph<Float>()
+        val closeSpec = Motion.exit<Float>()
         // An unroll, not a scale: the former `scaleIn` grew the card already whole from
         // 82 %, so it existed before it had arrived.
         val reveal by animateFloatAsState(
             targetValue = if (opening) 1f else 0f,
             // The exit is not the entrance reversed: opening presents something to read,
             // closing only frees the screen, so it goes quickly and without bounce.
-            animationSpec =
-                if (opening) spring(
-                    dampingRatio = 0.85f,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-                else tween(130, easing = FastOutLinearInEasing),
+            animationSpec = if (opening) openSpec else closeSpec,
             // The window is withdrawn only once the unroll has closed back up.
             finishedListener = { if (!opening) present = false },
             label = "menu-reveal"
@@ -124,6 +126,7 @@ fun TileMenu(
                     // Opacity runs ahead of the sweep: without it the first pixel revealed
                     // arrives at full strength and snaps.
                     alpha = (reveal * 1.8f).coerceAtMost(1f)
+                    compositingStrategy = CompositingStrategy.ModulateAlpha
                     translationX =
                         (1f - reveal) * SLIDE.toPx() * (if (openLeft) 1f else -1f)
                 }
@@ -138,11 +141,15 @@ fun TileMenu(
                 }
         ) {
             if (openLeft) {
-                MenuCard(title, changeIconLabel, renameLabel, hideLabel, surface, dark, onChangeIcon, onRename, onHide)
+                ShadowsFollow({ (reveal * 1.8f).coerceAtMost(1f) }) {
+                    MenuCard(title, changeIconLabel, renameLabel, hideLabel, surface, dark, onChangeIcon, onRename, onHide)
+                }
                 Tail(tail, pointsLeft = false)
             } else {
                 Tail(tail, pointsLeft = true)
-                MenuCard(title, changeIconLabel, renameLabel, hideLabel, surface, dark, onChangeIcon, onRename, onHide)
+                ShadowsFollow({ (reveal * 1.8f).coerceAtMost(1f) }) {
+                    MenuCard(title, changeIconLabel, renameLabel, hideLabel, surface, dark, onChangeIcon, onRename, onHide)
+                }
             }
         }
     }
@@ -166,14 +173,7 @@ private fun MenuCard(
     Column(
         modifier = Modifier
             .width(206.dp)
-            .shadow(
-                elevation = if (dark) 0.dp else 26.dp,
-                shape = shape,
-                clip = false,
-                // Warm black, the duotone world's shadow ink.
-                ambientColor = InkText.copy(alpha = 0.10f),
-                spotColor = InkText.copy(alpha = 0.14f)
-            )
+            .liftShadow(shape, 16.dp, dark, fade = LocalShadowFade.current)
             .clip(shape)
             .background(surface)
             .padding(vertical = 8.dp),
