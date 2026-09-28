@@ -45,12 +45,6 @@
     <string name="lib_join_by_code">Rejoindre par code</string>
     <string name="launch_mode_online">%1$s · jeu en ligne</string>
     <string name="launch_mode_session">%1$s · session à plusieurs</string>
-    <string name="launch_online_1">Emufii dirige melonDS vers Kaeru</string>
-    <string name="launch_online_2">Le jeu s\'ouvre tout seul</string>
-    <string name="launch_online_3">Tu joues en ligne, sans rien régler</string>
-    <string name="launch_session_1">Emufii ouvre une session et donne un code</string>
-    <string name="launch_session_2">Tes amis le saisissent pour te rejoindre</string>
-    <string name="launch_session_3">Les consoles se voient comme en Wi-Fi local</string>
     <string name="psp_online_title">Jouer en ligne</string>
     <string name="psp_online_what_body">Tu joues avec des inconnus, sur un serveur public tenu par des tiers. Emufii ne crée aucune session et ne monte aucun tunnel : elle ouvre PPSSPP, et c\'est lui qui te connecte.</string>
     <string name="psp_online_steps_title">À faire, une fois pour toutes</string>
@@ -62,11 +56,8 @@
     <string name="psp_online_open_again">1. Rouvrir PPSSPP pour le paramétrage</string>
     <string name="psp_online_launch_game">2. Lancer le jeu</string>
     <string name="lib_open_emulator">Voir la marche à suivre</string>
-    <string name="lib_mode_friends">Entre amis</string>
+    <string name="lib_mode_friends">Jeu sans fil</string>
     <string name="lib_mode_public">En ligne</string>
-    <string name="launch_psp_public_1">Emufii ne crée aucune session : ce mode ne passe pas par elle.</string>
-    <string name="launch_psp_public_2">Emufii t’ouvre PPSSPP pour le régler, puis le jeu, dans cet ordre.</string>
-    <string name="launch_psp_public_3">Dans le jeu, prends le mode ad hoc : tu tombes sur les joueurs déjà connectés.</string>
     <string name="lib_play_online">Jouer en ligne</string>
 
     <!-- Session -->
@@ -417,8 +408,8 @@
     <string name="session_dolphin_lobby">2. Revenir au salon Dolphin</string>
     <string name="session_dolphin_lobby_opened">Retour au salon Dolphin</string>
     <!-- PS2: ARMSX2's LAN, which has nothing to do with its online play -->
-    <string name="launch_ps2_profile_missing">Il manque le profil réseau PS2. Ouvre les réglages d\'Emufii, ligne « Profil réseau PS2 » : sans lui, aucun jeu LAN de PS2 n\'ouvre son menu local.</string>
-    <string name="launch_ppsspp_setup_missing">Il manque le paramétrage PPSSPP. Ouvre les réglages d\'Emufii, ligne « Paramétrage automatique PPSSPP » : sans lui, une session PSP ne rejoint jamais le salon ad hoc du jeu.</string>
+    <string name="launch_ps2_profile_missing">Il manque le profil réseau PS2</string>
+    <string name="launch_ppsspp_setup_missing">PPSSPP n’est pas encore paramétré</string>
     <string name="settings_row_ps2_profile">Profil réseau PS2</string>
     <string name="settings_row_ppsspp_config">Paramétrage automatique PPSSPP</string>
     <string name="settings_ppsspp_config_not_ready">Le dossier mémorisé est indisponible ou n’est plus accessible en écriture.</string>
@@ -677,4 +668,11 @@
     <string name="console_games_ds">Les jeux *Nintendo Wi-Fi Connection* : Mario Kart DS, Pokémon…</string>
     <string name="console_games_ps2">La *soixantaine* de jeux au mode LAN</string>
     <string name="console_games_dolphin">Tous les jeux *multijoueur en local* : Smash Bros. Brawl, Mario Kart…</string>
+    <string name="psp_server_label">Serveur</string>
+    <string name="psp_server_finding">Recherche des joueurs…</string>
+    <string name="psp_server_players">%1$d sur ce jeu</string>
+    <string name="psp_server_nobody">Personne sur ce jeu pour l’instant</string>
+    <string name="psp_server_unknown">Pas de compteur en direct</string>
+    <string name="launch_ppsspp_setup_hint">Réglages → Paramétrage automatique PPSSPP</string>
+    <string name="launch_ps2_profile_hint">Réglages → Profil réseau PS2</string>
 </resources>

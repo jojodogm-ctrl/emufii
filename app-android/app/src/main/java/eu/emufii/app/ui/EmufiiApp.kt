@@ -221,6 +221,12 @@ fun EmufiiApp(settings: SettingsStore) {
     var screen by remember {
         mutableStateOf(if (onProfilePage) Screen.ProfileAndSettings else Screen.Library)
     }
+    // In composition, before the new screen's cursor lands: see `Sfx.settle`.
+    var settledFor by remember { mutableStateOf<Screen?>(null) }
+    if (settledFor != screen) {
+        settledFor = screen
+        Sfx.settle()
+    }
     // The gate must not re-arm while a session lives, or returning lands on the logo.
     SideEffect {
         SplashGate.sessionAlive =
@@ -618,8 +624,12 @@ fun EmufiiApp(settings: SettingsStore) {
                         }
                 )
             )
-            return@LaunchedEffect
         }
+    }
+    // Keyed on the screen alone: under the friends key, a status landing after launch
+    // published Idle over the game the library had just announced.
+    LaunchedEffect(screen) {
+        if (screen is Screen.Friends) return@LaunchedEffect
         SecondScreen.publish(
             (screen as? Screen.InSession)?.session?.let { active ->
                 SecondScreenModel.InSession(
@@ -788,21 +798,28 @@ fun EmufiiApp(settings: SettingsStore) {
                 onOpenFinder = { screen = Screen.Finder },
                 // DS online play shares nothing with the session flow: no code to create,
                 // none to join.
-                onCreate = { rom, private ->
-                    if (rom.console.backend == Backend.MELONDS_WFC) screen = Screen.Wfc(rom)
-                    else startHostSession(rom, private)
-                },
-                onJoinWith = { rom ->
-                    screen = if (rom.console.backend == Backend.MELONDS_WFC) {
-                        Screen.Wfc(rom)
-                    }
-                    else {
-                        Screen.Join(rom.toRef())
-                    }
-                },
+                onCreate = { rom, private -> startHostSession(rom, private) },
+                onJoinWith = { rom -> screen = Screen.Join(rom.toRef()) },
                 // No session, no tunnel: the player picks a server inside PPSSPP.
                 // pourquoi : docs/decisions/lancement-et-navigation.md § Two routes that are not sessions
-                onPlayPublic = { rom -> screen = Screen.PspOnline(rom) },
+                // DS online play is Kaeru WFC, the second route next to the session.
+                onPlayPublic = { rom ->
+                    if (rom.console == Console.DS) {
+                        screen = Screen.Wfc(rom)
+                    } else {
+                        // Straight into the game when its INI can be written; the manual
+                        // screen stays for a memory stick Emufii cannot reach.
+                        when (val launched = eu.emufii.app.psp.PpssppLauncher(context).launchAutoPublic(rom)) {
+                            null -> screen = Screen.PspOnline(rom)
+                            eu.emufii.app.azahar.LaunchResult.Success -> Unit
+                            eu.emufii.app.azahar.LaunchResult.NotInstalled ->
+                                fail(context.getString(R.string.err_not_installed, "PPSSPP"))
+                            is eu.emufii.app.azahar.LaunchResult.Error ->
+                                fail(context.getString(R.string.err_generic, launched.message))
+                            else -> Unit
+                        }
+                    }
+                },
                 onFolderPicked = { uri -> changeLibraryFolder(uri) },
                 libraryRevision = libraryRevision
             )

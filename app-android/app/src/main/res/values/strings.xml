@@ -54,12 +54,6 @@
     <string name="lib_join_by_code">Join with a code</string>
     <string name="launch_mode_online">%1$s · online play</string>
     <string name="launch_mode_session">%1$s · multiplayer session</string>
-    <string name="launch_online_1">Emufii points melonDS at Kaeru</string>
-    <string name="launch_online_2">The game opens on its own</string>
-    <string name="launch_online_3">You play online, nothing to set up</string>
-    <string name="launch_session_1">Emufii opens a session and gives you a code</string>
-    <string name="launch_session_2">Your friends type it in to join you</string>
-    <string name="launch_session_3">The consoles see each other as on local Wi-Fi</string>
     <string name="psp_online_title">Play online</string>
     <string name="psp_online_what_body">You play with strangers, on a public server run by third parties. Emufii creates no session and brings up no tunnel: it opens PPSSPP, and PPSSPP is what connects you.</string>
     <string name="psp_online_steps_title">To do, once and for all</string>
@@ -71,11 +65,8 @@
     <string name="psp_online_open_again">1. Reopen PPSSPP for setup</string>
     <string name="psp_online_launch_game">2. Launch the game</string>
     <string name="lib_open_emulator">See what to do</string>
-    <string name="lib_mode_friends">With friends</string>
+    <string name="lib_mode_friends">Wireless play</string>
     <string name="lib_mode_public">Online</string>
-    <string name="launch_psp_public_1">Emufii creates no session: this mode does not go through it.</string>
-    <string name="launch_psp_public_2">Emufii opens PPSSPP for you to set up, then the game, in that order.</string>
-    <string name="launch_psp_public_3">In the game, take ad hoc mode: you land among the players already connected.</string>
     <string name="lib_play_online">Play online</string>
 
     <!-- Session -->
@@ -393,8 +384,8 @@
     <string name="hint_dolphin_manual">In Dolphin, ⋮ menu then Netplay: direct connection, and enter %1$s.</string>
     <string name="session_dolphin_lobby">2. Back to the Dolphin lobby</string>
     <string name="session_dolphin_lobby_opened">Back to the Dolphin lobby</string>
-    <string name="launch_ps2_profile_missing">The PS2 network profile is missing. Open Emufii\'s settings, "PS2 network profile": without it, no PS2 LAN game will open its local menu.</string>
-    <string name="launch_ppsspp_setup_missing">The PPSSPP setup is missing. Open Emufii\'s settings, "Automatic PPSSPP setup": without it, a PSP session never joins the game\'s ad hoc lobby.</string>
+    <string name="launch_ps2_profile_missing">The PS2 network profile is missing</string>
+    <string name="launch_ppsspp_setup_missing">PPSSPP isn’t set up yet</string>
     <string name="settings_row_ps2_profile">PS2 network profile</string>
     <string name="settings_row_ppsspp_config">PPSSPP automatic setup</string>
     <string name="settings_ppsspp_config_not_ready">The saved folder is unavailable or no longer writable.</string>
@@ -675,4 +666,11 @@
     <string name="console_games_ds">Games with *Nintendo Wi-Fi Connection*: Mario Kart DS, Pokémon…</string>
     <string name="console_games_ps2">The *60 or so* games with a LAN mode</string>
     <string name="console_games_dolphin">Every game with *local multiplayer*: Smash Bros. Brawl, Mario Kart…</string>
+    <string name="psp_server_label">Server</string>
+    <string name="psp_server_finding">Looking for where players are…</string>
+    <string name="psp_server_players">%1$d playing this game</string>
+    <string name="psp_server_nobody">Nobody on this game right now</string>
+    <string name="psp_server_unknown">No live count</string>
+    <string name="launch_ppsspp_setup_hint">Settings → Automatic PPSSPP setup</string>
+    <string name="launch_ps2_profile_hint">Settings → PS2 network profile</string>
 </resources>

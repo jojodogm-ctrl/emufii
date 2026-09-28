@@ -71,6 +71,21 @@ class PpssppConfigStore(context: Context) {
         productCode: String?,
         filename: String?,
         displayName: String?,
+    ): PpssppConfigResult = apply(productCode, filename, displayName, PpssppIni::privateConfig)
+
+    /** Public ad hoc on PPSSPP's default server; restored like the private values. */
+    fun applyPublic(
+        productCode: String?,
+        filename: String?,
+        displayName: String?,
+        host: String,
+    ): PpssppConfigResult = apply(productCode, filename, displayName) { PpssppIni.publicConfig(it, host) }
+
+    private fun apply(
+        productCode: String?,
+        filename: String?,
+        displayName: String?,
+        edit: (String) -> String,
     ): PpssppConfigResult {
         val id = PpssppIni.resolveDiscId(productCode, filename, displayName)
             ?: return PpssppConfigResult.UnknownDiscId
@@ -90,7 +105,7 @@ class PpssppConfigStore(context: Context) {
                 target = system.createFile("application/octet-stream", name)
                     ?: error("PPSSPP game config could not be created")
             }
-            writeVerified(target, PpssppIni.privateConfig(current))
+            writeVerified(target, edit(current))
             PpssppConfigResult.Success
         }.getOrElse { PpssppConfigResult.Failure(it.message ?: it.javaClass.simpleName) }
     }

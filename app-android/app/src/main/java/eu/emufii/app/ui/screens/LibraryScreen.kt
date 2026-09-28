@@ -448,14 +448,13 @@ fun LibraryScreen(
                 onPrimary = { private -> onCreate(rom, private) },
                 // DS online play has no session to create or join: each console dials the
                 // revival server itself.
-                onJoinWithCode =
-                    if (rom.console.backend == Backend.MELONDS_WFC) null
-                    else ({ state.clearSelection(); onJoinWith(rom) }),
+                onJoinWithCode = { state.clearSelection(); onJoinWith(rom) },
                 // The PSP's public ad hoc: a second kind of multiplayer, hence
                 // its own button. (PS2's was set aside, see docs.)
                 // pourquoi : docs/decisions/bibliotheque.md § The veils, and why the launch card is where it is
                 onPlayOnline =
-                    if (rom.console.backend == Backend.PPSSPP) ({ onPlayPublic(rom) })
+                    if (rom.console.backend == Backend.PPSSPP || rom.console.backend == Backend.MELONDS)
+                        ({ onPlayPublic(rom) })
                     else null
             )
         }

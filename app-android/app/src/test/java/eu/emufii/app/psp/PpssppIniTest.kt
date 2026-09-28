@@ -9,6 +9,19 @@ import org.junit.Test
 class PpssppIniTest {
 
     @Test
+    fun `public config points a private game back at PPSSPP's default server`() {
+        val privateFile = PpssppIni.privateConfig("[Network]\nPortOffset = 10000\n")
+        val after = PpssppIni.publicConfig(privateFile)
+
+        assertTrue(after.contains("EnableWlan = True"))
+        assertTrue(after.contains("EnableAdhocServer = True"))
+        assertTrue(after.contains("proAdhocServer = socom.cc"))
+        assertTrue(after.contains("AdhocServerRelayMode = 0"))
+        assertFalse(after.contains("10.66.1.1"))
+        assertTrue(after.contains("PortOffset = 10000"))
+    }
+
+    @Test
     fun `private config changes only the four network keys`() {
         val before = """
             ; Castlevania settings

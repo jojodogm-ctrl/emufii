@@ -409,8 +409,17 @@ internal class SessionScreenState(
                 result to "ARMSX2"
             }
 
-            Backend.MELONDS_WFC ->
-                return context.getString(R.string.session_wfc_launch_from_library)
+            // No room step: WatermelonDS waits for the other player itself.
+            Backend.MELONDS -> {
+                if (session.hostIp.isBlank()) return context.getString(R.string.session_netplay_no_address)
+                eu.emufii.app.wfc.MelonDs(context).launchNetplay(
+                    rom.uri,
+                    isHost = session.role == Session.Role.HOST,
+                    hostAddress = session.hostIp,
+                    // everyone in the session when the host launches, the host included
+                    players = _members.value.size
+                ) to "WatermelonDS"
+            }
 
             Backend.NONE -> return context.getString(R.string.session_unsupported_console)
         }

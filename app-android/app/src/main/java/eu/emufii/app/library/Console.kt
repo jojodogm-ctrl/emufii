@@ -31,7 +31,7 @@ enum class Console(
     DS(
         label = "DS",
         extensions = setOf("nds", "dsi", "ids", "srl"),
-        backend = Backend.MELONDS_WFC
+        backend = Backend.MELONDS
     ),
 
     SWITCH(
@@ -147,11 +147,13 @@ enum class Backend {
     PPSSPP,
 
     /**
-     * Kaeru WFC, reached by moving DNS rather than building a network: no session
-     * code, no tunnel, each console talks to the revival server.
+     * Two routes, like the PSP. A session is WatermelonDS's netplay: each phone
+     * emulates both consoles, and only inputs cross the tunnel, to the host's
+     * address on [defaultNetplayPort]. Online play is Kaeru WFC, reached by moving
+     * DNS rather than building a network: no session code, no tunnel.
      * pourquoi : docs/decisions/reglages-et-consoles.md § The four multiplayer families
      */
-    MELONDS_WFC,
+    MELONDS,
 
     /**
      * Dolphin's own netplay: Compose screen, no view ids, its own driver, and
@@ -197,6 +199,8 @@ enum class Backend {
             // ARMSX2's own screen says "there is no automatic negotiation": both
             // ends have to carry this port.
             ARMSX2 -> eu.emufii.app.ps2.Ps2Target.DEFAULT_PORT
+            // WatermelonDS's netplay, fixed on both ends
+            MELONDS -> eu.emufii.app.wfc.MelonDsPackage.NETPLAY_PORT
             else -> eu.emufii.app.netplay.NetplayUi.DEFAULT_PORT
         }
 
@@ -204,7 +208,7 @@ enum class Backend {
         AZAHAR -> "Azahar"
         EDEN -> "Eden"
         PPSSPP -> "PPSSPP"
-        MELONDS_WFC -> "melonDS"
+        MELONDS -> "melonDS"
         DOLPHIN -> "Dolphin"
         ARMSX2 -> "ARMSX2"
         NONE -> ""

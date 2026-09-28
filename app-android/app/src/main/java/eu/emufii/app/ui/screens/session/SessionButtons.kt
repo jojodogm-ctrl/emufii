@@ -404,6 +404,7 @@ internal fun launchLabel(
     session.backend == Backend.AZAHAR ||
             session.backend == Backend.EDEN ||
             session.backend == Backend.PPSSPP ||
+            session.backend == Backend.MELONDS ||
             // The PS2 is included: ARMSX2's `MainActivity` is exported and takes a `content://`.
             session.backend == Backend.ARMSX2 ->
         // Numbered only where a step 1 sits above it.
@@ -412,7 +413,6 @@ internal fun launchLabel(
             else R.string.session_launch_emulation
         )
 
-    session.backend == Backend.MELONDS_WFC -> stringResource(R.string.session_wfc_not_a_session)
     // Dolphin has no step 2, and saying so beats "not yet supported".
     // pourquoi : docs/decisions/session.md § The per-console cards, and what each must prevent
     session.backend == Backend.DOLPHIN -> stringResource(R.string.session_dolphin_lobby)

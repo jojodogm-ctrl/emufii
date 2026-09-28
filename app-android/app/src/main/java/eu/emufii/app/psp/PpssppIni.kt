@@ -10,6 +10,18 @@ internal val PRIVATE_NETWORK = linkedMapOf(
     "AdhocServerRelayMode" to "2",
 )
 
+/**
+ * PPSSPP's own defaults for public ad hoc: `socom.cc` is `DefaultProAdhocServer()` in
+ * `Core/Config.cpp`, and Auto relay is what its `aemu_postoffice` relay wants. The same
+ * four keys as [PRIVATE_NETWORK], so one backup covers both modes.
+ */
+internal val PUBLIC_NETWORK = linkedMapOf(
+    "EnableWlan" to "True",
+    "EnableAdhocServer" to "True",
+    "proAdhocServer" to "socom.cc",
+    "AdhocServerRelayMode" to "0",
+)
+
 internal data class PpssppIniValue(val present: Boolean, val value: String = "")
 
 internal data class PpssppNetworkSnapshot(
@@ -29,6 +41,11 @@ internal object PpssppIni {
     fun privateConfig(source: String): String = rewrite(
         source,
         PRIVATE_NETWORK.mapValues { (_, value) -> value },
+    )
+
+    fun publicConfig(source: String, host: String = PspServers.DEFAULT_HOST): String = rewrite(
+        source,
+        PUBLIC_NETWORK.mapValues { (key, value) -> if (key == "proAdhocServer") host else value },
     )
 
     fun snapshot(source: String, fileExisted: Boolean): PpssppNetworkSnapshot {

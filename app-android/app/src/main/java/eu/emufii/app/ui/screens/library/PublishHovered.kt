@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import eu.emufii.app.compat.LocalCompatDb
 import eu.emufii.app.library.RomTagReader
 import eu.emufii.app.library.compatKeys
@@ -32,12 +34,13 @@ internal fun PublishHovered(entries: List<Entry>, cursor: State<Int>) {
     val folder = (entry as? Entry.Folder)?.console
     val db = LocalCompatDb.current
     val meta = LocalGameMetaDb.current
+    val published = remember { mutableStateOf<SecondScreenModel?>(null) }
     LaunchedEffect(hovered, folder, db, meta) {
         // Cancelled and restarted on each move: only what the player stopped on is
         // announced.
         // pourquoi : docs/decisions/bibliotheque.md § What is published to the second screen
         delay(SECOND_SCREEN_SETTLE_MS.milliseconds)
-        SecondScreen.publish(
+        val face =
             folder?.let { SecondScreenModel.ConsoleFolder(it) } ?: hovered?.let { rom ->
                 SecondScreenModel.Browsing(
                     rom = rom,
@@ -48,7 +51,8 @@ internal fun PublishHovered(entries: List<Entry>, cursor: State<Int>) {
                     meta = meta.metaFor(rom.compatKeys()),
                 )
             } ?: SecondScreenModel.Idle
-        )
+        published.value = face
+        SecondScreen.publish(face)
     }
-    DisposableEffect(Unit) { onDispose { SecondScreen.clear() } }
+    DisposableEffect(Unit) { onDispose { SecondScreen.clearIfShowing(published.value) } }
 }

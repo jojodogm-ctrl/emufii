@@ -29,8 +29,18 @@ data class CompatEntry(
     val name: String,
     val rating: CompatRating,
     val note: String? = null,
-    val keys: List<String>
+    val keys: List<String>,
+    /** DS only: the verdict over Wi-Fi Connection, apart from local wireless play. */
+    val online: CompatRating? = null,
+    /** DS only: the file's own `rating`, local wireless play. [rating] is then the better of the two, for the tile. */
+    val wireless: CompatRating? = null
 )
+
+/** Best first: a game that works in one mode is not a broken game. */
+private val RANK = listOf(CompatRating.PERFECT, CompatRating.PARTIAL, CompatRating.UNTESTED, CompatRating.BROKEN)
+
+private fun better(a: CompatRating, b: CompatRating?): CompatRating =
+    if (b == null || RANK.indexOf(a) <= RANK.indexOf(b)) a else b
 
 /** Flattened on parse: the library draws hundreds of tiles per scroll, each asking this. */
 class CompatDb private constructor(
@@ -58,11 +68,14 @@ class CompatDb private constructor(
                 val keys = (0 until keysArray.length())
                     .mapNotNull { keysArray.optString(it).trim().takeIf(String::isNotEmpty) }
                 if (keys.isEmpty()) continue
+                val online = CompatRating.fromName(obj.optString("online"))
                 val entry = CompatEntry(
                     name = obj.optString("name").ifBlank { keys.first() },
-                    rating = rating,
+                    rating = better(rating, online),
                     note = obj.optString("note").takeIf { it.isNotBlank() && it != "null" },
-                    keys = keys
+                    keys = keys,
+                    online = online,
+                    wireless = rating.takeIf { online != null }
                 )
                 // First writer wins: a duplicated key is a no-op, not a verdict that
                 // depends on file order.

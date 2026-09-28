@@ -79,7 +79,8 @@ internal fun EmulatorHintCard(
         )
 
         Backend.PPSSPP -> Unit
-        Backend.MELONDS_WFC -> WfcNotASessionCard()
+        // nothing to type: the address travels in the launch
+        Backend.MELONDS -> Unit
         Backend.NONE -> UnsupportedHintCard(session.console?.label)
     }
 }

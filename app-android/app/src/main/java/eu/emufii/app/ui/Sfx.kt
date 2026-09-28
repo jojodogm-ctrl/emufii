@@ -64,7 +64,25 @@ object Sfx {
         pool = p
     }
 
-    fun hover() = play(hoverId, HOVER_VOLUME)
+    /**
+     * A screen arriving places its cursor in two steps (the first focusable, then the
+     * remembered one), and each landing sounded: one hover per arrival, not two.
+     */
+    private var settleUntil = 0L
+    private var settledHoverPlayed = false
+
+    fun settle(windowMs: Long = 400) {
+        settleUntil = android.os.SystemClock.uptimeMillis() + windowMs
+        settledHoverPlayed = false
+    }
+
+    fun hover() {
+        if (android.os.SystemClock.uptimeMillis() < settleUntil) {
+            if (settledHoverPlayed) return
+            settledHoverPlayed = true
+        }
+        play(hoverId, HOVER_VOLUME)
+    }
 
     fun click() = play(clickId, CLICK_VOLUME)
 

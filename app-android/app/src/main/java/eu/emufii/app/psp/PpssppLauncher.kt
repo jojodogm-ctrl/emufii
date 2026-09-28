@@ -81,6 +81,26 @@ class PpssppLauncher(private val context: Context) {
         return launchGame(rom.uri)
     }
 
+    /**
+     * The one-tap online route: the game's own INI points at the public server, so
+     * nothing is set by hand. Null when it cannot be written; the caller then falls back
+     * on the manual screen.
+     */
+    fun launchAutoPublic(rom: Rom): LaunchResult? {
+        if (installedPackage() == null) return LaunchResult.NotInstalled
+        return when (val prepared = config.applyPublic(
+            rom.productCode, rom.filename, rom.displayName,
+            PspServers.chosenHost ?: PspServers.DEFAULT_HOST,
+        )) {
+            PpssppConfigResult.Success -> launchGame(rom.uri)
+            PpssppConfigResult.NotConfigured,
+            PpssppConfigResult.PermissionMissing,
+            PpssppConfigResult.InvalidRoot,
+            PpssppConfigResult.UnknownDiscId -> null
+            else -> prepared.asLaunchError()
+        }
+    }
+
     /** Restore before showing settings, otherwise PPSSPP displays Emufii's private values. */
     fun openPublicSettings(rom: Rom): LaunchResult {
         if (installedPackage() == null) return LaunchResult.NotInstalled

@@ -35,7 +35,7 @@ class NetplayNamesTest {
         // form refused the whole dialog while blaming the address.
         assertNull(NetplayNames.usernameFor(Backend.AZAHAR, "Clossv"))
         assertNull(NetplayNames.usernameFor(Backend.PPSSPP, "Clossv"))
-        assertNull(NetplayNames.usernameFor(Backend.MELONDS_WFC, "Clossv"))
+        assertNull(NetplayNames.usernameFor(Backend.MELONDS, "Clossv"))
     }
 
     @Test

@@ -177,6 +177,15 @@ object SecondScreen {
         _stepCursor.value = null
     }
 
+    /**
+     * A leaving publisher clears only its own face: the library's old grid is disposed
+     * at the end of its exit animation, after the new grid has already published.
+     */
+    @Synchronized
+    fun clearIfShowing(model: SecondScreenModel?) {
+        if (model != null && _base.value === model) clear()
+    }
+
     /** Same game, not equal: late facts must not snap an open second page shut. */
     private fun sameGame(before: SecondScreenModel, after: SecondScreenModel): Boolean =
         before is SecondScreenModel.Browsing && after is SecondScreenModel.Browsing &&

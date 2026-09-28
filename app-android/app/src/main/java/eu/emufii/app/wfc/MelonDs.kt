@@ -25,7 +25,24 @@ object MelonDsPackage {
     const val DEBUG = "me.magnum.melonds.debug"
     const val DUALS = "me.magnum.melondualds"
 
-    val candidates = listOf(MAIN, DEBUG, DUALS)
+    /**
+     * WatermelonDS with two-player netplay, installed next to the release. First, so
+     * a DS session opens the build that can play it.
+     */
+    const val DUALS_DEV = "me.magnum.melondualds.dev"
+
+    val candidates = listOf(DUALS_DEV, MAIN, DEBUG, DUALS)
+
+    /** WatermelonDS's netplay listens here on the host. */
+    const val NETPLAY_PORT = 8070
+
+    /** Read by WatermelonDS's `EmulatorActivity`: "host" or "guest", and the host's address. */
+    const val EXTRA_NETPLAY_ROLE = "eu.emufii.netplay.role"
+    const val EXTRA_NETPLAY_ADDRESS = "eu.emufii.netplay.address"
+    const val EXTRA_NETPLAY_PLAYERS = "eu.emufii.netplay.players"
+
+    /** Each phone runs one console per player: four is the ceiling. */
+    const val MAX_NETPLAY_PLAYERS = 4
 
     const val EMULATOR_ACTIVITY = "me.magnum.melonds.ui.emulator.EmulatorActivity"
 
@@ -39,9 +56,25 @@ class MelonDs(private val context: Context) {
 
     fun installedPackage(): String? = EmulatorPick.packageFor(context, Console.DS)
 
-    fun launchGame(romUri: Uri): LaunchResult {
+    /**
+     * A session: the same launch, plus who hosts. WatermelonDS then waits for the
+     * other player on its own and starts once both are in, as long as both opened
+     * the same game.
+     */
+    fun launchNetplay(romUri: Uri, isHost: Boolean, hostAddress: String, players: Int): LaunchResult =
+        launchGame(romUri) {
+            putExtra(MelonDsPackage.EXTRA_NETPLAY_ROLE, if (isHost) "host" else "guest")
+            if (!isHost) putExtra(MelonDsPackage.EXTRA_NETPLAY_ADDRESS, hostAddress)
+            // The host starts as soon as this many are in, rather than after a pause
+            // with nobody new arriving; left out when unknown.
+            if (isHost && players in 2..MelonDsPackage.MAX_NETPLAY_PLAYERS)
+                putExtra(MelonDsPackage.EXTRA_NETPLAY_PLAYERS, players)
+        }
+
+    fun launchGame(romUri: Uri, extras: Intent.() -> Unit = {}): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
         val intent = Intent(MelonDsPackage.actionLaunchRom(pkg)).apply {
+            extras()
             component = ComponentName(pkg, MelonDsPackage.EMULATOR_ACTIVITY)
             data = romUri
             putExtra(MelonDsPackage.EXTRA_URI, romUri.toString())
