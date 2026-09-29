@@ -105,7 +105,24 @@ Wi-Fi. If you're playing with friends, keep the session private.
 is in this repository, but the session server and relay are private. The
 license doesn't cover the Emufii name or logo.
 
-Emufii is built with the help of [Claude Code](https://claude.com/claude-code).
-Every feature is tested on real hardware before release, and the app and servers
-have had a security review. If you find a security issue, please report it
-privately on [Discord](https://discord.gg/tvWcb28vBZ).
+If you find a security issue, please report it privately on
+[Discord](https://discord.gg/tvWcb28vBZ).
+
+## How it was built
+
+**Emufii is built with [Claude Code](https://claude.com/claude-code), and I'd
+rather tell you upfront.** About 90% of the code was written with the AI, along
+with much of the research into how each emulator handles multiplayer.
+
+That doesn't mean nobody is in charge. I decide the design and how the project
+is built and tested, I review the code that goes in, and I test every feature on
+real hardware before it ships.
+
+**If you're not comfortable with software made this way, that's completely
+fair.** Just know that the app and the servers have had a security review, with
+every issue found fixed, and that experienced developers have started
+contributing to the project.
+
+If that sounds good to you,
+**[grab the latest version](https://github.com/jojodogm-ctrl/emufii/releases/latest)**
+and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
