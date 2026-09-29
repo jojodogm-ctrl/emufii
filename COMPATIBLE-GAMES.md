@@ -1,0 +1,3588 @@
+# Compatible games
+
+Every game Emufii expects to work, console by console. This is the same list the app uses for the green bead in your library.
+
+A few honest notes before you dive in:
+
+- **"Expected to work" is not "tested by hand".** The lists are built from each console's multiplayer mode (see [Consoles](README.md#consoles)), and only a fraction were played end to end. If a game here lets you down, tell us on [Discord](https://discord.gg/tvWcb28vBZ) and it will be fixed.
+- **Both players need the same dump of the same game**, same region included.
+- Some titles appear several times, once per regional release.
+
+Use your browser's search (Ctrl+F / Cmd+F) to find a game quickly.
+
+| Console | Emulator | Games |
+|---|---|---|
+| [Nintendo Switch](#nintendo-switch) | Eden | 231 |
+| [Nintendo 3DS](#nintendo-3ds) | Azahar | 212 |
+| [Wii](#wii) | Dolphin | 1314 |
+| [GameCube](#gamecube) | Dolphin | 433 |
+| [PSP](#psp) | PPSSPP | 239 |
+| [PlayStation 2](#playstation-2) | ARMSX2 | 64 |
+| [Nintendo DS](#nintendo-ds) | melonDS | 1000 |
+
+## Nintendo Switch
+
+Games with local wireless play.
+
+<details>
+<summary><b>Show the 231 games</b></summary>
+
+- 20XX
+- Ace of Seafood
+- Advance Wars™ 1+2: Re-Boot Camp
+- Air Conflicts: Pacific Carriers
+- Air Conflicts: Secret Wars
+- Alice Gear Aegis CS Concerto of Simulatrix
+- Alien Hominid Invasion
+- Aliisha:The Oblivion of Twin Goddesses
+- All-Star Fruit Racing
+- Among Us
+- Animal Crossing™: New Horizons
+- Aqua Moto Racing Utopia
+- Arcade Archives VS. BALLOON FIGHT
+- Arcade Archives VS. BASEBALL
+- Arcade Archives VS. MAH-JONG
+- Arcade Archives VS. TENNIS
+- Arcade Archives VS. WRECKING CREW
+- ARMS™
+- Art of Balance
+- ASTRONEER
+- Attack on Titan 2
+- Bang-On Balls: Chronicles
+- Barony
+- Battle Sea
+- Bayonetta™ 2
+- Blanc
+- Bloody Zombies
+- Borderlands: Game of the Year Edition
+- Borderlands: The Handsome Collection
+- Borderlands: The Pre-Sequel
+- Boreal Blade
+- Brawlout
+- Broforce
+- Cannon Brawl
+- Capcom Beat 'Em Up Bundle
+- Capcom Fighting Collection
+- Cardfight!! Vanguard Dear Days
+- Castle Crashers Remastered
+- Catherine: Full Body
+- Chiki-Chiki Boxy Pro Wrestling
+- Chiki-Chiki Boxy Racers
+- Clubhouse Games™: 51 Worldwide Classics
+- Cruis'n Blast
+- Cube Creator X
+- DAEMON X MACHINA™
+- Dark Dungeon Warrior
+- Darksiders Genesis
+- Diablo III: Eternal Collection
+- Disc Jam
+- Divinity: Original Sin 2 - Definitive Edition
+- DNF Duel: Who's Next
+- Don't Starve Together
+- DOOM + DOOM II
+- Door Kickers: Action Squad
+- DRAGON BALL FighterZ
+- Duck Game
+- Duke Nukem 3D: 20th Anniversary World Tour
+- Dying Light: Definitive Edition
+- EARTH DEFENSE FORCE: WORLD BROTHERS
+- EARTH DEFENSE FORCE: WORLD BROTHERS 2
+- Earthfall: Alien Horde
+- Easy Come Easy Golf
+- eBaseball Powerful Pro Baseball 2020
+- EXORDER
+- Exploding Kittens
+- FAST RMX
+- FIFA 18
+- FIFA 19
+- Fight Crab
+- Fishing Fighters
+- FLIP OVER FROG
+- Flip Wars
+- Football Heroes Turbo
+- FREECELL BATTLE KING
+- Full Metal Furies
+- Gang Beasts
+- Gear.Club Unlimited 2
+- Get Me Out, Please
+- Girls und Panzer Dream Tank Match DX
+- Glitch Busters: Stuck On You
+- GOD EATER 3
+- Goonya Fighter
+- Gotta Protectors: Cart of Darkness
+- GRID™ Autosport
+- Hammerwatch
+- HARDCORE MECHA
+- Heroes of Hammerwatch - Ultimate Edition
+- Hotshot Racing
+- Human: Fall Flat
+- Hyper Jam
+- HYPERCHARGE Unboxed
+- ibb & obb
+- Ice Station Z
+- It Takes Two
+- JEWEL WARS
+- Just Shapes & Beats
+- Kamen Rider Climax Scramble Zi-O
+- Killer Queen Black
+- Kirby Fighters™ 2
+- Kirby’s Dream Buffet™
+- Knights and Bikes
+- KORG Gadget for Nintendo Switch
+- LEGO® 2K Drive
+- Let’s Play! Oink Games
+- LogiKing
+- Luigi’s Mansion™ 3
+- Lumberhill
+- MACHI KORO With Everyone
+- Mantis Burn Racing
+- Mario & Sonic at the Olympic Games Tokyo 2020
+- Mario Golf™: Super Rush
+- Mario Kart™ 8 Deluxe
+- Mario Party™ Superstars
+- Mario Strikers™: Battle League
+- Mario Tennis™ Aces
+- MARVEL ULTIMATE ALLIANCE 3: The Black Order
+- Mega Man Battle Network Legacy Collection Vol. 1
+- Mega Man Battle Network Legacy Collection Vol. 2
+- Mindball Play
+- Modern Combat Blackout
+- Monaco: Complete Edition
+- Monster Hunter Generations Ultimate™
+- Monster Hunter Rise
+- Monster Truck Freestyle
+- Morphies Law
+- MotoGP™18
+- MotoGP™19
+- MotoGP™20
+- Ms. Splosion Man
+- MudRunner - American Wilds
+- MX vs ATV All Out
+- NAMCO MUSEUM
+- Nine Parchments
+- Nintendo Switch™ Sports
+- OBAKEIDORO!
+- Overcooked! 2
+- Panty Party
+- PAYDAY 2
+- PeopleWillMoney
+- PixARK
+- Poisoft Thud Card
+- Pokémon™ Brilliant Diamond
+- Pokémon™ Legends: Arceus
+- Pokémon™ Scarlet
+- Pokémon™ Shield
+- Pokémon™ Shining Pearl
+- Pokémon™ Sword
+- Pokémon™ Violet
+- Pokkén Tournament™ DX
+- Portal 2
+- Portal Knights
+- Puyo Puyo Champions
+- Puyo Puyo™Tetris®
+- Puzzle Quest: The Legend Returns
+- Quake II
+- Ragtag Adventurers
+- Rayman® Legends Definitive Edition
+- Remnant: From the Ashes
+- Resident Evil 5
+- Resident Evil 6
+- Resident Evil Revelations 2
+- Rise of the Triad: Ludicrous Edition
+- Risk of Rain 2
+- River City Saga: Three Kingdoms
+- River City: Rival Showdown
+- Rocket League®
+- Saints Row IV®: Re-Elected™
+- SAINTS ROW®: THE THIRD™ - THE FULL PACKAGE
+- Serious Sam Collection
+- Sid Meier’s Civilization VI
+- Skulls of the Shogun: Bone-A-Fide Edition
+- Smash Reversi
+- Sniper Elite 3 Ultimate Edition
+- Sniper Elite 4
+- Sniper Elite V2 Remastered
+- SOLITAIRE BATTLE ROYAL
+- SpeedRunners
+- Spelunky
+- Splatoon™ 2
+- Splatoon™ 3
+- SpongeBob SquarePants: Battle for Bikini Bottom - Rehydrated
+- Stardew Valley
+- Staxel
+- Stick Fight: The Game
+- Strange Brigade
+- Super Beat Sports™
+- Super Bomberman R
+- Super Kirby Clash™
+- Super Mario Maker™ 2
+- Super Mario Party™
+- Super Smash Bros.™ Ultimate
+- Taiko no Tatsujin: Drum 'n' Fun!
+- Tales of Djungarian Hamster
+- Teenage Mutant Ninja Turtles: The Cowabunga Collection
+- Tennis
+- Tetris® 99
+- THE Bass Fishing
+- The Battle Cats Unite!
+- THE CARD Perfect Collection
+- The Survivalists
+- Titan Quest
+- Torchlight II
+- Touhou Gensou Mahjong
+- Touhou Kobuto V: Burst Battle
+- Trine 2: Complete Story
+- Trine 3: The Artifacts of Power
+- Trine Enchanted Edition
+- TRIVIAL PURSUIT® Live!
+- Ultra Street Fighter® II: The Final Challengers
+- Undead Battle Royale
+- UNO®
+- Vagante
+- Vampire Slayer: The Resurrection
+- Virtual Battle
+- Voice of Cards: The Beasts of Burden
+- WarioWare™: Get It Together!
+- Wartales
+- WBSC eBASEBALL™: POWER PROS
+- We Need to Go Deeper
+- Windjammers
+- Witchtastic
+- Word Search by POWGI
+- World War Z
+- Worms Armageddon: Anniversary Edition
+- Worms W.M.D
+- Xenon Racer
+- Yu-Gi-Oh! Legacy of the Duelist : Link Evolution
+- Yu-Gi-Oh! RUSH DUEL: Dawn of the Battle Royale!!
+- Zombie Army 4: Dead War
+- Zombie Army Trilogy
+- Zorya: The Celestial Sisters ™
+
+</details>
+
+## Nintendo 3DS
+
+Games with local play or download play.
+
+<details>
+<summary><b>Show the 212 games</b></summary>
+
+- 3D Altered Beast
+- 3D Gunstar Heroes
+- 3D Streets of Rage
+- 3D Streets of Rage 2
+- Air Battle Hockey 3D
+- Animal Crossing: New Leaf
+- Aqua Moto Racing 3D
+- Arc Style - Baseball 3D
+- ARC STYLE: Soccer 3D
+- Asphalt 3D
+- Attack on Titan - Humanity in Chains
+- ATV Wild Ride 3D
+- Battleminerz
+- Beast Saga: Saikyou Gekitotsu Colosseum!
+- Ben 10: Galactic Racing
+- Beyblade Evolution
+- Blazblue: Continuum Shift II
+- Boku no Hero Academia: Battle for All
+- Bugs Vs. Tanks!
+- Carps & Dragons
+- Cars 2
+- Cartoon Network: Punch Time Explosion
+- Centipede: Infestation
+- Chou Tousouchuu Atsumare! Saikyou no Tousousha-tachi
+- Classic Games Overload: Card & Puzzle Edition
+- Code of Princess
+- Colors! 3D
+- Combat of Giants: Dinosaurs 3D
+- Conception II: Children of the Seven Stars
+- Cooking Mama 4: Kitchen Magic
+- Cooking Mama 5: Bon Appetit!
+- Cooking Mama: Sweet Shop
+- Cube Creator 3D
+- Cube Creator DX
+- Culdcept Revolt
+- Daigasso! Band Brothers P Debut
+- Daigassou! Band Brothers P
+- Deca Sports Extreme
+- Digimon World Re-Digitize Decode
+- Disney Art Academy
+- Disney Infinity: Toy Box Challenge
+- Donkey Kong Country Returns 3D (英文版)
+- Dr. Mario: Miracle Cure
+- Dream Trigger 3D
+- Dress to Play - Magic Bubbles!
+- DualPenSports
+- E.X. Troopers
+- F1 2011
+- Face Racers: Photo Finish
+- Fantasy Life
+- FIFA 14: Legacy Edition
+- FIFA 15: Legacy Edition
+- FIFA Soccer 12
+- FIFA Soccer 13
+- Final Fantasy Explorers
+- Fire Emblem Fates: Birthright
+- Fire Emblem Fates: Conquest
+- Fire Emblem: Awakening
+- Fossil Fighters: Frontier(英文版)
+- Freakyforms Deluxe - Your Creations, Alive!
+- Frogger 3D
+- Game Center CX: 3-Choume no Arino
+- Games Festival 1
+- Games Festival 2
+- Gem Smashers
+- Girls' Fashion Shoot
+- Gotta Protectors
+- Harvest Moon 3D: A New Beginning
+- Harvest Moon 3D: The Tale of Two Towns
+- Hatsune Miku: Project Mirai DX
+- Hello Kitty Picnic with Sanrio Characters
+- Hero Bank
+- Hero Bank 2
+- Heroes of Ruin
+- Hyrule Warriors Legends
+- Ice Station Z
+- Imagine Fashion World 3D
+- Imagine: Babyz
+- Imagine: Fashion Designer
+- Inazuma Eleven 3: Bomb Blast
+- Inazuma Eleven 3: Lightning Bolt
+- Inazuma Eleven 3: Team Ogre Attacks!
+- Inazuma Eleven Go 2: Chrono Stone: Neppuu
+- Inazuma Eleven Go 2: Chrono Stone: Raimei
+- Inazuma Eleven GO: Light
+- Inazuma Eleven GO: Shadow
+- IRONFALL -Invasion- (日文版)
+- Kid Icarus: Uprising
+- Kingdom Hearts 3D: Dream Drop Distance
+- Kirby Battle Royale
+- Kirby Fighters Deluxe(英文版)
+- Kirby: Planet Robobot
+- Kirby: Triple Deluxe (英文版)
+- KOKUGA
+- Kung Fu Panda: Showdown of Legendary Legends
+- LBX: Little Battlers eXperience
+- LEGO Batman 2 - DC Super Heroes
+- LEGO The Lord of the Rings
+- Luigi's Mansion
+- Luigi's Mansion: Dark Moon
+- Mahjong Cub3D
+- Mario & Sonic at the London 2012 Olympic Games
+- Mario & Sonic at the Rio 2016 Olympic Games
+- Mario Golf: World Tour
+- Mario Kart 7
+- Mario Party: Island Tour (英文版)
+- Mario Party: Star Rush
+- Mario Party: Star Rush: Party Guest
+- Mario Party: The Top 100
+- Mario Sports Superstars
+- Mario Tennis Open
+- Metroid Prime: Federation Force
+- Minecraft: New Nintendo 3DS Edition
+- Monster 4x4 3D
+- MONSTER HUNTER 3 ULTIMATE
+- Monster Hunter 4 Ultimate
+- Monster Hunter Generations
+- Monster Strike
+- NASCAR Unleashed
+- Navy Commander
+- Need for Speed: The Run
+- New Art Academy
+- New Super Mario Bros. 2
+- Nicktoons MLB 3D
+- Nintendo Pocket Football Club
+- One Piece: Unlimited Cruise SP2
+- One Piece: Unlimited World Red
+- Pac-Man Party 3D
+- Petz Beach
+- Petz Countryside
+- Pippi Longstocking 3D
+- Planet Crashers
+- Pokemon Alpha Sapphire
+- Pokémon Moon
+- Pokémon Mystery Dungeon: Gates to Infinity
+- Pokémon Omega Ruby
+- Pokémon Sun
+- Pokémon Ultra Moon
+- Pokémon Ultra Sun
+- Pokemon X
+- Pokemon Y
+- Power Disc Slam
+- Pro Evolution Soccer 2011 3D
+- Pro Evolution Soccer 2012 3D
+- Psycho Pigs
+- Puyo Puyo Tetris
+- Rabbids Rumble
+- Rhythm Heaven Megamix
+- Rhythm Thief & the Emperor’s Treasure
+- Ridge Racer 3D
+- River City: Rival Showdown
+- River City: Tokyo Rumble
+- Sega 3D Classics Collection
+- Sega 3D Fukkoku Archives
+- Sega 3D Fukkoku Archives 3: Final Stage
+- Skylanders SuperChargers Racing
+- Slime Mori Mori Dragon Quest 3: Daikaizoku to Shippo Dan
+- Snow Moto Racing 3D
+- Soccer Up Online
+- Sonic & All-Stars Racing Transformed
+- Sonic Boom: Fire & Ice
+- Sonic Lost World (英文版)
+- SpeedThru - Potzol's Puzzle
+- Splat The Difference
+- Star Fox 64 3D
+- Steel Diver
+- Steel Diver - Sub Wars
+- Story of Seasons
+- Story of Seasons: Trio of Towns
+- Style Savvy: Fashion Forward
+- Style Savvy: Trendsetters
+- Sudoku + 7 Other Complex Puzzles by Nikoli
+- Sudoku Party
+- Super Monkey Ball 3D
+- Super Pokémon Rumble
+- Super Smash Bros. for Nintendo 3DS
+- Super Street Fighter IV: 3D Edition
+- Survivor 3D: The Ultimate Adventure
+- Sushi Striker: The Way of Sushido
+- Taiko no Tatsujin: Chibi Dragon to Fushigi na Orb
+- Taiko no Tatsujin: Doko Don! Mystery Adventure
+- Taiko no Tatsujin: Don to Katsu no Jikuu Daibouken
+- Tank Troopers
+- Team Kirby Clash Deluxe
+- Tekken 3D: Prime Edition
+- Tenkai Knights: Brave Battle
+- Terraria
+- Tetris Axis
+- Tetris Ultimate
+- The Adventures of Tintin: The Secret of the Unicorn
+- The Battle Cats POP!
+- The Legend of Zelda: Tri Force Heroes
+- The Snack World: TreJarers
+- THEATRHYTHM FINAL FANTASY
+- Theatrhythm Final Fantasy: Curtain Call
+- TOUCH BATTLE TANK - TAG COMBAT -
+- Transformers Prime: The Game
+- Undead Storm Nightmare
+- WarioWare Gold
+- Winter Sports - Feel the Spirit
+- Worcle Worlds
+- World Soccer Winning Eleven 2014
+- World Soccer Winning Eleven 2014: Aoki Samurai no Chousen
+- WWE All Stars
+- YO-KAI WATCH
+- Yo-Kai Watch 2: Bony Spirits
+- Yo-Kai Watch 2: Fleshy Souls
+- Yo-Kai Watch 2: Psychic Specters
+- YO-KAI WATCH 3
+- Yo-Kai Watch Blasters: Red Cat Corps
+- Yo-Kai Watch Blasters: White Dog Squad
+- Yoshi's New Island
+
+</details>
+
+## Wii
+
+Any game with same-console multiplayer, played through Dolphin netplay.
+
+<details>
+<summary><b>Show the 1314 games</b></summary>
+
+- 007: Quantum of Solace
+- 101-in-1 Party Megamix
+- 101-in-1 Party Megamix Wii
+- 101-in-1 Sports Party Megamix
+- 2010 FIFA World Cup South Africa
+- 2010 FIFA World Cup: Minami Africa Taikai
+- ABBA: You Can Dance
+- AC/DC Live: Rock Band Track Pack
+- Academy of Champions: Soccer
+- ACB Total 2010-2011
+- Action Girlz Racing
+- Active Life: Explorer
+- Active Life: Extreme Challenge
+- Active Life: Magical Carnival
+- Active Life: Outdoor Challenge
+- Adibou et les Saisons Magiques
+- AFL
+- AFL: Game of the Year Edition
+- Aladin Magic Racer
+- Alan Hansen's Sports Challenge
+- Alice in Wonderland
+- Alien Monster Bowling League
+- Alien Syndrome
+- All Round Hunter
+- All Star Cheer Squad
+- All Star Cheer Squad 2
+- All Star Karate
+- Alvin and the Chipmunks
+- Alvin and the Chipmunks: Chipwrecked
+- Alvin and the Chipmunks: The Squeakquel
+- American Mensa Academy
+- AMF Bowling World Lanes
+- AMF Bowling: Pinbusters!
+- And-Kensaku
+- Andrew Lloyd Webber Musicals: Sing and Dance
+- Angry Birds Star Wars
+- Anpanman Niko Niko Party
+- Aqua Panic!
+- Aquarius Baseball: Genkai no, Sono Saki e.
+- Arcade Shooting Gallery
+- Arcade Zone
+- Arctic Tale
+- Are You Smarter than a 5th Grader Back to School
+- Are You Smarter than a 5th Grader Game Time
+- Are You Smarter than a 5th Grader Make the Grade
+- Army Rescue
+- Arthur and the Revenge of Maltazard
+- Ashes Cricket 2009
+- Asterix at the Olympic Games
+- Astro Boy: The Video Game
+- Athletic Piggy Party
+- Atrévete a Soñar
+- Attack of the Movies 3-D
+- ATV Fever
+- ATV Quad Kings
+- Avatar: The Last Airbender: Into the Inferno
+- Avatar: The Last Airbender: The Burning Earth
+- Babysitter Mama
+- Backyard Baseball '09
+- Backyard Baseball '10
+- Backyard Football
+- Backyard Football '09
+- Backyard Football '10
+- Backyard Sports: Rookie Rush
+- Backyard Sports: Sandlot Sluggers
+- Bakugan: Battle Brawlers
+- Bakugan: Defenders of the Core
+- Balloon Pop
+- Balls of Fury
+- Band Hero
+- Barbie as the Island Princess
+- Barbie Dreamhouse Party
+- Baseball Blast!
+- Basketball Hall of Fame: Ultimate Hoops Challenge
+- Bass Fishing Wii: World Tournament
+- Bass Pro Shops: The Hunt: Trophy Showdown
+- Bass Pro Shops: The Strike: Tournament Edition
+- Batman: The Brave and the Bold: The Videogame
+- Battalion Wars 2
+- Battle of Giants: Dinosaurs Strike
+- Battle of the Bands
+- Battle Rage: Mech Conflict
+- Battle vs. Chess
+- Beach Fun: Summer Challenge
+- Bee Movie Game
+- Ben 10: Alien Force
+- Ben 10: Galactic Racing
+- Ben 10: Omniverse
+- Ben 10: Omniverse 2
+- Ben 10: Protector of Earth
+- Benjamin Bluemchen: Toeroeoeoe im Zoo
+- Beyblade: Metal Fusion: Battle Fortress
+- Bibi & Tina: Das grosse Reiterfest
+- Bibi Blocksberg: Das grosse Hexenbesen-Rennen!
+- Big Beach Sports
+- Big Beach Sports 2
+- Big Brain Academy: Wii Degree
+- Big Buck Hunter Pro
+- Big League Sports
+- Big League Sports: Summer
+- Bigfoot: Collision Course
+- Bigfoot: King of Crush
+- Billy the Wizard: Rocket Broomstick Racing
+- Birthday Party Bash
+- Bit.Trip Complete
+- Blast Works: Build, Trade, Destroy
+- Blazing Angels: Squadrons of WWII
+- Bleach: Shattered Blade
+- Bleach: Versus Crusade
+- Block Party: 20 Games
+- Boku to Sim no Machi Party
+- Bokujou Monogatari: Waku Waku Animal March
+- Bokujou Monogatari: Yasuragi no Ki
+- Bomberman
+- Bomberman Land
+- Bomberman Land Wii
+- Boogie
+- Boogie SuperStar
+- Boom Blox
+- Boom Blox (Demo)
+- Boom Blox Bash Party
+- Boot Camp Academy
+- Bratz Kidz
+- Bratz: Girlz Really Rock
+- Bratz: The Movie
+- Brave
+- Broken Sword: Shadow of the Templars: The Director's Cut
+- Brunswick Pro Bowling
+- Brunswick Zone Cosmic Bowling
+- Buck Fever
+- Build-A-Bear Workshop: A Friend Fur All Seasons
+- Build-A-Bear Workshop: Friendship Valley
+- Build'n Race
+- Bully: Scholarship Edition
+- Burger Island
+- Bust-A-Move
+- Bust-a-Move Bash!
+- Cabela's Adventure Camp
+- Cabela's Big Game Hunter 2010
+- Cabela's Big Game Hunter 2012
+- Cabela's Dangerous Hunts 2011
+- Cabela's Dangerous Hunts 2011: Special Edition
+- Cabela's Dangerous Hunts 2013
+- Cabela's North American Adventures
+- Cabela's Survival: Shadows of Katmai
+- Cake Mania: In the Mix!
+- Call of Duty: Modern Warfare: Reflex
+- Call of Duty: World at War
+- Calvin Tucker's Farm Animal Racing
+- Calvin Tucker's Redneck Farm Animals Racing Tournament
+- Calvin Tucker's Redneck Jamboree
+- Candace Kane's Candy Factory
+- Carl Jiisan no Soratobu le
+- Carnival Games
+- Carnival Games: MiniGolf
+- Cars
+- Cars 2
+- Cars Toon: Mater's Tall Tales
+- Cars: Mater-National Championship
+- Cars: Race-O-Rama
+- Cartoon Network: Punch Time Explosion XL
+- Castle of Shikigami III
+- Castlevania Judgment
+- Cate West: The Vanishing Files
+- Celebrity Sports Showdown
+- Centipede: Infestation
+- Champion Jockey: G1 Jockey & Gallop Racer
+- Championship Foosball
+- Chaos a la Maison
+- Chaotic: Shadow Warriors
+- Charm Girls Club: Pajama Party
+- Cheggers Party Quiz
+- Cheongongui Gisa Rodea
+- Chevrolet Camaro: Wild Ride
+- Chicken Blaster
+- Chicken Riot
+- Chicken Shoot
+- Chrysler Classic Racing
+- Chuck E. Cheese's Sports Games
+- Chuck E. Cheese's Super Collection
+- Circus
+- Circus Games
+- Classic British Motor Racing
+- Cloudy with a Chance of Meatballs
+- Club Penguin: Game Day!
+- Cocoto Festival
+- Cocoto Kart Racer
+- Cocoto Kart Racer 2
+- Cocoto Magic Circus
+- Cold Stone Creamery: Scoop It Up
+- Conduit 2
+- Cook Wars
+- Cooking Mama
+- Cooking Mama 2: Taihen!! Mama wa Ooisogashi!
+- Cooking Mama 2: World Kitchen
+- Cooking Mama World: Babysitting Mama
+- Cooking Mama: Cook Off
+- Cooking Mama: Minna to Issho ni Oryouri Taikai!
+- Cooking Mama: World Kitchen
+- Countdown: The Game
+- Counter Force
+- Country Dance
+- Country Dance 2
+- Country Dance: 30 Chart-Topping Hits!!!
+- Cranium Kabookii
+- Crash Car Racer
+- Crash of the Titans
+- Crash: Mind over Mutant
+- Crayon Shin-chan: Saikyou Kazoku Kasukabe King Wii
+- Crazy Chicken Tales
+- Crazy Chicken: Carnival
+- Crazy Climber Wii
+- Crazy Machines
+- Crazy Mini Golf 2
+- Crazy Quiz!
+- Cruis'n
+- Cruise Ship Resort
+- Cruise Ship Vacation Games
+- Cuisine Party
+- Cyberbike: Cycling Sports
+- Daikaijuu Battle: Ultra Coliseum
+- Daikaijuu Battle: Ultra Coliseum DX: Ultra Senshi Daishuuketsu
+- Dance Dance Revolution
+- Dance Dance Revolution II
+- Dance Dance Revolution: Disney Grooves
+- Dance Dance Revolution: Hottest Party
+- Dance Dance Revolution: Hottest Party 2
+- Dance Dance Revolution: Hottest Party 3
+- Dance Dance Revolution: Winx Club
+- Dance on Broadway
+- Dance Party Club Hits
+- Dance Party Pop Hits
+- Dance Sensation!
+- Dance! It's Your Stage
+- Dancing Stage: Hottest Party
+- Dancing with the Stars
+- Dancing with the Stars: We Dance!
+- Data East Arcade Classics
+- Dave Mirra BMX Challenge
+- Dawn of Discovery
+- de Blob
+- de Blob 2
+- De Chiffres & Des Lettress: Le Jeu Officiel
+- Dead Space: Extraction
+- Deal or No Deal
+- Deal or No Deal: Der Banker schlaegt zurueck
+- Deal or No Deal: Special Edition
+- Death Jr.: Root of Evil
+- Deca Sporta: Wiiro Jeulgineun Sports 10 Jongmok!
+- Deca Sports
+- Deca Sports (Demo)
+- Deca Sports 2
+- Deca Sports 2 (Demo)
+- Deca Sports 3
+- Deer Drive
+- Deer Drive Legends
+- Def Jam: Rapstar
+- Despicable Me: The Game
+- Destroy All Humans! Big Willy Unleashed
+- Dewy's Adventure
+- Dino Strike
+- DiRT 2
+- Disney Channel: All Star Party
+- Disney Guilty Party
+- Disney Infinity
+- Disney Planes
+- Disney Princess: Enchanted Journey
+- Disney Princess: My Fairytale Adventure
+- Disney Sing It
+- Disney Sing It: Family Hits
+- Disney Sing It: High School Musical 3: Senior Year
+- Disney Sing It: Party Hits
+- Disney Sing It: Pop Hits
+- Disney Th!nk Fast: The Ultimate Trivia Showdown
+- Disney Universe
+- Disney Violetta: Rhythm & Music
+- Disney's Chicken Little: Ace in Action
+- Diva Girls: Divas on Ice
+- DJ Hero
+- DJ Hero 2
+- Dodge Racing: Charger vs Challenger
+- Dokapon Kingdom
+- Dokapon Kingdom for Wii
+- Domino Rally
+- Don King Boxing
+- Donkey Kong Country Returns
+- Donkey Kong: Barrel Blast
+- Dora Saves the Crystal Kingdom
+- Dora Saves the Snow Princess
+- Doraemon Wii: Himitsu Dougu-ou Ketteisen!
+- Drag & Stock Racer
+- Dragon Ball Z: Budokai Tenkaichi 2
+- Dragon Ball Z: Budokai Tenkaichi 3
+- Dragon Ball Z: Sparking! Meteor
+- Dragon Ball Z: Sparking! Neo
+- Dragon Ball: Revenge of King Piccolo
+- Dragon Quest: Monster Battle Road Victory
+- Drawn to Life: The Next Chapter
+- Dream Dance & Cheer
+- Dream Pinball 3D
+- DreamWorks Megamind: Mega Team Unite
+- DreamWorks Super Star Kartz
+- DreamWorks The Croods: Prehistoric Party! & Rise of the Guardians: Combo Pack
+- Driver: San Francisco
+- EA Playground
+- EA Sports Active 2: Personal Trainer
+- EA Sports Active: More Workouts
+- EA Sports Active: NFL Training Camp
+- EA Sports Active: Personal Trainer
+- EA Sports Active: Personal Trainer Wii: 30-nichi Seikatsu Kaizen Program
+- EA Sports Active: Personal Trainer Wii: 6-shuukan Shuuchuu Hikishime Program
+- El Chavo
+- Elebits
+- Emergency Heroes
+- Emergency Mayhem
+- Ennichi no Tatsujin
+- Epic Mickey 2: Futatsu no Chikara
+- Epic Mickey 2: The Power of Two
+- Everyone Sing
+- Excite Truck
+- ExciteBots: Trick Racing
+- ExerBeat
+- Eyeshield 21: Field Saikyou no Senshi-tachi
+- F1 2009
+- FaceBreaker K.O. Party
+- Family Feud: 2010 Edition
+- Family Feud: 2012 Edition
+- Family Feud: Decades
+- Family Fishing
+- Family Fortunes
+- Family Fun Football
+- Family Game Night 4: The Game Show
+- Family GameShow
+- Family Jockey
+- Family Party: 30 Great Games
+- Family Party: 30 Great Games: Outdoor Fun
+- Family Party: 30 Great Games: Winter Fun
+- Family Party: 90 Great Games Party Pack
+- Family Party: Fitness Fun
+- Family Ski & Snowboard
+- Fantastic Football Fan Party
+- Fantastic Four: Rise of the Silver Surfer
+- Far Cry Vengeance
+- Farmyard Party
+- Fast Food Panic
+- FIFA 08
+- FIFA 08: World Class Soccer
+- FIFA 09: All-Play
+- FIFA 10
+- FIFA 10: World Class Soccer
+- FIFA 14
+- FIFA 15
+- FIFA Soccer 11
+- FIFA Soccer 12
+- FIFA Soccer 13
+- Final Fantasy Crystal Chronicles: The Crystal Bearers
+- Fishing Master
+- Fishing Master: World Tour
+- Fishing Resort
+- Fit & Fun: Your Virtual Personal Coach
+- Fit Music
+- Fix It: Home Improvement Challenge
+- FlatOut
+- FlingSmash
+- Food Network: Cook or Be Cooked!
+- Ford Racing: Off Road
+- Fortune Street
+- Fritz Chess
+- Furu Furu Park
+- G.I. Joe: The Rise of Cobra
+- Galileo Family Quiz
+- Game Party
+- Game Party 2
+- Game Party 3
+- Gegege no Kitarou: Youkai Daiundoukai
+- Gem Smashers
+- Geometry Wars: Galaxies
+- Geon Cube
+- Get Up and Dance
+- Ghost Squad
+- Ghostbusters: The Video Game
+- GI Jockey Wii
+- GI Jockey Wii 2008
+- Glacier 3
+- Glacier 3: The Meltdown
+- Go Play: Circus Star
+- Go Play: City Sports
+- Go Play: Lumberjacks
+- Go Vacation
+- Go West! A Lucky Luke Adventure
+- Go, Diego, Go! Great Dinosaur Rescue
+- Go, Diego, Go! Safari Rescue
+- Godzilla: Unleashed
+- Gold's Gym: Dance Workout
+- Golden Balls
+- GoldenEye 007
+- Goosebumps HorrorLand
+- Gormiti: The Lords of Nature!
+- Gottlieb Pinball Classics
+- Grand Slam Tennis
+- Grease: The Official Video Game
+- Great Party Games
+- Green Day: Rock Band
+- Greg Hastings Paintball 2
+- Groovin' Blocks
+- GT Pro Series
+- GTI Club Supermini Festa!
+- Guilty Gear XX Accent Core
+- Guilty Gear XX Accent Core Plus
+- Guinness World Records: The Videogame
+- Guitar Hero 5
+- Guitar Hero III: Legends of Rock
+- Guitar Hero World Tour
+- Guitar Hero: Aerosmith
+- Guitar Hero: Metallica
+- Guitar Hero: Smash Hits
+- Guitar Hero: Van Halen
+- Guitar Hero: Warriors of Rock
+- Gummy Bears: MiniGolf
+- Gunblade NY & L.A. Machineguns Arcade Hits Pack
+- Gunslingers
+- Hajime no Ippo Revolution
+- Hamster Heroes
+- Haneru no Tobira Wii: Giri Girissu
+- Hannah Montana: Spotlight World Tour
+- Hannah Montana: The Movie
+- Happy Dance Collection
+- Happy Feet
+- Happy Feet Two
+- Happy Neuron Academy
+- Harley Davidson: Road Trip
+- Harry Potter and the Half-Blood Prince
+- Harvest Moon: Magical Melody
+- Harvest Moon: Tree of Tranquility
+- Hasbro Family Game Night
+- Hasbro Family Game Night 2
+- Hasbro Family Game Night Fun Pack
+- Hasbro Family Game Night Value Pack
+- Hasbro: Family Game Night 3
+- Haunted House
+- Heathcliff: The Fast and the Furriest
+- Heathcliff! The Fast and the Furriest
+- Heavenly Guardian
+- Heavy Fire: Afghanistan
+- Hell's Kitchen: The Game
+- Hello Kitty Seasons
+- Help Wanted
+- Help Wanted (Demo)
+- High School Musical 3: Senior Year Dance!
+- High School Musical: Sing It!
+- Hollywood Squares
+- Honda ATV Fever
+- Horrible Histories: Ruthless Romans
+- Horse Life 2
+- Hospital. 6-nin no Ishi
+- Hot Wheels: Battle Force 5
+- Hot Wheels: Beat That!
+- Hot Wheels: Track Attack
+- How to Train Your Dragon
+- How to Train Your Dragon 2
+- Hula Wii: Hula de Hajimeru: Bi to Kenkou!
+- Hyper Fighters
+- I Spy Game Pack
+- I Spy Spooky Mansion
+- iCarly
+- Ice Age: Dawn of the Dinosaurs
+- Igor: The Game
+- Ikenie no Yoru
+- Imagine Champion Rider
+- Imagine: Fashion Party
+- Imagine: Party Babyz
+- Inazuma Eleven Go: Strikers 2013
+- Inazuma Eleven Strikers
+- Inazuma Eleven Strikers 2012 Xtreme
+- Indiana Jones and the Staff of Kings
+- Indianapolis 500 Legends
+- International Athletics
+- Intervilles: Le Jeu Officiel
+- Iron Chef America: Supreme Cuisine
+- Isometric & Karate Exercise: Wii de Kotsuban Fitness
+- Itadaki Street Wii
+- Ivy the Kiwi?
+- Jakers! Kart Racing
+- Jambo! Safari: Animal Rescue
+- James Cameron's Avatar: The Game
+- Jawa: Mammoth to Himitsu no Ishi
+- Jeep Thrills
+- Jenga World Tour
+- Jeopardy!
+- Jerry Rice & Nitus' Dog Football
+- Jigsaw Puzzle: Kyou no Wanko
+- Jikkyou Powerful Major League 2 Wii
+- Jikkyou Powerful Major League 2009
+- Jikkyou Powerful Major League 3
+- Jikkyou Powerful Pro Yakyuu 15
+- Jikkyou Powerful Pro Yakyuu Next
+- Jikkyou Powerful Pro Yakyuu Wii
+- Jillian Michaels' Fitness Ultimatum 2009
+- Jimmie Johnson's Anything with an Engine
+- Jinsei Game Wii
+- Jinsei Game Wii EX
+- Jinsei Game: Happy Family
+- Jinsei Game: Happy Family: Gotouchi Neta Zouryou Shiage
+- Ju-on: The Grudge
+- Ju-on: The Grudge: Haunted House Simulator
+- JumpStart Crazy Karts
+- JumpStart Get Moving Family Fitness
+- Jungle Kartz
+- Junior Fitness Trainer
+- Junior League Sports
+- Just Dance
+- Just Dance 2
+- Just Dance 2014
+- Just Dance 2015
+- Just Dance 2016
+- Just Dance 2017
+- Just Dance 2018
+- Just Dance 2019
+- Just Dance 2020
+- Just Dance 3
+- Just Dance 4
+- Just Dance Kids
+- Just Dance Kids 2
+- Just Dance Kids 2014
+- Just Dance Wii
+- Just Dance Wii 2
+- Just Dance: Best Of
+- Just Dance: Disney Party
+- Just Dance: Disney Party 2
+- Just Dance: Greatest Hits
+- Just Dance: Summer Party
+- K-Pop Dance Festival
+- Kamen Rider: Climax Heroes Fourze
+- Kamen Rider: Climax Heroes OOO
+- Kamen Rider: Climax Heroes W
+- Kamen Rider: Dragon Knight
+- Kamen Rider: Super Climax Heroes
+- Karaoke Joysound
+- Karaoke Joysound Wii Super DX: Hitori de Minna de Utai Houdai!
+- Karaoke Joysound Wii: Duet Kyoku-hen
+- Karaoke Joysound Wii: Enka Kayoukyoku-hen
+- Karaoke Revolution
+- Karaoke Revolution Glee
+- Karaoke Revolution Glee: Volume 2
+- Karaoke Revolution Glee: Volume 3
+- Karaoke Revolution Presents: American Idol Encore
+- Karaoke Revolution Presents: American Idol Encore 2
+- Kart Racer
+- Katekyoo Hitman Reborn! Dream Hyper Battle! Wii
+- Kawasaki Jet Ski
+- Kawasaki Quad Bikes
+- Kawasaki Snowmobiles
+- Kekkaishi: Kokubourou no Kage
+- Kevin VanDam Big Bass Challenge
+- Kid Adventures: Sky Captain
+- KidFit Island Resort
+- Kidou Senshi Gundam: MS Sensen 0079
+- Kidz Bop Dance Party! The Video Game
+- Kidz Sports Basketball
+- Kidz Sports Crazy Golf
+- Kidz Sports Crazy Mini Golf
+- Kidz Sports Crazy Mini Golf 2
+- Kidz Sports Ice Hockey
+- Kidz Sports International Football
+- Kidz Sports International Soccer
+- Kiki Trick
+- King of Clubs
+- King of Pool
+- Kirby's Epic Yarn
+- Kirby's Return to Dream Land
+- Koh-Lanta
+- Kororinpa: Marble Mania
+- Kotoba no Puzzle: Mojipittan Wii Deluxe
+- Kung Fu Panda
+- Kung Fu Panda: Legendary Warriors
+- Kyoufu Taikan: Juon
+- L' Entraineur Cerebral et Sportif
+- La Voz
+- La Voz Vol. 2
+- Legend of Sayuki
+- Legend of the Dragon
+- LEGO Batman 2: DC Super Heroes
+- LEGO Batman: The Videogame
+- LEGO Harry Potter: Years 1-4
+- LEGO Harry Potter: Years 5-7
+- LEGO Indiana Jones 2: The Adventure Continues
+- LEGO Indiana Jones: The Original Adventures
+- LEGO Pirates of the Caribbean: The Video Game
+- LEGO Rock Band
+- LEGO Star Wars III: The Clone Wars
+- LEGO Star Wars: The Complete Saga
+- LEGO The Lord of the Rings
+- Let's Dance
+- Let's Dance with Mel B
+- Let's Paint
+- Let's Sing
+- Let's Sing 2014
+- Let's Sing 2015
+- Let's Sing 2016
+- Let's Sing 2016: Hits Francais
+- Let's Sing 2017: Mit Deutschen Hits!
+- Let's Sing 2018: Mit Deutschen Hits
+- Let's Sing 2019: Mit Deutschen Hits
+- Let's Sing 6: Versión Española
+- Let's Sing 7: Versión Española
+- Let's Sing 8: Versión Española
+- Let's Tap
+- Line Rider 2: Unbound
+- Link's Crossbow Training
+- Little League World Series Baseball 2008
+- Little League World Series Baseball 2009
+- Little League World Series Baseball: Double Play
+- Littlest Pet Shop: Friends
+- Looney Tunes: Acme Arsenal
+- Los 40 Principales: Karaoke Party
+- Lost in Blue: Shipwrecked
+- Love Is... in Bloom
+- Lucha Libre AAA: Heroes del Ring
+- M&M's Beach Party
+- M&M's Kart Racing
+- Mad Dog McCree: Gunslinger Pack
+- Mad Tracks
+- Madagascar 3: Europe's Most Wanted
+- Madagascar 3: The Video Game
+- Madagascar Kartz
+- Madagascar: Escape 2 Africa
+- Madden NFL 07
+- Madden NFL 08
+- Madden NFL 09: All-Play
+- Madden NFL 10
+- Madden NFL 11
+- Madden NFL 12
+- Madden NFL 13
+- MadWorld
+- Mahjong Party Pack
+- Mahjongg Party
+- Major Dream: Major Wii: Nagero! Gyroball!!
+- Major Dream: Major Wii: Perfect Closer
+- Major League Baseball 2K10
+- Major League Baseball 2K11
+- Major League Baseball 2K12
+- Major League Baseball 2K8
+- Major League Baseball 2K9
+- Major Minor's Majestic March
+- Mama's 2-Pack
+- Marble Saga: Kororinpa
+- Marble Saga: Kororinpa (Demo)
+- Marines: Modern Urban Combat
+- Mario & Sonic at Bejing Olympic
+- Mario & Sonic at London Olympic
+- Mario & Sonic at the London 2012 Olympic Games
+- Mario & Sonic at the Olympic Games
+- Mario & Sonic at the Olympic Winter Games
+- Mario & Sonic at Vancouver Olympic
+- Mario Kart Wii
+- Mario Party 8
+- Mario Party 9
+- Mario Power Tennis
+- Mario Sports Mix
+- Mario Strikers Charged Football
+- Mario Super Sluggers
+- Martian Panic
+- Marvel Super Hero Squad
+- Marvel Super Hero Squad: The Infinity Gauntlet
+- Marvel Super Heroes 3D: Grandmaster's Challenge
+- Marvel: Ultimate Alliance
+- Marvel: Ultimate Alliance 2
+- Mathews Bow Hunting
+- Maximum Racing: Crash Car Racer
+- Maximum Racing: Drag & Stock Racer
+- Maximum Racing: GP Classic Racing
+- Maximum Racing: Sprint Cars
+- Maximum Racing: Super Karts
+- Maximum Racing: Super Truck Racer
+- Medal of Honor: Vanguard
+- Medieval Games
+- Meet the Robinsons
+- Mein Wortschatz-Coach
+- Meine Tierpension
+- Mensa Academy
+- Merv Griffin's Crosswords
+- Metal Slug Anthology
+- Metal Slug Complete
+- MIB: Alien Crisis
+- Miburi & Teburi
+- Michael Jackson: The Experience
+- Mijn Dierenpension: Verzorg en Speel met de Leukste Dieren!
+- Milestone Shooting Collection 2
+- Mini Desktop Racing
+- Mini Golf Resort
+- MiniCopter Adventure Flight
+- Minna de Asobou! Namco Carnival
+- Minna no Joushiki Ryoku TV
+- Minon: Everyday Hero
+- Minute to Win It
+- MLB Power Pros
+- MLB Power Pros 2008
+- MLB Superstars
+- Modu Hamkke Takoron
+- Momotarou Dentetsu 16: Hokkaido Daiidou no Maki!
+- Momotarou Dentetsu 2010: Sengoku Ishin no Hero Daishuugou! no Maki
+- Monkey Mischief! Party Time
+- Monopoly
+- Monopoly Collection
+- Monopoly Streets
+- Monster 4x4: Stunt Racer
+- Monster 4x4: World Circuit
+- Monster High: 13 Wishes
+- Monster High: Skultimate Roller Maze
+- Monster Hunter G
+- Monster Hunter Tri
+- Monster Jam
+- Monster Jam: Path of Destruction
+- Monster Jam: Urban Assault
+- Monster Trux Arenas
+- Monster Trux Arenas: Special Edition
+- Monster Trux Offroad
+- Monsters vs. Aliens
+- Mortal Kombat: Armageddon
+- Mortimer Beckett and the Secrets of Spooky Manor
+- MotoGP
+- Mountain Sports
+- Movie Games
+- Mr Bean's Wacky World
+- Mr Bean's Wacky World of Wii
+- Mushroom Men: The Spore Wars
+- Musiic Party: Rock the House
+- MX vs. ATV Untamed
+- My Horse & Me: Riding for Gold
+- My Word Coach
+- MySims Collection
+- MySims Party
+- MySims Racing
+- MySims Racing (Demo)
+- MySims SkyHeroes
+- Mystery Case Files: The Malgrave Incident
+- Mystery Case Files: The Malgrave Incident (Demo)
+- Myth Makers: Orbs of Doom
+- Myth Makers: Super Kart GP
+- Namco Museum Megamix
+- Namco Museum Remix
+- Naruto Shippuden: Clash of Ninja Revolution III
+- Naruto Shippuden: Dragon Blade Chronicles
+- Naruto Shippuden: Dragon Blade Chronicles - European Version
+- Naruto Shippuuden: Gekitou Ninja Taisen! Special
+- Naruto: Clash of Ninja 2 (Demo)
+- Naruto: Clash of Ninja Revolution
+- Naruto: Clash of Ninja Revolution 2
+- NASCAR 2011: The Game
+- NASCAR Kart Racing
+- NASCAR the Game: Inside Line
+- NASCAR Unleashed
+- Nat Geo Challenge! Wild Life
+- Nat Geo Quiz! Wild Life
+- National Geographic: Challenge!
+- NBA 2K10
+- NBA 2K11
+- NBA 2K12
+- NBA 2K13
+- NBA Jam
+- NBA Live 08
+- NBA Live 09: All-Play
+- NCAA Football 09: All-Play
+- Need for Speed: Carbon
+- Need for Speed: Hot Pursuit
+- Need for Speed: Nitro
+- Need for Speed: ProStreet
+- Need for Speed: The Run
+- Need for Speed: Undercover
+- Negima! Neo-Pactio Fight!!
+- Neighborhood Games
+- Neopets: Puzzle Adventure
+- Nerf N-Strike
+- Nerf N-Strike Elite
+- Nerf N-Strike: Double Blast Bundle
+- New Carnival Games
+- New Super Mario Bros. Wii
+- NHK Kouhaku Quiz Gassen
+- NHL 2K10
+- NHL 2K11
+- NHL 2K9
+- NHL Slapshot
+- Ni Hao, Kai-Lan: Super Game Day
+- Nickelodeon Big Time Rush: Dance Party
+- Nickelodeon Dance
+- Nickelodeon Dance 2
+- Nickelodeon Dora's Big Birthday Adventure
+- Nickelodeon SpongeBob SquarePants: Plankton's Robotic Revenge
+- Nickelodeon SpongeBob's Boating Bash
+- Nicktoons MLB
+- Nicktoons: Attack of the Toybots
+- NiGHTS: Journey of Dreams
+- Nihon Yakyuu Kikou Shounin: Batting Revolution
+- Ninja Captains
+- Ninja Reflex
+- Nitrobike
+- Nodame Cantabile: Dream Orchestra
+- North American Hunting Extravaganza
+- North American Hunting Extravaganza 2
+- Now! That's What I Call Music: Dance & Sing
+- Obscure II
+- Obscure: The Aftermath
+- Octomania
+- Offroad Extreme!
+- Offroad Extreme! Special Edition
+- Offshore Tycoon
+- One Piece Unlimited Cruise 1: The Treasure Beneath the Waves
+- One Piece: Unlimited Cruise: Episode 2: Mezameru Yuusha
+- Onechanbara: Bikini Zombie Slayers
+- Oops! Prank Party
+- Oops! Prank Party (Demo)
+- Open Season
+- Our House: Party!
+- Outdoor Action Double Pack
+- Overlord: Dark Legend
+- Pac-Man Party
+- Party Pigs Farmyard Games
+- Paws & Claws: Pet Resort
+- PBR: Out of the Chute
+- PDC World Championship Darts
+- PDC World Championship Darts 2009
+- PDC World Championship Darts: Pro Tour
+- Pékin Express
+- Penguins of Madagascar
+- Penny Racers Party: Turbo-Q Speedway
+- PES 2008: Pro Evolution Soccer
+- PES 2009: Pro Evolution Soccer
+- PES 2010: Pro Evolution Soccer
+- PES 2011: Pro Evolution Soccer
+- PES 2012: Pro Evolution Soccer
+- PES 2013: Pro Evolution Soccer
+- Petanque Master
+- Pétanque Pro
+- Petit Copter Wii: Adventure Flight
+- Petz Rescue: Wildlife Vet
+- Petz Sports
+- Petz: Catz 2
+- Petz: Crazy Monkeyz
+- Petz: Dogz 2
+- Petz: Horse Club
+- Pheasants Forever
+- Pheasants Forever: Wingshooter
+- Phineas and Ferb: Across the 2nd Dimension
+- Pikmin 2
+- Pinball Hall of Fame: The Gottlieb Collection
+- Pinball Hall of Fame: The Williams Collection
+- Pirate Blast
+- Pirates of the Caribbean: At World's End
+- Pirates PlundArrr
+- Pirates vs. Ninjas: Dodgeball
+- Pirates: Hunt for Blackbeard's Booty
+- Planet 51: The Game
+- Planet Basket 2009-2010
+- Play Gardens
+- Play the World
+- Playground: Kouen de Asobou!
+- Playmobil Circus
+- Pocoyo Racing
+- Pokémon Battle Revolution
+- PokéPark 2: Wonders Beyond
+- Pony Friends 2
+- Pool Hall Pro
+- Pool Party
+- Pop!
+- Pop'n Music
+- PopStar Guitar
+- Power Rangers Samurai
+- Precure All Stars: Zenin Shuugou Let's Dance!
+- Press Your Luck: 2010 Edition
+- Prince of Persia: The Forgotten Sands
+- Prince of Persia: The Forgotten Sands + 1989
+- Pro Golfer Saru
+- Pro Yakyuu Family Stadium
+- Pucca's Race for Kisses
+- Punch-Out!!
+- Puyo Puyo 7
+- Puyo Puyo! Puyopuyo 15th Anniversary
+- Puyo Puyo!! Puyopuyo 20th Anniversary
+- Puzzle Kingdoms
+- Puzzle Quest: Challenge of the Warlords
+- Puzzler Collection
+- Questions pour un Champion: Le Jeu Officiel
+- Quiz Party
+- Rabbids Go Home
+- Racquet Sports
+- Radio Helicopter
+- Radirgy Noa Wii
+- Rainbow Pop
+- Ram Racing
+- Rampage: Total Destruction
+- Rapala Pro Bass Fishing
+- Rapala We Fish
+- Ratatouille
+- Raving Rabbids: Party Collection
+- Raving Rabbids: Travel in Time
+- Rayman Origins
+- Rayman: Raving Rabbids
+- Rayman: Raving Rabbids 2
+- Rayman: Raving Rabbids: TV Party
+- Ready 2 Rumble: Revolution
+- Rec Room Games
+- Red Steel
+- Reel Fishing: Angler's Dream
+- Reload
+- Remington Dangerous Animals
+- Remington Great American Bird Hunt
+- Remington Super Slam Hunting: Africa
+- Remington Super Slam Hunting: Alaska
+- Remington Super Slam Hunting: North America
+- Resident Evil: The Darkside Chronicles
+- Resident Evil: The Umbrella Chronicles
+- Rhythm Heaven Fever
+- Rig Racer 2
+- Ringling Bros. and Barnum & Bailey
+- Rio
+- Rise of the Guardians
+- Rock Band
+- Rock Band 2
+- Rock Band 3
+- Rock Band Track Pack: Classic Rock
+- Rock Band: Country Track Pack
+- Rock Band: Country Track Pack 2
+- Rock Band: Metal Track Pack
+- Rock Band: Track Pack Volume 1
+- Rock Band: Track Pack Volume 2
+- Rock Blast
+- Rock Revolution
+- Rockstar Games Presents Table Tennis
+- Rodea the Sky Soldier
+- Rogue Trooper: Quartz Zone Massacre
+- Rolling Stone: Drum King
+- Roogoo: Twisted Towers
+- Rooms: The Main Building
+- RTL Biathlon 2009
+- Rubik's World
+- Rudolph the Red-Nosed Reindeer
+- Rugby League 3
+- Saint
+- Samba de Amigo
+- Samurai Shodown Anthology
+- Samurai Spirits: 6beonui Seungbu
+- Samurai Warriors 3
+- Samurai Warriors: Katana
+- Sangokushi 11 with Power-Up Kit
+- Santa Claus Is Comin' to Town!
+- Scene It Bright Lights! Big Screen!
+- Scene It Twilight
+- Scene It? Ganz großes Kino!
+- Schlag den Raab
+- Schlag den Raab: Das 2. Spiel
+- Schlag den Raab: Das 3. Spiel
+- Science Papa
+- Scooby-Doo! and the Spooky Swamp
+- Scooby-Doo! First Frights
+- SCORE International Baja 1000: The Official Game
+- Scrabble Interactive
+- SD Gundam: Gashapon Wars
+- SD Gundam: Gashapon Wars (Taikenban)
+- Sea Monsters: A Prehistoric Adventure
+- Secret Files: Tunguska
+- Sega Superstars Tennis
+- Sengoku Basara 2: Heroes: Double Pack (Sengoku Basara 2 - Heroes)
+- Sengoku Basara 3: Utage
+- Sengoku Basara: Samurai Heroes
+- Sengoku Musou 3
+- Sengoku Musou 3: Moushouden
+- Sesame Street: Cookie's Counting Carnival
+- Sesame Street: Elmo's A-to-Zoo Adventure
+- Sesame Street: Ready, Set, Grover!
+- Sharuui Takoron
+- Shaun White Skateboarding
+- Shaun White Snowboarding: Road Trip
+- Shaun White Snowboarding: Road Trip (Target Limited Edition)
+- Shaun White Snowboarding: World Stage
+- Shikakui Atama o Maruku Suru. Wii
+- Shikigami no Shiro III
+- Shimano Extreme Fishing
+- Shimano Xtreme Fishing
+- Shin Chan: ¡Las Nuevas Aventuras para Wii!
+- Shin Chuuka Taisen: Michael to Meimei no Bouken
+- Shonen Jump One Piece: Unlimited Adventure
+- Showtime Championship Boxing
+- Shrek Forever After
+- Shrek the Third
+- Shrek's Carnival Craze: Party Games
+- Sid Meier's Pirates!
+- SimAnimals
+- Simple Wii Series Vol. 1: The Minna de Kart Race
+- Simple Wii Series Vol. 2: The Minna de Bass Tsuri Taikai
+- Simple Wii Series Vol. 3: Asonde Oboeru: The Party Casino
+- Simple Wii Series Vol. 5: The Block Kuzushi
+- Simple Wii Series Vol. 6: The Wai Wai Combat
+- Sin & Punishment: Star Successor
+- Sin Junghwa-daeseon: Michaelgwa Meimeiui Moheom
+- Sing 4: The Hits Edition
+- Six Flags Fun Park
+- Skate City Heroes
+- Skate It
+- Ski and Shoot
+- Ski-Doo Snowmobile Challenge
+- Sky Crawlers: Innocent Aces
+- Skylanders: Giants
+- Skylanders: Spyro no Daibouken
+- Skylanders: Spyro's Adventure
+- Skylanders: SuperChargers Racing
+- Skylanders: Swap Force
+- Skylanders: Trap Team
+- Sled Shred featuring the Jamaican Bobsled Team
+- Sleepover Party
+- Smart Series Presents: Jaja's Adventure
+- Smarty Pants: Trivia Fun for Everyone!
+- Smiley World: Island Challenge
+- Sniper Elite
+- SNK Arcade Classics Vol. 1
+- So Blonde: Back to the Island
+- Sonic & Sega All-Stars Racing
+- Sonic and the Black Knight
+- Sonic and the Secret Rings
+- Sonic Colors
+- Sonic Riders: Zero Gravity
+- Soulcalibur Legends
+- Space Camp
+- Space Chimps
+- Spaghetti Western Shooter
+- Spectrobes: Origins
+- Speed
+- Speed 2
+- Speed Racer
+- Speed Racer: The Videogame
+- Speed Zone
+- Spellbound Party
+- Spider-Man: Friend or Foe
+- SpongeBob SquarePants featuring Nicktoons: Globs of Doom
+- SpongeBob's Atlantis SquarePantis
+- SpongeBob's Truth or Square
+- Spore Hero
+- Spore: Kimi ga Tsukuru Hero
+- Sports Party
+- SPRay
+- Sprint Cars
+- Spyborgs
+- Squeeballs Party
+- SSX Blur
+- Star Wars: Rogue Squadron III: Rebel Strike (Limited Edition Preview Disc)
+- Star Wars: The Clone Wars: Lightsaber Duels
+- Star Wars: The Clone Wars: Republic Heroes
+- Star Wars: The Force Unleashed
+- Star Wars: The Force Unleashed II
+- Storybook Workshop
+- Stunt Flyer: Hero of the Skies
+- Sugoro Chronicle: Migite ni Ken o Hidarite ni Saikoro o
+- Summer Athletics
+- Summer Athletics 2009
+- Summer Athletics: The Ultimate Challenge
+- Summer Challenge: Athletics Tournament
+- Summer Sports 2: Island Sports Party
+- Summer Sports Party
+- Summer Sports: Paradise Island
+- Summer Stars 2012
+- Super Fruit Fall
+- Super Karts
+- Super Mario All-Stars
+- Super Mario Galaxy
+- Super Mario Galaxy 2
+- Super Monkey Ball: Banana Blitz
+- Super Monkey Ball: Step & Roll
+- Super Sentai Battle: Ranger Cross
+- Super Sonic Racer
+- Super Swing Golf
+- Super Swing Golf Season 2
+- Super Truck Racer
+- Supersonic Racer
+- Supervivientes
+- Surf's Up
+- Survivor
+- Sushi Go Round
+- Suzumiya Haruhi no Gekidou
+- Swing Golf Pangya 2nd Shot!
+- Swords
+- Table Football
+- Taiko no Tatsujin Wii
+- Taiko no Tatsujin Wii: Chou Goukaban
+- Taiko no Tatsujin Wii: Dodoon to 2-daime!
+- Taiko no Tatsujin Wii: Ketteiban
+- Taiko no Tatsujin Wii: Minna de Party 3-daime!
+- Tak and the Guardians of Gross
+- Takumi Restaurant wa Daihanjou!
+- Tales of Symphonia: Dawn of the New World
+- Tamagotchi no Furi Furi Kagekidan!
+- Tamagotchi: Party On!
+- Tangled
+- Target: Terror
+- Tatsunoko vs. Capcom: Cross Generation of Heroes
+- Tatsunoko vs. Capcom: Ultimate All-Stars
+- Team Elimination Games
+- Teenage Mutant Ninja Turtles: Smash-Up
+- Ten Pin Alley 2
+- Tenkuu no Kishi Rodea
+- Tetris Party Deluxe
+- Tetris Party Premium
+- The $1,000,000 Pyramid
+- The Adventures of Tintin: The Game
+- The Amazing Race
+- The Bachelor: The Videogame
+- The Beatles: Rock Band
+- The Biggest Loser
+- The Biggest Loser Challenge
+- The BIGS
+- The BIGS 2
+- The Black Eyed Peas Experience
+- The Cages: Pro Style Batting Practice
+- The Chronicles of Narnia: Prince Caspian
+- The Croods: Prehistoric Party!
+- The Daring Game for Girls
+- The Garfield Show: Threat of the Space Lasagna
+- The Grim Adventures of Billy & Mandy
+- The Hip Hop Dance Experience
+- The House of the Dead 2 & 3 Return
+- The House of the Dead: Overkill
+- The King of Fighters Collection: The Orochi Saga
+- The Last Airbender
+- The Legend of Spyro: Dawn of the Dragon
+- The Lord of the Rings: Aragorn's Quest
+- The Monkey King: The Legend Begins
+- The Munchables
+- The Naked Brothers Band: The Video Game
+- The Price Is Right
+- The Price Is Right: 2010 Edition
+- The Price Is Right: Decades
+- The Princess and the Frog
+- The Simpsons Game
+- The Sims 3
+- The Sky Crawlers: Innocent Aces
+- The Smurfs 2
+- The Smurfs Party Pack
+- The Smurfs: Dance Party
+- The Spiderwick Chronicles
+- The Spirit of the Wolf
+- The Ultimate Battle of the Sexes
+- The Ultimate Battle of the Sexes: Quiz & Play!
+- The Ultimate Red Ball Challenge
+- The Voice: I Want You
+- The World of Golden Eggs: Nori Nori Rhythm-kei
+- The X Factor
+- Think Logic Trainer
+- Think: Logik Trainer
+- Think: Train Je Brein
+- Thrillville: Off the Rails
+- Tiger Woods PGA Tour 07
+- Tiger Woods PGA Tour 08
+- Tiger Woods PGA Tour 09: All-Play
+- Tiger Woods PGA Tour 10
+- Tiger Woods PGA Tour 11
+- Tiger Woods PGA Tour 12
+- Titanic Mystery
+- Titeuf: Le Film
+- TNA Impact! Total Nonstop Action Wrestling
+- Tokyo Friend Park II: Ketteiban: Minna de Chousen! Taikan Attraction!
+- Tom Clancy's Ghost Recon
+- Tom Clancy's H.A.W.X. 2
+- Tom Clancy's Splinter Cell: Double Agent
+- Tony Hawk: Ride
+- Tony Hawk's Downhill Jam
+- Tony Hawk's Proving Ground
+- Top Shot Arcade
+- Top Spin 3
+- Top Spin 4
+- Top Trumps Adventures
+- Tornado Outbreak
+- Totally Spies! Totally Party
+- Tournament of Legends
+- Tournament Pool
+- Toushinden
+- Toy Story 3
+- Toy Story Mania!
+- TrackMania
+- TrackMania: Build to Race
+- Transformers Prime: The Game
+- Transformers: Cybertron Adventures
+- Transformers: Dark of the Moon: Stealth Force Edition
+- Transformers: Revenge of the Fallen
+- Transformers: Ultimate Battle Edition
+- Trauma Center: New Blood
+- Trauma Team
+- Triple Crown Championship Snowboarding
+- Trivial Pursuit
+- Trivial Pursuit: Bet You Know It
+- Tron: Evolution: Battle Grids
+- Truck Racer
+- Truth or Lies
+- Turbo Trainz
+- Turbo: Super Stunt Squad
+- TV Show King Party
+- TV Total Events
+- Twinkle Queen
+- U-Sing
+- U-Sing 2
+- U-Sing: Johnny Hallyday
+- UFC Personal Trainer: The Ultimate Fitness System
+- Ultimate Band
+- Ultimate Board Game Collection
+- Ultimate Duck Hunting
+- Ultimate I Spy
+- Ultimate Party Challenge
+- Up
+- Urban Extreme: Street Rage
+- Vacation Isle: Beach Party
+- Vacation Sports
+- Valhalla Knights: Eldar Saga
+- Vegas Party
+- Veggy World
+- Vertigo
+- Victorious Boxers Challenge
+- Victorious Boxers: Revolution
+- Virtua Tennis 2009
+- Virtua Tennis 4
+- Wacky Races: Crash & Dash
+- Wacky World of Sports
+- Walk It Out!
+- WALL-E
+- WarioWare: Smooth Moves
+- Warning: Code de la Route
+- Water Sports
+- We Cheer
+- We Cheer (Demo)
+- We Cheer 2
+- We Dance
+- We Dare: Flirty Fun for All
+- We Love Golf!
+- We Sing
+- We Sing 80s
+- We Sing Deutsche Hits
+- We Sing Deutsche Hits 2
+- We Sing Down Under
+- We Sing Pop!
+- We Sing Robbie Williams
+- We Sing Rock!
+- We Sing UK Hits
+- We Sing Vol. 2
+- We Ski
+- We Ski & Snowboard
+- We Wish You a Merry Christmas
+- Western Heroes
+- Wheel of Fortune
+- Wheelspin
+- Where's Waldo? The Fantastic Journey
+- Who Wants to Be a Millionaire
+- Who Wants to Be a Millionaire: 2nd Edition
+- Wicked Monsters Blast!
+- Wii Chess
+- Wii Fit
+- Wii Fit Plus
+- Wii Music
+- Wii Party
+- Wii Play
+- Wii Play: Motion
+- Wii Sports
+- Wii Sports + Wii Sports Resort
+- Wii Sports Resort
+- Wild Earth: African Safari
+- Wild West Shootout
+- Williams Pinball Classics
+- Wing Island
+- Winning Eleven Play Maker 2008 (Taikenban)
+- Winning Eleven Play Maker 2010: Aoki Samurai no Chousen
+- Winning Eleven Play Maker 2011
+- Winning Eleven Play Maker 2013
+- Winter Blast: Snow & Ice Games
+- Winter Sports 2: The Next Challenge
+- Winter Sports 2008: The Ultimate Challenge
+- Winter Sports 2009: The Next Challenge
+- Winter Sports 2010: The Great Tournament
+- Winter Sports 2011: Go for Gold
+- Winter Sports 2012: Feel the Spirit
+- Winter Sports 3: The Great Tournament
+- Winter Sports: The Ultimate Challenge
+- Winter Stars
+- Wipeout 2
+- Wipeout 3
+- Wipeout: Create & Crash
+- Wipeout: The Game
+- Wonder World Amusement Park
+- WordJong Party
+- World Championship Athletics
+- World of Zoo
+- World Party Games
+- World Series of Poker: Tournament of Champions: 2007 Edition
+- Worms: A Space Oddity
+- Worms: Battle Islands
+- WSC Real 08: World Snooker Championship
+- WWE '12
+- WWE '13
+- WWE All Stars
+- WWE SmackDown vs. Raw 2008
+- WWE SmackDown vs. Raw 2009
+- WWE SmackDown vs. Raw 2010
+- WWE SmackDown vs. Raw 2011
+- WWII Aces
+- Yamaha Supercross
+- Yatterman Wii: Bikkuri Dokkiri Machine de Mou Race da Koron
+- You Don't Know Jack
+- Yu-Gi-Oh! 5D's: Duel Transer
+- Yu-Gi-Oh! 5D's: Wheelie Breakers
+- Yukinko Daisenpuu: Sayuki to Koyuki no Hie Hie Daisoudou
+- Zaidan Houjin Nihon Kanji Nouryoku Kentei Kyoukai Kounin: Kanken Wii: Kanji-ou Ketteisen
+- Zaidan Houjin Nihon Kanji Nouryoku Kentei Kyoukai Koushiki Soft: 250 Mannin no Kanken: Wii de Tokoton Kanji Nou
+- Zero: Shinku no Chou
+- ZhuZhu Pets: Featuring the Wild Bunch
+- Zoo Hospital
+- Zumba Fitness
+- Zumba Fitness 2
+- Zumba Fitness Core
+- Zumba Fitness: World Party
+- Zumba Kids
+
+</details>
+
+## GameCube
+
+Any game with same-console multiplayer, played through Dolphin netplay. Games that need a Game Boy Advance as a controller are left out.
+
+<details>
+<summary><b>Show the 433 games</b></summary>
+
+- 007: Agent Under Fire
+- 007: Everything or Nothing
+- 007: From Russia with Love
+- 007: Nightfire
+- 1080 Avalanche
+- 18 Wheeler: American Pro Trucker
+- 2002 FIFA World Cup
+- 2006 FIFA World Cup
+- 4x4 Evo 2
+- Aggressive Inline
+- Alien Hominid
+- All-Star Baseball 2002
+- All-Star Baseball 2003 featuring Derek Jeter
+- All-Star Baseball 2004 featuring Derek Jeter
+- Amazing Island
+- Army Men: Air Combat: The Elite Missions
+- Army Men: Sarge's War
+- ATV: Quad Power Racing 2
+- Auto Modellista
+- Backyard Baseball
+- Backyard Football
+- Backyard Sports: Baseball 2007
+- Bakuten Shoot Beyblade 2002: Nettou! Magne Tag Battle!
+- Baldur's Gate: Dark Alliance
+- Batman: Rise of Sin Tzu
+- Battle Stadium D.O.N
+- Beach Spikers: Virtua Beach Volleyball
+- Beyblade VForce: Super Tournament Battle
+- Big Air Freestyle
+- Billy Hatcher and the Giant Egg
+- Black & Bruised
+- Bleach GC: Tasogare ni Mamieru Shinigami
+- Bloody Roar: Extreme
+- Bloody Roar: Primal Fury
+- BMX XXX
+- Bobobo-bo Bo-bobo: Dasshutsu!! Hajike Royale
+- Bomberman Generation
+- Bomberman Jetters
+- Bomberman Land 2
+- Bratz: Forever Diamondz
+- Buffy the Vampire Slayer: Chaos Bleeds
+- Burnout
+- Burnout 2: Point of Impact
+- Bust-A-Move 3000
+- Butt-Ugly Martians: Zoom or Doom!
+- Capcom vs. SNK 2 EO
+- Cars
+- Cel Damage
+- Charinko Hero
+- Chicken Little
+- Choro Q!
+- City Racer
+- Cocoto Funfair
+- Cocoto Kart Racer
+- Cocoto Platform Jumper
+- Conflict: Desert Storm
+- Conflict: Desert Storm II
+- Conflict: Desert Storm II: Back to Baghdad
+- Crash Bandicoot: Bakusou! Nitro Kart
+- Crash Nitro Kart
+- Crash Tag Team Racing
+- Custom Robo
+- Dakar 2: The World's Ultimate Rally
+- Dance Dance Revolution: Mario Mix
+- Dark Summit
+- Def Jam: Fight for NY
+- Def Jam: Vendetta
+- Defender
+- Digimon Battle Chronicle
+- Digimon Rumble Arena 2
+- Digimon World 4
+- Disney's Extreme Skate Adventure
+- Disney's Party
+- Donkey Konga
+- Donkey Konga 2
+- Donkey Konga 3: Tabehoudai! Haru Mogitate 50-kyoku
+- Dragon Ball Z
+- Dragon Ball Z: Budokai
+- Dragon Ball Z: Budokai 2
+- Dragon Ball Z: Sagas
+- Dream Mix TV: World Fighters
+- Driven
+- Drome Racers
+- Duel Masters: Nettou! Battle Arena
+- Egg Mania: Eggstreme Madness
+- ESPN International Winter Sports 2002
+- ESPN MLS ExtraTime 2002
+- Evolution Skateboarding
+- Evolution Snowboarding
+- F-Zero GX
+- F1 2002
+- F1 Career Challenge
+- Family Stadium 2003
+- Fantastic 4
+- FIFA 2002: Road to FIFA World Cup
+- FIFA 2003: European Football
+- FIFA Soccer 06
+- FIFA Soccer 07
+- FIFA Soccer 2002
+- FIFA Soccer 2003
+- FIFA Soccer 2004
+- FIFA Soccer 2005
+- FIFA Street
+- FIFA Street 2
+- FIFA World Cup Germany 2006
+- Fight Night Round 2
+- Flushed Away
+- Franklin: Un anniversaire surprise
+- Freaky Flyers
+- Freedom Fighters
+- Freekstyle
+- Freestyle Metal X
+- Freestyle Street Soccer
+- Frogger: Ancient Shadow
+- Frogger's Adventures: The Rescue
+- From TV Animation One Piece: Treasure Battle!
+- Gadget Racers
+- Gauntlet: Dark Legacy
+- Geist
+- Gekitou Pro Yakyuu: Mizushima Shinji All Stars vs. Pro Yakyuu
+- Giant Egg: Billy Hatcher no Daibouken
+- Go! Go! Hypergrind
+- Goblin Commander: Unleash the Horde
+- Godzilla: Destroy All Monsters Melee
+- GoldenEye: Rogue Agent
+- Gotcha Force
+- Grooverider: Slot Car Thunder
+- GT Cube
+- Happy Feet
+- Harry Potter and the Goblet of Fire
+- Harry Potter and the Prisoner of Azkaban
+- Harry Potter to Azkaban no Shuujin
+- Harry Potter to Honoo no Goblet
+- Harry Potter: Quidditch World Cup
+- Harvest Moon: Magical Melody
+- Home Run King
+- Hot Wheels: Velocity X
+- Hot Wheels: World Race
+- Hunter: The Reckoning
+- Ikaruga
+- Intellivision Lives!
+- International Superstar Soccer 2
+- International Superstar Soccer 3
+- Jeremy McGrath Supercross World
+- Jikkyou Powerful Pro Yakyuu 11 Chou Ketteiban
+- Judge Dredd: Dredd vs. Death
+- Karaoke Revolution Party
+- Kelly Slater's Pro Surfer
+- Kidou Senshi Gundam: Gundam vs. Z Gundam
+- King Arthur
+- Kirby Air Ride
+- Knockout Kings 2003
+- Kururin Squash!
+- Legends of Wrestling
+- Legends of Wrestling II
+- LEGO Star Wars II: The Original Trilogy
+- LEGO Star Wars: The Video Game
+- Lord of the Rings: Ou no Kikan
+- Lost Kingdoms
+- Lost Kingdoms II
+- Lotus Challenge
+- Madden NFL 06
+- Madden NFL 07
+- Madden NFL 08
+- Madden NFL 2002
+- Madden NFL 2003
+- Madden NFL 2004
+- Madden NFL 2005
+- Magical Park
+- Major League Baseball 2K6
+- Mario Golf: Toadstool Tour
+- Mario Kart: Double Dash!!
+- Mario Party 4
+- Mario Party 5
+- Mario Party 6
+- Mario Party 7
+- Mario Power Tennis
+- Mario Superstar Baseball
+- Marvel Nemesis: Rise of the Imperfects
+- Mary-Kate and Ashley: Sweet 16: Licensed to Drive
+- Mat Hoffman's Pro BMX 2
+- MC Groovz Dance Craze
+- Medabots Infinity
+- Medal of Honor: Europa Kyoushuu
+- Medal of Honor: European Assault
+- Medal of Honor: Frontline
+- Medal of Honor: Rising Sun
+- Mega Man Anniversary Collection
+- Mega Man X Collection
+- Metal Arms: Glitch in the System
+- Metroid Prime 2: Echoes
+- Micro Machines
+- Midway Arcade Treasures
+- Midway Arcade Treasures 2
+- Midway Arcade Treasures 3
+- MLB SlugFest 2003
+- MLB SlugFest 2004
+- Momotarou Dentetsu 11: Black Bonby Shutsugen! no Maki
+- Momotarou Dentetsu 12: Nishi Nihon-hen mo Arimasse!
+- Monopoly Party
+- Monopoly: Mezase!! Daifugou Jinsei!!
+- Monster 4x4: Masters of Metal
+- Monster Jam: Maximum Destruction
+- Monsters, Inc.: Scream Arena
+- Mortal Kombat: Deadly Alliance
+- Mortal Kombat: Deception
+- Mr. Driller: Drill Land
+- Mr. Incredible: Kyouteki Underminer Toujou
+- Muppets: Party Cruise
+- Muscle Champion: Kinniku-jima no Kessen
+- MVP Baseball 2004
+- MVP Baseball 2005
+- MX SuperFly
+- Mystic Heroes
+- Namco Museum
+- Namco Museum 50th Anniversary
+- Naruto: Clash of Ninja
+- Naruto: Clash of Ninja 2
+- Naruto: Gekitou Ninja Taisen! 3
+- Naruto: Gekitou Ninja Taisen! 4
+- NASCAR 2005: Chase for the Cup
+- NASCAR Thunder 2003
+- NASCAR: Dirt to Daytona
+- NBA 2K2
+- NBA 2K3
+- NBA Courtside 2002
+- NBA Live 06
+- NBA Live 2003
+- NBA Live 2004
+- NBA Live 2005
+- NBA Street
+- NBA Street V3
+- NBA Street Vol. 2
+- NCAA College Basketball 2K3
+- NCAA College Football 2K3
+- NCAA Football 2003
+- NCAA Football 2004
+- NCAA Football 2005
+- Need for Speed: Carbon
+- Need for Speed: Hot Pursuit 2
+- Need for Speed: Most Wanted
+- Need for Speed: Underground
+- Need for Speed: Underground 2
+- NFL 2K3
+- NFL Blitz 2002
+- NFL Blitz 2003
+- NFL Blitz Pro
+- NFL QB Club 2002
+- NFL Street
+- NFL Street 2
+- NHL 06
+- NHL 2003
+- NHL 2004
+- NHL 2005
+- NHL 2K3
+- NHL Hitz 2002
+- NHL Hitz 2003
+- NHL Hitz Pro
+- Nicktoons Unite!
+- Nicktoons: Battle for Volcano Island
+- Nintendo Puzzle Collection
+- One Piece: Grand Battle! 3
+- One Piece: Pirates Carnival
+- Open Season
+- Outlaw Golf
+- Over the Hedge
+- Pac-Man Fever
+- Pac-Man World Rally
+- Party Blast
+- Phantasy Star Online Episode I & II Plus
+- Pikmin 2
+- Pokemon Colosseum
+- Pokemon XD: Gale of Darkness
+- Pool Edge
+- Pool Paradise
+- Pro Rally 2002
+- Puyo Pop Fever
+- Puyo Puyo Fever
+- R-Racing Evolution
+- R: Racing
+- Rally Championship
+- Rampage: Total Destruction
+- Ratatouille
+- Rave Master
+- Rayman 3: Hoodlum Havoc
+- Rayman Arena
+- Red Faction II
+- RedCard
+- RedCard 20-03
+- Rei Fighter Gekitsui Senki
+- Ribbit King Plus! (Bonus Disc)
+- Road Trip: The Arcade Edition
+- RoadKill
+- Robotech: Battlecry
+- Rocket Power: Beach Bandits
+- Rocky
+- Rugrats: Royal Ransom
+- Rune
+- Rune II: Koruten no Kagi no Himitsu
+- SD Gundam Gashapon Wars
+- Sega Soccer Slam
+- Serious Sam: Next Encounter
+- Shadow the Hedgehog
+- Shaman King: Soul Fight
+- Shonen Jump's One Piece: Grand Adventure
+- Shonen Jump's One Piece: Grand Battle
+- Shonen Jump's One Piece: Pirates' Carnival
+- Shrek 2
+- Shrek Super Party
+- Shrek: Smash n' Crash Racing
+- Shrek: SuperSlam
+- Smashing Drive
+- Smuggler's Run: Warzones
+- Sonic Adventure 2: Battle
+- Sonic Gems Collection
+- Sonic Heroes
+- Sonic Mega Collection
+- Sonic Riders
+- Soulcalibur II
+- Space Raiders
+- Speed Challenge: Jacques Villeneuve's Racing Vision
+- Speed Kings
+- SpongeBob SquarePants: Lights, Camera, Pants!
+- Sports: Football
+- Sports: Skateboarding
+- Sports: Soccer
+- SpyHunter
+- SRS: Street Racing Syndicate
+- SSX 3
+- SSX on Tour
+- SSX on Tour with Mario
+- SSX Tricky
+- Star Fox: Assault
+- Star Wars: Jedi Knight II: Jedi Outcast
+- Star Wars: Rogue Squadron II
+- Star Wars: Rogue Squadron II: Rogue Leader
+- Star Wars: Rogue Squadron III
+- Star Wars: Rogue Squadron III: Rebel Strike
+- Star Wars: The Clone Wars
+- Starsky & Hutch
+- Street Hoops
+- Strike Force Bowling
+- Super Bubble Pop
+- Super Bust-A-Move All Stars
+- Super Mario Strikers
+- Super Monkey Ball
+- Super Monkey Ball 2
+- Super Monkey Ball Adventure
+- Super Puzzle Bobble All Stars
+- Super Smash Bros. Melee
+- Swingerz Golf
+- SX Superstar
+- Tak 2: The Staff of Dreams
+- Tak: The Great Juju Challenge
+- Tales of Symphonia
+- Taz: Wanted
+- Teen Titans
+- Teenage Mutant Ninja Turtles
+- Teenage Mutant Ninja Turtles 2: Battle Nexus
+- Teenage Mutant Ninja Turtles 3: Mutant Nightmare
+- Terminator 3: The Redemption
+- Tetris Worlds
+- The Fairly OddParents: Shadow Showdown
+- The Grim Adventures of Billy & Mandy
+- The Incredibles: Rise of the Underminer
+- The Italian Job
+- The Lord of the Rings: The Return of the King
+- The Lord of the Rings: The Third Age
+- The Simpsons: Hit & Run
+- The Simpsons: Road Rage
+- The Sims
+- The Sims 2
+- The Sims: Bustin' Out
+- The Urbz: Sims in the City
+- Tiger Woods PGA Tour 06
+- Tiger Woods PGA Tour 2003
+- Tiger Woods PGA Tour 2004
+- Tiger Woods PGA Tour 2005
+- TimeSplitters 2
+- TimeSplitters: Future Perfect
+- TMNT: Mutant Melee
+- Tom and Jerry in War of the Whiskers
+- Tom Clancy's Ghost Recon
+- Tom Clancy's Rainbow Six 3
+- Tom Clancy's Rainbow Six: Lockdown
+- Tom Clancy's Splinter Cell: Chaos Theory
+- Tom Clancy's Splinter Cell: Double Agent
+- Tony Hawk's American Wasteland
+- Tony Hawk's Pro Skater 3
+- Tony Hawk's Pro Skater 4
+- Tony Hawk's Underground
+- Tony Hawk's Underground 2
+- TransWorld Surf: Next Wave
+- Tube Slider: The Championship of Future Formula
+- Turok: Evolution
+- TY the Tasmanian Tiger 2: Bush Rescue
+- TY the Tasmanian Tiger: Night of the Quinkan
+- UEFA Champions League 2004-2005
+- UFC: Throwdown
+- Ultimate Muscle: Legends vs. New Generation
+- Universal Studios Theme Park Adventure
+- Viewtiful Joe: Red Hot Rumble
+- Virtua Striker 2002
+- WarioWare, Inc.: Mega Party Game$!
+- Warrior Blade: Rastan vs. Barbarian
+- Wave Race: Blue Storm
+- Whirl Tour
+- Winnie the Pooh's Rumbly Tumbly Adventure
+- World Racing
+- Worms 3D
+- Worms Blast
+- Wreckless: The Yakuza Missions
+- WTA Tour Tennis
+- WWE Crush Hour
+- WWE Day of Reckoning
+- WWE Day of Reckoning 2
+- WWE WrestleMania X8
+- WWE WrestleMania XIX
+- X-Men Legends
+- X-Men Legends II: Rise of Apocalypse
+- X-Men: Next Dimension
+- XGIII: Extreme G Racing
+- XGRA: Extreme G Racing Association
+- XIII
+- Zapper
+- Zatch Bell! Mamodo Battles
+- Zatch Bell! Mamodo Fury
+- Zoids Vs.
+- Zoids Vs. II
+- Zoids Vs. III
+- Zoids: Battle Legends
+- Zoids: Full Metal Crash
+- ZooCube
+
+</details>
+
+## PSP
+
+Games with ad hoc multiplayer.
+
+<details>
+<summary><b>Show the 239 games</b></summary>
+
+- 007: From Russia with Love
+- Ace Combat X: Skies of Deception
+- Ace Combat: Joint Assault
+- Activision Hits Remixed
+- Adventure Player
+- After Burner: Black Falcon
+- AI Igo
+- AI Mahjong
+- AI Shougi
+- Air Conflicts: Aces of World War II
+- Alien Syndrome
+- Aliens vs. Predator: Requiem
+- All Kamen Rider: Rider Generation 2
+- Another Century's Episode Portable
+- Ape Academy
+- Ape Academy 2
+- Ape Escape Academy
+- Archer MacLean's Mercury
+- Armored Core : Silent Line Portable
+- Armored Core 3 Portable
+- Armored Core: Formula Front
+- Army of Two: The 40th Day
+- Asphalt: Urban GT 2
+- ATV Offroad Fury Pro
+- ATV Offroad Fury: Blazin' Trails
+- B-Boy
+- Bakugan: Defenders Of The Core
+- Blade Dancer: Lineage of Light
+- BlazBlue - Continuum Shift II
+- Blazblue Continuum Shift Extend
+- BlazBlue: Calamity Trigger
+- Bleach: Heat the Soul
+- Bleach: Heat the Soul 2
+- Bleach: Heat the Soul 3
+- Bleach: Heat the Soul 4
+- Bleach: Heat the Soul 5
+- Bleach: Heat the Soul 6
+- Bleach: Heat the Soul 7
+- Bliss Island
+- Blokus Portable: Steambot Championship
+- Blood Bowl
+- Bomberman
+- Bounty Hounds
+- Brian Lara 2007: Pressure Play
+- Burnout Dominator
+- Burnout Legends
+- Busou Shinki: Battle Masters Mk. 2
+- Bust-a-Move Ghost
+- Call Of Duty : Roads To Victory
+- Capcom Classics Collection Reloaded
+- Chikyuu Boueigun 2 Portable
+- Chili Con Carnage
+- Coded Arms
+- Coded Arms: Contagion
+- Colin McRae Rally 2005 Plus
+- Colin McRae: Dirt 2
+- Crash Tag Team Racing
+- Crazy Taxi: Fare Wars
+- Darkstalkers Chronicle: The Chaos Tower
+- Dave Mirra BMX Challenge
+- Dead to Rights: Reckoning
+- Disgaea: Afternoon of Darkness
+- Disney-Pixar Cars - Race-O-Rama
+- Dissidia 012 - Duodecim Final Fantasy
+- DJ Max Emotional Sense - Fever
+- DJ Max Portable 2
+- DJ Max Portable 3
+- DJ Max Portable Black Square
+- DJ Max Portable Clazziquai Edition
+- Dot Hack Link
+- Dragon Ball Z : Shin Budokai
+- Dragon Ball Z: Shin Budokai 2
+- Dragon Ball Z: Tenkaichi Tag Team
+- Dragonball Evolution
+- Dragoneer's Aria
+- Driver 76
+- Dungeon Siege: Throne of Agony
+- Dynasty Warriors: Strikeforce
+- Eragon
+- Fairy Tail Portable Guild 2
+- Fat Princess : Fistful of Cake
+- Fate/unlimited Codes
+- FIFA 06
+- FIFA 07
+- FIFA Street 2
+- Fight Night : Round 3
+- Final Fantasy Tactics: War of the Lions
+- Fired Up
+- FlatOut : Head On
+- Football Manager Handheld 2007
+- Football Manager Handheld 2008
+- Football Manager Handheld 2009
+- Football Manager Handheld 2010
+- Football Manager Handheld 2011
+- Football Manager Handheld 2012
+- Football Manager Handheld 2013
+- Ford Street Racing : L.A. Duel
+- Free Running
+- FRONTIER GATE Boost+
+- Full Auto 2 Battlelines
+- FullMetal Alchemist: Brotherhood
+- Ghost in the Shell: Stand Alone Complex
+- Gladiator Begins
+- God Eater
+- God Eater 2
+- God Eater Burst
+- Gran Turismo
+- Grand Theft Auto : Chinatown Wars
+- Grand Theft Auto : Liberty City Stories
+- Grand Theft Auto : Vice City Stories
+- Guilty Gear Judgment
+- Guilty Gear XX Accent Core Plus
+- Gun Showdown
+- Gundam Assault Survive
+- Gundam Memories
+- Half-Minute Hero
+- Harry Potter and the Order of the Phoenix
+- Hellboy : The Science of Evil
+- Heroes' VS
+- Ikki Tousen - Xross Impact
+- Infected
+- Initial D: Street Stage
+- Jikkyou Powerful Pro Yakyuu Portable
+- Jikkyou Powerful Pro Yakyuu Portable 2
+- Jikkyou Powerful Pro Yakyuu Portable 3
+- Jikkyou Powerful Pro Yakyuu Portable 4
+- Juiced 2 : Hot Import Nights
+- Kamen Rider Super Climax Heroes
+- Kidou Senshi Gundam - Gundam vs. Gundam
+- Kidou Senshi Gundam - Gundam vs. Gundam Next Plus
+- Kidou Senshi Gundam Seed - Rengou vs. Z.A.F.T. Portable
+- Killzone®: Liberation
+- Kingdom Hearts Birth By Sleep Final Mix
+- Lord of Apocalypse
+- Lord of Arcana - doesn't work
+- Lumines II
+- M.A.C.H. Modified Air Combat Heroes
+- Macross Triangle Frontier
+- Mahou Shoujo Lyrical Nanoha A's Portable: The Battle of Aces
+- Mahou Shoujo Lyrical Nanoha A's Portable: The Gears of Destiny
+- Marvel Nemesis
+- Medal of Honor: Heroes
+- Medal of Honor: Heroes 2
+- Medievil Resurrection
+- Mercury Meltdown 0.9.8.1413
+- Metal Gear Solid : Peace Walker
+- Metal Gear Solid : Portable Ops Plus
+- Metal Slug Anthology
+- Metal Slug XX
+- Miami Vice : The Game
+- Micro Machines V4
+- Midnight Club : L.A. Remix
+- Midnight Club 3: DUB EDITION
+- ModNation Racers
+- Monster Hunter Freedom
+- Monster Hunter Freedom 2
+- Monster Hunter Freedom Unite
+- Monster Hunter Portable 3rd
+- Monster Kingdom : Jewel Summoner
+- Mortal Kombat : Unchained
+- MotoGP
+- MX vs. ATV - On the Edge
+- Naruto Shippuden: Legends : Akatsuki Rising
+- Naruto Shippuden: Ultimate Ninja Heroes 3
+- Naruto Shippuden: Ultimate Ninja Impact
+- Naruto: Ultimate Ninja Heroes
+- Naruto: Ultimate Ninja Heroes 2 : The Phantom Fortress
+- Need for Speed Most Wanted
+- Need for Speed Shift
+- Patapon 3
+- PES 2008 - Pro Evolution Soccer
+- PES 2009 - Pro Evolution Soccer
+- PES 2010 - Pro Evolution Soccer
+- PES 2011 - Pro Evolution Soccer
+- PES 2012 - Pro Evolution Soccer
+- PES 6 - Pro Evolution Soccer
+- Phantasy Star Portable
+- Phantasy Star Portable 2
+- Phantasy Star Portable 2 Infinity
+- PixelJunk Monsters Deluxe
+- Platypus
+- Prince Of Persia : Rival Swords
+- Ridge Racer
+- Ridge Racer 2
+- Rurouni Kenshin: Meiji Kenkaku Romantan Saisen
+- Saki Achiga-hen episode of side - A portable
+- Saru! Get You! P!
+- SOCOM: U.S Navy Seals Fireteam Bravo 1
+- SOCOM: U.S Navy Seals Fireteam Bravo 3
+- Sonic Rivals
+- Sonic Rivals 2
+- SoulCalibur : Broken Destiny
+- SSX on Tour
+- Star Wars - Battlefront II
+- Star Wars Battlefront: Renegade Squadron
+- Star Wars: The Force Unleashed = Star Wars : Le Pouvoir de la Force
+- Steambot Chronicles: Battle Tournament
+- Street Fighter Alpha 3 Max
+- Street Riders
+- Sunday Vs Magazine: Shuuketsu! Choujou Daikessen
+- SWAT - Target Liberty
+- Syphon Filter: Dark Mirror
+- Syphon Filter: Logan's Shadow
+- Tales of VS.
+- Tekken - Dark Resurrection
+- Tekken 6
+- The Eye of Judgment: Legends
+- Tony Hawk's Project 8
+- Toukiden - Model 1000 don't support, use 2000/3000
+- Toukiden Kiwami
+- UFC Undisputed 2010
+- Undead Knights
+- Untold Legends: Brotherhood of the Blade
+- Valhalla Knights
+- Valkyria Chronicles II
+- Virtua Tennis 3
+- Virtua Tennis: World Tour
+- Warriors of the Lost Empire
+- Warriors Orochi 2
+- Weiss Schwarz Portable: Boost Schwarz
+- White Knight Chronicles : Origins
+- WipEout Pulse
+- WipEout Pure
+- Worms: Battle Islands
+- Worms: Open Warfare
+- Worms: Open Warfare 2
+- WRC - FIA World Rally Championship
+- WWE SmackDown vs. Raw 2007
+- WWE SmackDown vs. Raw 2008
+- WWE SmackDown vs. Raw 2009
+- WWE SmackDown vs. Raw 2010
+- WWE SmackDown vs. Raw 2011
+- Yu-Gi-Oh! 5D's Tag Force 4
+- Yu-Gi-Oh! 5D's Tag Force 5
+- Yu-Gi-Oh! 5D's Tag Force 6
+- Yu-Gi-Oh! GX Tag Force
+- Yu-Gi-Oh! GX Tag Force 2
+- Yu-Gi-Oh! GX Tag Force 3
+- Yuusha no Kuse ni Namaikida -3D
+
+</details>
+
+## PlayStation 2
+
+Games with System Link / LAN play.
+
+<details>
+<summary><b>Show the 64 games</b></summary>
+
+- 25 to Life
+- Armored Core - Last Raven
+- Armored Core - Nexus [Disc 1]
+- Armored Core - Nexus [Disc 2]
+- Armored Core - Nine Breaker
+- ATV Offroad Fury 2
+- ATV Offroad Fury 3
+- ATV Offroad Fury 4
+- Call of Duty 2 - Big Red One
+- Colin McRae Rally 2005
+- Conflict - Global Terror
+- Crash Tag Team Racing
+- Dance Dance Revolution X
+- DTM Race Driver 3 - The Ultimate Racing Simulator
+- Fight Club
+- Ford vs. Chevy
+- Full Spectrum Warrior - Ten Hammers
+- Godzilla - Save the Earth
+- Gran Turismo 4
+- GRAN TURISMO 4
+- Greg Hastings' Tournament Paintball Max'd
+- Heroes of the Pacific
+- Hot Wheels - Stunt Track Challenge
+- IndyCar Series 2005
+- Jak X - Combat Racing
+- Juiced
+- Midnight Club 3 - DUB Edition Remix
+- Midnight Club II
+- MotoGP 4
+- MTX Mototrax
+- NASCAR Thunder 2004
+- OutRun 2006 - Coast 2 Coast
+- Project - Snowblind
+- Robotech - Invasion
+- Rogue Trooper
+- SEGA AGES 2500シリーズ Vol.31 電脳戦機バーチャロン
+- SOCOM - US Navy Seals - Combined Assault
+- SOCOM 3 - U.S. Navy SEALs
+- SOCOM II - U.S. Navy SEALs
+- SOCOM Ⅱ: U.S. NAVY SEALs
+- Spy vs. Spy
+- Star Wars - Battlefront
+- Star Wars - Battlefront II
+- Street Racing Syndicate
+- TimeSplitters - Future Perfect
+- TimeSplitters 2
+- TOCA Race Driver 2
+- TOCA Race Driver 3 - The Ultimate Racing Simulator
+- TOCA Race Driver 3 + V8 Supercars Australia 3
+- TOCA RACE DRIVER 3 THE ULTIMATE RACING SIMULATOR
+- TOCA RACE DRIVER 3 THE ULTIMATE RACING SIMULATOR [BEST PRICE]
+- Tom Clancy's Rainbow Six - Lockdown
+- Tom Clancy's Splinter Cell - Chaos Theory
+- Tom Clancy's Splinter Cell - Double Agent
+- Tom Clancy's Splinter Cell - Pandora Tomorrow
+- Tony Hawk's American Wasteland
+- Tony Hawk's Pro Skater 3
+- Tony Hawk's Pro Skater 4
+- Tony Hawk's Underground
+- Tony Hawk's Underground 2
+- Tribes - Aerial Assault
+- Twisted Metal - Black Online
+- Urban Chaos - Riot Response
+- Warhammer 40,000 - Fire Warrior
+
+</details>
+
+## Nintendo DS
+
+Games that used Nintendo Wi-Fi Connection, now served by Kaeru WFC.
+
+<details>
+<summary><b>Show the 1000 games</b></summary>
+
+- 007: Blood Stone
+- 1000 Cooking Recipes from ELLE à Table
+- 101 in 1 Explosive Megamix
+- 101 in 1 Sports Megamix
+- 101 MiniGolf World
+- 11 Card Games
+- 1500 DS Spirits Vol. 1: Mahjong
+- 1500 DS Spirits Vol. 10: Igo
+- 1500 DS Spirits Vol. 2: Shougi
+- 1500 DS Spirits Vol. 3: Block Kuzushi
+- 1500 DS Spirits Vol. 4: Reversi
+- 1500 DS Spirits Vol. 5: Hanafuda
+- 1500 DS Spirits: Mahjong V
+- 1500 DS Spirits: Shougi V
+- 2 in 1: My Pet School + Best Friends - My Horse
+- 2006 FIFA World Cup: Germany 2006
+- 3 in 1: My Riding Stables + My Pet School + My Western Horse
+- 4 Game Fun Pack: Monopoly + Boggle + Yahtzee + Battleship
+- 4 TRAVELLERS - Play French
+- A Topsy Turvy Life: The Turvys Strike Bac
+- Absolute Reversi
+- Advance Wars: Days of Ruin
+- Advance Wars: Dual Strike
+- Age of Empires: Mythologies
+- Age of Empires: The Age of Kings
+- AiRace
+- Akko ni Omakase!: Brain Shock
+- ALC no 10-punkan Eigo Master: Chuukyuu
+- ALC no 10-punkan Eigo Master: Joukyuu
+- ALC no 10-punkan Eigo Master: Shokyuu
+- Alssongdalssong: Myeonghwatamheom DS
+- Alvin and the Chipmunks
+- American Dragon: Jake Long - Attack of the Dark Dragon
+- AMF Bowling Pinbusters!
+- Anan Kanshuu: Onna Dikara Kinkyuu Up! DS
+- Angelique Duet
+- Animal Boxing
+- Animal Crossing: Wild World
+- Anno 1701: Dawn of Discovery
+- Ante Up: Texas Hold'em
+- Appare! Shougi Jiisan: Washi to Shoubu ja
+- Arkanoid DS
+- Around the World in 80 Days
+- Art Style: BASE 10
+- Asonde Igo ga Sarani Tsuyoku Naru!: Ginsei Igo DS: Chuukyuu Hen
+- Asonde Igo ga Tsuyoku Naru!: Ginsei Igo DS
+- Asonde Shougi ga Tsuyoku Naru!: Ginsei Shougi DS
+- Asphalt: Urban GT
+- Asphalt: Urban GT 2
+- Atama no Kaiten no Training: Rubik's Cube & Chou Yuumei Puzzle-tachi
+- Atama o Kitaete Asobu Taisen Yajirushi Puzzle: Puppynu Vector One
+- Atari Greatest Hits: Volume 1
+- Atsumare! Power Pro Kun no DS Koushien
+- Avatar: The Last Airbender: Into the Inferno
+- Away: Shuffle Dungeon
+- Bakugan: Battle Brawlers
+- Bakugan: Defenders of the Core
+- Balls of Fury
+- Bangai-O Spirits
+- Banushi Life Game: Winner's Circle
+- Barbie: Groom and Glam Pups
+- Battle of Giants:  Mutant Insects - Revenge
+- Battle of Giants: Dinosaurs
+- Battle of Giants: Dinosaurs: Fight for Survival
+- Battle of Giants: Dragons
+- Battle of Giants: Dragons: Bronze Edition
+- Battle Spirits Digital Starter
+- Bejeweled Twist
+- Ben 10: Protector of Earth
+- Ben 10: Triple Pack
+- Besser Essen: Leben Leicht Gemacht
+- Beyblade: Metal Fusion
+- Beyblade: Metal Masters
+- Big Brain Academy
+- Bionicle Heroes
+- BlayzBloo: Super Melee Brawlers Battle Royale
+- Bleach: Dark Souls
+- Bleach: The Blade of Fate
+- Blood Bowl
+- Blue Dragon: Awakened Shadow
+- Bolt
+- Bomberman
+- Bomberman Blitz
+- Bomberman Land Touch!
+- Bomberman Land Touch! 2
+- Bomberman Story DS
+- Boogie
+- Bouken-ou Beet: Vandel vs. Busters
+- Boulder Dash: Rocks!
+- Brain Age 2: More Training in Minutes a Day!
+- Brain Age: Train Your Brain in Minutes a Day!
+- Brain Assist
+- Bratz Ponyz 2
+- Bratz: 4 Real
+- Bratz: Forever Diamondz
+- Bratz: Girlz Really Rock
+- Brave Story: Boku no Kioku to Negai
+- Break 'em All
+- Bridge
+- Brothers in Arms DS
+- Bubble Bobble Revolution
+- Build-A-Bear Workshop : Où Se Font les Meilleurs Amis
+- Build-A-Bear Workshop: Welcome to Hugsville
+- Bust-A-Move DS
+- Cake Ninja
+- Cake Ninja 2
+- Call of Duty 4: Modern Warfare
+- Call of Duty: Black Ops
+- Call of Duty: Modern Warfare - Mobilized
+- Call of Duty: Modern Warfare 3 - Defiance
+- Call of Duty: World at War
+- Captain Tsubasa: Gekitou no Kiseki
+- Carcassonne
+- Card Game 9
+- Card Games: The Classics
+- Cars
+- Cars 2
+- Cars: Mater-National Championship
+- Cars: Race-O-Rama
+- Cartoon Network Racing
+- Castlevania: Dawn of Sorrow
+- Castlevania: Order of Ecclesia
+- Castlevania: Portrait of Ruin
+- Catz
+- Chameleon: To Dye For!
+- Charm Girls Club: My Fashion Mall
+- Charm Girls Club: My Fashion Show
+- Charm Girls Club: My Perfect Prom
+- Chessmaster: The Art of Learning
+- Chibi-Robo!: Park Patrol
+- Chicken Little: Ace in Action
+- Children of Mana
+- Chocobo to Mahou no Ehon: Majo to Shoujo to 5-nin no Yuusha
+- Chocoken no Sweets Department: Patissier Ikusei Simulation Game
+- Chotto Asobi Taizen: Otegaru Trump
+- Chou Gekijouban Keroro Gunsou: Enshuu Da yo!: Zenin Shuugou
+- Chou Nekketsu Koukou Kunio-kun: Dodgeball-bu
+- Chrono Trigger
+- Chungjeon! Hanguginui Sangsingnyeok DS
+- Ciao Dream Touch!: Happy Anniversary
+- Cinnamoroll: Ohanashi Shiyo!: Kirakira de Kore Cafe
+- Clash of Elementalists
+- Club Penguin: Elite Penguin Force
+- Club Penguin: EPF: Herbert's Revenge
+- Clubhouse Games
+- Cocoro no Cocoron
+- Cocoto Racers
+- Cocoto: Kart Racer
+- Code Geass: Hangyaku no Lelouch R2: Banjou no Geass Gekijou
+- Code Lyoko: Fall of X.A.N.A.
+- Combat of Giants: Fight for Survival
+- Contact
+- Contra 4
+- Cookie & Cream
+- Cookie Shop: Create Your Dream Shop
+- Cooking Mama
+- Cooking Mama 3: Shop & Chop
+- Cooking Mama World: Combo Pack Volume 1
+- Cory in the House
+- Cosmetick Paradise
+- Crash Boom Bang!
+- Crash: Mind over Mutant
+- Crayon Shin-chan: Arashi o Yobu Nendororoon Daihenshin!
+- Crayon Shin-chan: Obaka Dainin Den: Susume! Kasukabe Ninja Tai!
+- Crayon Shin-chan: Shock Gahn!: Densetsu o Yobu Omake Daiketsusen!!
+- Crazy Frog Racer
+- Crazy Golf
+- Croket! DS: Tenkuu no Yuusha-tachi
+- Cross Treasures
+- Curling DS
+- Curling Super Championship
+- Custom Battler Bomberman
+- Custom Beat Battle: Draglade 2
+- Custom Robo Arena
+- Daigassou! Band-Brothers DX
+- Daikoukai Jidai IV: Rota Nova
+- Daisenryaku DS: Great Strategy
+- Dance! It's Your Stage
+- Danny Phantom: Urban Jungle
+- Daredemo Asobi Taizen
+- Date ni Gametsui Wake ja Nee!: Dungeon Maker Girls Type
+- De Kolonisten van Catan
+- Deal or No Deal: Der Banker Schlaegt Zurueck
+- Death Note: Kira Game
+- Death Note: L o Tsugu Mono
+- Deca Sports DS
+- Dekiru Otoko no Mote Life: Hiru no Mote Kouza Hen
+- Dekiru Otoko no Mote Life: Yoru no Mote Jissen Hen
+- Deltora Quest: Nanatsu no Houseki
+- Diary Girl
+- Diddy Kong Racing DS
+- Dig Dug: Digging Strike
+- Digimon Story: Lost Evolution
+- Digimon World Championship
+- Digimon World DS
+- Digimon World: Dawn
+- Digimon World: Dusk
+- Diner Dash: Sizzle & Serve
+- Dino King Battle: Taiko kara no Hyouryuusha
+- Dino Master: Dig, Discover, Duel
+- Dinosaur King
+- DiRT 2
+- Disgaea DS
+- Disney Friends
+- DK: Jungle Climber
+- Dogz
+- Dokapon Journey
+- Dorabase 2: Nettou Ultra Stadium
+- Dorabase: Doraemon Super Baseball Gaiden: Dramatic Stadium
+- Doraemon: Nobita no Kyouryuu 2006 DS
+- Doraemon: Nobita no Shin Makai Daibouken DS
+- Downtown Texas Hold'em
+- Draglade
+- Dragon Ball DS
+- Dragon Ball Z: Bukuu Ressen
+- Dragon Ball Z: Harukanaru Densetsu
+- Dragon Ball Z: Harukanaru Gokuu Densetsu
+- Dragon Ball: Origins
+- Dragon Ball: Origins 2
+- Dragon Quest Heroes: Rocket Slime
+- Dragon Quest IV: Chapters of the Chosen
+- Dragon Quest IX: Sentinels of the Starry Skies
+- Dragon Quest Monsters: Joker
+- Dragon Quest Monsters: Joker 2
+- Dragon Quest Monsters: Joker 2: Professional
+- Dragon Quest V: Hand of the Heavenly Bride
+- Dragon Tamer: Sound Spirit
+- Dragon Zakura DS
+- Drawn to Life
+- Drawn to Life: Collection
+- Drawn to Life: SpongeBob SquarePants Edition
+- Drawn to Life: The Next Chapter
+- Drift Street International
+- Drone Tactics
+- Dropcast
+- DS Bimoji Training
+- DS Dengeki Bunko: Allison
+- DS Dengeki Bunko: Inukami! feat. Animation
+- DS Dengeki Bunko: Iriya no Sora, UFO no Natsu
+- DS GoStop
+- DS Kageyama Method Dennou Hanpuku: Masu x Masu Pre-Hyaku Masu Keisan: Hyaku Masu no Mae ni Kore Da yo!
+- DS Rakubiki Jiten
+- Duke Nukem: Critical Mass
+- Dun-Dam: Dungeons & Dam
+- Dungeon Explorer: Warriors of Ancient Arts
+- Dungeon Raiders
+- Dynasty Warriors DS: Fighter's Battle
+- E=M6 Défi Cérébral
+- EA Playground
+- Eco-Creatures: Save the Forest
+- Ecolis: Aoi Umi to Ugoku Shima
+- Egg Monster Hero
+- Eigo de Tabisuru: Little Charo
+- Eigo ga Nigate na Otona no DS Training: Eigo Zuke
+- Eigo ga Nigate na Otona no DS Training: Motto Eigo Zuke
+- Eijukugo Target 1000 DS
+- Eindeloos Games Top 10
+- Elebits: The Adventures of Kai and Zero
+- Element Hunters
+- Elemental Monster: Itsu Hashira Gami no Nazo
+- Elite Beat Agents
+- Elite Forces: Unit 77
+- Enchanted
+- Ener-G: Dance Squad
+- Etrian Odyssey III: The Drowned City
+- Everyday Soccer
+- Extreme Hangman
+- Eyeshield 21: Max Devil Power!
+- Ferrari Challenge: Trofeo Pirelli
+- Ferrari GT: Evolution
+- FIFA 08
+- FIFA 09
+- FIFA Soccer 06
+- FIFA Soccer 07
+- FIFA Soccer 10
+- FIFA Soccer 11
+- FIFA Street 2
+- Final Fantasy Crystal Chronicles: Echoes of Time
+- Final Fantasy Crystal Chronicles: Ring of Fates
+- Final Fantasy Crystal Chronicles: Ring of Fates (Demo)
+- Final Fantasy Fables: Chocobo Tales
+- Final Fantasy III
+- Final Fantasy IV
+- Final Fantasy: The 4 Heroes of Light
+- Finding Nemo: Escape to the Big Blue
+- Finding Nemo: Escape to the Big Blue: Special Edition
+- Fire Emblem: Shadow Dragon
+- Flight Control
+- Football Academy: Build and Prove Your Football Knowledge
+- Fossil Fighters Champions
+- Fossil League: Dino Tournament Championship
+- Foto Showdown
+- Freedom Wings
+- From the Abyss
+- Fushigi no Dungeon: Fuurai no Shiren 4: Kami no Hitomi to Akuma no Heso
+- Fuuun! Dairoujou
+- G-Force
+- G.I. Joe: The Rise of Cobra
+- Gaitame Baibai Trainer: Kabutore FX
+- Galactik Football
+- Galaxy Saver
+- Gardening Mama
+- Geometry Wars: Galaxies
+- Ginga Tetsudou 999 DS
+- Globulos Party
+- Glory Days 2
+- Go Fetch! 2
+- GO Series: Undead Storm
+- Gokujou!! Mecha Mote Iinchou: Girls 'Mote Kawa' Box
+- Gokujou!! Mecha Mote Iinchou: Mecha Mote Days, Hajimemasuwa!
+- Gokujou!! Mecha Mote Iinchou: MM Town de Miracle Change!
+- GoldenEye 007
+- GoldenEye: Rogue Agent
+- Goooooal America
+- GoPets: Vacation Island!
+- Gotouchi Kentei DS
+- Grand Theft Auto: Chinatown Wars
+- Grid
+- Guilty Gear: Dust Strikers
+- Guitar Hero: On Tour
+- Guitar Hero: On Tour: Decades
+- Guitar Hero: On Tour: Modern Hits
+- Guitar Rock Tour
+- Gunpey DS: Music x Puzzle
+- Guruguru Nagetto
+- Hachi-One Diver DS
+- Hajime no Ippo: The Fighting! DS
+- Hamsterz Life
+- Hannah Montana: Music Jam
+- Happy Feet
+- Harobots Action!!
+- Harry Potter and the Deathly Hallows: Part 1
+- Harry Potter and the Goblet of Fire
+- Harry Potter and the Half-Blood Prince
+- Harry Potter and the Order of the Phoenix
+- Harvest Moon DS: Grand Bazaar
+- Harvest Moon DS: Island of Happiness
+- Harvest Moon DS: The Tale of Two Towns
+- Harvest Moon: Frantic Farming
+- Hearts Spades Euchre
+- Heavy Armor Brigade
+- Hell's Kitchen Vs.
+- Hello Kitty no Oshare Party: Sanrio Character Zukan DS
+- Heroes of Mana
+- Hi Hi Puffy AmiYumi: The Genie & the Amp
+- Hidden Photo
+- High School Musical: Makin' the Cut!
+- Hippatte!! Puzzle Bobble
+- Hooked on Bass Fishing
+- Horse Life 3
+- Horse Life: Adventures
+- Horsez
+- Hoshigami: Ruining Blue Earth: Remix
+- Hot Wheels: Track Attack
+- Hudson x GReeeeN: Live! DeeeeS!
+- Idaten Jump DS: Moero! Flame Kaiser
+- Il Mio Coach: Arricchisco il Mio Inglese
+- Illu-Logi VOW
+- Imagine: Babysitters
+- Imagine: Ballet Star
+- Imagine: Fashion Designer
+- Imagine: Fashion Designer: New York
+- Imagine: Fashion Designer: World Tour
+- Imagine: Figure Skater
+- Imagine: Party Planner
+- Imagine: Rock Star
+- Imagine: Soccer Captain
+- Imagine: Teacher
+- Imagine: Wedding Designer
+- Inazuma Eleven
+- Inazuma Eleven 2 : Tempête de Feu
+- Inazuma Eleven 2: Blizzard
+- Inazuma Eleven 3: Sekai e no Chousen!!: Bomber
+- Inazuma Eleven 3: Sekai e no Chousen!!: Spark
+- Inazuma Eleven 3: Sekai e no Chousen!!: The Ogre
+- Indoor Sports Club
+- Infinite Space
+- Iron Master: The Legendary Blacksmith
+- Irozuki Tingle no Koi no Balloon Trip
+- iSpot Japan
+- Itadaki Street DS: Dragon Quest Super Mario
+- Itsudemo Dokodemo Dekiru Igo: AI Igo DS
+- Itsudemo Dokodemo Dekiru Shougi: AI Shougi DS
+- Ivy the Kiwi
+- Jackass The Game DS
+- Jam with the Band
+- Jan Sangoku Musou
+- Jazzy Billiards
+- Jenga World Tour
+- Jet Impulse
+- Jetix Puzzle Buzzle
+- Jewel Quest: Expeditions
+- Jewelpet: Kawaii Mahou no Fantasy
+- Jewelpet: Mahou no DS Kirapikarin
+- Jinsei Game
+- Jinsei Game DS
+- Jinsei Game Q: DS Heisei no Dekigoto
+- Jinsei Game Q: DS Shouwa no Dekigoto
+- Jump Super Stars
+- Jump Ultimate Stars
+- Just SING! Vol. 3
+- Juushinden: Ultimate Beast Battlers
+- Kageyama Hideo no IQ Teacher DS: Kangaeru Chikara to Oboeru Chikara
+- Kaijuu Busters
+- Kaite, Shabette, Hajimeyou!: Monster Farm DS
+- Kanbayashi Shiki Nouryoku Kaihatsu Hou: Unou Kids DS
+- Kanshuu Nihon Joushiki Ryoku Kentei Kyoukai: Imasara Hito ni wa Kikenai: Otona no Joushiki Ryoku Training DS
+- Karasawa Shunichi no Zettai ni Ukeru!!: Zatsugakuen DS
+- Katekyoo Hitman Reborn! DS: Fate of Heat II: Unmei no Futari
+- Katekyoo Hitman Reborn! DS: Flame Rumble X: Mirai Chou Bakuhatsu!!
+- Kawaii Koinu DS 3
+- Kawaii Koneko DS 2
+- Kawaii Koneko DS 3
+- Keitai Sousakan 7 DS: Buddy Sequence
+- Kekkaishi: Karasumori Ayakashi Kidan
+- Kero Kero 7
+- Keroro Gunsou: Enshuu Da yo!: Zenin Shuugou Part 2
+- Keshikasu-kun: Battle Kasu-tival
+- Kidou Gekidan Haro Ichiza: Gundam Mahjong +Z: Sarani Dekiru You ni Natta Na!
+- Kidou Gekidan Haro Ichiza: Gundam Mahjong DS: Oyaji ni mo Agarareta Koto nai no ni!
+- Kim Possible: Global Gemini
+- Kingdom Hearts: 358-2 Days
+- Kingdom Hearts: Re-coded
+- Kirarin Revolution: Minna de Odorou Furi Furi Debut!
+- Kirarin Revolution: Naa-san to Issho
+- Kirby Super Star Ultra
+- Kirby: Squeak Squad
+- Knights
+- Kodawari Saihai Simulation: Ochanoma Pro Yakyuu DS
+- Kodawari Saihai Simulation: Ochanoma Pro Yakyuu DS: 2010 Nendo Ban
+- Koe de Asobou: HeartCatch PreCure!
+- Konami Arcade Collection
+- Konami Classics Series: Arcade Hits
+- Kono Quiz Yarou!!
+- Korg DS-10 Synthesizer
+- Korg M01 Music Workstation
+- Kotoba no Puzzle: Mojipittan DS
+- Kouchuu Kakutou: Mushi-1 Grand-Prix
+- Kouchuu Ouja Mushi King Super Collection
+- Kouchuu Ouja Mushi King: Greatest Champion e no Michi 2
+- Kouchuu Ouja Mushi King: Greatest Champion e no Michi DS
+- Koukou Yakyuu-dou DS
+- Kunitori Zunou Battle: Nobunaga no Yabou
+- Kupuu!! Mamegoma!
+- Kurikin: Nano Island Story
+- KuruKuru Princess: Tokimeki Figure: Mezase! Vancouver
+- Kurupoto: Cool Cool Stars
+- La Kou Rate Ura Mahjong Retsuden: Mukoubuchi: Gobureist Desu ne
+- Labyrinth
+- Le Incollables CM1-CM2s
+- Learn to Play Chess with Fritz & Chesster
+- LEGO Batman 2: DC Super Heroes
+- LEGO Battles: Ninjago
+- LEGO Indiana Jones 2: The Adventure Continues
+- LEGO Indiana Jones: The Original Adventures
+- LEGO Star Wars II: The Original Trilogy
+- LEGO Star Wars: The Complete Saga
+- Let's Play Garden
+- Let's Ride: Friends Forever
+- Lise no Atelier: O'ldor no Renkinjutsushi
+- Littlest Pet Shop: Garden
+- Littlest Pet Shop: Jungle
+- Littlest Pet Shop: Winter
+- Live Battle Card: Live On DS
+- Livly Garden
+- Lock's Quest
+- LonQ! Highland in DS: Puu Puu Seijin Arawaru!! Shukketsu Dai-service! Onara no Saiten SP
+- Looney Tunes: Duck Amuck
+- Lost in Blue 2
+- Lost in Blue 3
+- LostMagic
+- Love Plus+
+- Lucky☆Star: Moe Drill
+- Luminous Arc
+- Luminous Arc 2
+- Luminous Arc 3: Eyes
+- Lunar: Genesis
+- Mabeop Cheonjamun DS
+- Mabeop Cheonjamun DS 2: Choehuui Hanja Mabeop
+- Machi no Pet-ya-san DS 2: Wannyan 333-hiki Daishuugou!
+- Madden NFL 08
+- MAER Heaven: Boukyaku no Klavier
+- MAER Heaven: Kaldea no Akuma
+- Magical Michael Pang
+- Magical Starsign
+- Magician's Quest: Mysterious Times
+- MagicQ DS
+- Magnetica
+- Mahjong
+- Mahjong Fight Club DS: Wi-Fi Taiou
+- Mahjong Taikai
+- Mainichi Shinbunsha Kyouryoku: Saikyou no Kanji Drill 5-man Mon
+- Majime ni Fumajime: Kaiketsu Zorori: Kyoufu no Takarabako
+- Mamegoma 3: Kawaii ga Ippai!
+- Manga-ka Debut Monogatari DS: Akogare! Manga-ka Ikusei Game
+- Mario & Sonic at the Olympic Games
+- Mario & Sonic at the Olympic Winter Games
+- Mario Hoops 3 on 3
+- Mario Kart DS
+- Mario Kart DS (Demo)
+- Mario Party DS
+- Mario vs. Donkey Kong 2: March of the Minis
+- Mario vs. Donkey Kong: Mini-Land Mayhem!
+- Mario vs. Donkey Kong: Minis March Again!
+- Marvel Super Hero Squad
+- Math Play
+- Mawashite Tsunageru Touch Panic
+- Mechanic Master
+- MechAssault: Phantom War
+- Meet the Robinsons
+- Mega Man Battle Network 5: Double Team DS
+- Mega Man Star Force 2: Zerker x Ninja
+- Mega Man Star Force 2: Zerker x Saurian
+- Mega Man Star Force 3: Black Ace
+- Mega Man Star Force 3: Red Joker
+- Mega Man Star Force: Dragon
+- Mega Man Star Force: Leo
+- Mega Man Star Force: Pegasus
+- Mega Man ZX: Advent
+- Mein Wortschatz-Coach: Verbessere Dein Ausdrucksvermoegen
+- Meine Tierschule
+- Mensch Aergere Dich Nicht: Das Beliebte Original
+- Metal Fight Beyblade: Baku Shin Susanoo Shuurai!
+- Metal Max 3
+- Meteos
+- Meteos: Disney Magic
+- Metroid Prime Hunters: First Hunt
+- Metroid Prime: Hunters
+- Mezase! Koushien
+- Mezase! Shoujo Manga Ka!! Ciao Manga School
+- Mezase!! Tsuri Master DS
+- Mi Experto en Inglés: Mejora Tu Vocabulario Inglés
+- Mi Experto en Vocabulario
+- Miami Nights: Singles in the City
+- Milon no Hoshizora Shabon: Puzzle Kumikyoku
+- Minna de Asobou: Shanghai DS 2
+- Minna de Flash Anzan DS
+- Minna de Jibun no Setsumeisho: B-Gata, A-Gata, AB-Gata, O-Gata
+- Minna no Mahjong DS
+- Minna no Suizokukan
+- Minna to Kimi no Piramekino!
+- Mirakuru! Mimika DS
+- Mitsukete! Keroro Gunsou: Machigai Sagashi Daisakusen de Arimasu!
+- Mizuiro Blood
+- Moero! Nekketsu Rhythm Damashii: Osu! Tatakae! Ouendan 2
+- Momotarou Dentetsu DS: Tokyo & Japan
+- Momotarou Dentetsu: 20 Shuunen
+- Momotarou Dentetsu: World
+- Mon Coach Personnel: J'Améliore mon Anglais
+- Mon Coach Personnel: J'Améliore Mon Espagnol
+- Mon Coach Personnel: J'Enrichis Mon Vocabulaire
+- Mondai na Nihongo
+- Monmallineun 3-gongjuwa Hamkkehaneun: Geurimyeonsang Yeongdaneo Amgibeop
+- Monokuro Boo & Baby Boo: Kururin Boo
+- Monopoly
+- Monster Bomber
+- Monster Farm DS 2: Yomigaeru! Master Breeder Densetsu
+- Monster Lab
+- Monster Mayhem: Build and Battle
+- Motto! Hamster to Kurasou: Akachan ga Umareta yo
+- Motto! Stitch! DS: Rhythm de Rakugaki Daisakusen
+- Mr. Driller: Drill Spirits
+- Mushi: Machi no Konchuu Monogatari
+- Mushroom Men: Rise of the Fungi
+- My Dress-Up
+- My French Coach Level 2: Improve Your French
+- My Japanese Coach: Learn a New Language
+- My Melody Angel Book: Denshi Techou & Enjoy Game
+- My Secret World by Imagine
+- My Spanish Coach: Learn a New Language
+- My Word Coach: Improve Your Vocabulary
+- My Word Coach: Verbeter Je Woordenschat
+- MySims
+- MySims Agents
+- MySims Kingdom
+- MySims Party
+- MySims Racing
+- MySims SkyHeroes
+- Mystery Case Files: MillionHeir
+- Mystery Dungeon: Shiren the Wanderer
+- N+
+- Namco Museum DS
+- Nangoku Sodachi DS
+- Nanostray
+- Nanpure 10000 Mon
+- Nanpure VOW
+- Naruto RPG 2: Chidori vs Rasengan
+- Naruto Shippuden: Naruto vs Sasuke
+- Naruto Shippuden: Ninja Council 4
+- Naruto Shippuden: Ninja Destiny 2
+- Naruto Shippuden: Shinobi Rumble!!
+- Naruto Shippuu Den: Dairansen! Kagebunshin Emaki
+- Naruto: Ninja Council 3
+- Naruto: Ninja Destiny
+- Naruto: Path of the Ninja 2
+- Need for Speed Carbon: Own the City
+- Need for Speed: Nitro
+- Need for Speed: Nitro-X
+- Need for Speed: ProStreet
+- Need for Speed: Underground 2
+- Neko Neko Bakery DS
+- Nettou! Powerful Koushien
+- New Eitango Target 1900 DS
+- New Horizon: English Course 1 DS
+- New Horizon: English Course 2 DS
+- New Horizon: English Course 3 DS
+- New International Track & Field
+- New Super Mario Bros.
+- New Zealand Story Revolution
+- Ni no Kuni: Shikkoku no Madoushi
+- Nicktoons: Attack of the Toybots
+- Nicktoons: Battle for Volcano Island
+- Nicola Kanshuu: Model Oshare Audition
+- Nihon Pro Mahjong Kishikai Kanshuu: Pro ni Naru Mahjong DS
+- Nihongo Kentei Iinkai Kounin: Nihongo Kentei DS
+- Ninja Reflex
+- Ninjatown
+- Nintama Rantarou: Nintama no Tame no Ninjutsu Training
+- Nintendogs Jack Russell Relay Mode (Demo)
+- Nintendogs: Best Friends
+- Nintendogs: Chihuahua & Friends
+- Nintendogs: Dachshund & Friends
+- Nintendogs: Dalmatian & Friends
+- Nintendogs: Download-Relay Version
+- Nintendogs: Lab & Friends
+- Nobunaga no Yabou DS
+- Nounai Aesthe IQ Suppli DS
+- Nova Usagi no Game de Ryuugaku! DS
+- Ochaken no Daibouken: Honwaka Yumemiru Sekai Ryokou
+- Ochaken no Heya DS
+- Ochaken no Heya DS 2
+- Ochaken no Heya DS 4
+- Odoru Daisousa-sen: The Game: Sensuikan ni Sennyuu Seyo!
+- Oekaki Puzzle Battle!: Yuusha Ou GaoGaiGar Hen
+- Ogwangui Darin DS
+- One Piece Gigant Battle 2: Shin Sekai
+- One Piece: Gear Spirit
+- One Piece: Gigant Battle!
+- Open Season
+- Orla Froesnapper
+- Oshare Majo Love and Berry: DS Collection
+- Otona no Onna Ryoku Kentei
+- Otona Ryoku Kentei
+- Panzer Tactics DS
+- Paper Airplane Chase
+- Partouche Poker Tour: Poker Texas Hold'em No Limit
+- Paul's Shooting Adventure 2
+- Pen1 Grand Prix: Penguin no Mondai Special
+- Penguin no Mondai X: Tenkuu no 7 Senshi
+- Penguin no Mondai: The World
+- Personal Trainer: Math
+- Pet Shop Monogatari DS 2
+- Petz: Catz Clan
+- Petz: Dogz Pack
+- Petz: Hamsterz Life 2
+- Petz: Horseshoe Ranch
+- Petz: Monkeyz House
+- Phantasy Star 0
+- Picross 3D
+- Picross DS
+- PictoChat
+- Pingu no Waku Waku Carnival!
+- Pinky Street: Kirakira Music Hour
+- Pippi Longstocking
+- Pirates
+- Pirates of the Caribbean: At World's End
+- Pirates of the Caribbean: Dead Man's Chest
+- Planet Puzzle League
+- Plants vs. Zombies
+- Platinum Sudoku
+- Pocoyo Racing
+- Point Blank DS
+- Pokémon Black Version
+- Pokémon Black Version 2
+- Pokémon Conquest
+- Pokemon Dash
+- Pokemon Mystery Dungeon: Explorers of Darkness
+- Pokemon Mystery Dungeon: Explorers of Sky
+- Pokemon Ranger: Guardian Signs
+- Pokemon Trozei!
+- Pokémon White Version
+- Pokémon White Version 2
+- Pokemon: Diamond Version
+- Pokemon: HeartGold Version
+- Pokemon: Pearl Version
+- Pokemon: Platinum Version
+- Pokemon: SoulSilver Version
+- Polar Rampage
+- Polarium
+- Pony Friends 2
+- Pop Cutie!: Street Fashion Simulation
+- Pop Island
+- Pop Island: Paperfield
+- PostPet DS: Yumemiru Momo to Fushigi no Pen
+- Poupeegirl DS
+- Power Pocket Koushien
+- Power Pro Kun Pocket 10
+- Power Pro Kun Pocket 8
+- Power Pro Kun Pocket 9
+- Powerful Golf
+- Prey the Stars
+- Princess on Ice
+- Princess: Magical Jewels
+- Prinzessin Lillifee: Feenzauber
+- Prinzessin Lillifee: Meine Liebsten Freunde
+- Prinzessin Lillifee: Meine Wunderbare Welt
+- Prism: Light the Way
+- Pro Evolution Soccer 2008
+- Pro Evolution Soccer 6
+- Pro Yakyuu Famista DS
+- Pro Yakyuu Famista DS 2009
+- Pro Yakyuu Famista DS 2010
+- Pro Yakyuu Team o Tsukurou! 2
+- Professional Fisherman's Tour: Northern Hemisphere
+- Professor Layton and the Last Specter
+- Puchi Puchi Virus
+- Puffins: Let's Race!
+- Puppy Palace
+- Purr Pals
+- Puyo Pop Fever
+- Puyo Puyo 7
+- Puyo Puyo Fever Two!
+- Puyo Puyo!: Puyopuyo 15th Anniversary
+- Puyo Puyo!!: Puyopuyo 20th Anniversary
+- Puyo Puyo!!: Puyopuyo 20th Anniversary: Taikenban (Not For Resale)
+- Puzzle Bobble DS
+- Puzzle Quest: Challenge of the Warlords
+- Puzzle Quest: Galactrix
+- Puzzle Series Vol. 9: Sudoku 2 Deluxe
+- QuickSpot
+- Quiz Kirameki Star Road
+- Quiz Magic Academy DS: Futatsu no Jikuuseki
+- Quiz Taxi
+- Quiz! Hexagon II
+- Quiz! Nihongo-ou
+- Rabbids Go Home: A Comedy Adventure
+- Race Driver: Create & Race
+- Ragnarok Online DS
+- Ratatouille
+- Rayman: Raving Rabbids 2
+- Rayman: Raving Rabbids: TV Party
+- Real Adventures: Wild Horses - The Quest for the Golden Horse
+- Real Soccer 2008
+- Real Soccer 2009
+- Real Soccer 2010
+- Rekishi Taisen: Gettenka: Tenkaichi Battle Royale
+- Resident Evil: Deadly Silence
+- Retro Atari Classics
+- Ridge Racer DS
+- River King: Mystic Valley
+- Road to Vegas
+- Rock Band 3
+- Rockman EXE: Operate Shooting Star
+- Rooms: The Main Building
+- Rummikub
+- Rune Factory 2: A Fantasy Harvest Moon
+- Rune Factory 3: A Fantasy Harvest Moon
+- Rune Factory: A Fantasy Harvest Moon
+- Ryoukiki Exercise: Riron no Migite to Kansei no Hidarite
+- SaGa 2: Hihou Densetsu: Goddess of Destiny
+- Saiyuuki Kinkaku Ginkaku no Inbou
+- Saka Tsuku DS: Touch and Direct
+- Sam Power: Footballer
+- San-X Character Channel: All-Star Daishuugou!
+- San-X Character Sagashi Land
+- San-X Land: Theme Park de Asobou!
+- Sangokushi DS
+- Sangokushi DS 2
+- Sangokushi Taisen DS
+- Sangokushi Taisen Ten
+- SBK: Snowboard Kids
+- Schach
+- Scrabble Classic
+- Scrabble Slam!
+- Scribblenauts
+- SD Gundam Sangoku Den: Brave Battle Warriors: Shin Militia Taisen
+- Secret Key Distribution 2009
+- SEGA Casino
+- Shaun White Snowboarding
+- Shikakui Atama o Maruku Suru. DS: Joushiki, Nanmon no Shou
+- Shikakui Atama o Maruku Suru. DS: Kanji no Shou
+- Shikakui Atama o Maruku Suru. DS: Keisan no Shou
+- Shin chan e i Colori Magici!
+- Shin Lucky Star Moe Drill: Tabidachi
+- Shougi World Champion: Gekisashi DS
+- Shrek the Third
+- Shrek: Super Slam
+- Sid Meier's Civilization Revolution
+- Sideswiped
+- SimAnimals: Africa
+- SimCity DS
+- SimCity: Creator
+- Simple DS Series Vol. 1: The Mahjong
+- Simple DS Series Vol. 13: Ijoukishou o Tsuppashire: The Arashi no Drift Rally
+- Simple DS Series Vol. 18: The Soukou Kihei Gun Ground
+- Simple DS Series Vol. 2: The Billiard
+- Simple DS Series Vol. 20: The Senkan
+- Simple DS Series Vol. 21: The Hohei: Butai de Shutsugeki! Senjou no Inu-tachi
+- Simple DS Series Vol. 46: The Hikyou Tankentai: Choujou Special 'Kyoui! Jinrui Mitou no Sekai Kakuchi ni Nazo no Mikakunin Seibutsu wa Sonzai Shita!!'
+- Simple DS Series Vol. 6: The Party Game
+- Simple DS Series Vol. 7: The Illust Puzzle & Suuji Puzzle
+- Skate It
+- Slide Adventure: Mag Kid
+- SNK vs. Capcom: Card Fighters DS
+- Solatorobo: Red the Hunter
+- Solitaire DS
+- Sonic & SEGA All-Stars Racing
+- Sonic Chronicles: The Dark Brotherhood
+- Sonic Colors
+- Sonic Rush
+- Sonic Rush Adventure
+- Soroeru Puzzle Douwa Oukoku
+- Souseiki Gadget Robo
+- Space Invaders Extreme
+- Space Invaders Extreme 2
+- Space Puzzle Bobble
+- Spectrobes
+- Spectrobes: Beyond the Portals
+- Speed Racer: The Videogame
+- Spider-Man 3
+- SpongeBob SquarePants Featuring Nicktoons: Globs of Doom
+- SpongeBob's Atlantis SquarePantis
+- SpongeBob's Surf & Skate: Roadtrip
+- SpongeBob's Truth or Square
+- Spore Creatures
+- Spore Hero Arena
+- Sports Collection
+- Star Fox Command
+- Star Trek: Tactical Assault
+- Star Wars: Battlefront: Elite Squadron
+- Star Wars: Episode III: Revenge of the Sith
+- Star Wars: Lethal Alliance
+- Star Wars: The Clone Wars: Republic Heroes
+- Star Wars: The Force Unleashed
+- Stitch Jam
+- Style Book: Cinnamoroll
+- Style Book: Fushigi Boshi no Futago Hime Gyu!
+- Style Book: Junior City
+- Subbuteo
+- Suikoden: Tierkreis
+- Sukashikashipanman DS: 'Shokotan' Koto Nakagawa Shoko Produce
+- Sunday x Magazine: Nettou! Dream Nine
+- Supa Robo Gakuen
+- Super Black Bass: Dynamic Shot
+- Super Mario 64 DS
+- Super Monkey Ball: Touch & Roll
+- Super Scribblenauts
+- Super Star Kartz
+- Superman Returns
+- Surf's Up
+- Suujin Taisen
+- Table Game Spirits 2
+- Table Game Spirits Victory
+- Taiko no Tatsujin DS: Dororon! Yookai Daikessen!!
+- Tales of Innocence
+- Tales of the Tempest
+- Tamagotch no Appare! Niji-Venture
+- Tamagotch no Kirakira Omisetchi
+- Tamagotch no Narikiri Challenge
+- Tamagotch no Narikiri Channel
+- Tamagotchi Connection: Corner Shop
+- Tamagotchi Connection: Corner Shop 2
+- Tamagotchi Connection: Corner Shop 3
+- Tank Beat
+- Tao's Adventure: Curse of the Demon Seal
+- Tecmo Bowl: Kickoff
+- Teenage Mutant Ninja Turtles: Arcade Attack
+- Tenchu: Dark Secret
+- Tennis no Ouji-sama 2005: Crystal Drive
+- Tetris DS
+- Tetris Party Deluxe
+- Tetris Party Live
+- That's So Raven: Psychic on the Scene
+- The Chronicles of Narnia: The Lion, the Witch and the Wardrobe
+- The Croods: Prehistoric Party!
+- The Golden Compass
+- The Legend of Zelda: Four Swords Anniversary Edition
+- The Legend of Zelda: Phantom Hourglass
+- The Legend of Zelda: Spirit Tracks
+- The Legendary Starfy
+- The Little Mermaid: Ariel's Undersea Adventure
+- The Original Rummikub: Brings People Together
+- The Princess and the Frog
+- The Quest Trio: Jewels, Cards and Tiles
+- The Rub Rabbits!
+- The Simpsons Game
+- The Sims 2
+- The Sims 2: Pets
+- The Suite Life of Zack & Cody: Circle of Spies
+- The World Ends with You
+- Theme Park
+- THINK: Training für den Kopf: Logik Trainer - Think Again
+- thinkSMART Games: Scotland Yard: Hunting Mister X
+- Thrillville: Off the Rails
+- Tiger Woods PGA Tour
+- Tingle no Balloon Fight DS
+- Tinker Bell and the Great Fairy Rescue
+- TOEIC Test DS Training
+- Tokyo Friend Park II: DS de Kitaeru Undou Nouryoku
+- Tom Clancy's EndWar
+- Tom Clancy's Splinter Cell: Chaos Theory
+- Tongari Boushi to Mahou no Omise
+- Tongari Boushi to Oshare na Mahou Tsukai
+- Tony Hawk's American Sk8land
+- Tony Hawk's Proving Ground
+- Toon-Doku: Sudoku with Pictures!
+- Top Gun
+- Tottoko Hamutaro: Nazo Nazo Q: Kumo no Ue no Hatena Jou
+- Touch de Tanoshimu Hyakunin Isshu: DS Shigureden
+- Touch Game Party
+- Touch the Dead
+- TouchMaster
+- Toy Story 3
+- TrackMania DS
+- TrackMania Turbo
+- Transformers: Autobots
+- Transformers: Decepticons
+- Transformers: Revenge of the Fallen: Autobots Version
+- Transformers: Revenge of the Fallen: Decepticons Version
+- Transformers: Ultimate Autobots Edition
+- Treasure Gaust: Gaust Diver: Crimson Red
+- Treasure Gaust: Gaust Diver: Deep Blue
+- Trioncube
+- TRON: Evolution
+- True Swing Golf
+- Tsubasa Chronicle
+- Tsubasa Chronicle Vol. 2
+- Tsumiki: Block Drop Mania
+- Turn It Around
+- TV Anime Fairy Tail: Gekitou! Madoushi Kessen
+- Ubongo
+- Uchi no 3 Shimai DS
+- Uchi no 3 Shimai DS 2: 3 Shimai no Odekake Daisakusen
+- Uchi no 3 Shimai no Karaoke Utagassen & Party Game
+- Ultimate Band
+- Ultimate Mortal Kombat
+- Ultimate Spider-Man
+- UNO
+- UNO 52
+- Unou Ikusei: IQ Breeder: Pet to Nakayoku IQ Lesson
+- Unou no Tatsujin: Hirameki Kosodate My Angel
+- Unou no Tatsujin: Soukai! Machigai Museum 2
+- Unou Tanren Unotan DS: Shichida Shiki Otona no Shun Kan Training
+- Up
+- Uranai Demo Shite Miyouka DS
+- Utacchi
+- Wagamama Fashion: Girls Mode
+- WALL-E
+- Warhammer 40,000: Squad Command
+- WarioWare: D.I.Y.
+- WarioWare: Snapped!
+- Watashi no Rilakkuma
+- Where's Wally: The Fantastic Journey: Travel Pack 1
+- Where's Wally? Travel Pack 1
+- Where's Wally? Travel Pack 2
+- Where's Wally? Travel Pack 3
+- Wi-Fi Taiou: Gensen Table Game DS
+- Wi-Fi Taiou: Morita Shougi DS
+- Wiffle Ball
+- Winx Club: Mission Enchantix
+- Winx Club: Your Magic Universe
+- WireWay
+- World Championship Games: A Track & Field Event
+- World of Zoo
+- World Poker Tour: Texas Hold 'Em
+- Worms: Open Warfare 2
+- WWE SmackDown dae Raw 2009 Featuring ECW
+- WWE SmackDown vs Raw 2008 Featuring ECW
+- Yakitate!! Japan: Game Ichigou: Choujou Kessen!! Pantasic Grand Prix!
+- Yakuman DS
+- Yamakawa Shuppansha Kanshuu: Shousetsu Nihonshi B: Shin Sougou Training Plus
+- Yamakawa Shuppansha Kanshuu: Shousetsu Nihonshi B: Sougou Training
+- Yamakawa Shuppansha Kanshuu: Shousetsu Sekaishi B: Shin Sougou Training Plus
+- Yamakawa Shuppansha Kanshuu: Shousetsu Sekaishi B: Sougou Training
+- Yoshi Touch & Go
+- Yu Yu Hakusho DS: Ankoku Bujutsukai Hen
+- Yu-Gi-Oh! 5D's: Stardust Accelerator: World Championship 2009
+- Yu-Gi-Oh! 5D's: World Championship 2010: Reverse of Arcadia
+- Yu-Gi-Oh! 5D's: World Championship 2011: Over the Nexus
+- Yu-Gi-Oh! Duel Monsters GX: Spirit Summoner
+- Yu-Gi-Oh!: Nightmare Troubadour
+- Yu-Gi-Oh!: World Championship 2007
+- Yu-Gi-Oh!: World Championship 2008
+- Zaidan Houjin Nihon Kanji Nouryoku Kentei Kyoukai Kounin: Kanken DS 3 Deluxe
+- Zaidan Houjin Nihon Kanji Nouryoku Kentei Kyoukai Koushiki Soft: 200 Mannin no Kanken: Tokoton Kanji Nou
+- Zaidan Houjin Nihon Kanji Nouryoku Kentei Kyoukai Koushiki Soft: 250 Mannin no Kanken: Shin Tokoton Kanji Nou: 47,000 + Jouyou Kanji Jiten, Yoji Jukugo Jiten
+- Zekkyou Senshi Sakebrain
+- Zenmai Zamurai
+- Zettai Zetsumei Dangerous Jiisan DS: Dangerous Sensation
+- Zoids Battle Colosseum
+- Zoids Saga DS: Legend of Arcadia
+- Zombie Blaster
+- Zoo Keeper
+- Zoo Tycoon 2 DS
+- Zubo
+- Zunou ni Asekaku Game Series! Vol. 1: Cool 104 Joker & Setline
+- Zunou Nouryoku Koujou Machine: Touch de Zunoo DS
+- ゲーム&ウオッチ ジャッジ
+- ちょっとアソビ大全 おなじみテーブル
+- ちょっとアソビ大全 じっくりトランプ
+
+</details>
+
+---
+
+<sub>Generated from the compatibility database, last updated 2026-09-28.</sub>
