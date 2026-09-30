@@ -61,7 +61,7 @@ Every player needs the same emulator version and the same copy of the game.
 
 ## Install
 
-> ⚠️ **Beta.** Only tested on an AYN Thor running Android 13. Expect bugs, and
+> ⚠️ **Beta.** Works on Android 13, 14 and 15. Expect bugs, and
 > please report them on [Discord](https://discord.gg/tvWcb28vBZ).
 
 1. Install the emulators you want to use.
