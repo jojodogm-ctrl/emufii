@@ -4,10 +4,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The probe decides whether Emufii refuses to launch: a wrong id list is a refusal on a
- * build that would have worked.
- */
 class NetplayUiSupportTest {
 
     @Test

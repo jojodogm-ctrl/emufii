@@ -25,15 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.ByteArrayInputStream
 
-/**
- * The session tunnel, carried by a foreground service.
- *
- * `GoBackend` ships its own `VpnService` but starts it with `startService` and
- * never calls `startForeground`, so the tunnel would die exactly when the player
- * switches to the emulator. Hence subclassing `GoBackend.VpnService` and
- * starting it ourselves.
- * pourquoi : docs/decisions/tunnel-wireguard.md § Why Emufii has its own `VpnService`
- */
+// GoBackend's own VpnService never calls startForeground, so the tunnel would die in the background.
 class EmufiiWgService : GoBackend.VpnService() {
 
     companion object {
@@ -46,7 +38,7 @@ class EmufiiWgService : GoBackend.VpnService() {
         private const val EXTRA_CONFIG = "config"
         private const val EXTRA_IP = "ip"
 
-        /** Must match WireGuard's own name rules: `[a-zA-Z0-9_=+.-]{1,15}`. */
+        /** WireGuard name rules: [a-zA-Z0-9_=+.-]{1,15}. */
         private const val TUNNEL_NAME = "emufii"
 
         private val _state = MutableStateFlow(WgState.Idle as WgState)
@@ -67,19 +59,9 @@ class EmufiiWgService : GoBackend.VpnService() {
     private var tunnel: SessionTunnel? = null
     private var scope: CoroutineScope? = null
 
-    /**
-     * Keeps the Wi-Fi radio awake for the session. Measured: 25 % loss at one
-     * ping/s, 0 % at three, jitter 46→369 ms, and the Switch's LDN handshake is
-     * made of exactly those rare packets.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § The Wi-Fi lock is not a comfort detail
-     */
+    /** Keeps Wi-Fi out of power save; idle radio drops packets LDN relies on. */
     private var wifiLock: WifiManager.WifiLock? = null
 
-    /**
-     * The library reports handshake progress here. `Online` means the interface
-     * exists, not that a player joined, nor that a handshake landed.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § "Online" means less than you think
-     */
     private inner class SessionTunnel(val code: String, val ip: String) : Tunnel {
         override fun getName(): String = TUNNEL_NAME
 
@@ -104,9 +86,8 @@ class EmufiiWgService : GoBackend.VpnService() {
         val code = intent?.getStringExtra(EXTRA_CODE)
         val configText = intent?.getStringExtra(EXTRA_CONFIG)
         val ip = intent?.getStringExtra(EXTRA_IP)
+        // Restarted with a null intent: nothing to rejoin.
         if (code == null || configText == null || ip == null) {
-            // START_STICKY had the system restart us with a null intent; there is
-            // no session to rejoin, so go away rather than sit on the VPN slot.
             Log.w(TAG, "started with no configuration, stopping")
             stopSelf()
             return START_NOT_STICKY
@@ -122,9 +103,7 @@ class EmufiiWgService : GoBackend.VpnService() {
                 val config = Config.parse(ByteArrayInputStream(configText.toByteArray()))
                 val b = backend ?: GoBackend(applicationContext).also { backend = it }
                 val t = SessionTunnel(code, ip).also { tunnel = it }
-                // Blocking, and deliberately off the main thread: the library
-                // re-resolves the endpoint with one-second waits between attempts,
-                // so this can sit for several seconds on a cold network.
+                // Blocking: endpoint resolution retries with one-second waits.
                 b.setState(t, Tunnel.State.UP, config)
                 notify(getString(R.string.svc_wg_online, ip))
             } catch (e: Exception) {
@@ -134,9 +113,6 @@ class EmufiiWgService : GoBackend.VpnService() {
             }
         }
 
-        // Not START_STICKY: a session is brokered by the coordinator and its peers
-        // expire, so a tunnel resurrected blindly after a process death would
-        // point at a game that no longer exists.
         return START_NOT_STICKY
     }
 
@@ -144,14 +120,10 @@ class EmufiiWgService : GoBackend.VpnService() {
         if (wifiLock?.isHeld == true) return
         val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
             ?: return
-        // Low-latency mode has existed since Android 10 and minSdk is 33: there
-        // is no fallback to write.
         val lock = runCatching {
             wifi.createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, TAG)
         }.getOrNull() ?: return
-        // Without this, a lock taken twice would need releasing twice, and a
-        // tunnel brought back up after a fall would leave the radio locked for
-        // good.
+        // Or a second acquire would need a second release.
         lock.setReferenceCounted(false)
         runCatching { lock.acquire() }
             .onSuccess { Log.d(TAG, "verrou Wi-Fi basse latence pris") }
@@ -183,11 +155,7 @@ class EmufiiWgService : GoBackend.VpnService() {
         }
     }
 
-    /**
-     * Swiped out of recents: bring the tunnel down. A foreground service
-     * survives task dismissal by design, so the VPN key outlived the app.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § Why Emufii has its own `VpnService`
-     */
+    /** A foreground service survives task removal, so bring the tunnel down here. */
     override fun onTaskRemoved(rootIntent: Intent?) {
         Log.d(TAG, "Emufii swiped away, taking the session tunnel down")
         stopTunnel()
@@ -201,9 +169,7 @@ class EmufiiWgService : GoBackend.VpnService() {
         scope = null
         tunnel = null
         backend = null
-        // Never skip the library's onDestroy: it resets the static future that
-        // lets GoBackend find this service.
-        // pourquoi : docs/decisions/tunnel-wireguard.md § Why Emufii has its own `VpnService`
+        // Required: it resets the static future GoBackend uses to find this service.
         super.onDestroy()
         _state.value = WgState.Idle
     }

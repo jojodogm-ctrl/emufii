@@ -3,12 +3,6 @@ package eu.emufii.app.library.psp
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/**
- * A PSP ISO is an ordinary ISO9660, its table of contents in the clear, and the two files
- * wanted are always at `PSP_GAME/ICON0.PNG` and `PSP_GAME/PARAM.SFO`. Free of Android, so
- * the parsing is tested on a byte array; every entry point returns null rather than
- * throwing, "we could not read it" being a normal answer the caller turns into initials.
- */
 object UmdIso {
 
     /** An ISO9660 is cut into 2048-byte sectors, with no exception here. */
@@ -22,22 +16,16 @@ object UmdIso {
     /** The largest file read; an icon is a few KB. */
     private const val MAX_FILE = 4 * 1024 * 1024
 
-    /** Returns null past the end. */
     fun interface Source {
         fun read(offset: Long, length: Int): ByteArray?
     }
 
     data class Entry(val offset: Long, val size: Int)
 
-    /**
-     * Names are compared ignoring case and the `;1` the standard sticks after filenames;
-     * those two are the classic cause of a "missing file" that is in fact present.
-     */
+    /** Case-insensitive, ignoring the ISO9660 `;1` version suffix. */
     fun find(source: Source, path: List<String>): Entry? {
         if (path.isEmpty()) return null
         val pvd = source.read(PVD_SECTOR.toLong() * SECTOR, SECTOR) ?: return null
-        // "CD001" right after the descriptor type: without it this is not an ISO9660,
-        // and everything that follows would confidently read noise.
         if (String(pvd, 1, 5, Charsets.US_ASCII) != "CD001") return null
 
         var dir = record(pvd, ROOT_RECORD_AT) ?: return null
@@ -60,8 +48,7 @@ object UmdIso {
         var i = 0
         while (i < data.size) {
             val len = data[i].toInt() and 0xFF
-            // A zero length is padding to the end of the sector, the next entry starting
-            // at the following one; ignoring it misses any directory over 2048 bytes.
+            // Zero length is padding to the end of the sector; the next entry starts on the next one.
             if (len == 0) {
                 val next = (i / SECTOR + 1) * SECTOR
                 if (next <= i || next >= data.size) return null
@@ -97,11 +84,6 @@ object UmdIso {
     }
 }
 
-/**
- * Two keys are used: `TITLE`, the name the console displays, better than a filename
- * carrying region and revision, and `DISC_ID` (`ULES01267`), stable from one dump to the
- * next, hence the icon's cache key.
- */
 object ParamSfo {
 
     private const val MAGIC = 0x46535000   // "\0PSF" little-endian

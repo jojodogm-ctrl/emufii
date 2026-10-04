@@ -19,11 +19,7 @@ data class CrashLog(
     val preview: String
 )
 
-/**
- * Catches every uncaught exception, writes it to filesDir/crashes/, and hands it back to
- * the platform handler so Android still shows the crash dialog and closes the process.
- * Keeps the ten most recent reports and nothing older.
- */
+/** Writes uncaught exceptions to filesDir/crashes/ (ten kept), then defers to the platform handler. */
 object CrashLogger {
     private const val TAG = "CrashLogger"
     private const val CRASH_DIR = "crashes"

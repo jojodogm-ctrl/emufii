@@ -18,15 +18,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * One report per row: date on top, a one-line preview underneath. The whole card is the
- * focus target and pressing A opens the detail; the delete action lives in that dialog,
- * so a gamepad only ever has one focusable per row.
- *
- * [entry] true when the caller wants the page's cursor to land on this row on entry: the
- * header's Down key will jump straight here, and Up from here will jump back to the
- * header. Only one control on the page should carry it.
- */
 @Composable
 fun CrashLogsListItem(
     crash: CrashLog,

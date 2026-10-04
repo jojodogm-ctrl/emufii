@@ -20,17 +20,9 @@ import eu.emufii.app.ui.theme.plateColors
 
 data class CardBounds(val top: Float, val height: Float)
 
-/**
- * Root coordinates, not a parent's: what needs it is not at the same depth.
- * pourquoi : docs/decisions/reglages-ecran.md § The opaque fill exists for the cursor, not for the look
- */
 val LocalCardBounds = compositionLocalOf { CardBounds(0f, 0f) }
 
-/**
- * An opaque fill that is, to the pixel, what the card already painted here; a glow is a
- * shadow, and a shadow crosses anything that is not opaque.
- * pourquoi : docs/decisions/reglages-ecran.md § The opaque fill exists for the cursor, not for the look
- */
+/** Opaque fill matching the card exactly: a glow is a shadow and shows through anything translucent. */
 @Composable
 fun Modifier.cardSliceFill(shape: Shape, tint: Color = Color.Transparent): Modifier {
     val card = LocalCardBounds.current

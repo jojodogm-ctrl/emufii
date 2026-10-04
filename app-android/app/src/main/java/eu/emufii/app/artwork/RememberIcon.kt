@@ -14,10 +14,7 @@ import eu.emufii.app.settings.SettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * The two are not drawn the same way: [embedded] is 48 px of pixel art, scaled up
- * without smoothing on pain of mush, [remote] a real image that is smoothed instead.
- */
+/** [embedded] is pixel art scaled without smoothing; [remote] is smoothed. */
 data class TileArt(
     val remote: String?,
     val embedded: java.io.File?,
@@ -26,19 +23,9 @@ data class TileArt(
     val isPixelArt: Boolean get() = remote == null
     val model: Any? get() = remote ?: embedded
 
-    /**
-     * Whole-image display: pixel-art icons lose visible parts under a crop, and the
-     * artwork a frontend hands us — an ES-DE box front or a Cocoon key art the player
-     * re-cropped — is already framed the way it should be shown.
-     */
     val fitsWhole: Boolean get() = isPixelArt || fromFrontend
 }
 
-/**
- * Starts with what the ROM carries, so the grid is painted immediately: waiting on the
- * network for a library already on disk would show holes at startup. The search then sets
- * off, and the tile repaints if it succeeds.
- */
 @Composable
 fun rememberTileArt(rom: Rom): State<TileArt> {
     val context = LocalContext.current
@@ -48,18 +35,11 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
     val folder by settings.frontendFolder.collectAsStateWithLifecycle()
     val frontend by settings.artworkFrontend.collectAsStateWithLifecycle()
     val revision by ArtworkStore.revision.collectAsStateWithLifecycle()
-    // Starts from the last cover resolved for this game, not from its bare icon: the launch
-    // card composes its own copy of the cover, and for the frames before the lookup
-    // answered it showed the ROM's icon on white in the middle of the flight.
-    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
     val state = remember(rom.uri) {
         mutableStateOf(resolvedArt[rom.uri] ?: TileArt(null, rom.iconFile))
     }
 
     LaunchedEffect(rom.uri, apiKey, folder, frontend, revision) {
-        // The frontend comes before the catalogue, and the player's own choice before the
-        // frontend, which `iconUrl` already honours: the frontend's artwork sits on the
-        // device, was downloaded for this exact file, and in places was re-cropped by hand.
         val remote: String = run {
             if (store.chosenFor(rom) != null) return@run store.iconUrl(rom, apiKey)
             val local = withContext(Dispatchers.IO) {
@@ -76,9 +56,6 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
             local?.toString() ?: store.iconUrl(rom, apiKey)
         } ?: return@LaunchedEffect
 
-        // Anything not on `http(s)://` came off the device — either the frontend
-        // lookup or a manual pick against a local tree — and gets whole-image display.
-        // SteamGridDB choices stay cropped.
         val fromFrontend = !remote.startsWith("http")
         val art = TileArt(remote, rom.iconFile, fromFrontend)
         resolvedArt[rom.uri] = art
@@ -87,5 +64,4 @@ fun rememberTileArt(rom: Rom): State<TileArt> {
     return state
 }
 
-/** The last art resolved per game, so a second place showing it starts where the first ended. */
 private val resolvedArt = java.util.concurrent.ConcurrentHashMap<android.net.Uri, TileArt>()

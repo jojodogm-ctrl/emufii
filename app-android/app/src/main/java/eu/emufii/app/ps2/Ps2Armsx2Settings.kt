@@ -2,12 +2,7 @@ package eu.emufii.app.ps2
 
 import org.json.JSONObject
 
-/**
- * ARMSX2 keeps its configuration in app-private preferences nothing outside can read, but
- * mirrors it beside the memory cards as `armsx2-settings.json` (`ConfigStore.BACKUP_FILENAME`,
- * written on every settings save). The `global` object carries flat camelCase keys; an absent
- * key means ARMSX2 runs its default, which the fallbacks here reproduce.
- */
+/** Reads the `armsx2-settings.json` mirror ARMSX2 writes beside its memory cards; absent keys mean defaults. */
 object Ps2Armsx2Settings {
 
     data class GameOverride(
@@ -63,10 +58,6 @@ object Ps2Armsx2Settings {
         )
     }
 
-    /**
-     * The native `PCSX2-Android.ini` at the data root: builds exist that write it and no JSON
-     * mirror, so the folder flow reads whichever is there, the mirror when both are.
-     */
     fun parseIni(ini: String): Parsed {
         val values = mutableMapOf<String, String>()
         var section = ""

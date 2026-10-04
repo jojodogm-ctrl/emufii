@@ -1,10 +1,6 @@
 package eu.emufii.app.ps2
 
-/**
- * Navigation guard for ARMSX2 setup. Compose keeps the previous screen in the
- * Accessibility tree during its animations, so without a latch a 500 ms re-read clicks
- * the same top-left control twice: drawer open then closed, or Back twice.
- */
+/** Compose keeps the previous screen in the a11y tree while animating; this latch stops double clicks. */
 internal class Ps2ProvisioningRoute {
     enum class Screen { HOME, DRAWER, MEMORY_CARDS, UNKNOWN }
     enum class Action { OPEN_DRAWER, OPEN_MEMORY_CARDS, BACK_TO_HOME, USE_MEMORY_CARDS, WAIT }
@@ -60,10 +56,6 @@ internal class Ps2ProvisioningRoute {
     companion object {
         private const val RETRY_AFTER_PASSES = 4
 
-        /**
-         * The drawer is an overlay, not an [AppRoute]: Home stays in the semantics tree
-         * below it, so the overlay wins whenever one of its own rows is present.
-         */
         fun classify(onManager: Boolean, inDrawer: Boolean, onHome: Boolean): Screen = when {
             inDrawer -> Screen.DRAWER
             onManager -> Screen.MEMORY_CARDS

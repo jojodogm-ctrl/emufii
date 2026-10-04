@@ -7,11 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The trees below are transcribed from `uiautomator dump` on the Thor, Dolphin dev build
- * 2606-302, 2026-08-15, landscape at 1920×1080. This backend has no resource ids at all,
- * so geometry and text are the entire contract and a synthetic tree would prove nothing.
- */
+/** Trees transcribed from `uiautomator dump` of Dolphin 2606-302 at 1920x1080; it exposes no resource ids. */
 class DolphinScreenTest {
 
     private fun field(text: String, bounds: Bounds) =
@@ -20,11 +16,7 @@ class DolphinScreenTest {
     private fun label(text: String, bounds: Bounds) =
         Node(text = text, className = Node.TEXT_VIEW, bounds = bounds)
 
-    /**
-     * A button box, sibling of its own caption: on the Thor the `Button` and its `TextView`
-     * sit at the same depth and only the bounds relate them. Nesting them, as Compose
-     * suggests, stopped the driver one tap short of opening a room.
-     */
+    /** Button and caption are siblings in the real tree, related only by bounds. */
     private fun buttonBox(bounds: Bounds) =
         Node(text = "", className = "android.widget.Button", bounds = bounds, clickable = true)
 
@@ -75,8 +67,7 @@ class DolphinScreenTest {
 
     @Test
     fun `the tab and the button share a label and must not be confused`() {
-        // Dolphin labels both from `netplay_connection_role_host`: pressing the button on
-        // the wrong tab starts the wrong side of the session.
+        // Both are labelled from `netplay_connection_role_host`.
         val tab = DolphinScreen.tab(hostTab, listOf("Host"))
         val button = DolphinScreen.actionButton(hostTab, listOf("Host"))
         assertNotNull(tab)
@@ -87,8 +78,6 @@ class DolphinScreenTest {
 
     @Test
     fun `the closed dropdown is not mistaken for an open one`() {
-        // The form shows the selected option as the field's text, so matching option labels
-        // alone re-opens the menu forever; a popup carries no EditText.
         assertFalse(DolphinScreen.isDropdownOpen(connectTab, direct, traversal))
         assertFalse(DolphinScreen.isDropdownOpen(hostTab, direct, traversal))
     }
@@ -105,8 +94,6 @@ class DolphinScreenTest {
 
     @Test
     fun `labels are matched in whatever language Dolphin runs in`() {
-        // No API asks a third-party app which locale it is in, so the driver passes every
-        // translation and matches case- and whitespace-insensitively.
         val french = listOf("Adresse IP", "IP address")
         assertEquals("127.0.0.1", DolphinScreen.fieldFor(connectTab, french)?.text)
         assertEquals("2626", DolphinScreen.fieldFor(connectTab, listOf(" port "))?.text)
@@ -120,10 +107,6 @@ class DolphinScreenTest {
         assertEquals(Bounds(1714, 900, 1837, 947), button?.bounds)
     }
 
-    /**
-     * The lobby as host, dumped from the Thor on 2026-08-16. The game selector reads like
-     * the form's fields: a clickable `EditText` whose "Game" label fits inside its bounds.
-     */
     private val lobby = listOf(
         field("Smash Bros. Brawl", Bounds(978, 203, 1883, 221)),
         label("Game", Bounds(1015, 203, 1091, 221)),
@@ -145,8 +128,6 @@ class DolphinScreenTest {
 
     @Test
     fun `the disc's title and ours name the same game`() {
-        // Emufii cuts the filename at the first bracket and gets "Super Smash Bros. Brawl";
-        // Dolphin reads the disc header and displays "Smash Bros. Brawl".
         assertTrue(DolphinScreen.looselyMatches("Smash Bros. Brawl", "Super Smash Bros. Brawl"))
         assertFalse(DolphinScreen.looselyMatches("Resident Evil 4", "Super Smash Bros. Brawl"))
     }

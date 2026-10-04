@@ -10,10 +10,6 @@ import java.nio.channels.FileChannel
 
 data class NdsData(val icon: Bitmap?, val title: String?, val cacheKey: String?)
 
-/**
- * Two small reads, the 0x200-byte header then the banner it points at, so a scan of a full
- * library stays quick; the decoding is in [NdsBanner].
- */
 class NdsBannerReader(private val context: Context) {
 
     private companion object {
@@ -80,7 +76,6 @@ class NdsBannerReader(private val context: Context) {
     }
 }
 
-/** At most [count] bytes, short only at the end of [stream]. */
 internal fun readAtMost(stream: InputStream, count: Int): ByteArray {
     val buffer = ByteArray(count)
     var total = 0
@@ -92,7 +87,6 @@ internal fun readAtMost(stream: InputStream, count: Int): ByteArray {
     return buffer.copyOf(total)
 }
 
-/** False if [stream] ends before [count] bytes have been passed over. */
 internal fun skipFully(stream: InputStream, count: Long): Boolean {
     var left = count
     while (left > 0) {

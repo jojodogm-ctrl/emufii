@@ -13,6 +13,7 @@
     <!-- Le panneau arriere, quand le curseur est sur une pastille de la barre du haut. -->
     <string name="bar_root">Bibliothèque</string>
     <string name="bar_search_summary">Filtre la bibliothèque au fil de la frappe, toutes consoles confondues.</string>
+    <string name="bar_back_summary">Revenir à toutes les consoles.</string>
     <string name="bar_layout_summary">Grille, carrousel ou liste. La liste est celle qui distingue deux dumps d\'un même jeu.</string>
     <string name="bar_sort_summary">A → Z, ajouté récemment, ou par console : le tri par console range la bibliothèque en dossiers.</string>
     <string name="bar_sessions_summary">Les sessions ouvertes, à rejoindre d\'un code ou d\'une touche.</string>
@@ -92,6 +93,7 @@
     <string name="session_netplay_open">1. Paramétrage automatique de %1$s</string>
     <string name="session_netplay_manual_open">Paramétrage manuel</string>
     <string name="session_netplay_waiting_host">1. En attente de l\'hôte…</string>
+    <string name="session_ds_waiting_host">En attente du lancement de l\'hôte…</string>
     <string name="session_netplay_busy">1. Paramétrage de %1$s…</string>
     <string name="session_netplay_again">1. Refaire le paramétrage de %1$s</string>
     <string name="session_netplay_done">1. %1$s est paramétré</string>
@@ -120,43 +122,52 @@
     <string name="ppsspp_config_write_failed">Impossible d’écrire puis de vérifier la configuration du jeu PPSSPP.</string>
 
     <!-- Per-emulator hints -->
-    <string name="hint_azahar_title">Dans Azahar</string>
-    <string name="hint_azahar_automated">Emufii ouvre le multijoueur et remplit l\'adresse pour toi.</string>
     <string name="hint_azahar_important">Important</string>
-    <string name="hint_azahar_username">Avant de jouer, change ton pseudo à la main dans Azahar → Paramètres et système : il lui faut au moins 5 caractères. Emufii n\'y touche pas, et Azahar refuse le salon si le pseudo est trop court, en accusant l\'adresse, qui est pourtant bonne.</string>
-    <string name="hint_azahar_manual">Ouvre le menu → Multiplayer, puis saisis %1$s.</string>
+    <string name="hint_azahar_username">Ton nom Azahar doit faire *5 caractères ou plus*, sinon le salon est refusé.</string>
+    <string name="hint_azahar_manual">Menu → *Multijoueur*, puis saisis l\'adresse.</string>
     <string name="hint_azahar_enable">Laisser Emufii le remplir</string>
     <string name="session_offline_title">Serveur injoignable</string>
     <string name="session_offline_body">Emufii n\'arrive plus à joindre le serveur de sessions : la liste des joueurs ci-dessous date de la dernière réponse. Le tunnel, lui, tient : une partie en cours continue. Vérifie ta connexion.</string>
     <string name="hint_missing_rom_title">Jeu absent de ta bibliothèque</string>
     <string name="hint_missing_rom_body">Tu es bien dans la session et sur le même réseau, mais Emufii n\'a pas trouvé ce jeu chez toi. Ajoute-le à ton dossier de ROMs, relance un scan, puis reviens.</string>
-    <string name="hint_psp_title">Dans PPSSPP, une fois pour toutes</string>
-    <string name="hint_psp_body">PPSSPP ne se laisse pas piloter par Emufii : il dessine sa propre interface. Ces quatre réglages sont donc à faire à la main, mais une seule fois, jamais à refaire.</string>
-    <string name="hint_psp_automated">Emufii appliquera les quatre valeurs réseau de la session privée à ce jeu juste avant de le lancer. Tout le reste, y compris ton pseudo, reste inchangé.</string>
-    <string name="hint_psp_automatic_ready">Le paramétrage automatique PPSSPP est prêt, lance le jeu.</string>
-    <string name="hint_psp_exit_before_switch">Avant de passer d’une session privée au jeu public, ou l’inverse, quitte le jeu en cours jusqu’au menu de PPSSPP. Sinon PPSSPP peut réécrire en quittant les anciennes valeurs gardées en mémoire.</string>
-    <string name="hint_psp_step1">Réseau → Activer le réseau/WLAN</string>
-    <string name="hint_psp_step2">Réseau → Adresse du serveur ad hoc → Ajouter un serveur → colle %1$s</string>
-    <string name="hint_psp_step2b">Juste en dessous : « Essayez d\'utiliser le relais de paquets » sur Désactivé</string>
-    <string name="hint_psp_relay_why">PPSSPP le dit lui-même : ce mode sert quand un serveur public relaie les paquets à ta place. Ici tes consoles se parlent directement : il n\'a rien à faire.</string>
-    <string name="hint_psp_step3">Réseau → Activer le serveur ad hoc intégré</string>
-    <string name="hint_psp_step4">Système → Pseudo : le tien, Emufii n\'y touche pas</string>
-    <string name="hint_psp_copied">Adresse copiée, tu n\'as plus qu\'à la coller</string>
+    <string name="hint_psp_automatic_ready">Prêt : lance le jeu.</string>
+    <string name="hint_psp_exit_before_switch">Reviens au menu de PPSSPP avant de passer du privé au public.</string>
+    <string name="hint_psp_step1">Réseau → *Activer le réseau/WLAN*</string>
+    <string name="hint_psp_step2">Adresse du serveur ad hoc → Ajouter → colle *%1$s*</string>
+    <string name="hint_psp_step2b">*Relais de paquets du serveur* : désactivé</string>
+    <string name="hint_psp_step3">*Activer le serveur ad hoc intégré*</string>
+    <string name="hint_psp_step4">Système → Pseudo : le tien, Emufii n\'y touche jamais</string>
     <string name="hint_psp_copy">Copier l\'adresse</string>
-    <string name="hint_psp_wifi_title">Reste près de ta box</string>
-    <string name="hint_psp_wifi">C\'est le seul réglage qui change vraiment le confort de jeu, et il n\'est pas dans l\'émulateur. Mesuré sur une vraie partie : un joueur éloigné de sa box envoie ses paquets par rafales au lieu d\'un flux régulier, et ça se voit à l\'écran comme des à-coups. Le même joueur rapproché, plus rien. Le 5 GHz vaut mieux que le 2,4, et l\'économie d\'énergie doit être coupée.</string>
+    <string name="hint_psp_wifi">Reste près de ta box, en 5 GHz, économie d\'énergie coupée.</string>
     <string name="session_psp_setup">Paramétrage manuel (obligatoire)</string>
     <string name="session_psp_setup_again">Rouvrir PPSSPP</string>
-    <string name="hint_psp_why">Cette adresse ne change jamais : le relais l\'envoie vers l\'hôte de la session en cours, quelle que soit la partie.</string>
-    <string name="hint_same_version">Même version du jeu des deux côtés, mises à jour et DLC compris. Sinon le salon se forme et la partie ne démarre jamais.</string>
-    <string name="hint_eden_title">Dans Eden</string>
-    <string name="hint_eden_host">Le multijoueur d\'Eden est dans ses réglages, pas dans le jeu : ⚙ Réglages → Multiplayer → « Create ». Tu peux l\'ouvrir avant ou pendant la partie.</string>
-    <string name="hint_eden_guest">Le multijoueur d\'Eden est dans ses réglages, pas dans le jeu : ⚙ Réglages → Multiplayer → « Join ». Tu peux l\'ouvrir avant ou pendant la partie.</string>
-    <string name="hint_eden_automated">Emufii remplit l\'adresse, le port et ton pseudo pour toi dès que la fenêtre s\'ouvre.</string>
-    <string name="hint_eden_username">Ton pseudo Emufii est recopié dans Eden : deux joueurs qui portent le même pseudo ne peuvent pas partager un salon, et Eden donne le même à tout le monde par défaut.</string>
-    <string name="hint_eden_manual">Puis saisis %1$s.</string>
+    <string name="hint_same_version">*Même version du jeu* des deux côtés, mises à jour et DLC compris.</string>
+    <string name="hint_eden_host">Dans Eden : ⚙ Paramètres → Multijoueur → *Créer*, avant ou pendant la partie.</string>
+    <string name="hint_eden_guest">Dans Eden : ⚙ Paramètres → Multijoueur → *Rejoindre*, avant ou pendant la partie.</string>
     <string name="hint_wfc_title">DS en ligne</string>
     <string name="hint_wfc_body">Le jeu en ligne DS ne se joue pas par session : chaque console appelle le serveur communautaire qui a remplacé celui de Nintendo, il n\'y a pas de réseau à partager. Reviens à la bibliothèque et lance le jeu depuis là.</string>
+    <string name="hint_azahar_blame">Salon refusé ? Vérifie d\'abord ton *nom* : Azahar accuse l\'adresse même quand c\'est le nom.</string>
+    <string name="hint_eden_nickname">*Un pseudo différent* par joueur : Eden refuse deux pseudos identiques dans un salon.</string>
+    <string name="hint_eden_server">Le salon tourne sur *le serveur d\'Emufii* : personne n\'héberge sur son téléphone.</string>
+    <string name="hint_dolphin_together">Personne ne lance le jeu seul : le salon *le démarre pour tout le monde* d\'un coup.</string>
+    <string name="hint_ps2_online">Le jeu demande de se connecter à un serveur ? C\'était un jeu *en ligne*, Emufii n\'y peut rien.</string>
+    <string name="hint_psp_wifi_why">Loin de la box, les paquets arrivent *par rafales*, et ça se voit en saccades.</string>
+    <string name="hint_sheet_role">Ton rôle</string>
+    <string name="hint_sheet_host">Hôte</string>
+    <string name="hint_sheet_guest">Invité</string>
+    <string name="hint_sheet_setup">Réglage</string>
+    <string name="hint_sheet_auto">Automatique</string>
+    <string name="hint_sheet_manual">À la main</string>
+    <string name="hint_sheet_address">Adresse</string>
+    <string name="hint_sheet_players">Joueurs</string>
+    <string name="hint_sheet_steps">Marche à suivre</string>
+    <string name="hint_ds_title">Jeu sans fil</string>
+    <string name="hint_ds_players">%1$d / %2$d</string>
+    <string name="hint_ds_host_1">*Lance en premier* : WatermelonDS attend les autres tout seul.</string>
+    <string name="hint_ds_host_2">Dans le jeu, ouvre le menu multijoueur *sans fil* et crée la partie.</string>
+    <string name="hint_ds_guest_1">Ton lancement se débloque *5 secondes après celui de l\'hôte*.</string>
+    <string name="hint_ds_guest_2">Dans le jeu, ouvre le même menu *sans fil* et rejoins la partie de l\'hôte.</string>
+    <string name="hint_ds_same_rom">*Même ROM* des deux côtés, sinon les deux parties se désynchronisent.</string>
     <string name="hint_unknown_console">Console inconnue</string>
     <string name="hint_unsupported_body">Le jeu est dans ta bibliothèque, mais Emufii ne sait pas encore monter le multijoueur pour cette console. Le réseau de la session est en place : à toi de jouer si ton émulateur sait s\'en servir.</string>
 
@@ -186,7 +197,7 @@
     <string name="prep_first_time">Ça peut prendre 10-15 s la première fois.</string>
 
     <!-- Profile and settings -->
-    <string name="profile_photo_note">Ta photo reste sur ton téléphone. Les autres joueurs te voient avec tes initiales et ta couleur.</string>
+    <string name="profile_photo_note">Tes amis voient ta photo et ton dernier jeu lancé. Les autres joueurs te voient avec tes initiales et ta couleur.</string>
     <string name="profile_remove_photo">Retirer la photo</string>
     <string name="profile_name_label">Pseudo</string>
     <string name="profile_name_hint">Ce que les autres verront dans la session.</string>
@@ -301,8 +312,8 @@
     <string name="err_not_installed">%1$s n\'est pas installé</string>
     <string name="err_no_netplay_ui">Cette version de %1$s (%2$s) n\'a pas le multijoueur. Mets-la à jour pour jouer en ligne.</string>
     <string name="onb_name_title">Ton pseudo</string>
-    <string name="onb_name_body">C\'est le nom que tes amis verront. Emufii le donne aussi à l\'émulateur au moment de te connecter à une partie.</string>
-    <string name="onb_name_too_short">%1$d caractères minimum : les émulateurs refusent un pseudo plus court.</string>
+    <string name="onb_name_body">Tes amis le voient, et l\'émulateur l\'affiche en partie.</string>
+    <string name="onb_name_too_short">%1$d caractères minimum, sinon l\'émulateur refuse la connexion.</string>
     <string name="azahar_automation_stopped">Automatisation interrompue, saisis %1$s dans Azahar</string>
     <string name="azahar_fields_filled">Champs remplis, valide dans Azahar</string>
     <!--
@@ -315,17 +326,17 @@
     <string name="netplay_fields_filled">Champs remplis, valide dans %1$s</string>
     <!-- First run -->
     <string name="onb_welcome_title">Bienvenue dans Emufii</string>
-    <string name="onb_welcome_body">Joue en ligne avec tes amis, sur les émulateurs que tu as déjà. Emufii met vos appareils sur un même réseau : les jeux croient que vous êtes côte à côte, et leur mode multijoueur local marche à travers Internet.</string>
+    <string name="onb_welcome_body">Le multijoueur local de tes jeux, *à distance*, avec les émulateurs que tu as déjà.</string>
     <string name="onb_start">Commencer</string>
     <string name="onb_next">Continuer</string>
     <string name="onb_skip">Plus tard</string>
     <string name="onb_finish">Terminer</string>
     <string name="onb_folder_title">Où sont tes jeux ?</string>
-    <string name="onb_notif_title">Te prévenir pendant la partie</string>
-    <string name="onb_notif_body">Emufii affiche l\'état du tunnel et du réseau local dans une notification, pendant que tu joues dans l\'émulateur. Sans elle, Android peut couper le réseau quand Emufii passe en arrière-plan.</string>
+    <string name="onb_notif_title">Garder le tunnel ouvert</string>
+    <string name="onb_notif_body">Sans notification, Android peut *couper le réseau* quand tu passes dans l\'émulateur.</string>
     <string name="onb_notif_enable">Autoriser les notifications</string>
-    <string name="onb_notif_refused">Refusé. Tu peux l\'activer plus tard dans les réglages d\'Android.</string>
-    <string name="onb_fill_title">Saisir les adresses à ta place</string>
+    <string name="onb_notif_refused">Refusé. Active-les plus tard dans les réglages d\'Android.</string>
+    <string name="onb_fill_title">Accessibilité : la saisie auto</string>
     <string name="onb_fill_enable">Ouvrir les réglages Android</string>
 
     <!-- Friends -->
@@ -373,7 +384,7 @@
     <string name="settings_artwork_body">Une ROM ne contient qu\'une icône de 32 ou 48 pixels. Avec une clé SteamGridDB, Emufii va chercher de vraies jaquettes pour les jeux que ton frontend ne couvre pas.</string>
     <string name="settings_artwork_field">Clé SteamGridDB</string>
     <string name="settings_artwork_where">Clé gratuite sur steamgriddb.com, dans les préférences de ton compte. Sans elle, les icônes des ROMs restent affichées.</string>
-    <string name="onb_artwork_title">Une belle bibliothèque</string>
+    <string name="onb_artwork_title">Une jaquette pour chaque jeu</string>
     <string name="tile_menu_icon">Changer l\'icône</string>
     <string name="icon_pick_title">Choisir une icône</string>
     <string name="icon_pick_search">Nom du jeu</string>
@@ -398,13 +409,11 @@
     <string name="finder_search">Chercher un jeu, un joueur, un code</string>
     <string name="finder_no_match">Aucune session ne correspond</string>
     <!-- Dolphin: one step only, the game is picked in the lobby -->
-    <string name="hint_dolphin_title">Dolphin</string>
-    <string name="hint_dolphin_host">Ouvre le salon, puis choisis le jeu dedans : tous les joueurs le lanceront en même temps.</string>
-    <string name="hint_dolphin_guest">Rejoins le salon, puis attends que l\'hôte choisisse le jeu. Ne lance rien toi-même.</string>
-    <string name="hint_dolphin_same_dump">Il vous faut le même dump exactement, des deux côtés. Dolphin compare les empreintes et refuse sinon.</string>
-    <string name="hint_dolphin_same_save">Vous devez aussi partir de la même sauvegarde. Si l\'un de vous est plus avancé dans le jeu, les deux parties divergent dès le lancement : chacun voit une partie différente, sans message d\'erreur. Le plus sûr est que personne n\'ait de sauvegarde.</string>
-    <string name="hint_dolphin_automated">Emufii remplit l\'adresse et le port, met la connexion en direct, et règle le salon sur le jeu de la partie.</string>
-    <string name="hint_dolphin_manual">Dans Dolphin, menu ⋮ puis Netplay : connexion directe, et saisis %1$s.</string>
+    <string name="hint_dolphin_host">Ouvre le salon, puis *choisis le jeu* dedans.</string>
+    <string name="hint_dolphin_guest">Rejoins le salon et *attends que l\'hôte* choisisse le jeu.</string>
+    <string name="hint_dolphin_same_dump">*Même dump* des deux côtés : Dolphin les compare.</string>
+    <string name="hint_dolphin_same_save">*Même sauvegarde*, ou aucune : sinon les parties divergent sans message.</string>
+    <string name="hint_dolphin_manual">⋮ → *Netplay*, connexion directe, puis saisis l\'adresse.</string>
     <string name="session_dolphin_lobby">2. Revenir au salon Dolphin</string>
     <string name="session_dolphin_lobby_opened">Retour au salon Dolphin</string>
     <!-- PS2: ARMSX2's LAN, which has nothing to do with its online play -->
@@ -443,17 +452,15 @@
         <item quantity="one">Attention : %1$d jeu a son propre réglage de carte ou de BIOS et peut ignorer le réglage global.</item>
         <item quantity="other">Attention : %1$d jeux ont leur propre réglage de carte ou de BIOS et peuvent ignorer le réglage global.</item>
     </plurals>
-    <string name="hint_ps2_title">PS2 (ARMSX2)</string>
-    <string name="hint_ps2_host">Dans le jeu, choisis le mode LAN, System Link ou Network Play. C\'est toi qui ouvres la partie.</string>
-    <string name="hint_ps2_guest">Attends que l\'hôte ouvre sa partie, puis rejoins-la depuis le menu LAN du jeu.</string>
-    <string name="hint_ps2_lan_only">Seuls les jeux livrés avec un mode LAN ou System Link marchent ici, une soixantaine en tout. Si le jeu demande de se connecter à un serveur, c\'était un jeu en ligne, et Emufii ne peut rien pour lui.</string>
+    <string name="hint_ps2_host">Dans le jeu, ouvre *LAN / System Link* et crée la partie.</string>
+    <string name="hint_ps2_guest">Une fois la partie de l\'hôte ouverte, rejoins-la depuis le menu *LAN* du jeu.</string>
+    <string name="hint_ps2_lan_only">Seulement les jeux avec un mode *LAN ou System Link*, une soixantaine.</string>
     <string name="hint_ps2_profile_choose_folder">Choisir le dossier ARMSX2</string>
     <string name="hint_ps2_profile_redo">Refaire le paramétrage</string>
     <string name="hint_ps2_profile_button">Préparer automatiquement</string>
     <string name="hint_ps2_profile_change_folder">Changer de dossier</string>
-    <string name="hint_ps2_pad">Avec l\'adaptateur réseau branché, certains jeux ne répondent plus du tout à la manette. Si ça arrive, coupe DEV9 Ethernet dans ARMSX2.</string>
-    <string name="hint_ps2_automated">Au lancement, Emufii configure DEV9, Local Link, le salon et la carte réseau pour ce jeu, puis l\'ouvre directement. Aucun parcours d\'ARMSX2 n\'est nécessaire.</string>
-    <string name="hint_ps2_manual">Dans ARMSX2, Réglages puis Réseau : mode local, et saisis %1$s.</string>
+    <string name="hint_ps2_pad">La manette ne répond plus ? Coupe *DEV9 Ethernet* dans ARMSX2.</string>
+    <string name="hint_ps2_manual">Paramètres → *Réseau* : mode local, puis saisis l\'adresse.</string>
     <string name="session_ps2_fallback_assigning">Cette image ne donne pas accès à un CRC de démarrage lisible. Emufii a ouvert ARMSX2 uniquement pour affecter la carte préparée. Reviens ensuite ici et relance le paramétrage des champs réseau.</string>
     <string name="session_ps2_fallback_accessibility">Cette image ne donne pas accès à un CRC de démarrage lisible et nécessite l’ancien parcours ARMSX2. Active le remplissage automatique dans les réglages d’Emufii, puis réessaie.</string>
     <string name="emulators_version_short">v%1$s</string>
@@ -478,6 +485,14 @@
     <string name="panel_vps_online">En ligne</string>
     <string name="panel_vps_offline">Hors ligne</string>
     <string name="panel_vps_unknown">Vérification…</string>
+    <string name="relay_auto">Automatique</string>
+    <string name="relay_auto_now">Actuellement : %1$s</string>
+    <string name="relay_rtt">%1$d ms</string>
+    <string name="relay_title">Serveur Emufii</string>
+    <string name="relay_auto_hint">Choisit le serveur le plus proche</string>
+    <string name="relay_rtt_unknown">Non mesuré</string>
+    <string name="region_eu">Europe</string>
+    <string name="region_na">Amérique du Nord</string>
     <string name="panel_page_details">R · Détails</string>
     <string name="panel_page_back">R · Revenir au jeu</string>
     <string name="panel_released">Sorti en %1$s</string>
@@ -521,6 +536,13 @@
         <item quantity="one">%d masqué</item>
         <item quantity="other">%d masqués</item>
     </plurals>
+    <string name="settings_incompatible_title">Jeux incompatibles</string>
+    <string name="settings_incompatible_switch">Les masquer de la bibliothèque</string>
+    <string name="settings_incompatible_note">Les jeux auxquels Emufii ne permet pas de jouer à plusieurs disparaissent de la bibliothèque. Ils restent sur l\'appareil, et reviennent si tu désactives ce réglage.</string>
+    <plurals name="settings_incompatible_count">
+        <item quantity="one">%d jeu dans ta bibliothèque</item>
+        <item quantity="other">%d jeux dans ta bibliothèque</item>
+    </plurals>
     <string name="settings_notify_friends">Amis</string>
     <string name="settings_second_screen_switch">Afficher sur le panneau arrière</string>
     <string name="settings_library_subfolders">Sous-dossiers explorés aussi, quelle que soit la console.</string>
@@ -546,6 +568,15 @@
         <item quantity="other">%d amis</item>
     </plurals>
     <string name="friends_panel_title">Amis</string>
+    <string name="settings_share_last_game">Montrer mon dernier jeu à mes amis</string>
+    <string name="friends_last_game">Dernier jeu</string>
+    <string name="friends_playing_now">En train de jouer</string>
+    <string name="friends_no_game">Rien pour l\'instant</string>
+    <string name="friends_in_game">En partie</string>
+    <string name="friends_just_now">À l\'instant</string>
+    <string name="friends_close">Fermer</string>
+    <string name="friends_add_note">Tape le code qu\'on t\'a donné.</string>
+    <string name="friends_show_code">Montre ce code à un ami</string>
     <string name="friends_count_online">%1$d en ligne</string>
     <plurals name="join_code_remaining">
         <item quantity="one">Encore %d caractère</item>
@@ -565,7 +596,7 @@
     <string name="onb_rail_folder">Tes jeux</string>
     <string name="onb_rail_consoles">Tes consoles</string>
     <string name="onb_rail_cocoon">Jaquettes locales</string>
-    <string name="onb_rail_artwork">Jaquettes en ligne</string>
+    <string name="onb_rail_artwork">SteamGridDB</string>
     <string name="onb_rail_ppsspp">PSP · PPSSPP</string>
     <string name="onb_rail_ps2">PS2 · ARMSX2</string>
     <string name="onb_rail_autofill">Remplissage auto</string>
@@ -573,55 +604,53 @@
     <string name="onb_rail_done">C\'est prêt</string>
 
     <string name="onb_name_field">Pseudo</string>
-    <string name="onb_name_note">Tu pourras en changer à tout moment dans Réglages → Profil.</string>
+    <string name="onb_name_note">Modifiable dans Réglages → Profil.</string>
 
-    <string name="onb_folder_body">Emufii lit tes ROMs là où elles sont déjà. Elle ne les déplace pas, ne les renomme pas, n\'écrit rien dedans.</string>
-    <string name="onb_folder_step1">Appuie sur Choisir le dossier : le sélecteur d\'Android s\'ouvre.</string>
-    <string name="onb_folder_step2">Va jusqu\'au dossier qui contient tes jeux, puis valide avec Utiliser ce dossier.</string>
-    <string name="onb_folder_step3">Emufii regarde aussi dans les sous-dossiers. Tu peux garder ton classement habituel, toutes consoles mélangées.</string>
-    <string name="onb_folder_after">Emufii cherchera tes jeux dès que tu auras terminé. Compte quelques secondes, même pour plusieurs centaines de jeux.</string>
+    <string name="onb_folder_body">Emufii lit tes ROMs *sur place*. Rien n\'est déplacé, renommé ni modifié.</string>
+    <string name="onb_folder_step1">Choisis le dossier *qui contient tes jeux*.</string>
+    <string name="onb_folder_step2">Les *sous-dossiers* comptent aussi : garde ton rangement.</string>
+    <string name="onb_folder_after">Le scan démarre à la fin du guide et prend quelques secondes.</string>
     <string name="onb_folder_change">Choisir un autre dossier</string>
 
-    <string name="onb_consoles_body">Choisis les consoles auxquelles tu joues. Les autres n\'apparaîtront pas dans ta bibliothèque, et on ne t\'embêtera pas avec leurs réglages.</string>
-    <string name="onb_consoles_note">Tu peux changer d\'avis à tout moment dans Réglages → Consoles.</string>
+    <string name="onb_consoles_body">Coche celles auxquelles tu joues. Les autres quittent ta bibliothèque et ce guide.</string>
+    <string name="onb_consoles_note">Modifiable dans Réglages → Consoles.</string>
 
     <string name="onb_cocoon_title">Tu utilises déjà un frontend ?</string>
-    <string name="onb_cocoon_body">Ton frontend a téléchargé de vraies jaquettes pour tes jeux. Emufii peut les lire directement : pas de compte, pas de clé, pas de réseau.</string>
+    <string name="onb_cocoon_body">Emufii reprend les jaquettes que ton frontend a déjà téléchargées. *Sans compte ni réseau.*</string>
     <string name="onb_cocoon_pill_on">Dossier lié</string>
     <string name="onb_cocoon_pill_off">Facultatif</string>
-    <string name="onb_cocoon_step1">Appuie sur Choisir le dossier %1$s.</string>
-    <string name="onb_frontend_step2_cocoon">Va dans Android → data → le dossier de Cocoon (Cocoonv2), puis valide.</string>
-    <string name="onb_frontend_step2_esde">Va dans le dossier ES-DE à la racine de ton stockage, puis valide. Son dossier downloaded_media fonctionne aussi.</string>
-    <string name="onb_cocoon_step3">Emufii n\'y lit que les images. Elle n\'écrit jamais dans le dossier de %1$s.</string>
-    <string name="onb_cocoon_after">Emufii utilisera en priorité les jaquettes de %1$s. Seule une image que tu as choisie toi-même passe avant.</string>
+    <string name="onb_cocoon_step1">Choisis le dossier *%1$s*.</string>
+    <string name="onb_frontend_step2_cocoon">Le *dossier de données* choisi à l\'installation de Cocoon : celui qui contient downloaded_media.</string>
+    <string name="onb_frontend_step2_esde">Par défaut, le dossier *ES-DE* à la racine du stockage (ou son downloaded_media).</string>
+    <string name="onb_cocoon_step3">Lecture seule : Emufii n\'écrit rien dans le dossier de %1$s.</string>
+    <string name="onb_cocoon_after">Les jaquettes de %1$s passent en premier, sauf une image choisie à la main.</string>
 
-    <string name="onb_artwork_body">Sans frontend, tes jeux n\'ont que la minuscule icône rangée dans la ROM. Une clé SteamGridDB, gratuite, la remplace par une vraie jaquette.</string>
-    <string name="onb_artwork_step1">Crée un compte sur steamgriddb.com, c\'est gratuit.</string>
-    <string name="onb_artwork_step2">Va dans les préférences de ton compte, section API, et génère une clé.</string>
-    <string name="onb_artwork_step3">Colle-la ci-dessous. Elle ne sert qu\'à chercher des images, et reste sur l\'appareil.</string>
+    <string name="onb_artwork_body">Sans frontend, une *clé SteamGridDB gratuite* remplace l\'icône de la ROM par une vraie jaquette.</string>
+    <string name="onb_artwork_step1">Crée un compte sur *steamgriddb.com*.</string>
+    <string name="onb_artwork_step2">Préférences → *API* → génère une clé, puis colle-la ici.</string>
+    <string name="onb_artwork_step3">La clé reste sur l\'appareil et ne sert qu\'aux images.</string>
 
-    <string name="onb_ppsspp_title">La PSP demande un réglage</string>
-    <string name="onb_ppsspp_body">PPSSPP n\'accepte pas qu\'on lui donne une adresse de l\'extérieur. Emufii doit donc l\'écrire elle-même dans ses fichiers, avant chaque partie, d\'où le dossier à lui indiquer une bonne fois.</string>
+    <string name="onb_ppsspp_title">PSP : un dossier à indiquer</string>
+    <string name="onb_ppsspp_body">PPSSPP ne prend pas d\'adresse de l\'extérieur. Emufii écrit ses réglages réseau *avant chaque partie*.</string>
 
-    <string name="onb_ps2_title">La PS2 demande un profil réseau</string>
-    <string name="onb_ps2_body">Comme sur la vraie console, les jeux PS2 vont chercher leurs réglages réseau sur la carte mémoire. Emufii y installe un profil une bonne fois pour toutes : ensuite, tu n\'y touches plus.</string>
+    <string name="onb_ps2_title">PS2 : un profil réseau</string>
+    <string name="onb_ps2_body">Les jeux PS2 lisent leur réglage réseau *sur la carte mémoire*. Emufii y installe un profil, une seule fois.</string>
 
-    <string name="onb_fill_body">Avant chaque partie, l\'émulateur demande l\'adresse et le port de l\'hôte, à taper à la main. Si tu l\'autorises, Emufii les remplit pour toi. Elle ne voit que l\'écran de l\'émulateur qu\'elle remplit, rien d\'autre.</string>
+    <string name="onb_fill_body">À chaque partie, l\'émulateur demande l\'adresse de l\'hôte. Emufii peut *la taper pour toi*.</string>
 
     <string name="onb_notif_pill_on">Autorisées</string>
     <string name="onb_notif_pill_off">À décider</string>
-    <string name="onb_notif_step1">Appuie sur Autoriser : Android pose la question.</string>
-    <string name="onb_notif_step2">Réponds Autoriser. C\'est ce qui garde le tunnel ouvert pendant que tu joues.</string>
-    <string name="onb_notif_after">Pendant une partie, une notification affiche l\'état du tunnel et le code de session.</string>
+    <string name="onb_notif_step1">Appuie sur *Autoriser*, puis confirme dans la fenêtre d\'Android.</string>
+    <string name="onb_notif_after">Pendant la partie, la notification montre l\'état du tunnel et le code de session.</string>
 
-    <string name="onb_done_title">Tout est en place</string>
-    <string name="onb_done_body">Ta bibliothèque s\'ouvre juste après. Vise un jeu, appuie sur B pour le lancer, ou crée une session pour y jouer à plusieurs.</string>
-    <string name="onb_done_where">Tout ce que tu as passé se retrouve dans les Réglages, avec les mêmes explications.</string>
-    <string name="onb_recap_folder">Dossier de jeux</string>
+    <string name="onb_done_title">C\'est prêt</string>
+    <string name="onb_done_body">Choisis un jeu pour le lancer, ou crée une session pour jouer à plusieurs.</string>
+    <string name="onb_done_where">Ce que tu as passé t\'attend dans les Réglages.</string>
+    <string name="onb_recap_folder">Tes jeux</string>
     <string name="onb_recap_artwork">Jaquettes</string>
-    <string name="onb_recap_ppsspp">PPSSPP configuré</string>
-    <string name="onb_recap_ps2">Profil réseau PS2</string>
-    <string name="onb_recap_autofill">Remplissage automatique</string>
+    <string name="onb_recap_ppsspp">PPSSPP</string>
+    <string name="onb_recap_ps2">Profil PS2</string>
+    <string name="onb_recap_autofill">Saisie auto</string>
     <string name="onb_recap_notif">Notifications</string>
     <string name="onb_recap_later">Plus tard</string>
 
@@ -675,4 +704,35 @@
     <string name="psp_server_unknown">Pas de compteur en direct</string>
     <string name="launch_ppsspp_setup_hint">Réglages → Paramétrage automatique PPSSPP</string>
     <string name="launch_ps2_profile_hint">Réglages → Profil réseau PS2</string>
+    <string name="onb_tile_state">État</string>
+    <string name="onb_tile_folder">Dossier</string>
+    <string name="onb_tile_card">Carte</string>
+    <string name="onb_tile_consoles">Consoles</string>
+    <string name="onb_tile_none">Aucun</string>
+    <string name="onb_ppsspp_step1">Choisis la *racine de la Memory Stick* : le dossier qui contient *PSP/SYSTEM*.</string>
+    <string name="onb_ppsspp_step2">Emufii écrit des réglages *par jeu*, et remet les tiens après une session publique.</string>
+    <string name="onb_ppsspp_caveat">Reviens au *menu de PPSSPP* avant de changer de mode.</string>
+    <string name="onb_ps2_step1">Choisis le *dossier personnalisé* d\'ARMSX2 : Emufii y trouve carte mémoire et BIOS.</string>
+    <string name="onb_ps2_step2">Emufii prépare une *copie vérifiée* de ta carte, réservée au jeu lancé.</string>
+    <string name="onb_ps2_safe">*Aucune sauvegarde n\'est supprimée.*</string>
+    <string name="onb_fill_step1">Ouvre les réglages, puis *Applications téléchargées*.</string>
+    <string name="onb_fill_step2">Active *Emufii*, puis reviens ici.</string>
+    <string name="onb_fill_restricted">Option grisée ? Infos de l\'appli Emufii → ⋮ → *Autoriser les paramètres restreints*.</string>
+    <string name="onb_fill_scope">Emufii ne lit *que l\'écran de l\'émulateur* qu\'elle remplit.</string>
+    <string name="onb_fill_without">Sans ça, les sessions marchent : l\'adresse se tape à la main.</string>
+    <string name="onb_fill_on">Activée</string>
+    <string name="onb_fill_off">Désactivée</string>
+    <string name="onb_welcome_how">Comment ça marche</string>
+    <string name="onb_welcome_step1">Crée une session : Emufii te donne un *code à 6 caractères*.</string>
+    <string name="onb_welcome_step2">Ton ami le tape, et *le jeu s\'ouvre* des deux côtés.</string>
+    <string name="onb_welcome_step3">Vous jouez en *multijoueur local*, chacun chez soi.</string>
+    <string name="artwork_frontend_iisu">iiSU</string>
+    <string name="onb_frontend_step2_iisu">Chemin : *Android → media → com.iisulauncher*.</string>
+    <string name="version_mismatch_title">Version d\'émulateur différente</string>
+    <string name="version_mismatch_body">L\'hôte joue sur la %1$s, tu as la %2$s.</string>
+    <string name="version_mismatch_leave">Quitter la session</string>
+    <string name="version_mismatch_continue">Rejoindre quand même</string>
+    <string name="version_mismatch_host">Hôte</string>
+    <string name="version_mismatch_you">Toi</string>
+    <string name="version_mismatch_hint">Le salon peut te refuser, ou le jeu *se désynchroniser* une fois lancé. Mets à jour pour avoir la même des deux côtés.</string>
 </resources>

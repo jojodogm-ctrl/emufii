@@ -16,17 +16,8 @@ sealed interface FriendEvent {
     ) : FriendEvent
 }
 
-/**
- * The game is kept by title, not by session code: relaunching the same game opens a new
- * session, and announcing it twice teaches people to ignore the notification.
- */
 data class SeenFriend(val online: Boolean, val game: String?)
 
-/**
- * Pure by design: the same function serves the in-app alert and the background job, so
- * the two cannot diverge, and it is the only part testable without a device.
- * pourquoi : docs/decisions/amis-et-notifications.md § The announcement rules, each earned by picturing the notification it avoids
- */
 fun friendEvents(
     previous: Map<String, SeenFriend>,
     current: Map<String, FriendStatus>,

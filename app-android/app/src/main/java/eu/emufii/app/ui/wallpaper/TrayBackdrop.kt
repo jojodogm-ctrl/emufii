@@ -42,25 +42,15 @@ import kotlin.math.PI
 import kotlin.math.max
 import kotlin.math.sin
 
-/**
- * Everything here is drawn once and reused: the movement budget is the subject.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § MATERIAL (background)
- * pourquoi : docs/decisions/theme-duotone-shelves.md § The lustre is gone
- */
 @Composable
 fun TrayBackdrop(
     modifier: Modifier = Modifier,
     dark: Boolean = false,
     oled: Boolean = LocalEmufiiOledTheme.current,
-    /**
-     * False for a still tray. No caller passes it any more.
-     * pourquoi : docs/decisions/second-ecran.md § The rear panel animates, in the end
-     */
     animated: Boolean = true
 ) {
     val time = (if (animated) rememberSlowMillis() else FROZEN_MS) / CYCLE_MS
 
-    /** A `Picture` avoided rebuilding the paths but still replayed every gradient per frame. */
     val still = remember { mutableStateOf<ImageBitmap?>(null) }
     var baked by remember { mutableStateOf<StillKey?>(null) }
 
@@ -75,8 +65,6 @@ fun TrayBackdrop(
             val h = (size.height * STILL_SCALE).toInt().coerceAtLeast(1)
             val bitmap = ImageBitmap(w, h)
             CanvasDrawScope().draw(
-                // Density follows the scale, or the shelves' 2 dp contour would be
-                // drawn at pixel size then enlarged.
                 density = Density(density * STILL_SCALE, fontScale),
                 layoutDirection = LayoutDirection.Ltr,
                 canvas = androidx.compose.ui.graphics.Canvas(bitmap),
@@ -97,7 +85,6 @@ fun TrayBackdrop(
     }
 }
 
-/** Half a side, so a quarter of the pixels: the tray is only wide gradients. */
 private const val STILL_SCALE = 0.5f
 
 private data class StillKey(
@@ -107,7 +94,6 @@ private data class StillKey(
     val oled: Boolean,
 )
 
-/** Shared between the still tray and the waves, or the two drift apart. */
 private class TrayGeometry(size: Size) {
     val side = 0.58f * max(size.width, size.height)
     val radius = CornerRadius(side * 0.30f, side * 0.30f)
@@ -155,9 +141,6 @@ private fun DrawScope.drawStillTray(
         ground: Color,
     ) {
         val path = Path().apply { addRoundRect(rect) }
-        // No contour any more: a very diffuse shadow lifts the shelf, like every plate.
-        // Blurred in software, which is free here, this bitmap being baked once.
-        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Flat plates, dropped shadows
         if (!oled) {
             drawIntoCanvas { canvas ->
                 val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
@@ -176,7 +159,6 @@ private fun DrawScope.drawStillTray(
                 canvas.nativeCanvas.drawPath(shadow.asAndroidPath(), paint)
             }
         }
-        // A flat fill made the tile look printed rather than moulded.
         drawPath(
             path,
             brush = Brush.verticalGradient(
@@ -189,8 +171,6 @@ private fun DrawScope.drawStillTray(
             )
         )
 
-        // Dissolves the long sides, not the corner: a shelf shows one sharp corner and
-        // two edges running off screen.
         if (dark || oled) {
             drawPath(
                 path,
@@ -206,7 +186,6 @@ private fun DrawScope.drawStillTray(
             )
         }
 
-        // The sharp corner otherwise stops on nothing.
         drawCircle(
             brush = Brush.radialGradient(
                 colorStops = arrayOf(
@@ -237,7 +216,6 @@ private fun DrawScope.drawStillTray(
         bottom
     )
 
-    // Without it the halos run off all four edges and the screen reads as unframed.
     if (!oled) {
         drawRect(
             brush = Brush.radialGradient(
@@ -285,7 +263,6 @@ private fun DrawScope.drawWaves(
                     )
                 )
             }
-            // Three concentric strokes: a blur's profile, sampled in three.
             for ((width, share) in WAVE_HALO) {
                 drawPath(
                     ripple,
@@ -302,12 +279,10 @@ private fun DrawScope.drawWaves(
 
 private const val WAVES = 2
 
-/** About thirty-five seconds a wave: slow enough that it cannot be followed. */
 private const val WAVE_SPEED = 0.55
 
 private val WAVE_STROKE = 2.5.dp
 
-/** Width, then share of the opacity, widest and palest first. */
 private val WAVE_HALO: List<Pair<Dp, Float>> = listOf(
     13.dp to 0.22f,
     WAVE_STROKE to 1.0f,
@@ -315,5 +290,4 @@ private val WAVE_HALO: List<Pair<Dp, Float>> = listOf(
 
 private const val CYCLE_MS = 19_000
 
-/** Where a still tray freezes: the waves half way, never zero, where they show nothing. */
 private const val FROZEN_MS = 8_000.0

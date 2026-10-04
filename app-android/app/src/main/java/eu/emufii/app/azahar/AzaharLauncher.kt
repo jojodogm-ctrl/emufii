@@ -15,7 +15,6 @@ sealed class LaunchResult {
     data object Success : LaunchResult()
     data object NotInstalled : LaunchResult()
 
-    /** Distinct from [Error]: the fix is the user's, updating the emulator. */
     data class NoNetplayUi(val versionName: String?) : LaunchResult()
 
     data class Error(val message: String) : LaunchResult()
@@ -45,10 +44,7 @@ class AzaharLauncher(private val context: Context) {
         }.getOrElse { LaunchResult.Error(it.message ?: "Unknown launch error") }
     }
 
-    /**
-     * The plan is armed only when the service is running: otherwise it lingers and fires on
-     * some later launch. A build with no multiplayer UI is refused rather than launched.
-     */
+    /** Arm the plan only while the service runs, or it fires on a later launch. */
     fun launchGame(romUri: Uri, plan: NetplayPlan? = null): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
         if (plan != null && !NetplayUiSupport.isPresent(context, pkg)) {
@@ -72,11 +68,7 @@ class AzaharLauncher(private val context: Context) {
         }.getOrElse { LaunchResult.Error(it.message ?: "Unknown launch error") }
     }
 
-    /**
-     * The room is joined before the game starts: Azahar connects from the main menu, then
-     * boots. Bundling both into one button launched the ROM into an emulator that had
-     * joined nothing.
-     */
+    /** Azahar joins the room from its main menu, before the game boots. */
     fun openForNetplay(plan: NetplayPlan): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
         if (!NetplayUiSupport.isPresent(context, pkg)) {
@@ -86,12 +78,7 @@ class AzaharLauncher(private val context: Context) {
         return launch()
     }
 
-    /**
-     * Compared as [ComponentName]s, not strings: Android stores this setting either long or
-     * short (`eu.emufii.app/.azahar.AzaharNetplayService`), and `flattenToString` only
-     * produces the long form, so a string comparison answered "off" on every device holding
-     * the short one.
-     */
+    /** Compare ComponentNames: Android stores this setting in long or short form. */
     fun isNetplayAutomationEnabled(): Boolean {
         val enabled = Settings.Secure.getString(
             context.contentResolver,
@@ -103,10 +90,7 @@ class AzaharLauncher(private val context: Context) {
         return splitter.any { ComponentName.unflattenFromString(it) == us }
     }
 
-    /**
-     * `FLAG_ACTIVITY_NEW_TASK` set unconditionally put the settings screen in its own task,
-     * and Back landed in a different app instead of the onboarding step that asked for it.
-     */
+    /** No FLAG_ACTIVITY_NEW_TASK, or Back lands in another app. */
     fun openAccessibilitySettings(): LaunchResult = runCatching {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

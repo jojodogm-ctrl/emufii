@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.components
 
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,45 +51,26 @@ import eu.emufii.app.ui.theme.plate
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.theme.TileShape
 
-/**
- * The consoles and the emulators that play them, as tiles; the tile carries the icon and
- * the version and is the control.
- * pourquoi : docs/decisions/reglages-ecran.md § A console carries a row, not a tile
- */
 @Composable
 fun ConsoleGrid(
     hidden: Set<Console>,
     onSetVisible: (Console, Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    /**
-     * The first tile becomes the pad's named destination; the naming must land on a
-     * really focusable control, never on a container.
-     * pourquoi : docs/decisions/coquille-ecrans.md § The header is declared before the content, and drawn over it
-     */
     firstTileIsEntry: Boolean = false,
-    /**
-     * The short form: no version number, a smaller icon, seven consoles on one line.
-     * pourquoi : docs/decisions/reglages-ecran.md § The console tile has a short version
-     */
-    compact: Boolean = false
+    compact: Boolean = false,
+    oneLine: Boolean = false
 ) {
     val context = LocalContext.current
-    // Read once: a row costs a package query and an icon rasterisation, and the answer
-    // cannot change without the player leaving to install something, which recreates this.
     val emulators = remember { allEmulators(context) }
 
-    // Counted on the width actually given to the grid, never the screen's: the settings
-    // page is 90 dp narrower, and "GameCube" came out as "GameCu".
-    // pourquoi : docs/decisions/reglages-ecran.md § How many tiles per line, and the width that decides it
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val minTile = if (compact) MIN_TILE_COMPACT else MIN_TILE
         val fits = ((maxWidth + GRID_GAP) / (minTile + GRID_GAP))
             .toInt()
             .coerceIn(3, emulators.size)
-        val columns = balancedColumns(emulators.size, fits)
+        val columns = if (oneLine) emulators.size else balancedColumns(emulators.size, fits)
 
         // `controlRing`'s `zIndex` only orders siblings, so not rows.
-        // pourquoi : docs/decisions/navigation-manette.md § The selected control draws in front of its neighbours
                 var focusedRow by remember { mutableStateOf(-1) }
 
         Column(
@@ -111,9 +93,6 @@ fun ConsoleGrid(
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    // A tile drawn at the end of a console grid reads as a console: the
-                    // place is held, not painted.
-                    // pourquoi : docs/decisions/reglages-ecran.md § The console grid is not allowed an orphan
                     repeat(columns - row.size) {
                         Spacer(Modifier.weight(1f))
                     }
@@ -123,11 +102,6 @@ fun ConsoleGrid(
     }
 }
 
-/**
- * The count that best fills the last row, never the maximum, which leaves an orphan.
- * pourquoi : docs/decisions/reglages-ecran.md § The console grid is not allowed an orphan
- * pourquoi : docs/decisions/reglages-ecran.md § How many tiles per line, and the width that decides it
- */
 internal fun balancedColumns(count: Int, fits: Int): Int {
     if (count <= fits) return count
     var best = fits
@@ -156,15 +130,8 @@ private fun ConsoleTile(
     compact: Boolean = false,
     onFocused: (Boolean) -> Unit = {}
 ) {
-    // Dimmed, not removed: turning a console back on is the other half of the gesture,
-    // and a blank square gives nothing to aim at.
     val alpha = if (visible) 1f else 0.45f
 
-    /**
-     * Desaturated rather than veiled, or the tile's loudest thing says on while the rest
-     * says otherwise.
-     * pourquoi : docs/decisions/reglages-ecran.md § A switched-off console is a hole in the board
-     */
     val iconFilter = remember(visible) {
         if (visible) null
         else ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
@@ -176,14 +143,10 @@ private fun ConsoleTile(
         modifier = modifier
             .height(if (compact) TILE_HEIGHT_COMPACT else TILE_HEIGHT)
             .onFocusEvent { onFocused(it.hasFocus) }
-            // Before the `clickable`: a `focusRequester` placed after no longer targets the
-            // focus node the clickable just created, and the request fails silently.
+            // Before clickable, or the focusRequester misses the clickable's focus node.
             .then(if (entry) Modifier.padEntry() else Modifier)
-            // The ring before the clip: after, its glow is cut to the tile's shape and
-            // fills it with a hard-edged wash instead of spilling out.
+            // Ring before the clip, or its glow is cut to the tile shape.
             .controlRing(TILE_SHAPE)
-            // On it is a plate, off it is a hole.
-            // pourquoi : docs/decisions/reglages-ecran.md § A switched-off console is a hole in the board
             .then(
                 if (visible) Modifier.plate(shape = TILE_SHAPE, dark = dark, oled = oled, lift = 5.dp)
                 else Modifier.socket(TILE_SHAPE, dark)
@@ -209,29 +172,34 @@ private fun ConsoleTile(
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
-                // The abbreviation rather than a question mark: an absent emulator is the
-                // ordinary case on a new device, and the tile must still name its machine.
-                Text(
-                    info.console.shortLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                val art = consoleArtwork(info.console, LocalEmufiiDarkTheme.current)
+                if (art != null) {
+                    Image(
+                        painter = painterResource(art),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        colorFilter = iconFilter,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Text(
+                        info.console.shortLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
         Text(
-            info.console.label,
+            if (compact && info.console == Console.GAMECUBE) info.console.shortLabel else info.console.label,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
             maxLines = 1,
-            // Three narrow columns and names we do not choose: the default hard clip bit
-            // deepest here.
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center
         )
         Text(
-            // Never translated: it is a product name, and a tile saying only "Switch"
-            // cannot answer what to install.
             info.name,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha * 0.85f),
@@ -254,28 +222,13 @@ private fun ConsoleTile(
     }
 }
 
-/**
- * Fixed: the last row's empty slots must match it, and an intrinsic height is not shared
- * between siblings.
- * pourquoi : docs/decisions/reglages-ecran.md § How many tiles per line, and the width that decides it
- */
 private val TILE_HEIGHT = 124.dp
 
 private val TILE_HEIGHT_COMPACT = 92.dp
 
-/** A short tile's minimum width: "GameCube" still fits. */
 private val MIN_TILE_COMPACT = 92.dp
 
-/**
- * The theme's one squircle radius, not a private copy of it.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § SHAPES
- */
 private val TILE_SHAPE = TileShape
 
-/**
- * Cut at display and not at the source: PPSSPP already carries its `v`, the other five
- * do not.
- * pourquoi : docs/decisions/reglages-ecran.md § An emulator's version is trimmed at display, not at the source
- */
 private fun shortVersion(version: String): String =
     version.removePrefix("v").removePrefix("V")

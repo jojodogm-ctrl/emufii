@@ -8,10 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-/** Durable state of the generated card used by ARMSX2 per-game settings. */
 object Ps2NetworkProfile {
 
-    /** Cleared wherever the answer can change, so a cached yes never outlives its card. */
     @Volatile
     private var verified: Boolean? = null
 
@@ -69,8 +67,6 @@ object Ps2NetworkProfile {
         prefs(context).edit {
             putString(KEY_ROOT, prepared.rootUri)
             putString(KEY_RECEIPT, json.toString())
-            // Publishing and reading the card back is the whole preparation: no second
-            // accessibility pass for global Slot 1, each launch assigns the game instead.
             putBoolean(KEY_READY, true)
             putBoolean(KEY_ASSIGNED, false)
         }
@@ -99,15 +95,12 @@ object Ps2NetworkProfile {
                 assigned = if (prefs(context).contains(KEY_ASSIGNED)) {
                     prefs(context).getBoolean(KEY_ASSIGNED, false)
                 } else {
-                    // Before version 45 KEY_READY meant accessibility had observed the
-                    // global Slot 1 assignment; keep that evidence across the migration.
                     prefs(context).getBoolean(KEY_READY, false)
                 },
             )
         }.getOrNull()
     }
 
-    /** Retained for a setup started under the accessibility flow and still in flight. */
     fun markAssigned(context: Context, cardName: String, cardSha256: String): Boolean {
         val receipt = receipt(context) ?: return false
         if (receipt.cardName != cardName || !receipt.cardSha256.equals(cardSha256, ignoreCase = true)) {
@@ -121,13 +114,7 @@ object Ps2NetworkProfile {
         return true
     }
 
-    /**
-     * ~175 ms on the Thor: proving the profile is still on the card reads the whole 8 MB
-     * image and the BIOS beside it. Never call it on the main thread, draw with
-     * [isReadyQuick] and confirm with [verifyReady]. Kept synchronous for the gate before
-     * joining a session, where a stale yes lands the guest in a tunnel whose game never
-     * opens its local menu.
-     */
+    /** Reads the whole 8 MB card image and the BIOS: never on the main thread. */
     fun isReady(context: Context): Boolean {
         if (!prefs(context).getBoolean(KEY_READY, false)) return false
         val receipt = receipt(context) ?: return false
@@ -139,11 +126,6 @@ object Ps2NetworkProfile {
         ).also { verified = it }
     }
 
-    /**
-     * The launch card called [isReady] three times for a single opening: half a second of
-     * blocked main thread on a popup meant to appear instantly. [verifyReady] refines this
-     * a moment later if the card has moved since.
-     */
     fun isReadyQuick(context: Context): Boolean =
         verified ?: prefs(context).getBoolean(KEY_READY, false)
 

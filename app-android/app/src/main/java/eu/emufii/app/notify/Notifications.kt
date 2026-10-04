@@ -17,13 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * Two channels so a player can silence one without losing the other; Android tunes each
- * from the system settings, so the app offers on and off and nothing finer.
- *
- * Posting is best effort: a refused permission or a muted channel must never surface as
- * an error the player has to deal with.
- */
 object Notifications {
 
     const val CHANNEL_FRIENDS = "emufii_friends"
@@ -33,18 +26,13 @@ object Notifications {
     const val EXTRA_OPEN = "eu.emufii.app.notify.OPEN"
     const val OPEN_FRIENDS = "friends"
 
-    /**
-     * A holder and not a navigation argument: the activity is usually already running, so
-     * the request arrives through `onNewIntent` rather than through the composition.
-     */
     object PendingOpen {
         private val _target = MutableStateFlow<String?>(null)
         val target: StateFlow<String?> = _target.asStateFlow()
 
         fun offer(intent: Intent?) {
             intent?.getStringExtra(EXTRA_OPEN)?.let { _target.value = it }
-            // A resumed activity keeps the intent that started it: without this the app
-            // jumps to the friends list on every later rotation.
+            // A resumed activity keeps its starting intent; without this every rotation reopens friends.
             intent?.removeExtra(EXTRA_OPEN)
         }
 
@@ -80,8 +68,6 @@ object Notifications {
         }
         post(
             context = context,
-            // One slot per friend: two alerts about the same person replace each other
-            // instead of stacking, and two friends never collide.
             id = ID_FRIEND_BASE + (event.code.hashCode() and 0x3ff),
             channel = CHANNEL_FRIENDS,
             icon = R.drawable.ic_notify_friend,
@@ -109,8 +95,7 @@ object Notifications {
 
         val pending = PendingIntent.getActivity(
             context,
-            // Distinct per notification, or Android hands the second one the first one's
-            // extras and every tap lands on the same screen.
+            // Distinct per notification, or Android reuses the first one's extras.
             id,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

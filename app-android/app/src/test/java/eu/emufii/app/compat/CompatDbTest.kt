@@ -27,7 +27,6 @@ class CompatDbTest {
 
     @Test
     fun `every region of one game answers with the same verdict`() {
-        // Two unrelated serials, one entry, one badge.
         val db = CompatDb.parse(sample)
         assertEquals(CompatRating.PERFECT, db.ratingFor(listOf("ps2:SLES-50877"))?.rating)
         assertEquals(CompatRating.PERFECT, db.ratingFor(listOf("ps2:SLUS-20314"))?.rating)
@@ -40,9 +39,6 @@ class CompatDbTest {
 
     @Test
     fun `the most specific key wins`() {
-        // Keys arrive exact-first, so a rating aimed at one region beats the
-        // family's. That is what lets one Japanese dump be marked broken without
-        // splitting the game in two.
         val db = CompatDb.parse(
             """
             {"games": [
@@ -57,8 +53,6 @@ class CompatDbTest {
 
     @Test
     fun `a malformed entry costs one game, not the database`() {
-        // This file is edited by hand as well as by the tool. One bad line must
-        // not blank every badge in the app.
         val db = CompatDb.parse(
             """
             {"games": [
@@ -70,9 +64,6 @@ class CompatDbTest {
         )
         assertEquals(1, db.size)
         assertEquals(CompatRating.PARTIAL, db.ratingFor(listOf("ps2:B"))?.rating)
-        // An unknown rating is skipped and never defaulted: defaulting would
-        // invent a verdict, which is the one thing a compatibility list must not
-        // do.
         assertNull(db.ratingFor(listOf("ps2:A")))
     }
 

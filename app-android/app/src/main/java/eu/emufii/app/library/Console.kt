@@ -1,10 +1,5 @@
 package eu.emufii.app.library
 
-/**
- * The grid stays one grid: which emulator is launched, and what the network needs
- * first, is our problem.
- * pourquoi : docs/decisions/reglages-et-consoles.md § The grid stays a grid
- */
 enum class Console(
     val label: String,
     val extensions: Set<String>,
@@ -16,14 +11,8 @@ enum class Console(
         backend = Backend.AZAHAR
     ),
 
-    /**
-     * No room to create and no dialog to fill in, just a fixed ad hoc server address
-     * the relay translates towards the session's host.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The four multiplayer families
-     */
     PSP(
         label = "PSP",
-        // No `.prx`: a module sitting next to a game, never a game.
         extensions = setOf("iso", "cso", "pbp", "chd"),
         backend = Backend.PPSSPP
     ),
@@ -40,11 +29,7 @@ enum class Console(
         backend = Backend.EDEN
     ),
 
-    /**
-     * Without `.iso`: the table is a map, one owner per key, and claiming it would
-     * take it from the PSP.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The extension table is a map: one owner per key
-     */
+    /** No `.iso`: one owner per extension, and it belongs to the PSP. */
     GAMECUBE(
         label = "GameCube",
         extensions = setOf("gcm"),
@@ -57,22 +42,13 @@ enum class Console(
         backend = Backend.DOLPHIN
     ),
 
-    /**
-     * No extension of its own, and that is not an oversight: PS2 arrives by its
-     * folder (`ps2/`) or by reading the bytes.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The extension table is a map: one owner per key
-     */
     PS2(
         label = "PS2",
         extensions = emptySet(),
         backend = Backend.ARMSX2
     );
 
-    /**
-     * The name the coordinator receives, and what decides on a VPS room: stable
-     * lowercase, never derived from [label].
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The network name is a contract, never a label
-     */
+    /** Sent to the coordinator, decides on a VPS room: never derive from [label]. */
     val wireName: String
         get() = when (this) {
             THREE_DS -> "3ds"
@@ -84,7 +60,6 @@ enum class Console(
             PS2 -> "ps2"
         }
 
-    /** Fits on a tile badge, where [label] would wrap. */
     val shortLabel: String
         get() = when (this) {
             THREE_DS -> "3DS"
@@ -104,11 +79,6 @@ enum class Console(
 
         val allExtensions: Set<String> = byExtension.keys
 
-        /**
-         * The cheapest and truest answer, the player having sorted the file
-         * themselves. Normalised, and the direct folder only, never its ancestors.
-         * pourquoi : docs/decisions/reglages-et-consoles.md § The folder name is the cheapest and truest answer
-         */
         private val byFolder: Map<String, Console> = mapOf(
             "ps2" to PS2,
             "playstation2" to PS2,
@@ -140,66 +110,27 @@ enum class Console(
 enum class Backend {
     AZAHAR,
 
-    /** The Switch's LDN over an ENet room, same port and dialog as Azahar. */
     EDEN,
 
-    /** PSP ad hoc through PPSSPP's per-game INI on a user-granted memory stick. */
     PPSSPP,
 
-    /**
-     * Two routes, like the PSP. A session is WatermelonDS's netplay: each phone
-     * emulates both consoles, and only inputs cross the tunnel, to the host's
-     * address on [defaultNetplayPort]. Online play is Kaeru WFC, reached by moving
-     * DNS rather than building a network: no session code, no tunnel.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The four multiplayer families
-     */
     MELONDS,
 
-    /**
-     * Dolphin's own netplay: Compose screen, no view ids, its own driver, and
-     * ENet/UDP 2626 rather than 24872.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The port is part of the plan
-     */
+    /** ENet/UDP 2626, not 24872. */
     DOLPHIN,
 
-    /**
-     * ARMSX2's Local Link, the ~57 games with a LAN mode: real Android views but no
-     * translatable strings, hence hardcoded labels. PS2 online play is not this.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The four multiplayer families
-     */
     ARMSX2,
 
-    /**
-     * No multiplayer path built yet; these ROMs still belong in the grid.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The four multiplayer families
-     */
     NONE;
 
-    /**
-     * True where a room must be joined before the game boots; WFC is out, having no
-     * room at all, only a resolver.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The four multiplayer families
-     */
     val hasNetplay: Boolean get() =
         this == AZAHAR || this == EDEN || this == DOLPHIN || this == ARMSX2
 
-    /**
-     * The emulator's own name, not a translated string: product names are
-     * the same everywhere. Hardcoding one made a Switch session announce Azahar.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The network name is a contract, never a label
-     */
-    /**
-     * The port this emulator's netplay listens on: 24872 for Azahar and Eden,
-     * 2626 for Dolphin. The wrong one reads as a broken tunnel.
-     * pourquoi : docs/decisions/reglages-et-consoles.md § The port is part of the plan
-     */
     val defaultNetplayPort: Int
         get() = when (this) {
             DOLPHIN -> eu.emufii.app.dolphin.DolphinTarget.DEFAULT_PORT
-            // ARMSX2's own screen says "there is no automatic negotiation": both
-            // ends have to carry this port.
+            // ARMSX2 does no port negotiation: both ends must use this port.
             ARMSX2 -> eu.emufii.app.ps2.Ps2Target.DEFAULT_PORT
-            // WatermelonDS's netplay, fixed on both ends
             MELONDS -> eu.emufii.app.wfc.MelonDsPackage.NETPLAY_PORT
             else -> eu.emufii.app.netplay.NetplayUi.DEFAULT_PORT
         }

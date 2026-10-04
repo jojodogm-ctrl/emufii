@@ -9,6 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -88,14 +89,55 @@ import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.theme.socket
 import eu.emufii.app.ui.wallpaper.TrayBackdrop
 import kotlinx.coroutines.delay
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.Path
+import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Animatable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.offset
+import eu.emufii.app.ui.components.SheetLabel
+import androidx.compose.ui.layout.layout
+import androidx.compose.foundation.layout.aspectRatio
+import eu.emufii.app.ui.components.consoleArtwork
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.text.style.TextOverflow
+import eu.emufii.app.library.EmulatorInfo
+import eu.emufii.app.library.emulatorInfo
+import eu.emufii.app.ui.components.FactTile
+import eu.emufii.app.ui.components.FitColumn
+import eu.emufii.app.ui.components.LocalSheetMaxHeight
+import eu.emufii.app.ui.components.Optional
+import eu.emufii.app.ui.components.SheetHeader
+import eu.emufii.app.ui.components.SheetStep
+import eu.emufii.app.ui.components.SheetWarning
+import eu.emufii.app.ui.components.accented
+import eu.emufii.app.ui.screens.settings.rememberPpssppSetup
+import eu.emufii.app.ui.screens.settings.rememberPs2Setup
+import eu.emufii.app.ui.theme.Coral
+import eu.emufii.app.ui.theme.GoodDark
+import eu.emufii.app.ui.theme.GoodLight
+import eu.emufii.app.ui.theme.WarnDark
+import eu.emufii.app.ui.theme.WarnLight
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-/**
- * The run has no fixed length: the emulator pages are drawn from what the player
- * answers on the consoles page.
- * pourquoi : docs/decisions/onboarding.md § The walkthrough has no fixed length
- */
 @Composable
 fun OnboardingScreen(
     initialName: String,
@@ -126,8 +168,6 @@ fun OnboardingScreen(
         }
     }
 
-    // Read only, as in the settings: we look at the images the frontend has already
-    // downloaded and write nothing into its folder.
     val frontendPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri: Uri? ->
@@ -143,8 +183,6 @@ fun OnboardingScreen(
         }
     }
 
-    // From the real permission rather than from whether the player pressed: it may
-    // already be granted, and the button would then do nothing.
     var notificationsGranted by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
@@ -155,8 +193,6 @@ fun OnboardingScreen(
     val notificationPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        // A refusal showed the same tick as a grant: after two refusals Android stops
-        // showing the prompt and the button never does anything again.
         notificationsGranted = granted
         notificationsRefused = !granted
     }
@@ -166,13 +202,9 @@ fun OnboardingScreen(
     var ps2Ready by remember { mutableStateOf(Ps2NetworkProfile.isReadyQuick(context)) }
     LaunchedEffect(Unit) { ps2Ready = Ps2NetworkProfile.verifyReady(context) }
 
-    // A round trip through Android's settings: there is no result to await, the answer
-    // only shows on return, so we poll.
     val launcher = remember { AzaharLauncher(context) }
     var autofillOn by remember { mutableStateOf(launcher.isNetplayAutomationEnabled()) }
 
-    // Held by value rather than index: hiding a console removes a page, and an index
-    // would then point at the next one.
     val steps = remember(hiddenConsoles) { onboardingSteps(hiddenConsoles) }
     var current by remember { mutableStateOf(OnbStep.WELCOME) }
     val index = steps.indexOf(current).coerceAtLeast(0)
@@ -197,11 +229,8 @@ fun OnboardingScreen(
         if (index > 0) current = steps[index - 1]
     }
 
-    // Back is the system button and B; a third control would be one more to read.
     BackHandler(enabled = index > 0) { goBack() }
 
-    // The fixed elements tighten too: at 468 dp tall their margins alone overflowed the
-    // room available.
     val configuration = LocalConfiguration.current
     val shortScreen = configuration.screenHeightDp < 520
     val wide = configuration.screenWidthDp >= 720
@@ -223,14 +252,16 @@ fun OnboardingScreen(
         ) {
             StepRail(current = index, total = steps.size, label = stringResource(current.railLabel))
 
-            // The page scrolls, the button stays: the weight serves the button first.
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                    .then(if (wide) Modifier else Modifier.verticalScroll(rememberScrollState())),
                 contentAlignment = Alignment.Center
             ) {
+              CompositionLocalProvider(
+                  LocalSheetMaxHeight provides if (wide) maxHeight else Dp.Unspecified
+              ) {
                 AnimatedContent(
                     targetState = current,
                     transitionSpec = {
@@ -239,6 +270,7 @@ fun OnboardingScreen(
                             .togetherWith(
                                 slideOutHorizontally { if (forward) -it / 4 else it / 4 } + fadeOut()
                             )
+                            .using(SizeTransform(clip = false))
                     },
                     label = "onboarding-step"
                 ) { shown ->
@@ -257,7 +289,6 @@ fun OnboardingScreen(
                         onSetFrontend = { option ->
                             if (option != artworkFrontend) {
                                 settingsStore.setArtworkFrontend(option)
-                                // A folder linked for the other layout finds nothing here.
                                 settingsStore.setFrontendFolder("")
                                 FrontendMedia.forget()
                             }
@@ -284,9 +315,9 @@ fun OnboardingScreen(
                         },
                     )
                 }
+              }
             }
 
-            // Both exits on one line: stacked, they cost a row the page has not got.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -301,15 +332,10 @@ fun OnboardingScreen(
                         }
                     ),
                     onClick = { goNext() },
-                    // The one page you cannot skip past: the nickname goes into the
-                    // emulator's form exactly as typed.
-                    // pourquoi : docs/decisions/onboarding.md § Everything can be skipped, except the nickname
                     enabled = current != OnbStep.NAME || !nameTooShort,
                     modifier = Modifier.weight(1f).height(actionHeight)
                 )
 
-                // Offered only where something is asked: the welcome page and the
-                // summary have nothing to skip.
                 if (current.skippable) {
                     GhostButton(
                         label = stringResource(R.string.onb_skip),
@@ -322,13 +348,11 @@ fun OnboardingScreen(
     }
 }
 
-/** Where the frontend keeps its images, so the picker opens in the right place. */
 private fun defaultFolderOf(frontend: ArtworkFrontend): Uri = DocumentsContract.buildDocumentUri(
     "com.android.externalstorage.documents",
     frontend.defaultFolderId
 )
 
-/** The enum's order is the run's order. */
 private enum class OnbStep(val railLabel: Int, val skippable: Boolean = true) {
     WELCOME(R.string.onb_rail_welcome, skippable = false),
     NAME(R.string.onb_rail_name, skippable = false),
@@ -343,11 +367,6 @@ private enum class OnbStep(val railLabel: Int, val skippable: Boolean = true) {
     DONE(R.string.onb_rail_done, skippable = false),
 }
 
-/**
- * The consoles whose multiplayer goes through driving the emulator. Neither the PSP
- * (tunnel) nor the DS (DNS) has a form to fill.
- * pourquoi : docs/decisions/onboarding.md § The walkthrough has no fixed length
- */
 private val AUTOMATED = setOf(
     Console.THREE_DS,
     Console.SWITCH,
@@ -370,10 +389,6 @@ private fun onboardingSteps(hidden: Set<Console>): List<OnbStep> = buildList {
     add(OnbStep.DONE)
 }
 
-/**
- * The why on the left, the what-to-do on the right; stacked when narrow.
- * pourquoi : docs/decisions/onboarding.md § Two columns, and they do not say the same thing
- */
 @Composable
 private fun StepLayout(
     wide: Boolean,
@@ -381,20 +396,19 @@ private fun StepLayout(
     title: String,
     body: String,
     state: (@Composable () -> Unit)? = null,
-    /**
-     * The why becomes a banner. One page asks for it, the consoles page.
-     * pourquoi : docs/decisions/onboarding.md § The consoles page takes the full width
-     */
     fullWidthWork: Boolean = false,
+    balanceMark: Boolean = true,
     work: (@Composable () -> Unit)? = null,
 ) {
+    val density = LocalDensity.current
+    var markHeight by remember { mutableStateOf(0.dp) }
     val why: @Composable (Modifier) -> Unit = { m ->
         Column(
             modifier = m,
             verticalArrangement = Arrangement.spacedBy(14.dp),
             horizontalAlignment = if (wide && work != null) Alignment.Start else Alignment.CenterHorizontally
         ) {
-            mark()
+            Box(Modifier.onSizeChanged { markHeight = with(density) { it.height.toDp() } }) { mark() }
             Text(
                 title,
                 style = MaterialTheme.typography.headlineSmall,
@@ -402,12 +416,13 @@ private fun StepLayout(
                 textAlign = if (wide && work != null) TextAlign.Start else TextAlign.Center
             )
             Text(
-                body,
-                style = MaterialTheme.typography.bodyMedium,
+                accented(body, onbInks().accent),
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = if (wide && work != null) TextAlign.Start else TextAlign.Center
             )
             state?.invoke()
+            if (wide && work != null && balanceMark) Spacer(Modifier.height(markHeight))
         }
     }
 
@@ -419,7 +434,7 @@ private fun StepLayout(
         }
 
         wide && fullWidthWork -> Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Row(
@@ -435,14 +450,17 @@ private fun StepLayout(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        body,
+                        accented(body, onbInks().accent),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
             state?.invoke()
-            work()
+            val max = LocalSheetMaxHeight.current
+            CompositionLocalProvider(
+                LocalSheetMaxHeight provides if (max == Dp.Unspecified) max else max - BANNER_HEIGHT
+            ) { work() }
         }
 
         wide -> Row(
@@ -450,7 +468,6 @@ private fun StepLayout(
             horizontalArrangement = Arrangement.spacedBy(26.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // No plate: it speaks over the tray like a screen title.
             why(Modifier.weight(0.42f))
             Box(Modifier.weight(0.58f)) { work() }
         }
@@ -466,7 +483,8 @@ private fun StepLayout(
     }
 }
 
-/** A page's mark: the app's glyph in the same socket as the emulator icons. */
+private val BANNER_HEIGHT = 86.dp
+
 @Composable
 private fun StepMark(size: Dp = 64.dp, glyph: @Composable (Color) -> Unit) {
     val dark = LocalEmufiiDarkTheme.current
@@ -487,15 +505,84 @@ private fun LogoMark(size: Dp = 96.dp) {
     )
 }
 
-/** Emulator pages lay the settings block here instead. */
+private data class OnbInks(val accent: Color, val alarm: Color, val good: Color, val warn: Color)
+
 @Composable
-private fun WorkCard(content: @Composable () -> Unit) {
+private fun onbInks(): OnbInks {
+    val dark = LocalEmufiiDarkTheme.current
+    return OnbInks(
+        accent = if (dark) Teal.darkBright else Teal.deep,
+        alarm = if (dark) Coral.darkBright else Coral.deep,
+        good = if (dark) GoodDark else GoodLight,
+        warn = if (dark) WarnDark else WarnLight,
+    )
+}
+
+@Composable
+private fun OnbSheet(content: @Composable (OnbInks) -> Unit) {
+    val inks = onbInks()
+    val maxHeight = LocalSheetMaxHeight.current
     SoftCard(modifier = Modifier) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(22.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) { content() }
+        FitColumn(
+            maxHeight = if (maxHeight == Dp.Unspecified) maxHeight else maxHeight - SheetPadV * 2,
+            spacing = 12.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = SheetPadV),
+            strictOrder = true,
+        ) { content(inks) }
     }
+}
+
+private val SheetPadV = 16.dp
+
+@Composable
+private fun EmulatorHeader(console: Console, title: String, inks: OnbInks) {
+    val context = LocalContext.current
+    val emulator by produceState<EmulatorInfo?>(null, console) {
+        value = withContext(Dispatchers.IO) { runCatching { emulatorInfo(context, console) }.getOrNull() }
+    }
+    val missing = emulator?.installed == false
+    SheetHeader(
+        icon = emulator?.icon,
+        fallbackLetter = title.take(1),
+        title = title,
+        subtitle = if (missing) stringResource(R.string.console_sheet_not_installed) else emulator?.version,
+        accent = inks.accent,
+        subtitleInk = if (missing) inks.alarm else inks.accent,
+        iconSize = 44.dp,
+    )
+}
+
+@Composable
+private fun StateTile(done: Boolean, doneLabel: String, todoLabel: String, inks: OnbInks, modifier: Modifier) {
+    FactTile(
+        label = stringResource(R.string.onb_tile_state),
+        value = if (done) doneLabel else todoLabel,
+        ink = if (done) inks.good else inks.warn,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun TileRow(content: @Composable RowScope.() -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth(), content = content)
+}
+
+@Composable
+private fun Steps(inks: OnbInks, vararg steps: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        steps.forEachIndexed { i, text -> SheetStep(i + 1, text, inks.accent) }
+    }
+}
+
+@Composable
+private fun SheetNote(text: String, inks: OnbInks) {
+    Text(
+        accented(text, inks.accent),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
 
 @Composable
@@ -531,9 +618,10 @@ private fun StepBody(
 
     OnbStep.WELCOME -> StepLayout(
         wide = wide,
-        mark = { LogoMark() },
+        mark = { LogoMark(size = 72.dp) },
         title = stringResource(R.string.onb_welcome_title),
         body = stringResource(R.string.onb_welcome_body),
+        work = { WelcomeSheet() }
     )
 
     OnbStep.NAME -> StepLayout(
@@ -542,30 +630,22 @@ private fun StepBody(
         title = stringResource(R.string.onb_name_title),
         body = stringResource(R.string.onb_name_body),
         work = {
-            WorkCard {
+            OnbSheet { inks ->
                 PadTextField(
                     value = name,
                     onValueChange = onNameChange,
                     isError = nameTooShort,
                     shape = PillShape,
                     label = stringResource(R.string.onb_name_field),
+                    selectAllOnEdit = true,
                     supportingText = {
                         if (nameTooShort) {
-                            Text(
-                                stringResource(
-                                    R.string.onb_name_too_short,
-                                    Profile.MIN_NAME_LENGTH
-                                )
-                            )
+                            Text(stringResource(R.string.onb_name_too_short, Profile.MIN_NAME_LENGTH))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text(
-                    stringResource(R.string.onb_name_note),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Optional { SheetNote(stringResource(R.string.onb_name_note), inks) }
             }
         }
     )
@@ -576,19 +656,23 @@ private fun StepBody(
         title = stringResource(R.string.onb_folder_title),
         body = stringResource(R.string.onb_folder_body),
         work = {
-            WorkCard {
+            OnbSheet { inks ->
+                CheckedTile(done = romFolder != null, inks = inks) {
+                    FactTile(
+                        stringResource(R.string.onb_tile_folder),
+                        romFolder?.let { folderLabel(it) } ?: stringResource(R.string.onb_tile_none),
+                        if (romFolder != null) inks.good else inks.warn,
+                        Modifier.fillMaxWidth()
+                    )
+                }
                 if (romFolder == null) {
-                    SettingsSteps(
+                    Steps(
+                        inks,
                         stringResource(R.string.onb_folder_step1),
                         stringResource(R.string.onb_folder_step2),
-                        stringResource(R.string.onb_folder_step3),
                     )
                 } else {
-                    BlockFact(
-                        stringResource(R.string.settings_library_fact_folder),
-                        folderLabel(romFolder)
-                    )
-                    BlockNotice(stringResource(R.string.onb_folder_after))
+                    Optional { SheetNote(stringResource(R.string.onb_folder_after), inks) }
                 }
                 DetailActions {
                     if (romFolder == null) {
@@ -616,17 +700,14 @@ private fun StepBody(
         body = stringResource(R.string.onb_consoles_body),
         fullWidthWork = true,
         work = {
-            WorkCard {
+            OnbSheet { inks ->
                 ConsoleGrid(
                     hidden = hiddenConsoles,
                     onSetVisible = onSetConsoleVisible,
                     compact = wide,
+                    oneLine = wide,
                 )
-                Text(
-                    stringResource(R.string.onb_consoles_note),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Optional { SheetNote(stringResource(R.string.onb_consoles_note), inks) }
             }
         }
     )
@@ -639,43 +720,43 @@ private fun StepBody(
             mark = { StepMark { PaintMark(size = 34.dp, color = it) } },
             title = stringResource(R.string.onb_cocoon_title),
             body = stringResource(R.string.onb_cocoon_body),
-            state = {
-                StatePill(
-                    if (has) DetailTone.GOOD else DetailTone.WARN,
-                    stringResource(
-                        if (has) R.string.onb_cocoon_pill_on else R.string.onb_cocoon_pill_off
-                    )
-                )
-            },
             work = {
-                WorkCard {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                OnbSheet { inks ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                         ArtworkFrontend.entries.forEachIndexed { index, option ->
-                            ChoiceRow(
-                                label = stringResource(option.labelRes),
-                                selected = option == artworkFrontend,
-                                onClick = { onSetFrontend(option) },
-                                entry = index == 0
-                            )
+                            Box(Modifier.weight(1f)) {
+                                ChoiceRow(
+                                    label = stringResource(option.labelRes),
+                                    selected = option == artworkFrontend,
+                                    onClick = { onSetFrontend(option) },
+                                    entry = index == 0
+                                )
+                            }
                         }
                     }
                     if (has) {
-                        BlockFact(
-                            stringResource(R.string.settings_library_fact_folder),
-                            folderLabel(frontendFolder.toUri())
-                        )
-                        BlockNotice(stringResource(R.string.onb_cocoon_after, frontendName))
+                        CheckedTile(done = true, inks = inks) {
+                            FactTile(
+                                stringResource(R.string.onb_tile_folder),
+                                folderLabel(frontendFolder.toUri()),
+                                inks.good,
+                                Modifier.fillMaxWidth()
+                            )
+                        }
+                        Optional { SheetNote(stringResource(R.string.onb_cocoon_after, frontendName), inks) }
                     } else {
-                        SettingsSteps(
+                        Steps(
+                            inks,
                             stringResource(R.string.onb_cocoon_step1, frontendName),
                             stringResource(
                                 when (artworkFrontend) {
                                     ArtworkFrontend.COCOON -> R.string.onb_frontend_step2_cocoon
                                     ArtworkFrontend.ESDE -> R.string.onb_frontend_step2_esde
+                                    ArtworkFrontend.IISU -> R.string.onb_frontend_step2_iisu
                                 }
                             ),
-                            stringResource(R.string.onb_cocoon_step3, frontendName),
                         )
+                        Optional { SheetNote(stringResource(R.string.onb_cocoon_step3, frontendName), inks) }
                     }
                     DetailActions {
                         if (has) {
@@ -708,12 +789,12 @@ private fun StepBody(
         title = stringResource(R.string.onb_artwork_title),
         body = stringResource(R.string.onb_artwork_body),
         work = {
-            WorkCard {
-                SteamGridDbMark()
-                SettingsSteps(
+            OnbSheet { inks ->
+                Optional { SteamGridDbMark() }
+                Steps(
+                    inks,
                     stringResource(R.string.onb_artwork_step1),
                     stringResource(R.string.onb_artwork_step2),
-                    stringResource(R.string.onb_artwork_step3),
                 )
                 PadTextField(
                     value = artworkKey,
@@ -722,6 +803,7 @@ private fun StepBody(
                     label = stringResource(R.string.settings_artwork_field),
                     modifier = Modifier.fillMaxWidth()
                 )
+                Optional { SheetNote(stringResource(R.string.onb_artwork_step3), inks) }
             }
         }
     )
@@ -731,13 +813,7 @@ private fun StepBody(
         mark = { StepMark { ChipMark(size = 34.dp, color = it) } },
         title = stringResource(R.string.onb_ppsspp_title),
         body = stringResource(R.string.onb_ppsspp_body),
-        work = {
-            PpssppBlock(
-                store = ppssppConfig,
-                ready = ppssppReady,
-                onReadyChanged = onPpssppReady,
-            )
-        }
+        work = { PpssppSheet(ppssppConfig, ppssppReady, onPpssppReady) }
     )
 
     OnbStep.PS2 -> StepLayout(
@@ -745,13 +821,7 @@ private fun StepBody(
         mark = { StepMark { ChipMark(size = 34.dp, color = it) } },
         title = stringResource(R.string.onb_ps2_title),
         body = stringResource(R.string.onb_ps2_body),
-        work = {
-            Ps2Block(
-                ready = ps2Ready,
-                profileName = profileName,
-                onReadyChanged = onPs2Ready,
-            )
-        }
+        work = { Ps2Sheet(ps2Ready, profileName, onPs2Ready) }
     )
 
     OnbStep.AUTOFILL -> StepLayout(
@@ -759,7 +829,51 @@ private fun StepBody(
         mark = { StepMark { ChipMark(size = 34.dp, color = it) } },
         title = stringResource(R.string.onb_fill_title),
         body = stringResource(R.string.onb_fill_body),
-        work = { AutofillBlock(enabled = autofillOn, onOpen = onOpenAutofill) }
+        work = {
+            OnbSheet { inks ->
+                TileRow {
+                    StateTile(
+                        autofillOn,
+                        stringResource(R.string.onb_fill_on),
+                        stringResource(R.string.onb_fill_off),
+                        inks, Modifier.weight(1f)
+                    )
+                    FactTile(
+                        stringResource(R.string.onb_tile_consoles),
+                        AUTOMATED.filter { it !in hiddenConsoles }.joinToString(" · ") {
+                            if (it == Console.GAMECUBE) "GC" else it.label
+                        },
+                        MaterialTheme.colorScheme.onSurface,
+                        Modifier.weight(2.4f)
+                    )
+                }
+                if (!autofillOn) {
+                    Steps(
+                        inks,
+                        stringResource(R.string.onb_fill_step1),
+                        stringResource(R.string.onb_fill_step2),
+                    )
+                    Optional { SheetWarning(stringResource(R.string.onb_fill_restricted), inks.alarm) }
+                }
+                Optional { SheetNote(stringResource(R.string.onb_fill_scope), inks) }
+                if (!autofillOn) Optional { SheetNote(stringResource(R.string.onb_fill_without), inks) }
+                DetailActions {
+                    if (autofillOn) {
+                        GhostButton(
+                            label = stringResource(R.string.settings_autofill_open),
+                            onClick = onOpenAutofill,
+                            fillWidth = true
+                        )
+                    } else {
+                        PrimaryButton(
+                            label = stringResource(R.string.settings_autofill_open),
+                            onClick = onOpenAutofill,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
     )
 
     OnbStep.NOTIF -> StepLayout(
@@ -767,35 +881,26 @@ private fun StepBody(
         mark = { StepMark { SignalMark(size = 34.dp, color = it) } },
         title = stringResource(R.string.onb_notif_title),
         body = stringResource(R.string.onb_notif_body),
-        state = {
-            StatePill(
-                if (notificationsGranted) DetailTone.GOOD else DetailTone.WARN,
-                stringResource(
-                    if (notificationsGranted) R.string.onb_notif_pill_on
-                    else R.string.onb_notif_pill_off
-                )
-            )
-        },
         work = {
-            WorkCard {
-                if (notificationsGranted) {
-                    BlockNotice(stringResource(R.string.onb_notif_after))
-                } else {
-                    SettingsSteps(
-                        stringResource(R.string.onb_notif_step1),
-                        stringResource(R.string.onb_notif_step2),
-                    )
-                    if (notificationsRefused) {
-                        BlockNotice(stringResource(R.string.onb_notif_refused))
-                    }
-                }
-                if (!notificationsGranted && !notificationsRefused) {
-                    DetailActions {
-                        PrimaryButton(
-                            label = stringResource(R.string.onb_notif_enable),
-                            onClick = onAskNotifications,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+            OnbSheet { inks ->
+                StateTile(
+                    notificationsGranted,
+                    stringResource(R.string.onb_notif_pill_on),
+                    stringResource(R.string.onb_notif_pill_off),
+                    inks, Modifier.fillMaxWidth()
+                )
+                when {
+                    notificationsGranted -> Optional { SheetNote(stringResource(R.string.onb_notif_after), inks) }
+                    notificationsRefused -> SheetWarning(stringResource(R.string.onb_notif_refused), inks.alarm)
+                    else -> {
+                        Steps(inks, stringResource(R.string.onb_notif_step1))
+                        DetailActions {
+                            PrimaryButton(
+                                label = stringResource(R.string.onb_notif_enable),
+                                onClick = onAskNotifications,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
@@ -807,8 +912,9 @@ private fun StepBody(
         mark = { LogoMark(size = 76.dp) },
         title = stringResource(R.string.onb_done_title),
         body = stringResource(R.string.onb_done_body),
+        balanceMark = false,
         work = {
-            WorkCard {
+            OnbSheet { inks ->
                 Recap(
                     stringResource(R.string.onb_recap_folder) to (romFolder != null),
                     stringResource(R.string.onb_recap_artwork) to
@@ -819,16 +925,187 @@ private fun StepBody(
                     stringResource(R.string.onb_recap_notif) to notificationsGranted,
                     hidden = hiddenConsoles,
                 )
-                BlockNotice(stringResource(R.string.onb_done_where))
+                Optional { SheetNote(stringResource(R.string.onb_done_where), inks) }
             }
         }
     )
 }
 
-/**
- * Rows that do not concern this player do not appear.
- * pourquoi : docs/decisions/onboarding.md § The summary names what was skipped
- */
+@Composable
+private fun WelcomeSheet() {
+    val dark = LocalEmufiiDarkTheme.current
+    OnbSheet { inks ->
+        SheetLabel(stringResource(R.string.onb_tile_consoles))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Console.entries.forEach { console ->
+                consoleArtwork(console, dark)?.let { art ->
+                    Image(
+                        painter = painterResource(art),
+                        contentDescription = console.label,
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                }
+            }
+        }
+        SheetLabel(stringResource(R.string.onb_welcome_how))
+        SheetStep(1, stringResource(R.string.onb_welcome_step1), inks.accent)
+        SheetStep(2, stringResource(R.string.onb_welcome_step2), inks.accent)
+        Optional { SheetStep(3, stringResource(R.string.onb_welcome_step3), inks.accent) }
+    }
+}
+
+@Composable
+private fun CheckedTile(done: Boolean, inks: OnbInks, tile: @Composable () -> Unit) {
+    Box(contentAlignment = Alignment.CenterEnd) {
+        tile()
+        if (done) DrawnCheck(inks.good, Modifier.padding(end = 14.dp).size(30.dp))
+    }
+}
+
+@Composable
+private fun DrawnCheck(color: Color, modifier: Modifier) {
+    val disc = remember { Animatable(0f) }
+    val stroke = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        disc.animateTo(1f, spring(dampingRatio = 0.45f, stiffness = 380f))
+    }
+    LaunchedEffect(Unit) {
+        delay(140)
+        stroke.animateTo(1f, tween(durationMillis = 320, easing = FastOutSlowInEasing))
+    }
+    val tick = remember { Path() }
+    val part = remember { Path() }
+    val measure = remember { PathMeasure() }
+    Canvas(modifier.graphicsLayer { scaleX = disc.value; scaleY = disc.value }) {
+        drawCircle(color)
+        tick.reset()
+        tick.moveTo(size.width * 0.28f, size.height * 0.53f)
+        tick.lineTo(size.width * 0.44f, size.height * 0.68f)
+        tick.lineTo(size.width * 0.73f, size.height * 0.36f)
+        measure.setPath(tick, false)
+        part.reset()
+        measure.getSegment(0f, measure.length * stroke.value, part, true)
+        drawPath(
+            part,
+            Color.White,
+            style = Stroke(width = size.width * 0.11f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        )
+    }
+}
+
+@Composable
+private fun PpssppSheet(store: PpssppConfigStore, ready: Boolean, onReadyChanged: (Boolean) -> Unit) {
+    val setup = rememberPpssppSetup(store, onReadyChanged)
+    OnbSheet { inks ->
+        Optional { EmulatorHeader(Console.PSP, "PPSSPP", inks) }
+        TileRow {
+            StateTile(
+                ready,
+                stringResource(R.string.settings_pill_ready),
+                stringResource(R.string.settings_pill_todo),
+                inks, Modifier.weight(1f)
+            )
+            FactTile(
+                stringResource(R.string.onb_tile_folder),
+                (if (ready) store.rootLabel() else null) ?: stringResource(R.string.onb_tile_none),
+                MaterialTheme.colorScheme.onSurface,
+                Modifier.weight(1f)
+            )
+        }
+        setup.error?.let { SheetWarning(stringResource(it), inks.alarm) }
+        if (!ready && setup.rootUri != null && setup.error == null) {
+            SheetWarning(stringResource(R.string.settings_ppsspp_config_not_ready), inks.alarm)
+        }
+        if (!ready) Steps(inks, stringResource(R.string.onb_ppsspp_step1))
+        Optional { SheetNote(stringResource(R.string.onb_ppsspp_step2), inks) }
+        Optional { SheetWarning(stringResource(R.string.onb_ppsspp_caveat), inks.accent) }
+        DetailActions {
+            if (ready) {
+                GhostButton(
+                    label = stringResource(R.string.settings_ppsspp_config_change),
+                    onClick = setup::pick,
+                    fillWidth = true,
+                )
+            } else {
+                PrimaryButton(
+                    label = stringResource(R.string.settings_ppsspp_config_choose),
+                    onClick = setup::pick,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Ps2Sheet(ready: Boolean, profileName: String, onReadyChanged: (Boolean) -> Unit) {
+    val setup = rememberPs2Setup(profileName, onReadyChanged)
+    OnbSheet { inks ->
+        Optional { EmulatorHeader(Console.PS2, "ARMSX2", inks) }
+        TileRow {
+            FactTile(
+                label = stringResource(R.string.onb_tile_state),
+                value = stringResource(
+                    when {
+                        setup.busy -> R.string.settings_pill_working
+                        setup.error != null -> R.string.settings_pill_failed
+                        ready -> R.string.settings_pill_ready
+                        else -> R.string.settings_pill_todo
+                    }
+                ),
+                ink = when {
+                    setup.error != null -> inks.alarm
+                    ready -> inks.good
+                    setup.busy -> inks.accent
+                    else -> inks.warn
+                },
+                modifier = Modifier.weight(1f)
+            )
+            FactTile(
+                stringResource(R.string.onb_tile_card),
+                setup.receipt?.cardName ?: stringResource(R.string.onb_tile_none),
+                MaterialTheme.colorScheme.onSurface,
+                Modifier.weight(1f)
+            )
+        }
+        setup.error?.let { SheetWarning(it, inks.alarm) }
+        if (!ready) {
+            SheetStep(1, stringResource(R.string.onb_ps2_step1), inks.accent)
+            Optional { SheetStep(2, stringResource(R.string.onb_ps2_step2), inks.accent) }
+        }
+        Optional { SheetWarning(stringResource(R.string.onb_ps2_safe), inks.accent) }
+        DetailActions {
+            if (ready) {
+                GhostButton(
+                    label = stringResource(R.string.hint_ps2_profile_redo),
+                    onClick = setup::prepare,
+                    fillWidth = true
+                )
+            } else {
+                PrimaryButton(
+                    label = stringResource(
+                        if (setup.rootUri == null) R.string.hint_ps2_profile_choose_folder
+                        else R.string.hint_ps2_profile_button
+                    ),
+                    onClick = setup::prepare,
+                    enabled = !setup.busy,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            if (setup.rootUri != null) {
+                GhostButton(
+                    label = stringResource(R.string.hint_ps2_profile_change_folder),
+                    onClick = setup::changeFolder,
+                    fillWidth = true,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun Recap(vararg rows: Pair<String, Boolean>, hidden: Set<Console>) {
     val shown = rows.filterIndexed { i, _ ->
@@ -840,39 +1117,39 @@ private fun Recap(vararg rows: Pair<String, Boolean>, hidden: Set<Console>) {
         }
     }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        shown.forEach { (label, done) ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    label,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
-                StatePill(
-                    if (done) DetailTone.GOOD else DetailTone.WARN,
-                    stringResource(
-                        if (done) R.string.settings_pill_ready else R.string.onb_recap_later
-                    )
-                )
+        shown.chunked(2).forEach { pair ->
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                pair.forEach { (label, done) ->
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            label,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StatePill(
+                            if (done) DetailTone.GOOD else DetailTone.WARN,
+                            stringResource(if (done) R.string.settings_pill_ready else R.string.onb_recap_later)
+                        )
+                    }
+                }
+                if (pair.size == 1) Box(Modifier.weight(1f))
             }
         }
     }
 }
 
-/** The last segment of a document tree, which is what the player recognises. */
 private fun folderLabel(uri: Uri): String {
     val raw = uri.lastPathSegment ?: return uri.toString()
     return raw.substringAfterLast(':').substringAfterLast('/').ifBlank { raw }
 }
 
-/**
- * Dots alone announced a length that changed under the player's eyes.
- * pourquoi : docs/decisions/onboarding.md § Where you are, and what it is about
- */
 @Composable
 private fun StepRail(current: Int, total: Int, label: String) {
     val dark = LocalEmufiiDarkTheme.current
@@ -889,7 +1166,6 @@ private fun StepRail(current: Int, total: Int, label: String) {
                         .width(if (active) 20.dp else 7.dp)
                         .clip(if (active) PillShape else CircleShape)
                         .background(
-                            // The teal axis, deep enough to hold on the cream.
                             if (active) (if (dark) Teal.darkBright else Teal.deep)
                             else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.22f)
                         )

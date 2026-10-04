@@ -7,11 +7,7 @@ import androidx.documentfile.provider.DocumentFile
 import java.io.File
 import java.security.MessageDigest
 
-/**
- * The active card is never edited: read, cloned in memory, patched, and published under
- * a new filename only once the result has been read back and verified. The original is
- * copied into `emufii-backups`, outside `memcards` so ARMSX2 cannot mount it by mistake.
- */
+// The active card is never edited: cloned, patched, verified, then published under a new name.
 object Ps2Armsx2Folder {
 
     data class Prepared(
@@ -25,10 +21,8 @@ object Ps2Armsx2Folder {
         val biosName: String?,
         val biosVersion: Int?,
         val gameOverrideCount: Int,
-        /** Set when the player's card is a folder one, so nothing was cloned. */
         val folderCardName: String?,
         val importedSaveCount: Int,
-        /** Saves that did not fit; the card is published anyway. */
         val savesLeftBehind: Int,
         val slot2AlreadyPreserved: Boolean,
         val sourceCardForSlot2: String?,
@@ -48,11 +42,7 @@ object Ps2Armsx2Folder {
         data class WriteFailed(val detail: String) : Outcome
     }
 
-    /**
-     * Never compare the card byte for byte: a memory card is a living disk, and one game
-     * save would be enough to declare it changed.
-     * pourquoi : docs/decisions/ps2-carte-memoire.md § A prepared card is not verified byte by byte
-     */
+    /** Not byte-compared: a single game save changes the card. */
     fun isStillValid(
         context: Context,
         rootUri: Uri,
@@ -68,10 +58,6 @@ object Ps2Armsx2Folder {
         isPreparedCardValid(context, rootUri, cardName, expectedConsoleIdHex)
     }.getOrDefault(false)
 
-    /**
-     * It no longer has to be the global Slot 1: EmuFii names the card in the per-game
-     * settings file immediately before ARMSX2 boots the selected game.
-     */
     fun isPreparedCardValid(
         context: Context,
         rootUri: Uri,
@@ -104,20 +90,14 @@ object Ps2Armsx2Folder {
 
         val slot1 = memcards.child(settings.slot1Filename)
         val slot2 = memcards.child(settings.slot2Filename)
-        // Enabled slots first, so a configured card wins over one merely present. A
-        // folder card cannot be cloned, but finding one does not end the search: the other
-        // slot may hold a plain image, and stopping at the first refused it to players.
+        // Enabled slots first; a folder card can't be cloned, so keep looking in the other slot.
         val candidates = listOfNotNull(
             slot1?.takeIf { settings.slot1Enabled },
             slot2?.takeIf { settings.slot2Enabled },
             slot1,
             slot2,
         )
-        // Without preferring the player's card, the run after a successful setup takes our
-        // own generated card in slot 1 as the source and never looks at the folder card in
-        // slot 2: the save import silently does nothing. Measured on the Thor, 2026-08-23.
-        // Ours comes last rather than never: a player image cloned and then unassigned
-        // leaves that clone the only place their saves live.
+        // Our generated card goes last, or a folder card in slot 2 is never imported.
         val ours = { f: DocumentFile -> f.name?.startsWith(TARGET_STEM, ignoreCase = true) == true }
         val theirImage = candidates.firstOrNull { it.isFile && !ours(it) }
         val folderCard = if (theirImage == null) candidates.firstOrNull { it.isDirectory } else null
@@ -142,9 +122,6 @@ object Ps2Armsx2Folder {
             return Outcome.InvalidMemoryCard(settings.slot1Filename, e.message.orEmpty())
         }
 
-        // A folder card left in slot 2 is indexed with an empty filter and the game sees
-        // nothing in it, so its saves are copied onto the card we publish; see
-        // [Ps2FolderCardImport] for the measurement. The player's folder is only read.
         var importedSaves = 0
         var savesLeftBehind = 0
         Log.d(TAG, "source=${source?.name} carteDossier=${folderCard?.name} " +
@@ -155,8 +132,6 @@ object Ps2Armsx2Folder {
                 patched = try {
                     Ps2CardPatch.addSave(patched, save.directory, save.files, PROFILE_EPOCH_SECOND)
                 } catch (e: Ps2CardPatch.CardFormatException) {
-                    // A full card is not a failure: the network profile is already on it,
-                    // so count what did not fit rather than discard a card that works.
                     savesLeftBehind = 1
                     break
                 }
@@ -168,8 +143,7 @@ object Ps2Armsx2Folder {
             }
         }
 
-        // A paused or running VM may still hold the file open: a source that changed
-        // while we rebuilt it could be a torn save the filesystem still parses.
+        // A running VM may have changed the source while we rebuilt it.
         if (source != null && sourceBytes != null &&
             sha256(sourceBytes) != runCatching { sha256(readBytes(context, source)) }.getOrNull()
         ) {
@@ -333,16 +307,10 @@ object Ps2Armsx2Folder {
 
     private fun DocumentFile.stem(): String = name?.substringBeforeLast('.', name.orEmpty()).orEmpty()
 
-    /**
-     * Anything unreadable is skipped rather than aborting: a folder card is the player's
-     * own directory, and one odd entry must not cost them the whole preparation.
-     */
     private fun readFolderCardSaves(
         context: Context,
         card: DocumentFile,
     ): List<Ps2FolderCardImport.Save> {
-        // Tracing kept: this walk reads somebody else's directory through SAF, every
-        // failure is recoverable, and a silent empty result looks like an empty card.
         val entries = card.listFiles()
         Log.d(TAG, "folder card ${card.name}: ${entries.size} entry(ies) " +
             entries.joinToString { "${it.name}${if (it.isDirectory) "/" else ""}" })
@@ -356,7 +324,7 @@ object Ps2Armsx2Folder {
                         .associate { it.name!! to readBytes(context, it) }
                     val index = files[Ps2FolderCardImport.INDEX]?.toString(Charsets.UTF_8)
                     val ordered = Ps2FolderCardImport.order(index, files)
-                    Log.d(TAG, "sauvegarde ${dir.name}: ${files.size} fichier(s) lu(s), " +
+                    Log.d(TAG, "save ${dir.name}: ${files.size} file(s) read, " +
                         "${ordered.size} retenu(s)")
                     ordered.takeIf { it.isNotEmpty() }
                         ?.let { Ps2FolderCardImport.Save(dir.name!!, it) }

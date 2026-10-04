@@ -34,10 +34,6 @@ import eu.emufii.app.ui.LocalRingTone
 import eu.emufii.app.ui.RingTone
 import kotlinx.coroutines.delay
 
-/**
- * Neither a dialog nor a system notification: the player is already holding the app, and
- * anything that has to be dismissed would make a friend coming online read as a problem.
- */
 @Composable
 fun FriendAlert(
     event: FriendEvent?,
@@ -53,16 +49,12 @@ fun FriendAlert(
         }
     }
 
-    // The trailer's toast: rises 30 dp into place, leaves on the faster exit spring. Not
-    // `AnimatedVisibility`, whose fade buffer cut the card's shadow square.
-    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
+    // Not AnimatedVisibility: its fade buffer clips the card's shadow square.
     val appear by rememberAppear(event != null)
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
         if (event != null || appear > 0.001f) ShadowsFollow({ appear }) {
-            // Held across the exit animation: reading `event` directly blanks the text the
-            // moment it goes null, and the card slides away empty.
+            // Held across the exit animation, or the text blanks when event goes null.
             val shown = lastNonNull(event)
-            // pourquoi : docs/decisions/theme-duotone-shelves.md § Two semantic axes
             CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
             SoftCard(
                 onClick = onOpen,
@@ -70,10 +62,7 @@ fun FriendAlert(
                     .padding(WindowInsets.statusBars.asPaddingValues())
                     .bloom({ appear }, blur = 0.dp, rise = 30.dp)
                     .padding(vertical = 8.dp)
-                    // In the gap the top bar leaves, between the service lamp and the
-                    // social shelf. Measured on the Thor 2026-09-02: free from 717 to
-                    // 1487 px of 1920, so 334 dp starting 188 dp off the right edge.
-                    // pourquoi : docs/decisions/bibliotheque.md § The top bar: two shelves, never a bar
+                    // The top bar's free gap on a 1920 px screen: 334 dp starting 188 dp from the right edge.
                     .padding(end = ALERT_END_INSET)
                     .widthIn(max = ALERT_WIDTH)
             ) {
@@ -83,7 +72,7 @@ fun FriendAlert(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
                     val name = shown?.name ?: stringResource(R.string.notify_friend_unnamed)
-                    Avatar(name = name, size = 34.dp, modifier = Modifier.popIn())
+                    shown?.let { FriendBadge(it, size = 42.dp, modifier = Modifier.popIn()) }
                     Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
                         Text(
                             name,
@@ -124,7 +113,6 @@ private fun lastNonNull(event: FriendEvent?): FriendEvent? {
 
 private val ALERT_WIDTH = 320.dp
 
-/** Clears the social shelf, which starts 188 dp off the right edge. */
 private val ALERT_END_INSET = 196.dp
 
 private const val VISIBLE_MS = 4_000L

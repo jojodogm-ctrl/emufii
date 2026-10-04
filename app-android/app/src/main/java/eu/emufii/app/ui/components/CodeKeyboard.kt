@@ -57,12 +57,6 @@ import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.liftShadow
 import eu.emufii.app.ui.theme.plateColors
 
-/**
- * The only keyboard the app still draws: search went back to the system IME, since
- * correcting a game title means layouts, languages and autocorrect.
- * pourquoi : docs/decisions/coquille-ecrans.md § The code keyboard is not the search keyboard
- * pourquoi : docs/decisions/theme-duotone-shelves.md § Hollows become notches
- */
 @Composable
 fun EmufiiCodeKeyboard(
     onKey: (Char) -> Unit,
@@ -74,8 +68,6 @@ fun EmufiiCodeKeyboard(
     var holds by remember { mutableStateOf(false) }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-    /** Column width sets the height, the room offered only caps it: divided by four, ten
-     * columns on a narrow panel gave keys twice as tall as they were wide. */
     val keyWidth = (maxWidth - KEY_GAP * (CODE_COLUMNS - 1)) / CODE_COLUMNS
     val roomPerRow = (maxHeight - KEY_GAP * (CODE_ROWS.size - 1)) / CODE_ROWS.size
     val keyHeight = minOf(keyWidth * KEY_ASPECT, roomPerRow)
@@ -83,10 +75,7 @@ fun EmufiiCodeKeyboard(
     Column(
         verticalArrangement = Arrangement.spacedBy(KEY_GAP),
         modifier = Modifier
-            // Ten columns exactly: the keypad centres rather than stretching to its tray.
             .width(keyWidth * CODE_COLUMNS + KEY_GAP * (CODE_COLUMNS - 1))
-            // One focusable node, the cursor held here: a key is told whether it is aimed at.
-            // pourquoi : CLAUDE.md § Gamepad navigation: the grid holds its own cursor
             .slabKeys(CODE_ROWS, cursor) { label -> onKey(label.first()) }
             .then(if (firstKeyFocus != null) Modifier.focusRequester(firstKeyFocus) else Modifier)
             .onFocusChanged { holds = it.isFocused }
@@ -97,8 +86,6 @@ fun EmufiiCodeKeyboard(
                 horizontalArrangement = Arrangement.spacedBy(KEY_GAP),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // A shorter row centres on two full-column margins: sharing the whole row
-                // between six keys lost the alignment under the rows above.
                 val margin = (CODE_COLUMNS - row.size) / 2f
                 if (margin > 0f) Spacer(Modifier.weight(margin).height(keyHeight))
                 row.forEachIndexed { keyIndex, label ->
@@ -116,15 +103,8 @@ fun EmufiiCodeKeyboard(
     }
 }
 
-/** At 1 you get a chequerboard, beyond it a column of bars. */
 private const val KEY_ASPECT = 0.86f
 
-/**
- * The order the alphabet is recited, not a keyboard layout: a code is read, not typed
- * from muscle memory. Ten columns throughout; a wider erase key left no column under any
- * other, so B erases instead, as it undoes everywhere else.
- * pourquoi : docs/decisions/coquille-ecrans.md § The code keyboard is not the search keyboard
- */
 private val CODE_ROWS = listOf(
     listOf("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"),
     listOf("K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"),
@@ -134,16 +114,10 @@ private val CODE_ROWS = listOf(
 
 private const val CODE_COLUMNS = 10
 
-/** At 6 dp the keys detached one by one and the block lost its shape. */
 private val KEY_GAP = 3.dp
 
-/** Smaller than the app's 14 dp: at a key's scale that radius eats half the edge. */
 private val KEY_CORNER = 8.dp
 
-/**
- * Nothing is painted inside a key to say a state: the state moves the key.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § MATERIAL (replaces Plastic.kt)
- */
 @Composable
 private fun RowScope.Key(
     label: String,
@@ -158,23 +132,17 @@ private fun RowScope.Key(
     val pressed by interaction.collectIsPressedAsState()
     val shape = remember { RoundedCornerShape(KEY_CORNER) }
 
-    // On the ring's clock, leaving without a fade: two lit keys are two places to be.
-    // pourquoi : docs/decisions/navigation-manette.md § The cursor never lingers
     val mark by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = tween(if (selected) RING_IN_MS else 0),
         label = "key-mark"
     )
-    // Less than a tile's 7 %: keys are three dp apart, and beyond that the aimed key
-    // bites into its neighbours instead of passing in front of them.
     val lift by animateFloatAsState(
         targetValue = if (selected) 1.06f else 1f,
         animationSpec = Motion.press(),
         label = "key-lift"
     )
 
-    // No vertical gradient: at 40 dp tall its three points of luminance do not show, and
-    // computing them forty times per recomposition returns nothing.
     val face = plateColors(dark, oled).first()
 
     Box(
@@ -190,16 +158,12 @@ private fun RowScope.Key(
             .focusRing(
                 focused = selected,
                 shape = shape,
-                // The tiles' ring weight on a thumb-sized key fills the gap between keys.
-                // pourquoi : docs/decisions/navigation-manette.md § The ring keeps the same weight everywhere
                 width = 3.dp,
                 glowRadius = 16.dp
             )
             .liftShadow(shape, 2.dp, dark, oled)
             .clip(shape)
             .background(face)
-            // A press darkens the face rather than sinking it: a tile's scale would make
-            // the letter hop at every character of a six-character code.
             .then(
                 if (pressed) Modifier.background(PressInk.copy(alpha = if (dark) 0.24f else 0.10f))
                 else Modifier
@@ -211,23 +175,14 @@ private fun RowScope.Key(
         Text(
             label,
             style = MaterialTheme.typography.titleMedium,
-            // Black is the mark that stays legible under a thumb, where the ring leaves
-            // central vision.
             fontWeight = if (mark > 0f) FontWeight.Black else FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-/** The shadows' warm black, never a blue-leaning grey. */
 private val PressInk = Color(0xFF241610)
 
-/**
- * One focusable node, a (row, column) index it computes, and keys it tells. An edge is
- * not consumed, so the host screen decides what happens there.
- * pourquoi : docs/decisions/coquille-ecrans.md § The slab holds its own cursor
- * pourquoi : CLAUDE.md § Gamepad navigation: the grid holds its own cursor
- */
 private class SlabCursor(rows: List<List<String>>) {
     var row by mutableIntStateOf(0)
     var col by mutableIntStateOf(0)
@@ -236,8 +191,6 @@ private class SlabCursor(rows: List<List<String>>) {
         if (dy != 0) {
             val next = row + dy
             if (next !in rows.indices) return false
-            // The column is kept in proportion: rows hold different numbers of keys, and
-            // a raw index made the cursor jump end to end across the short row.
             val ratio = (col + 0.5f) / rows[row].size
             row = next
             col = (ratio * rows[next].size).toInt().coerceIn(0, rows[next].lastIndex)
@@ -250,11 +203,6 @@ private class SlabCursor(rows: List<List<String>>) {
     }
 }
 
-/**
- * `onPreviewKeyEvent`, the keypad being the only focusable node. What leaves by an edge
- * is not consumed: the host screen decides.
- * pourquoi : docs/decisions/coquille-ecrans.md § The slab holds its own cursor
- */
 private fun Modifier.slabKeys(
     rows: List<List<String>>,
     cursor: SlabCursor,

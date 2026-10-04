@@ -37,11 +37,6 @@ import eu.emufii.app.ui.theme.WarnDark
 import eu.emufii.app.ui.theme.ErrorLight
 import eu.emufii.app.ui.theme.ErrorDark
 
-/**
- * The inside of an unfolded settings row: three things and nothing else, [DetailNote],
- * [DetailActions], [DetailStatus].
- * pourquoi : docs/decisions/coquille-ecrans.md § An expanded row is made of three things, and nothing else
- */
 @Composable
 fun DetailNote(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -52,10 +47,6 @@ fun DetailNote(text: String, modifier: Modifier = Modifier) {
     )
 }
 
-/**
- * Nothing here decides what a button looks like: the caller passes a filled
- * [PrimaryButton] first and [GhostButton]s after. This owns only the gap between them.
- */
 @Composable
 fun DetailActions(
     modifier: Modifier = Modifier,
@@ -67,17 +58,10 @@ fun DetailActions(
     ) { content() }
 }
 
-/** Four, matching the beads the library already uses. */
 enum class DetailTone { GOOD, BUSY, WARN, BAD }
 
 data class DetailFact(val label: String, val value: String)
 
-/**
- * [facts] are the identifiers behind the headline, a filename, a BIOS, a console id: they
- * are looked *up*, not read, so they go in a column of aligned rows. [caveat] is the one
- * thing that can be wrong while the state is still good, so it qualifies rather than
- * replaces, and sits at the bottom in the error colour.
- */
 @Composable
 fun DetailStatus(
     tone: DetailTone,
@@ -97,8 +81,6 @@ fun DetailStatus(
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            // Top, not centre: a translation can push a headline onto two lines, and a bead
-            // floating mid-sentence stops reading as its mark.
             verticalAlignment = Alignment.Top
         ) {
             StateBead(tone)
@@ -124,7 +106,6 @@ fun DetailStatus(
     }
 }
 
-/** 84 dp holds the longest label the app has in either language without wrapping it. */
 @Composable
 private fun FactRow(fact: DetailFact) {
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -143,7 +124,6 @@ private fun FactRow(fact: DetailFact) {
     }
 }
 
-/** Deliberately the shape, lighting and glyphs of the compatibility bead on a game tile. */
 @Composable
 fun StateBead(tone: DetailTone, size: Dp = 14.dp) {
     val dark = LocalEmufiiDarkTheme.current

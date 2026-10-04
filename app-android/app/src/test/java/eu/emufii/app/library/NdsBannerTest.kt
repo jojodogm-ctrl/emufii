@@ -6,10 +6,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Banner decoding, checked against banners built here byte by byte. A transposed tile or
- * a red/blue swap still produces a plausible icon, so the tests pin exact pixels.
- */
 class NdsBannerTest {
 
     private val bitmapOffset = 0x020
@@ -62,8 +58,6 @@ class NdsBannerTest {
         val b = banner()
         b.setPalette(1, r5 = 31, g5 = 0, b5 = 0)
 
-        // Tile index 3 is the fourth tile of the top row: x 24..31, y 0..7.
-        // Its first byte covers pixels (24,0) and (25,0).
         b[bitmapOffset + 3 * 32] = 0x01
 
         val pixels = NdsBanner.decodeIcon(b)!!
@@ -80,8 +74,6 @@ class NdsBannerTest {
         val b = banner()
         b.setPalette(1, r5 = 0, g5 = 31, b5 = 0)
 
-        // Tile 4 starts the second row of tiles: x 0..7, y 8..15.
-        // Row 7 of that tile is y = 15.
         b[bitmapOffset + 4 * 32 + 7 * 4] = 0x01
 
         val pixels = NdsBanner.decodeIcon(b)!!
@@ -107,16 +99,12 @@ class NdsBannerTest {
             setTitle(1, "Pokémon White 2")
             setTitle(2, "Pokémon Version Blanche 2")
         }
-        // One cartridge, two answers, decided by the app's language and not by a list
-        // frozen at French.
         TitleLanguage.set("fr")
         assertEquals("Pokémon Version Blanche 2", NdsBanner.pickTitle(both))
         TitleLanguage.set("en")
         assertEquals("Pokémon White 2", NdsBanner.pickTitle(both))
     }
 
-    // Exact strings dumped from the test library's cartridges, not invented: getting this
-    // rule wrong showed "Pokémon White Version 2" in the grid as plain "Pokémon".
     @Test
     fun `joins title and subtitle but drops the publisher`() {
         val threeLines = banner().apply { setTitle(2, "Pokémon\nWhite Version 2\nNintendo") }

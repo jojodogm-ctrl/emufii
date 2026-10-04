@@ -7,11 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONObject
 
-/** One-shot request for ARMSX2 to assign an already published card globally. */
 data class Ps2ProvisioningPlan(
     val cardName: String,
     val cardSha256: String,
-    /** Original card to enable in slot 2, null when that slot must be preserved. */
     val sourceCardForSlot2: String? = null,
     val armedAtMs: Long = System.currentTimeMillis(),
 )
@@ -72,13 +70,7 @@ object Ps2ProvisioningAutomation {
         _progress.value = Ps2ProvisioningProgress.Idle
     }
 
-    /**
-     * After an `install -r` the accessibility service stays listed and bound but
-     * receives no events: ARMSX2 opens and nothing follows, leaving a busy state that
-     * never ends. The driver reports [Ps2ProvisioningProgress.OpeningMemoryCards] on
-     * its first navigation action, about a second in, so sitting well past that on
-     * [Ps2ProvisioningProgress.OpeningArmsx2] means no pass ever ran.
-     */
+    /** After `install -r` the accessibility service stays bound but gets no events. */
     fun neverStarted(now: Long = System.currentTimeMillis()): Boolean {
         val current = _plan.value ?: return false
         return _progress.value == Ps2ProvisioningProgress.OpeningArmsx2 &&
@@ -95,7 +87,6 @@ object Ps2ProvisioningAutomation {
     }
 }
 
-/** Persist the one filename needed if Android recreates the service mid-route. */
 class Ps2ProvisioningStore(context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 

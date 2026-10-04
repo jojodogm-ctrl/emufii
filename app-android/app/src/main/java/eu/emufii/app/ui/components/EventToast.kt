@@ -31,11 +31,6 @@ import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.plate
 
-/**
- * A passing event, top centre: rises 30 dp into place, holds two seconds, leaves on the
- * exit spring. Nothing to dismiss; [who] puts an avatar at its head.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
- */
 @Composable
 fun EventToast(
     message: String?,
@@ -53,8 +48,6 @@ fun EventToast(
     var shown by remember { mutableStateOf<Pair<String, String?>?>(null) }
     if (message != null) shown = message to who
     val dark = LocalEmufiiDarkTheme.current
-    // Not `AnimatedVisibility`: its fade goes through a buffer the pill's size, and the
-    // pill's shadow was cut square until the fade ended.
     val appear by rememberAppear(message != null)
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         if (message != null || appear > 0.001f) ShadowsFollow({ appear }) {

@@ -1,56 +1,32 @@
 package eu.emufii.app.wg
 
-/**
- * No other player's key: the topology is hub-and-spoke.
- * pourquoi : docs/decisions/tunnel-wireguard.md § Three numbers measured into the configuration
- */
 data class WgTunnelInfo(
     val address: String,
-    /**
-     * Null on a guest. Without it, packets sent to the host arrive through the tunnel
-     * and are dropped.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § The host's second address, without which its packets are lost
-     */
+    /** Host only; without it packets to the host loop back through the tunnel and drop. */
     val hairpinAddress: String? = null,
     val subnet: String,
     val relayEndpoint: String,
     val relayPublicKey: String,
-    /** The relay's `AllowedIPs`: the session subnet plus the relay's own /32. */
     val relayAllowedIps: String
 )
 
-/**
- * Text rather than the builders: one shape to get right, and loggable when a tunnel
- * refuses to come up.
- * pourquoi : docs/decisions/tunnel-wireguard.md § Three numbers measured into the configuration
- */
 object WgConfig {
 
     /** Carrier NAT mappings expire well under a minute. */
     const val KEEPALIVE_SECONDS = 10
 
-    /**
-     * Without this the backend defaults to 1280, the IPv6 floor. Measured on the Thor:
-     * 1252 bytes get through, 1300 is lost, nothing fragments.
-     */
+    /** Backend default is 1280; measured path passes 1252, loses 1300. */
     const val MTU = 1420
 
     const val RELAY_ADDRESS = "10.67.0.1"
 
-    /**
-     * ARMSX2's keyboard has no dot key, so a PS2 guest cannot type an IPv4 address.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § DNS is advertised for the PS2 only
-     */
+    /** ARMSX2's keyboard has no dot key, so guests type a name, not an IP. */
     const val PS2_HOST_NAME = "emufii"
 
     fun render(
         info: WgTunnelInfo,
         privateKeyBase64: String,
-        /**
-         * Null everywhere but PS2: a VPN advertising a DNS takes over the device's
-         * whole resolution.
-         * pourquoi : docs/decisions/tunnel-wireguard.md § DNS is advertised for the PS2 only
-         */
+        /** PS2 only: a VPN DNS takes over all device resolution. */
         dns: String? = null
     ): String = buildString {
         appendLine("[Interface]")

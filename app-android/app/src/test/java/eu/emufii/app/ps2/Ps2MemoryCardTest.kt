@@ -7,11 +7,6 @@ import org.junit.Test
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/**
- * The emulator inspects almost nothing; the checks that matter run on the emulated side,
- * so these tests read the image back with an independent parser, not the writer's own
- * bookkeeping, and hold it to the card the BIOS formatted on the bench.
- */
 class Ps2MemoryCardTest {
 
     private val consoleId = Ps2NetcnfConfig.ARMSX2_CONSOLE_ID
@@ -30,8 +25,6 @@ class Ps2MemoryCardTest {
 
     @Test
     fun `page 0 is the superblock the BIOS writes, byte for byte`() {
-        // Measured off the card the PS2 formatted through ARMSX2 on 2026-08-20; a
-        // superblock has no variable field, so equality is exact.
         val image = card()
         val expected = ByteArray(528)
         val sb = ByteBuffer.wrap(expected).order(ByteOrder.LITTLE_ENDIAN)
@@ -86,8 +79,6 @@ class Ps2MemoryCardTest {
                 spare,
             )
         }
-        // Reserved block + IFD + FAT + directories + a few files: dozens, not thousands;
-        // zero would mean nothing was ECC'd.
         assertTrue(written in 50..500)
     }
 

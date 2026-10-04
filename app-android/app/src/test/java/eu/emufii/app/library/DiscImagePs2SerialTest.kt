@@ -4,10 +4,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/**
- * Measured on the bench's eight discs: only two carried a serial in the volume identifier,
- * the rest said `MC3REMIX`, `FINAL_FANTASY_X`, `1_01` or nothing.
- */
 class DiscImagePs2SerialTest {
 
     @Test
@@ -28,8 +24,6 @@ class DiscImagePs2SerialTest {
 
     @Test
     fun `a boot file that is not a serial yields nothing`() {
-        // A homebrew boots from an ELF with any name: returning it files the disc under
-        // a key that can never match.
         assertNull(DiscImage.bootSerial("BOOT2 = cdrom0:\\MYHOMEBREW.ELF;1"))
         assertNull(DiscImage.bootSerial("VER = 1.00"))
         assertNull(DiscImage.bootSerial(""))
@@ -68,10 +62,6 @@ class DiscImagePs2SerialTest {
         })
     }
 
-    /**
-     * The smallest ISO9660 the walk reads: a primary descriptor at sector 16, a root
-     * record pointing at sector 18, one file record in it.
-     */
     private fun syntheticIso(serial: String?): ByteArray {
         val sector = 2048
         val image = ByteArray(sector * 20)

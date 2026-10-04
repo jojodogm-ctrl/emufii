@@ -28,16 +28,11 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.ui.tap
 
-/**
- * The highlight is a ground, never a ring: this is a list, not an isolated control.
- * pourquoi : docs/decisions/bibliotheque.md § One menu row, not two pixel-identical copies
- */
 @Composable
 internal fun TrayMenuRow(
     label: String,
     onClick: () -> Unit,
     glyph: DrawScope.(Color) -> Unit,
-    /** Where the cursor lands when the menu opens. Null on an ordinary row. */
     landing: FocusRequester? = null,
     trailing: (@Composable RowScope.() -> Unit)? = null,
 ) {
@@ -62,7 +57,6 @@ internal fun TrayMenuRow(
             .tap(interactionSource = interaction, indication = null, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
-        // Read here: the `Canvas` draw lambda is not composable, the theme is out of reach.
         Canvas(Modifier.size(18.dp)) { glyph(tint) }
         Text(
             label,

@@ -23,11 +23,6 @@ import eu.emufii.app.ui.components.ConsoleRow
 import eu.emufii.app.ui.components.DetailNote
 import eu.emufii.app.ui.components.DetailTone
 
-/**
- * Which consoles appear in the grid, and with which build. A console carries a row
- * rather than a tile: the build question decided the shape.
- * pourquoi : docs/decisions/reglages-ecran.md § A console carries a row, not a tile
- */
 @Composable
 internal fun ConsolesPage(
     hidden: Set<Console>,
@@ -36,9 +31,6 @@ internal fun ConsolesPage(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    // Re-read when a build choice changes: the row's icon, name and version all come
-    // from the chosen package, so the row lies until it is re-read. It costs one
-    // package query per console, so not on every composition.
     var pickRevision by remember { mutableIntStateOf(0) }
     val emulators = remember(pickRevision) { allEmulators(context) }
 
@@ -58,18 +50,12 @@ internal fun ConsolesPage(
         modifier = modifier
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Bounded: the sentence ran the full width, nearly 1700 px on the Thor,
-            // where the eye loses the line before finding its end.
-            // pourquoi : docs/decisions/reglages-ecran.md § The console grid is not allowed an orphan
             DetailNote(
                 stringResource(R.string.consoles_pick_body),
                 modifier = Modifier.widthIn(max = 560.dp)
             )
 
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                // Two columns as soon as each holds a whole row without abbreviating a
-                // build name. Below that, one: two columns of truncated rows are worth
-                // less than one that reads.
                 val columns = if (maxWidth >= TWO_COLUMN_ROWS) 2 else 1
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     repeat(columns) { side ->
@@ -78,9 +64,6 @@ internal fun ConsolesPage(
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             emulators.forEachIndexed { index, info ->
-                                // Alternating, never cut mid-console: a console owns a
-                                // whole column, or its switch and its build choice end
-                                // up either side of the gutter.
                                 if (index % columns != side) return@forEachIndexed
                                 ConsoleRow(
                                     info = info,

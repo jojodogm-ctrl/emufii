@@ -1,10 +1,5 @@
 package eu.emufii.app.library
 
-/**
- * The region a dump claims: the serial first, then the filename tags. Nothing here
- * calls the network, a handheld in a train has to answer. Null prints as nothing.
- * pourquoi : docs/decisions/identite-et-dumps.md § Nothing calls the network
- */
 data class RomTags(
     val region: String? = null,
 ) {
@@ -13,22 +8,12 @@ data class RomTags(
     fun line(): String? = region
 }
 
-/*
- * The revision was taken out: a filename yields facts about a pressing plant, never
- * the version an update installs.
- * pourquoi : docs/decisions/identite-et-dumps.md § The revision was removed, and why
- */
-
 object RomTagReader {
 
     fun read(rom: Rom): RomTags =
         read(rom.console, rom.productCode, rom.titleIdHex, rom.filename)
 
-    /**
-     * The same reading without a [Rom], so a unit test can pin the rules:
-     * `android.net.Uri` is a stub on the desktop JVM.
-     * pourquoi : docs/decisions/identite-et-dumps.md § Region positions are repeated, not shared
-     */
+    /** Uri-free overload for JVM unit tests. */
     fun read(
         console: Console,
         productCode: String?,
@@ -38,11 +23,6 @@ object RomTagReader {
         region = regionFromId(console, productCode, titleIdHex) ?: regionFromName(filename),
     )
 
-    /**
-     * The region letter, at the positions `compatKeys` also uses: repeated rather than
-     * shared, because that one strips what this one keeps.
-     * pourquoi : docs/decisions/identite-et-dumps.md § Region positions are repeated, not shared
-     */
     private fun regionFromId(console: Console, productCode: String?, titleIdHex: String?): String? {
         val code = productCode?.trim()?.uppercase() ?: return null
         return when (console) {
@@ -82,11 +62,7 @@ object RomTagReader {
     private fun threeDsRegion(letter: Char): String? =
         if (letter == 'A') "World" else nintendoRegion(letter)
 
-    /**
-     * The four-letter Sony prefix read letter by letter: medium, publisher, region. A
-     * list of whole prefixes missed every PSP game in the world.
-     * pourquoi : docs/decisions/identite-et-dumps.md § The Sony prefix is read letter by letter
-     */
+    /** Sony prefix read letter by letter: medium, publisher, region. */
     private fun sonyRegion(code: String): String? {
         val prefix = code.filter { it.isLetter() }.take(4)
         if (prefix.length < 3) return null
@@ -102,11 +78,7 @@ object RomTagReader {
         }
     }
 
-    /**
-     * The region as the dumper wrote it, matched only on the two conventions' actual
-     * spellings: a looser match turns `(Disney's Aladdin)` into a region.
-     * pourquoi : docs/decisions/identite-et-dumps.md § Nothing calls the network
-     */
+    /** Exact spellings only, or "(Disney's Aladdin)" becomes a region. */
     private fun regionFromName(filename: String): String? {
         val tags = tagsIn(filename)
         for (tag in tags) {
@@ -122,8 +94,7 @@ object RomTagReader {
     private fun tagsIn(filename: String): List<String> =
         TAG.findAll(filename.substringBeforeLast('.')).map { it.groupValues[1].ifEmpty { it.groupValues[2] } }.toList()
 
-    // Escaped completely, braces included: Android compiles regexes with ICU, stricter
-    // than the JVM, which throws on a brace the desktop tests accept. See CLAUDE.md.
+    // Braces escaped on purpose: Android's ICU regex rejects what the JVM accepts.
     private val TAG = Regex("""\(([^()]*)\)|\[([^\[\]]*)\]""")
 
     private val NAME_REGIONS = mapOf(

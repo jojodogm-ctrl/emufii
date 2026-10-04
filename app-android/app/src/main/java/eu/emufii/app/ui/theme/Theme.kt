@@ -14,9 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-/**
- * pourquoi : docs/decisions/theme-duotone-shelves.md § PALETTE (numbered contract)
- */
 private fun lightScheme(accent: AccentCuts) = lightColorScheme(
     primary = accent.deep,
     onPrimary = Color.White,
@@ -76,18 +73,9 @@ private fun oledScheme(accent: AccentCuts) = darkScheme(accent).copy(
     outlineVariant = EdgeOled
 )
 
-/**
- * Read this rather than [isSystemInDarkTheme]: the in-app theme setting can disagree with
- * the phone, and a surface still asking the system lights up wrongly on Light over a dark
- * phone.
- */
+/** Use this, not isSystemInDarkTheme: the in-app setting can differ from the system. */
 val LocalEmufiiDarkTheme = staticCompositionLocalOf { false }
 
-/**
- * Separate from [LocalEmufiiDarkTheme] rather than a three-valued enum: the forty-four
- * places asking "am I dark?" want "yes" for OLED too, and only three read the difference.
- * Only true when [LocalEmufiiDarkTheme] is.
- */
 val LocalEmufiiOledTheme = staticCompositionLocalOf { false }
 
 @Composable
@@ -103,8 +91,7 @@ fun EmufiiTheme(
         LocalEmufiiOledTheme provides oledTheme,
         LocalAccent provides cuts
     ) {
-        // Material lays a grey veil over any focused control; on a handheld the cursor is
-        // always somewhere, so that greys the selection under its own teal ring.
+        // A gamepad always holds focus, so Material's focus veil would grey every selection.
         CompositionLocalProvider(LocalRippleConfiguration provides NoFocusRipple) {
             MaterialTheme(
                 colorScheme = when {
@@ -119,7 +106,6 @@ fun EmufiiTheme(
     }
 }
 
-/** `null` would disable the press ripple too, the only one of the four answering a gesture. */
 @OptIn(ExperimentalMaterial3Api::class)
 private val NoFocusRipple = RippleConfiguration(
     rippleAlpha = RippleAlpha(

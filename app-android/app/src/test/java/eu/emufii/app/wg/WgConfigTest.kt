@@ -5,12 +5,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The rendered tunnel configuration. Every mistake here fails the same way, a tunnel
- * that comes up and carries nothing. Two lines are load-bearing: the subnet prefix on
- * the address, which Switch LDN reads as its mask (docs/M19_SWITCH_LDN.md), and the
- * relay's /32 in AllowedIPs.
- */
 class WgConfigTest {
 
     private val info = WgTunnelInfo(
@@ -25,8 +19,6 @@ class WgConfigTest {
 
     @Test
     fun `the host carries its second address, the guest carries none`() {
-        // The host's ad hoc server hands this address out to the other players: without
-        // it here their packets arrive through the tunnel and are dropped.
         val host = WgConfig.render(info.copy(hairpinAddress = "10.67.1.254"), privateKey)
         assertTrue(host.contains("Address = 10.67.1.2/24, 10.67.1.254/24"))
 
@@ -35,14 +27,11 @@ class WgConfigTest {
 
     @Test
     fun `the MTU is declared, and below the carrier link's bar`() {
-        // With no explicit line the backend falls back to 1280 and Switch LDN breaks on
-        // it: discovery connects, then the game frames are dropped unfragmented. Measured
-        // on the Thor, 1252 bytes of payload got through, 1300 did not.
+        // Without an explicit MTU the backend uses 1280 and Switch LDN frames get dropped.
         val out = WgConfig.render(info, privateKey)
         assertTrue(out.contains("MTU = 1420"))
 
-        // The WireGuard header costs 60 bytes over IPv4: the carrying packet still has
-        // to fit a 1492 PPPoE.
+        // WireGuard over IPv4 adds 60 bytes; must still fit 1492 PPPoE.
         assertTrue(WgConfig.MTU + 60 <= 1492)
     }
 
@@ -57,8 +46,6 @@ class WgConfigTest {
 
     @Test
     fun `the address is a slash 32`() {
-        // On Android the routes come from the peer's AllowedIPs, so this only names the
-        // device; a wider prefix would claim other players' addresses.
         assertTrue(WgConfig.render(info, privateKey).contains("Address = 10.67.1.2/24"))
     }
 
@@ -72,12 +59,8 @@ class WgConfigTest {
 
     @Test
     fun `keepalive is set, because the phone is behind NAT`() {
-        // Without it the relay loses its NAT mapping after a minute or so and the player
-        // silently stops being reachable.
         val out = WgConfig.render(info, privateKey)
         assertTrue(out.contains("PersistentKeepalive = ${WgConfig.KEEPALIVE_SECONDS}"))
-        // Upper bound from NAT traversal, lower bound from the radio. The move from 25
-        // to 10 s was measured: an idle link costs 369 ms on the first packet, 46 ms warm.
         assertTrue(WgConfig.KEEPALIVE_SECONDS in 5..30)
     }
 

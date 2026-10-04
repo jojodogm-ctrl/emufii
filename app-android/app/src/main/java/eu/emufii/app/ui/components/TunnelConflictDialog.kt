@@ -6,11 +6,6 @@ import eu.emufii.app.R
 import eu.emufii.app.tunnel.TunnelHolder
 import androidx.compose.material3.MaterialTheme
 
-/**
- * The one action that silently ends something the player is inside, see
- * [eu.emufii.app.tunnel.tunnelHolder]; no tap-outside dismissal, since leaving the tunnel
- * where it is an answer, and an answer is given on a button.
- */
 @Composable
 fun TunnelConflictDialog(
     held: TunnelHolder,

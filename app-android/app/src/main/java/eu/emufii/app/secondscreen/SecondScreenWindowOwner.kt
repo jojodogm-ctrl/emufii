@@ -13,12 +13,6 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import android.view.View
 
-/**
- * The three owners Compose insists on, standalone from the first line: the foreground
- * service holding the panel while the emulator owns the front screen has no activity to
- * borrow them from.
- * pourquoi : docs/decisions/second-ecran.md § The three owners are self-contained from the first line
- */
 class SecondScreenWindowOwner : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
 
     private val lifecycleRegistry = LifecycleRegistry(this)
@@ -37,11 +31,7 @@ class SecondScreenWindowOwner : LifecycleOwner, ViewModelStoreOwner, SavedStateR
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
     }
 
-    /**
-     * Both halves matter: without DESTROYED the composition keeps its collectors on
-     * [SecondScreen] and the window leaks, without clearing the store it leaks one
-     * indirection further away.
-     */
+    /** Both halves matter: without DESTROYED collectors leak the window; without clearing the store it leaks too. */
     fun detach() {
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         viewModelStore.clear()

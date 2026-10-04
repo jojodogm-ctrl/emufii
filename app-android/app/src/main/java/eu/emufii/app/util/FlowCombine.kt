@@ -3,12 +3,7 @@ package eu.emufii.app.util
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
-/**
- * Kotlin's typed `combine` maxes at five flows and the vararg overload forces one type
- * across every source; the library screen combines fifteen heterogeneous flows, so a
- * typed helper takes the place of both. Written as three chained `combine` calls of
- * five so every source update still triggers a re-emission.
- */
+// Typed `combine` stops at five flows; chain three for fifteen heterogeneous sources.
 private data class Fifth<A, B, C, D, E>(
     val a: A,
     val b: B,

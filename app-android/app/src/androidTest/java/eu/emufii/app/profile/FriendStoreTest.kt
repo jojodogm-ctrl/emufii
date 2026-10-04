@@ -9,11 +9,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * Instrumented rather than JVM: the store's job is surviving a restart, and a mocked
- * preferences object would test the mock. A second instance is the closest thing to
- * relaunching the app.
- */
 @RunWith(AndroidJUnit4::class)
 class FriendStoreTest {
 

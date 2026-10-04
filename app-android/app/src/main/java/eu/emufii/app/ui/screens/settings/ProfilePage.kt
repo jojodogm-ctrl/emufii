@@ -27,6 +27,7 @@ import eu.emufii.app.R
 import eu.emufii.app.profile.Profile
 import eu.emufii.app.profile.playerDisplayName
 import eu.emufii.app.ui.components.Avatar
+import eu.emufii.app.ui.components.SwitchRow
 import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.PadTextField
 import eu.emufii.app.ui.components.padEntry
@@ -43,9 +44,6 @@ import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.tap
 
-/**
- * pourquoi : docs/decisions/reglages-ecran.md § The reset lives on the page it erases
- */
 @Composable
 internal fun ProfilePage(
     profile: Profile,
@@ -55,6 +53,8 @@ internal fun ProfilePage(
     onPickPhoto: () -> Unit,
     onClearPhoto: () -> Unit,
     onReset: () -> Unit,
+    shareLastGame: Boolean,
+    onSetShareLastGame: (Boolean) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -75,9 +75,6 @@ internal fun ProfilePage(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            // `border` draws over the content of the node carrying it, so
-                            // the pencil pill is declared after the ring.
-                            // pourquoi : docs/decisions/reglages-ecran.md § The ring and the pencil badge are siblings, not parent and child
                             var photoFocused by remember { mutableStateOf(false) }
                             Box(
                                 contentAlignment = Alignment.BottomEnd,
@@ -126,8 +123,6 @@ internal fun ProfilePage(
                                 },
                                 placeholder = stringResource(R.string.profile_default_name),
                                 label = stringResource(R.string.profile_name_label),
-                                // The same floor as the onboarding: a nickname shortened
-                                // here comes back in a form the emulator refuses.
                                 isError = name.trim().length < Profile.MIN_NAME_LENGTH,
                                 supportingText = {
                                     Text(
@@ -156,8 +151,12 @@ internal fun ProfilePage(
             },
             {
                 SettingsBlock(title = stringResource(R.string.settings_profile_seen_by)) {
-                    // pourquoi : docs/decisions/reglages-ecran.md § The pages' images come from the device, not from a stock library
-                    SeenByOthers(name = name)
+                    SeenByOthers(name = name, photo = profile.avatarFile)
+                    SwitchRow(
+                        label = stringResource(R.string.settings_share_last_game),
+                        checked = shareLastGame,
+                        onCheckedChange = onSetShareLastGame
+                    )
                     DetailNote(stringResource(R.string.profile_photo_note))
                 }
             },
@@ -170,13 +169,8 @@ internal fun ProfilePage(
     }
 }
 
-/**
- * Without their photo: a first version showed the avatar from the local file, the exact
- * opposite of what the row explains.
- * pourquoi : docs/decisions/reglages-ecran.md § The pages' images come from the device, not from a stock library
- */
 @Composable
-private fun SeenByOthers(name: String) {
+private fun SeenByOthers(name: String, photo: java.io.File?) {
     val dark = LocalEmufiiDarkTheme.current
     val online = if (dark) GoodDark else GoodLight
     val displayName = playerDisplayName(name.ifBlank { Profile.DEFAULT_NAME })
@@ -188,7 +182,7 @@ private fun SeenByOthers(name: String) {
             .socket(ROW_SHAPE, dark)
             .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
-        Avatar(name = displayName, imageFile = null, size = 40.dp)
+        Avatar(name = displayName, imageFile = photo, size = 40.dp)
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 displayName,

@@ -22,10 +22,6 @@ import eu.emufii.app.settings.SettingsStore
 import eu.emufii.app.ui.theme.EmufiiTheme
 import kotlinx.coroutines.delay
 
-/**
- * Mounts the second screen while there is a reason to light it, as a [Presentation].
- * pourquoi : docs/decisions/second-ecran.md § The panel only lights up if it has a reason
- */
 @Composable
 fun SecondScreenHost(enabled: Boolean) {
     val context = LocalContext.current
@@ -51,19 +47,12 @@ fun SecondScreenHost(enabled: Boolean) {
     }
 }
 
-/**
- * pourquoi : docs/decisions/second-ecran.md § The panel only lights up if it has a reason
- */
 fun secondScreenWanted(
     enabled: Boolean,
     foreground: Boolean,
     model: SecondScreenModel
 ): Boolean = enabled && (foreground || model is SecondScreenModel.InSession)
 
-/**
- * Carries its own [SecondScreenWindowOwner]: the service host has no activity to borrow from.
- * pourquoi : docs/decisions/second-ecran.md § The panel's state lives process-wide, not in the composition
- */
 private class EmufiiPresentation(
     context: Context,
     display: Display,
@@ -79,16 +68,11 @@ private class EmufiiPresentation(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // The window carried `FLAG_NOT_TOUCHABLE` and `FLAG_NOT_FOCUSABLE`, and the panel
-        // is touch.
-        // pourquoi : docs/decisions/second-ecran.md § The panel takes the steps, because it is touch
+        // Clear FLAG_NOT_TOUCHABLE and FLAG_NOT_FOCUSABLE: the panel is touch.
         window?.apply {
             addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
         }
 
-        // `context` here is not the constructor parameter: a non-`val` parameter is out
-        // of scope in a member function.
-        // pourquoi : docs/decisions/second-ecran.md § The window: the context is not the one you think
         val view = ComposeView(context.withAppLocales()).apply {
             setContent { SecondScreenSurface() }
         }
@@ -99,9 +83,6 @@ private class EmufiiPresentation(
     fun release() = owner.detach()
 }
 
-/**
- * pourquoi : docs/decisions/second-ecran.md § The language comes from the window, not from the process
- */
 private fun Context.withAppLocales(): Context {
     val locales = getSystemService(LocaleManager::class.java)
         ?.applicationLocales
@@ -111,10 +92,6 @@ private fun Context.withAppLocales(): Context {
     return createConfigurationContext(config)
 }
 
-/**
- * The theme is read from the store, not inherited: the service host has no enclosing one.
- * pourquoi : docs/decisions/second-ecran.md § The panel's state lives process-wide, not in the composition
- */
 @Composable
 private fun SecondScreenSurface() {
     val context = LocalContext.current
@@ -123,10 +100,7 @@ private fun SecondScreenSurface() {
     val published by SecondScreen.model.collectAsStateWithLifecycle()
     val aside by SecondScreen.aside.collectAsStateWithLifecycle()
 
-    /**
-     * The resting face waits: switching front screens is not atomic.
-     * pourquoi : docs/decisions/second-ecran.md § The resting face waits its turn
-     */
+    /** The resting face waits: switching front screens is not atomic. */
     var model by remember { mutableStateOf(published) }
     LaunchedEffect(published, aside) {
         if (published is SecondScreenModel.Idle &&

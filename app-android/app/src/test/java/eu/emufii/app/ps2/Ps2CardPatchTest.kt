@@ -9,11 +9,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
-/**
- * Fixtures are built with the product code itself ([Ps2MemoryCard.generate],
- * [Ps2CardPatch.addSave]) and every case ends by walking the patched card with this file's
- * own reader, which shares nothing with the writer beyond the format.
- */
 class Ps2CardPatchTest {
 
     private val epoch = 1755729273L
@@ -116,7 +111,6 @@ class Ps2CardPatchTest {
         val patched = Ps2CardPatch.inject(card, epochSecond = epoch)
         val saves = readAllSaves(patched)
         assertEquals(listOf("BWNETCNF"), saves.keys.toList())
-        // Re-keyed for the default console, no longer for the bench one.
         assertArrayEquals(
             Ps2NetcnfConfig.INDEX,
             saves.getValue("BWNETCNF").getValue("BWNETCNF"),
@@ -134,16 +128,13 @@ class Ps2CardPatchTest {
         var card = Ps2MemoryCard.generate("Emufii", epochSecond = epoch)
         card = Ps2CardPatch.addSave(card, "AAA-SAVE", listOf("a.bin" to ByteArray(10) { 1 }), epochSecond = epoch)
         card = Ps2CardPatch.addSave(card, "BBB-SAVE", listOf("b.bin" to ByteArray(10) { 2 }), epochSecond = epoch)
-        // Root order is now BWNETCNF, AAA, BBB.
 
         val patched = Ps2CardPatch.inject(card, epochSecond = epoch)
         val saves = readAllSaves(patched)
-        // BWNETCNF was freed and re-written, so it now sits after the others.
         assertEquals(
             listOf("AAA-SAVE", "BBB-SAVE", "BWNETCNF"),
             saves.keys.toList(),
         )
-        // Each save's '.' names its real slot in the root.
         val root = chainOf(patched, 0)
         for (slot in 2 until 5) {
             val saveDir = chainOf(patched, u32(root, slot * PAGE_DATA + 0x10))
@@ -155,8 +146,6 @@ class Ps2CardPatchTest {
     @Test
     fun `fragmented free space is allocated around, not through`() {
         var card = Ps2MemoryCard.generate("Emufii", epochSecond = epoch)
-        // The FAT entry and the root entry go, the clusters stay: the hole a delete leaves
-        // behind on a real card.
         var patched = Ps2CardPatch.inject(card, epochSecond = epoch)
         patched = Ps2CardPatch.addSave(
             patched, "BIG-SAVE",
@@ -183,16 +172,10 @@ class Ps2CardPatchTest {
         assertArrayEquals(Ps2NetcnfConfig.ARMSX2_CONSOLE_ID, Ps2CardPatch.recoverConsoleId(card))
     }
 
-    /**
-     * Emufii used to hold on to the card's checksum and call the setup gone the moment it
-     * changed; a card changes on every save. It cost a player their PS2 games between two
-     * launches.
-     */
     @Test
     fun `a game save added after preparation does not lose the profile`() {
         val prepared = Ps2MemoryCard.generate("Emufii", consoleId = benchId, epochSecond = epoch)
-        // `addSave` writes into the array it is given, where `inject` hands back a clone:
-        // without the copy the comparison is an array against itself.
+        // addSave writes in place, unlike inject.
         val played = Ps2CardPatch.addSave(
             prepared.copyOf(),
             "BASLUS-21355MC3",
@@ -207,7 +190,6 @@ class Ps2CardPatchTest {
     fun `a card without the save yields no identity`() {
         val card = Ps2MemoryCard.generate("Emufii", epochSecond = epoch)
         val stripped = Ps2CardPatch.addSave(card, "OTHER", listOf("x" to ByteArray(10)), epochSecond = epoch)
-        // OTHER replaced nothing, but BWNETCNF is still there; strip it by injecting nothing:
         val without = removeNetworkSave(stripped)
         assertNull(Ps2CardPatch.recoverConsoleId(without))
     }
@@ -228,7 +210,6 @@ class Ps2CardPatchTest {
 
     private val PAGE_DATA = 512
 
-    /** Card -> save directory name -> file name -> bytes. */
     private fun readAllSaves(card: ByteArray): Map<String, Map<String, ByteArray>> {
         val root = chainOf(card, 0)
         val out = linkedMapOf<String, Map<String, ByteArray>>()
@@ -256,7 +237,6 @@ class Ps2CardPatchTest {
         return out
     }
 
-    /** Structure checks any reader depends on: chains in bounds, ECC right. */
     private fun verifyStructure(card: ByteArray) {
         val pages = card.size / 528
         for (p in 0 until pages) {
@@ -264,7 +244,6 @@ class Ps2CardPatchTest {
             if (spare.contentEquals(ByteArray(16) { 0xFF.toByte() })) continue
             assertArrayEquals("page $p", Ps2MemoryCard.spare(card.copyOfRange(p * 528, p * 528 + 512)), spare)
         }
-        // Every chain stays inside the card and never revisits a cluster.
         val clustersSeen = mutableSetOf<Int>()
         fun walk(rel: Int) {
             var current = rel
@@ -300,8 +279,6 @@ class Ps2CardPatchTest {
     }
 
     private fun removeNetworkSave(card: ByteArray): ByteArray {
-        // A hand-rolled removal: root entry dropped, data pages erased with their spares,
-        // chains left dangling in the FAT, a card that looks deleted but was never reclaimed.
         val out = card.copyOf()
         val root = chainOf(card, 0)
         for (slot in 2 until root.size / PAGE_DATA) {

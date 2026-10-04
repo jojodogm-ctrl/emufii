@@ -5,11 +5,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/**
- * The rest of the driver talks to `AccessibilityNodeInfo`, which a JVM test cannot
- * construct: screen reading lives in [Ps2Screen], pinned against real trees in
- * `Ps2ScreenTest`.
- */
 class Ps2DriverTest {
 
     private fun plan(password: String?) = NetplayPlan(
@@ -38,8 +33,6 @@ class Ps2DriverTest {
 
     @Test
     fun `a code that is too short is not invented`() {
-        // Better ARMSX2's own than one the other player will not have: the emulator
-        // negotiates nothing.
         assertNull(codeOf("AB"))
         assertNull(codeOf(null))
     }

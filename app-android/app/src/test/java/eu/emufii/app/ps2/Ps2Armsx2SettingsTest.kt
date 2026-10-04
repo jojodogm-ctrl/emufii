@@ -6,12 +6,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The shape and key names are ARMSX2's own (`platforms/android/.../config/Settings.kt`,
- * `toJson` at :1814: flat camelCase under `global`; `ConfigStore.BACKUP_FILENAME`:
- * `armsx2-settings.json`), and every default here is ARMSX2's: an absent key and a missing
- * mirror parse to what a fresh install would act on.
- */
 class Ps2Armsx2SettingsTest {
 
     @Test

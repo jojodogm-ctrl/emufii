@@ -14,18 +14,10 @@ import kotlinx.coroutines.withContext
 import eu.emufii.app.library.Console
 import eu.emufii.app.library.EmulatorPick
 
-/**
- * Opens ARMSX2 with the Local Link autofill armed. By named component: its `VIEW`
- * filter declares no MIME type, so a SAF URI can never resolve there. And the setup
- * happens before the game starts, where DEV9 would re-read nothing.
- * pourquoi : docs/decisions/pilotes-emulateurs.md § ARMSX2 is launched by named component, never by filtering
- */
+/** By named component: ARMSX2's VIEW filter declares no MIME type, so a SAF URI never resolves. */
 class Ps2Launcher(private val context: Context) {
 
-    /**
-     * `xyz.aethersx2.android` does not count: that is the original AetherSX2, with no
-     * network layer. Both live side by side on the Thor.
-     */
+    /** Not xyz.aethersx2.android: that is the original AetherSX2, without networking. */
     fun installedPackage(): String? = EmulatorPick.packageFor(context, Console.PS2)
 
     fun isInstalled(): Boolean = installedPackage() != null
@@ -39,9 +31,7 @@ class Ps2Launcher(private val context: Context) {
         val intent = if (rom != null) {
             viewIntent(pkg, rom)
         } else {
-            // Without `CLEAR_TOP` and the named component, an already open ARMSX2 comes
-            // back where the player left it, mid game or in another settings tab, and the
-            // driver gives up silently on a screen it cannot read. Measured 2026-08-17.
+            // Without CLEAR_TOP an open ARMSX2 resumes wherever it was and the driver gets lost.
             Intent(Intent.ACTION_MAIN).apply {
                 component = ComponentName(pkg, VIEW_ACTIVITY)
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -74,11 +64,7 @@ class Ps2Launcher(private val context: Context) {
         }
     }
 
-    /**
-     * Writes ARMSX2's native per-game layer and boots the ROM in one operation.
-     * No accessibility plan is armed: the emulator reads this file after its
-     * private global preferences and before DEV9 initialises.
-     */
+    /** ARMSX2 reads this per-game file after its global prefs and before DEV9 initialises. */
     suspend fun launchPrivateGame(rom: RomRef, plan: NetplayPlan): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
         when (val configured = withContext(Dispatchers.IO) {
@@ -103,11 +89,7 @@ class Ps2Launcher(private val context: Context) {
         }.getOrElse { LaunchResult.Error(it.message ?: "Unknown launch error") }
     }
 
-    /**
-     * `com.armsx2.Main` is the activity behind the manifest's `MainActivity` alias, what
-     * `am start` resolves to with a `file://`, so it is what we target for a `content://`,
-     * which filtering cannot reach.
-     */
+    /** The activity behind the manifest's MainActivity alias, what `am start` resolves a file:// to. */
     private fun viewIntent(pkg: String, rom: Uri): Intent =
         Intent(Intent.ACTION_VIEW).apply {
             component = ComponentName(pkg, VIEW_ACTIVITY)

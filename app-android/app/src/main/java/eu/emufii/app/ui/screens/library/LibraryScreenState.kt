@@ -1,5 +1,6 @@
 package eu.emufii.app.ui.screens.library
 
+import eu.emufii.app.compat.CompatDb
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -29,11 +30,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * What a library cell holds: a game or a folder. Shared by the composable and the state
- * holder that computes the list.
- * pourquoi : docs/decisions/bibliotheque.md § Three layouts, one cursor contract
- */
 internal sealed interface Entry {
     val key: String
 
@@ -46,11 +42,6 @@ internal sealed interface Entry {
     }
 }
 
-/**
- * The library screen's flat, single-source view: the composable reads this and nothing
- * else. `entries` and `shown` are derived; every other field is owned by a
- * [MutableStateFlow] inside [LibraryScreenState] (or by [SettingsStore]).
- */
 internal data class LibraryUiState(
     val folderUri: Uri? = null,
     val loading: Boolean = false,
@@ -67,20 +58,9 @@ internal data class LibraryUiState(
     val layout: LibraryLayout = LibraryLayout.GRID,
     val hiddenConsoles: Set<Console> = emptySet(),
     val artworkKey: String = "",
-    /**
-     * Bumps on every manual refresh, so UI-only effects keyed on "the grid just
-     * changed" (e.g. the tile entrance animation) can retrigger themselves.
-     */
     val revision: Int = 0,
 )
 
-/**
- * Plain state-holder for [eu.emufii.app.ui.screens.LibraryScreen]. No ViewModel and no
- * DI — just [MutableStateFlow]s, an init block that runs the three orchestration
- * effects, and action methods the composable calls.
- *
- * pourquoi : docs/decisions/bibliotheque.md § Hidden consoles are hidden here, not in the scan
- */
 internal class LibraryScreenState(
     private val context: Context,
     private val repo: RomsRepository,
@@ -102,6 +82,17 @@ internal class LibraryScreenState(
     private val _renameFor = MutableStateFlow<Rom?>(null)
     private val _hideFor = MutableStateFlow<Rom?>(null)
     private val _revision = MutableStateFlow(0)
+    private val _compat = MutableStateFlow(CompatDb.EMPTY)
+
+    fun setCompat(db: CompatDb) {
+        _compat.value = db
+    }
+
+    private val _filter = kotlinx.coroutines.flow.combine(
+        settings.hiddenConsoles,
+        settings.hideIncompatible,
+        _compat,
+    ) { consoles, hideBroken, db -> Triple(consoles, hideBroken, db) }
 
     val uiState: StateFlow<LibraryUiState> = combineAll(
         _folderUri,
@@ -117,13 +108,15 @@ internal class LibraryScreenState(
         _hideFor,
         settings.librarySort,
         settings.libraryLayout,
-        settings.hiddenConsoles,
+        _filter,
         settings.steamGridDbKey,
     ) { folderUri, roms, loading, selected, openConsole,
         searchOpen, query, menuFor, pickIconFor, renameFor,
-        hideFor, sort, layout, hiddenConsoles, artworkKey ->
-        val shown = if (hiddenConsoles.isEmpty()) roms
-        else roms.filter { it.console !in hiddenConsoles }
+        hideFor, sort, layout, filter, artworkKey ->
+        val (hiddenConsoles, hideBroken, compat) = filter
+        val shown = roms.filter { rom ->
+            rom.console !in hiddenConsoles && !(hideBroken && compat.isBroken(rom))
+        }
         val needle = query.trim()
         val entries: List<Entry> = when {
             needle.isNotEmpty() ->
@@ -166,9 +159,6 @@ internal class LibraryScreenState(
     )
 
     init {
-        // Rescan on folder or manual-refresh change. Never forced: the explicit rescan
-        // already refreshed the cache. Also names encrypted dumps kept to themselves,
-        // asked for by the ids they did give up.
         scope.launch {
             combine(_folderUri, _revision) { uri, _ -> uri }.collect { uri ->
                 if (uri != null) {
@@ -185,7 +175,6 @@ internal class LibraryScreenState(
             }
         }
 
-        // A sort that leaves CONSOLE has no folders to open into.
         scope.launch {
             settings.librarySort.collect { s ->
                 if (s != LibrarySort.CONSOLE) _openConsole.value = null
@@ -244,11 +233,6 @@ internal class LibraryScreenState(
         _hideFor.value = rom
     }
 
-    /**
-     * Reloads the saved folder and forces a rescan. Called on init through the
-     * `_revision` collector; the composable calls it whenever the parent's
-     * `libraryRevision` changes so a settings-driven rescan still lands here.
-     */
     fun refresh() {
         _folderUri.value = repo.savedFolderUri()
         _revision.value += 1

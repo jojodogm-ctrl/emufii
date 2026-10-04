@@ -83,16 +83,12 @@ import androidx.compose.ui.graphics.SolidColor
 import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.theme.plateColors
 import eu.emufii.app.ui.glass
-import eu.emufii.app.ui.theme.shelfFill
 import eu.emufii.app.ui.tap
 import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.theme.edgeColor
 
-/**
- * The glyph shows the state, not the function.
- * pourquoi : docs/decisions/bibliotheque.md § The two library settings took the logo's corner
- */
 @Composable
 fun LayoutChip(
     current: LibraryLayout,
@@ -120,8 +116,6 @@ fun LayoutChip(
                     glyph = { tint -> drawLayoutGlyph(layout, tint) },
                     landing = LocalMenuLanding.current.takeIf { selected },
                     trailing = {
-                        // A tick, not a coloured ground: two highlights on top of each
-                        // other read as one, misplaced.
                         if (selected) CheckIcon(size = 14.dp, color = MaterialTheme.colorScheme.primary)
                         else Spacer(Modifier.size(14.dp))
                     }
@@ -158,8 +152,6 @@ fun SortChip(
                     glyph = { tint -> drawSortGlyph(sort, tint) },
                     landing = LocalMenuLanding.current.takeIf { selected },
                     trailing = {
-                        // A tick, not a coloured ground: two highlights on top of each
-                        // other read as one, misplaced.
                         if (selected) CheckIcon(size = 14.dp, color = MaterialTheme.colorScheme.primary)
                         else Spacer(Modifier.size(14.dp))
                     }
@@ -183,16 +175,8 @@ private val LibrarySort.labelRes: Int
         LibrarySort.CONSOLE -> R.string.lib_sort_console
     }
 
-/**
- * The open menu's cursor holder, claimed by the active row.
- * pourquoi : docs/decisions/bibliotheque.md § A menu's cursor lands on the current option
- */
 private val LocalMenuLanding = compositionLocalOf<FocusRequester?> { null }
 
-/**
- * The window outlives the close while the unroll reverses.
- * pourquoi : docs/decisions/bibliotheque.md § A menu's cursor lands on the current option
- */
 @Composable
 private fun ChipMenu(
     expanded: Boolean,
@@ -225,9 +209,6 @@ private fun ChipMenu(
             label = "chip-menu-reveal"
         )
 
-        // Without this there was no ring at all on opening.
-        // pourquoi : docs/decisions/bibliotheque.md § A menu's cursor lands on the current option
-        // pourquoi : docs/decisions/coquille-ecrans.md § The cursor arrives with the screen
         val landing = remember { FocusRequester() }
         LandOn(landing, key = title, enabled = opening)
 
@@ -239,8 +220,7 @@ private fun ChipMenu(
                     compositingStrategy = CompositingStrategy.ModulateAlpha
                     translationY = (1f - reveal) * (-10.dp.toPx())
                 }
-                // The drawing is clipped, not the layout: the window is placed on its
-                // size, and animating it would make it slide at every frame.
+                // Clip the drawing, not the layout, or the window slides every frame.
                 .drawWithContent {
                     clipRect(bottom = size.height * reveal) {
                         this@drawWithContent.drawContent()
@@ -284,10 +264,6 @@ private object BelowChip : PopupPositionProvider {
     }
 }
 
-/**
- * An abstract icon would force opening the menu to get your bearings.
- * pourquoi : docs/decisions/bibliotheque.md § The two library settings took the logo's corner
- */
 private fun DrawScope.drawLayoutGlyph(layout: LibraryLayout, color: Color) {
     val s = size.minDimension
     when (layout) {
@@ -307,7 +283,6 @@ private fun DrawScope.drawLayoutGlyph(layout: LibraryLayout, color: Color) {
         }
 
         LibraryLayout.CAROUSEL -> {
-            // The side slices are dimmed: that is what the carousel itself does.
             val cardW = s * 0.46f
             val sideW = s * 0.16f
             drawRoundRect(
@@ -351,10 +326,6 @@ private fun DrawScope.drawLayoutGlyph(layout: LibraryLayout, color: Color) {
     }
 }
 
-/**
- * By console is a folder: not an order but a filing.
- * pourquoi : docs/decisions/bibliotheque.md § The two library settings took the logo's corner
- */
 private fun DrawScope.drawSortGlyph(sort: LibrarySort, color: Color) {
     val s = size.minDimension
     val stroke = Stroke(width = s * 0.11f, cap = StrokeCap.Round)
@@ -376,7 +347,6 @@ private fun DrawScope.drawSortGlyph(sort: LibrarySort, color: Color) {
         LibrarySort.NAME -> bars(listOf(1f, 0.68f, 0.36f), s * 0.94f)
 
         LibrarySort.RECENT -> {
-            // The bars tighten to give the clock room: otherwise the two drawings touch.
             bars(listOf(1f, 0.66f, 0.32f), s * 0.56f)
             val c = Offset(s * 0.76f, s * 0.74f)
             val r = s * 0.21f
@@ -398,7 +368,6 @@ private fun DrawScope.drawSortGlyph(sort: LibrarySort, color: Color) {
         }
 
         LibrarySort.CONSOLE -> {
-            // The tab first, then the body, so the step at the top reads at 18 px.
             val path = Path().apply {
                 moveTo(s * 0.08f, s * 0.80f)
                 lineTo(s * 0.08f, s * 0.26f)
@@ -413,11 +382,6 @@ private fun DrawScope.drawSortGlyph(sort: LibrarySort, color: Color) {
     }
 }
 
-/**
- * The glyph is the field's magnifier: button and field are one control in two states.
- * pourquoi : docs/decisions/bibliotheque.md § Search, and the cross that closes it
- */
-/** What the bar opens out to. Read by the header's size transition as well. */
 val SEARCH_WIDTH = 430.dp
 
 @Composable
@@ -432,11 +396,6 @@ fun SearchChip(
     }
 }
 
-/**
- * The cross is the only control that ends the search. The system keyboard writes here:
- * the app's own keypad only avoided landscape's extract mode.
- * pourquoi : docs/decisions/bibliotheque.md § Search, and the cross that closes it
- */
 @Composable
 fun SearchField(
     value: String,
@@ -457,13 +416,7 @@ fun SearchField(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = modifier
             .height(40.dp)
-            // The room the search takes when it opens: wide enough for a game's name,
-            // and the spacer on its left gives way, so the bar reads as stretching out
-            // of the tool bank rather than appearing beside it.
-            // pourquoi : docs/decisions/bibliotheque.md § Search takes the shelf, and the two states do not cross
             .width(SEARCH_WIDTH)
-            // Glass, like everything else standing on the header. A plate here was the
-            // one opaque object left on the pebble.
             .then(
                 run {
                     Modifier.plate(
@@ -471,7 +424,7 @@ fun SearchField(
                         dark,
                         LocalEmufiiOledTheme.current,
                         lift = 3.dp,
-                        fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark)
+                        fill = plateColors(dark, LocalEmufiiOledTheme.current && dark).first()
                     )
                 }
             )
@@ -509,7 +462,6 @@ fun SearchField(
             it()
         }
         // The area grows, the glyph does not: 32 dp is what a 36 dp bar allows.
-        // pourquoi : docs/decisions/bibliotheque.md § Search, and the cross that closes it
         Box(
             modifier = Modifier
                 .size(32.dp)
@@ -525,12 +477,6 @@ fun SearchField(
     }
 }
 
-/**
- * The three library settings as one piece with three cells, the way a console puts its
- * switches on one plate. Each cell shows its own state; the separators are hairlines
- * that stop short of the edges, or the bank reads as three buttons again.
- * pourquoi : docs/decisions/bibliotheque.md § The tools are one bank, the people are discs
- */
 @Composable
 fun ToolBank(content: @Composable () -> Unit) {
     val dark = LocalEmufiiDarkTheme.current
@@ -543,18 +489,16 @@ fun ToolBank(content: @Composable () -> Unit) {
                         dark = dark,
                         oled = LocalEmufiiOledTheme.current,
                         lift = 3.dp,
-                        fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark)
+                        fill = plateColors(dark, LocalEmufiiOledTheme.current && dark).first()
                     )
                 }
             )
-            // The plate clips: without this margin a cell touches the contour and the
-            // cursor's glow is cut off square along it.
+            // The plate clips: this margin keeps the cursor glow from being cut square.
             .padding(BANK_MARGIN),
         verticalAlignment = Alignment.CenterVertically
     ) { content() }
 }
 
-/** Between two cells, never at the ends. */
 @Composable
 fun BankSeam() {
     Box(
@@ -565,10 +509,6 @@ fun BankSeam() {
     )
 }
 
-/**
- * A cell does not scale under the thumb: it sits in a plate that would have to scale
- * with it. It darkens instead.
- */
 @Composable
 private fun BankCell(
     onClick: () -> Unit,
@@ -608,14 +548,8 @@ private fun BankCell(
 private val CELL_WIDTH = 54.dp
 private val CELL_HEIGHT = 44.dp
 
-/**
- * What the bank keeps clear inside its contour: the plate clips, so this has to cover
- * the cursor's glow whole or the halo comes out cut off square along the pill.
- */
 private val BANK_MARGIN = 6.dp
 
-/** The cursor stays off the bank's contour: drawn on it, it cuts the piece in three. */
 private val CURSOR_INSET = 1.dp
 
-/** One cursor for the three cells, and it is the pill the rest of the header wears. */
 private val CellShape = RoundedCornerShape(percent = 50)

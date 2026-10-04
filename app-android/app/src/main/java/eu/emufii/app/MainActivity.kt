@@ -28,10 +28,7 @@ import eu.emufii.app.ui.theme.EmufiiTheme
 import eu.emufii.app.wg.EmufiiWgManager
 import eu.emufii.app.ui.Sfx
 
-/**
- * [onDenied] is not optional: a refusal has to undo the session already created on the
- * coordinator, or the app sits on its loading screen with an orphan network behind it.
- */
+/** [onDenied] must tear down the session already created on the coordinator. */
 fun interface EnsureVpnPermission {
     operator fun invoke(onGranted: () -> Unit, onDenied: () -> Unit)
 }
@@ -41,7 +38,6 @@ val LocalEnsureVpnPermission =
 
 class MainActivity : ComponentActivity() {
 
-    /** On resume, not on start: a started but unresumed activity is behind the emulator. */
     override fun onResume() {
         super.onResume()
         AppForeground.set(true)
@@ -59,7 +55,6 @@ class MainActivity : ComponentActivity() {
         AppForeground.set(false)
     }
 
-    /** A process Android kept alive skipped the logo on reopening. */
     override fun onStart() {
         super.onStart()
         if (!isChangingConfigurations) SplashGate.rearm()
@@ -68,7 +63,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Decoded before the first screen: loaded lazily, the first hover is silent.
-        // pourquoi : docs/decisions/sons.md § Two sounds, one family
         Sfx.prepare(this)
         enableEdgeToEdge()
         setContent {
@@ -89,14 +83,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // Not inside EmufiiApp: two stores, two StateFlows, and the settings page
-            // updates the one the theme is not reading.
+            // Hoisted out of EmufiiApp so theme and settings page share one store.
             val settings = remember { SettingsStore.get(this@MainActivity) }
             val theme by settings.theme.collectAsStateWithLifecycle()
             val dark = theme.isDark(isSystemInDarkTheme())
 
-            // enableEdgeToEdge picks the bar icon colour once, from the system theme:
-            // Light on a dark phone left white icons on a pale wallpaper.
             val view = LocalView.current
             SideEffect {
                 WindowCompat.getInsetsController(window, view).run {

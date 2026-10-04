@@ -32,6 +32,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextOverflow
+import eu.emufii.app.ui.components.SwitchRow
 import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.components.cardSliceFill
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
@@ -57,7 +58,6 @@ import eu.emufii.app.ui.components.SteamGridDbMark
 import eu.emufii.app.ui.components.padEntry
 import eu.emufii.app.ui.tap
 
-/** pourquoi : docs/decisions/reglages-ecran.md § On a page, the state comes before the explanation */
 @Composable
 internal fun LibraryPage(
     folder: String?,
@@ -73,6 +73,9 @@ internal fun LibraryPage(
     artworkSample: List<Rom>,
     hiddenCount: Int,
     onRestoreHidden: () -> Unit,
+    hideIncompatible: Boolean,
+    incompatibleCount: Int,
+    onSetHideIncompatible: (Boolean) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -81,7 +84,6 @@ internal fun LibraryPage(
         onBack = onBack,
         modifier = modifier
     ) {
-        // Order decides the columns: even left, odd right.
         val head = rememberBlockHeights()
         SettingsColumns(
             {
@@ -110,14 +112,17 @@ internal fun LibraryPage(
             {
                 FallbackBlock(key = artworkKey, onKeyChange = onArtworkKeyChange)
             },
+            {
+                IncompatibleBlock(
+                    enabled = hideIncompatible,
+                    count = incompatibleCount,
+                    onSetEnabled = onSetHideIncompatible
+                )
+            },
         )
     }
 }
 
-/**
- * The slot is the button.
- * pourquoi : CLAUDE.md § Working rules, the "HOME MENU" world
- */
 @Composable
 private fun FoldersBlock(
     modifier: Modifier = Modifier,
@@ -163,8 +168,6 @@ private fun FoldersBlock(
                             fillWidth = true,
                             modifier = Modifier.weight(1f)
                         )
-                        // Inside the slot, two nested clickables give two cursor stops.
-                        // pourquoi : CLAUDE.md § Gamepad navigation
                         if (secondFolder != null) {
                             GhostButton(
                                 label = stringResource(R.string.settings_library_remove_second),
@@ -202,8 +205,6 @@ private fun FoldersBlock(
             }
         }
 
-        // The one card on the page with nothing to read: stretched to its neighbour's
-        // height, it ended on a hand's width of empty plate under the buttons.
         DetailNote(stringResource(R.string.settings_library_folders_body))
     }
 }
@@ -214,11 +215,6 @@ private fun FolderSlot(
     note: String,
     onClick: () -> Unit,
     entry: Boolean = false,
-    /**
-     * The band is a share of the slot's height, and the first slot's note runs to two
-     * lines where the second's fits on one: at the same share the first wore the thicker
-     * cursor of the two. A smaller share for the taller slot puts them back level.
-     */
     bandFraction: Float = 0.12f
 ) {
     val dark = LocalEmufiiDarkTheme.current
@@ -307,7 +303,6 @@ private fun EmptyFolderSlot(label: String, onClick: () -> Unit) {
     }
 }
 
-/** pourquoi : docs/decisions/reglages-ecran.md § The pages' images come from the device, not from a stock library */
 @Composable
 private fun ArtworkBlock(
     modifier: Modifier = Modifier,
@@ -324,7 +319,6 @@ private fun ArtworkBlock(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         if (uri != null) {
-            // Read only: we never write there.
             val granted = runCatching {
                 context.contentResolver.takePersistableUriPermission(
                     uri,
@@ -339,12 +333,10 @@ private fun ArtworkBlock(
             }
         }
     }
-    // Straight to the frontend's folder, not wherever the picker was left.
     val pick = { folderPicker.launch(defaultFolderOf(frontend)) }
 
     SettingsBlock(
         modifier = modifier,
-        // Equal heights: buttons floating at different levels read as misaligned.
         spread = true,
         title = stringResource(R.string.settings_row_artwork),
         state = BlockState(
@@ -375,8 +367,6 @@ private fun ArtworkBlock(
                             label = stringResource(R.string.settings_cocoon_forget),
                             onClick = {
                                 settingsStore.setFrontendFolder("")
-                                // Clears the index only: the scan's thumbnails stay on disk.
-                                // pourquoi : docs/decisions/reglages-ecran.md § Giving up a frontend's folder needs a fresh walk
                                 FrontendMedia.forget()
                                 onSourceChanged()
                             },
@@ -389,7 +379,6 @@ private fun ArtworkBlock(
         }
     ) {
         ArtworkStrip(sample)
-        // Same tight gap as the language list: the choices are one object.
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             ArtworkFrontend.entries.forEachIndexed { index, option ->
                 ChoiceRow(
@@ -398,8 +387,7 @@ private fun ArtworkBlock(
                     onClick = {
                         if (option != frontend) {
                             settingsStore.setArtworkFrontend(option)
-                            // The folder was granted for the other layout: a Cocoon root
-                            // read as ES-DE finds nothing, so the link is dropped with it.
+                            // The grant is layout-specific: a Cocoon root read as ES-DE finds nothing.
                             settingsStore.setFrontendFolder("")
                             FrontendMedia.forget()
                             onSourceChanged()
@@ -427,15 +415,11 @@ private fun FallbackBlock(key: String, onKeyChange: (String) -> Unit) {
         ),
         onToggleExpanded = { expanded = !expanded },
         expanded = expanded,
-        // Open, this block carries a field and two notes: three times its folded height,
-        // and a band cut from that reached the ceiling and framed the card like a tube.
         bandFraction = if (expanded) 0.032f else 0.09f
     ) {
-        // Outside the fold: it is what says what the block is for.
         DetailNote(stringResource(R.string.settings_artwork_body))
         if (expanded) {
             SteamGridDbMark()
-            // In the clear: not a password, and masking would hide only the typo.
             PadTextField(
                 value = key,
                 onValueChange = onKeyChange,
@@ -447,10 +431,6 @@ private fun FallbackBlock(key: String, onKeyChange: (String) -> Unit) {
     }
 }
 
-/**
- * All or nothing: a per-game list could not be crossed with a stick.
- * pourquoi : docs/decisions/reglages-ecran.md § Restoring hidden games is all or nothing
- */
 @Composable
 private fun HiddenRomsBlock(count: Int, onRestore: () -> Unit) {
     SettingsBlock(
@@ -469,6 +449,28 @@ private fun HiddenRomsBlock(count: Int, onRestore: () -> Unit) {
                 fillWidth = true
             )
         }
+    }
+}
+
+@Composable
+private fun IncompatibleBlock(enabled: Boolean, count: Int, onSetEnabled: (Boolean) -> Unit) {
+    SettingsBlock(
+        title = stringResource(R.string.settings_incompatible_title),
+        state = BlockState(
+            if (enabled) DetailTone.GOOD else DetailTone.BUSY,
+            stringResource(
+                if (enabled) R.string.settings_value_autofill_on
+                else R.string.settings_value_autofill_off
+            )
+        )
+    ) {
+        SwitchRow(
+            label = stringResource(R.string.settings_incompatible_switch),
+            checked = enabled,
+            onCheckedChange = onSetEnabled,
+            note = pluralStringResource(R.plurals.settings_incompatible_count, count, count)
+        )
+        DetailNote(stringResource(R.string.settings_incompatible_note))
     }
 }
 

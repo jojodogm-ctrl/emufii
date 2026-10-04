@@ -3,17 +3,8 @@ package eu.emufii.app.meta
 import org.json.JSONObject
 import java.util.Locale
 
-/**
- * Editorial only: a missing entry costs a page, never a launch, a badge or a session,
- * so nothing is inferred from silence. Matched on the same keys as the compatibility
- * list ([eu.emufii.app.library.compatKeys]).
- */
 data class GameMeta(
     val keys: List<String>,
-    /**
-     * Two fields rather than one translated at read time: Wikidata publishes both, and
-     * the app has no business guessing that "course" is "racing".
-     */
     val genreFr: String? = null,
     val genreEn: String? = null,
     val released: String? = null,
@@ -27,10 +18,6 @@ data class GameMeta(
         if (locale.language.equals("fr", ignoreCase = true)) summaryFr ?: summaryEn
         else summaryEn ?: summaryFr
 
-    /**
-     * The first genre only, the line already holding a region; the catalogue keeps the
-     * second so a roomier screen can print it without a rebuild.
-     */
     fun genreFor(locale: Locale): String? {
         val both = if (locale.language.equals("fr", ignoreCase = true)) genreFr ?: genreEn
         else genreEn ?: genreFr
@@ -42,7 +29,6 @@ data class GameMeta(
             summaryFor(locale) == null
 }
 
-/** Flattened on parse like [eu.emufii.app.compat.CompatDb]: the lookup happens while a cursor moves. */
 class GameMetaDb private constructor(private val byKey: Map<String, GameMeta>) {
     val size: Int get() = byKey.size
 

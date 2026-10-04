@@ -90,16 +90,11 @@ import eu.emufii.app.ui.theme.PlateLightLow
 import eu.emufii.app.ui.theme.ShellDarkLow
 import eu.emufii.app.ui.tap
 
-/**
- * [first] must sit on a genuinely focusable control, never on a container: a request on a
- * `focusGroup` succeeds by focusing the group itself.
- * pourquoi : docs/decisions/coquille-ecrans.md § The header is declared before the content, and drawn over it
- */
+/** [first] must be a focusable control: requesting focus on a `focusGroup` focuses the group. */
 class ScaffoldFocus(val first: FocusRequester, val header: FocusRequester)
 
 val LocalScaffoldFocus = compositionLocalOf<ScaffoldFocus?> { null }
 
-/** Goes on a screen's first control: the header's "down" destination, and "up" goes back there. */
 @Composable
 fun Modifier.padEntry(): Modifier {
     val focus = LocalScaffoldFocus.current ?: return this
@@ -115,12 +110,6 @@ fun Modifier.padEntry(): Modifier {
         }
 }
 
-/**
- * On a control of the content's top row that is not its first: up goes to the header.
- * Spatial search would otherwise pick whatever sits higher on screen, a field in the next
- * column, before the header it cannot see.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Where the cursor goes
- */
 @Composable
 fun Modifier.upToHeader(): Modifier {
     val focus = LocalScaffoldFocus.current ?: return this
@@ -133,41 +122,22 @@ fun Modifier.upToHeader(): Modifier {
     }
 }
 
-/**
- * The header floats; it is never a bar with a background.
- * pourquoi : docs/decisions/coquille-ecrans.md § The header floats, and what that costs
- */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EmufiiScaffold(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    /**
-     * A screen whose back closes rather than goes up says so before it is pressed: in a
-     * session this button ends the session, and a chevron promised the opposite.
-     * pourquoi : docs/decisions/session.md § Back closes the session, and it says so
-     */
     backIcon: (@Composable (Color) -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
-    /**
-     * False when the screen fits whole: the veil and its 32 dp only serve content rising
-     * under the header, and cost 7 % of the Thor's height otherwise.
-     * pourquoi : docs/decisions/coquille-ecrans.md § The header floats, and what that costs
-     */
     contentScrolls: Boolean = true,
-    /** False for a screen placing its own cursor; nothing uses it today, the library not being scaffolded. */
     autoFocus: Boolean = true,
     content: @Composable (topPadding: Dp) -> Unit
 ) {
     val dark = LocalEmufiiDarkTheme.current
     val scaffoldFocus = remember { ScaffoldFocus(FocusRequester(), FocusRequester()) }
 
-    /**
-     * Two traps, in this order: ask for keyboard mode before focus, and ask again on each
-     * of the first frames without testing whether it worked.
-     * pourquoi : docs/decisions/coquille-ecrans.md § The cursor arrives with the screen
-     */
+    // Ask for keyboard mode before focus, and retry on each early frame without checking.
     val inputMode = LocalInputModeManager.current
     if (autoFocus) {
         LaunchedEffect(Unit) {
@@ -178,8 +148,7 @@ fun EmufiiScaffold(
             }
         }
     }
-    // See LibraryScreen: the bar hides behind the logo, and its height must be the same
-    // before and after, or the header jumps at the changeover.
+    // Same height with the bar hidden or shown, or the header jumps.
     val statusBar = WindowInsets.statusBarsIgnoringVisibility.asPaddingValues()
         .calculateTopPadding()
     val band = statusBar + HEADER_HEIGHT + 24.dp
@@ -187,20 +156,12 @@ fun EmufiiScaffold(
     Box(modifier = modifier.fillMaxSize()) {
         TrayBackdrop(modifier = Modifier.fillMaxSize(), dark = dark)
 
-        /**
-         * Declared before the content, traversal following declaration order, and drawn
-         * above it by `zIndex`. Focus properties, group and `moveFocus` were all tried and
-         * none crossed the boundary between two layers of one Box: name the destination.
-         * pourquoi : docs/decisions/coquille-ecrans.md § The header is declared before the content, and drawn over it
-         */
         Row(
             modifier = Modifier
                 .zIndex(1f)
                 .onPreviewKeyEvent { event ->
                     if (event.type == KeyEventType.KeyDown && event.key == Key.DirectionDown) {
-                        // Consumed only if the destination exists, or the cursor is trapped
-                        // on a screen with no first control.
-                        // pourquoi : docs/decisions/coquille-ecrans.md § The header is declared before the content, and drawn over it
+                        // Consume only if the target exists, or the cursor gets trapped.
                         runCatching { scaffoldFocus.first.requestFocus() }.isSuccess
                     } else {
                         false
@@ -226,8 +187,7 @@ fun EmufiiScaffold(
                 title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                // The header floats in a plain Box, not a Surface: with no colour to
-                // inherit, Text falls back to black, invisible on the dark wallpaper.
+                // Not in a Surface: Text would fall back to black.
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -236,18 +196,11 @@ fun EmufiiScaffold(
             trailing?.invoke()
         }
 
-        // Past the band *and* past the fade: the veil is still fully opaque at the band's
-        // lower edge, and content parked there sits under an undiluted copy of the
-        // wallpaper, all but erased in dark, where the first list header read as a smudge.
         CompositionLocalProvider(
             LocalScaffoldFocus provides scaffoldFocus,
             // What the header covers: the cursor reads it so as never to stop underneath.
             LocalScaffoldBand provides if (contentScrolls) band + FADE_HEIGHT else band
         ) {
-            // Up with nothing above inside the content goes to the header, from any
-            // control: before, only the first control knew the way, and the others stayed
-            // stuck or jumped sideways.
-            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Where the cursor goes
             val focusManager = LocalFocusManager.current
             Box(
                 Modifier.fillMaxSize().onKeyEvent { event ->
@@ -269,14 +222,8 @@ fun EmufiiScaffold(
     }
 }
 
-/** Six frames, about a hundred milliseconds: layout settles well before that on the Thor. */
 private const val AUTO_FOCUS_FRAMES = 6
 
-/**
- * A second copy of the wallpaper, erased except where the floating chrome sits; [fromTop]
- * false anchors it to the bottom. Put it *inside* the Haze source where one exists.
- * pourquoi : docs/decisions/coquille-ecrans.md § The header floats, and what that costs
- */
 @Composable
 fun WallpaperVeil(
     band: Dp,
@@ -286,11 +233,6 @@ fun WallpaperVeil(
     fade: Dp = FADE_HEIGHT
 ) = WallpaperVeil({ band }, dark, modifier, fromTop, fade)
 
-/**
- * The band as a lambda, for a veil that has to follow a scroll: read at composition it
- * would recompose the wallpaper on every frame, read in the draw it only repaints.
- * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
- */
 @Composable
 fun WallpaperVeil(
     band: () -> Dp,
@@ -300,20 +242,11 @@ fun WallpaperVeil(
     fade: Dp = FADE_HEIGHT
 ) {
     val oled = LocalEmufiiOledTheme.current
-    // The tray's own ground at that edge, so the band reads as the wallpaper carrying on
-    // rather than as a panel laid over it.
     val ground = when {
         oled -> ShellOled
         fromTop -> if (dark) ShellDark else ShellLight
         else -> if (dark) ShellDarkLow else ShellLightLow
     }
-    // A flat gradient, not a second copy of the wallpaper. Redrawing the tray meant a
-    // second set of shelves, waves and halos to line up with the ones already on screen,
-    // and they did not: the band showed the same shapes twice. The band only ever had to
-    // hide what scrolls under the chrome, and a ground colour hides it just as well --
-    // with nothing in it that can be drawn out of step. It also drops the offscreen layer
-    // this used to need, measured at 3.7 ms a frame with two veils up on 2026-09-10.
-    // pourquoi : docs/decisions/coquille-ecrans.md § The header floats, and what that costs
     Canvas(modifier = modifier.fillMaxSize()) {
         val solid = band().toPx().coerceAtLeast(0f)
         val total = (solid + fade.toPx()).coerceAtMost(size.height)
@@ -337,10 +270,6 @@ fun WallpaperVeil(
     }
 }
 
-/**
- * Round, moulded, floating over the tray, with a drawn glyph inside.
- * pourquoi : docs/decisions/coquille-ecrans.md § The round button is a moulded disc
- */
 @Composable
 fun CircleIconButton(
     onClick: () -> Unit,
@@ -352,8 +281,6 @@ fun CircleIconButton(
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val pressed by interaction.collectIsPressedAsState()
-    // Travel on top of the material's own depression: on the two dark themes a plate that
-    // only loses its shadow loses almost nothing, there being little shadow to lose.
     val press by animateFloatAsState(
         targetValue = if (pressed) 0.92f else 1f,
         animationSpec = Motion.press(),
@@ -372,11 +299,6 @@ fun CircleIconButton(
     }
 }
 
-/**
- * The name of a group of rows, in the app's own voice: sentence case at body
- * weight, never a tracked uppercase eyebrow.
- * pourquoi : docs/decisions/coquille-ecrans.md § The group title speaks the app's voice
- */
 @Composable
 fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(
@@ -387,7 +309,6 @@ fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     )
 }
 
-/** Material's minimum touch target, and therefore a pill's height. */
 private val TOUCH_TARGET = 48.dp
 
 @Composable
@@ -396,44 +317,24 @@ fun GhostButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     tint: Color? = null,
-    /**
-     * True for a lone pill that takes the width of its card. Explicit, never
-     * inferred: the frame is what receives the caller's modifier.
-     * pourquoi : docs/decisions/coquille-ecrans.md § The label is centred both ways, and both are needed
-     */
     fillWidth: Boolean = false,
-    /** Drawn instead of the label; [label] still travels with it, as the spoken name. */
     icon: (@Composable (Color) -> Unit)? = null,
-    /**
-     * Laid before the label, which stays; distinct from [icon], which replaces it. A service
-     * logo, never a decorative pictogram.
-     * pourquoi : docs/decisions/reglages-ecran.md § The two outbound links, and their order
-     */
     leading: (@Composable () -> Unit)? = null
 ) {
     val accent = tint ?: MaterialTheme.colorScheme.primary
     val shape = RoundedCornerShape(50)
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
-    // Around the pill, never inside it, and the gap exists at all times: appearing on
-    // selection would make a row of pills jump.
-    // pourquoi : docs/decisions/coquille-ecrans.md § The ring surrounds the chip, it does not bite into it
     Box(modifier = modifier.controlRing(shape), propagateMinConstraints = true) {
     Surface(
         onClick = sounded(onClick),
         shape = shape,
         color = accent.copy(alpha = 0.12f),
         interactionSource = interaction,
-        // `Surface(onClick)` reserves 48 dp and draws its background smaller, which the
-        // ring followed.
-        // pourquoi : docs/decisions/coquille-ecrans.md § The chip is the size of its touch target
         modifier = Modifier
             .heightIn(min = TOUCH_TARGET)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier)
     ) {
-        // `textAlign` cannot do the vertical, and NO `fillMaxWidth` here: it broke any row
-        // of two unweighted pills.
-        // pourquoi : docs/decisions/coquille-ecrans.md § The label is centred both ways, and both are needed
         Box(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
@@ -519,8 +420,4 @@ fun AvatarStack(
 
 private val HEADER_HEIGHT = 44.dp
 
-/**
- * How far below the header the backdrop takes to become transparent again.
- * pourquoi : docs/decisions/coquille-ecrans.md § The header floats, and what that costs
- */
 private val FADE_HEIGHT = 32.dp

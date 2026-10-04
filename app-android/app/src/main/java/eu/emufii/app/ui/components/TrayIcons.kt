@@ -14,12 +14,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * A 24-unit square, round caps, round joins, one weight: anything added is drawn to
- * those three rules.
- * pourquoi : docs/decisions/lancement-et-navigation.md § The app's icons are drawn, not typed
- */
-
+/** 24-unit grid, round caps and joins, one stroke weight. */
 private const val WEIGHT = 2.6f / 24f
 
 @Composable
@@ -101,10 +96,6 @@ fun FolderMark(modifier: Modifier = Modifier, size: Dp = 44.dp, color: Color) =
         close()
     }
 
-/**
- * No triangle around the mark: an outline inside an outline reads as cramped.
- * pourquoi : docs/decisions/lancement-et-navigation.md § The app's icons are drawn, not typed
- */
 @Composable
 fun WarnIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
@@ -125,7 +116,6 @@ fun BlockedIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
         moveTo(7.2f * u, 7.2f * u); lineTo(16.8f * u, 16.8f * u)
     }
 
-/** Not tried yet: the quietest of the four marks, the other three being verdicts. */
 @Composable
 fun TildeIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
@@ -133,12 +123,6 @@ fun TildeIcon(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
         cubicTo(7f * u, 8.5f * u, 9.5f * u, 8.5f * u, 12f * u, 12f * u)
         cubicTo(14.5f * u, 15.5f * u, 17f * u, 15.5f * u, 19.5f * u, 10f * u)
     }
-
-/**
- * One mark per settings page: in a menu where every row looks alike, the eye finds a
- * page by its shape before reading its name.
- * pourquoi : docs/decisions/reglages-ecran.md § One icon per page, and not one more
- */
 
 @Composable
 fun PersonMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
@@ -244,10 +228,6 @@ fun InfoMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
         moveTo(12f * u, 7.6f * u); lineTo(12f * u, 7.6f * u)
     }
 
-/**
- * Two overlapping sheets: the front one full, the back one peeking out top and right,
- * the standard "duplicate" pictogram. Drawn on the same 24-unit grid as every other mark.
- */
 @Composable
 fun CopyMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
@@ -266,10 +246,6 @@ fun CopyMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
         lineTo(15.5f * u, 15f * u)
     }
 
-/**
- * The report page: an oval body with two antennae, two side legs and a spine down the
- * middle. Drawn on the same 24-unit grid as every other tray glyph.
- */
 @Composable
 fun BugMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->
@@ -299,10 +275,6 @@ fun PencilMark(modifier: Modifier = Modifier, size: Dp = 14.dp, color: Color) =
         moveTo(13.5f * u, 7f * u); lineTo(17f * u, 10.5f * u)
     }
 
-/**
- * It lived in two copies at different proportions; a glyph is the same everywhere.
- * pourquoi : docs/decisions/lancement-et-navigation.md § The app's icons are drawn, not typed
- */
 @Composable
 fun LensMark(modifier: Modifier = Modifier, size: Dp = 20.dp, color: Color) =
     TrayIcon(size, color, modifier) { u ->

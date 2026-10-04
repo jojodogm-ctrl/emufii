@@ -89,19 +89,9 @@ import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import kotlinx.coroutines.delay
 import eu.emufii.app.ui.tap
 
-/**
- * Every session currently open, joinable in one tap. Polled rather than listened to: a
- * socket would be a lot for a screen you stay on for twenty seconds.
- * pourquoi : docs/decisions/lancement-et-navigation.md § The session finder polls, it does not listen
- */
 @Composable
 fun SessionFinderScreen(
     client: CoordinatorClient,
-    /**
-     * Puts a face on a session: the coordinator knows only a title, matched here
-     * against what we hold locally.
-     * pourquoi : docs/decisions/lancement-et-navigation.md § The session finder polls, it does not listen
-     */
     romsRepo: RomsRepository,
     onBack: () -> Unit,
     onJoin: (OpenSession) -> Unit
@@ -110,32 +100,25 @@ fun SessionFinderScreen(
     var library by remember { mutableStateOf<List<Rom>>(emptyList()) }
     var query by remember { mutableStateOf("") }
 
-    // The cache, never a fresh scan: this list must not trigger a read of a
-    // multi-GB SAF tree.
     LaunchedEffect(Unit) {
         library = withContext(Dispatchers.IO) { runCatching { romsRepo.scan() }.getOrDefault(emptyList()) }
     }
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    // Read outside the effect: stringResource needs a composable scope, and the
-    // fallback used to be a French literal showing up in an English app.
     val unreachable = stringResource(R.string.finder_unreachable)
 
     LaunchedEffect(Unit) {
         while (true) {
             client.listSessions()
                 .onSuccess { sessions = it; error = null }
-                // Never `it.message`: an unreachable coordinator carries the
-                // IOException's text, which names a host and a port.
+                // Never it.message: it can leak the coordinator's host and port.
                 .onFailure { error = unreachable }
             loading = false
             delay(REFRESH_MS)
         }
     }
 
-    // The filter covers what is read on the card: the code is searched too, that
-    // being what a friend sends you in a message.
     val shown = remember(sessions, query) {
         val q = query.trim()
         if (q.isBlank()) sessions
@@ -147,8 +130,6 @@ fun SessionFinderScreen(
 
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    // The social domain: the pad cursor turns coral here.
-    // pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
     CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
     EmufiiScaffold(
         title = stringResource(R.string.finder_title),
@@ -168,8 +149,6 @@ fun SessionFinderScreen(
             )
 
             sessions.isEmpty() && query.isBlank() -> FinderMessage(
-                // A socket with its mark inside, as the grid's last row leaves an
-                // empty slot.
                 mark = { tint -> PersonMark(size = 40.dp, color = tint) },
                 hollow = true,
                 title = stringResource(R.string.finder_nobody_yet),
@@ -196,8 +175,6 @@ fun SessionFinderScreen(
                 item { SectionHeader(pluralSessions(shown.size)) }
                 if (shown.isEmpty()) {
                     item {
-                        // Not the empty-list wording: "nobody" would suggest the
-                        // sessions had vanished rather than been filtered out.
                         Text(
                             stringResource(R.string.finder_no_match),
                             style = MaterialTheme.typography.bodyMedium,
@@ -224,12 +201,6 @@ fun SessionFinderScreen(
     }
 }
 
-/**
- * The search bar. The system keyboard writes here: the socket existed to hold the IME
- * off and open the app's own keypad instead, at the price of a keyboard that is
- * nobody's. It stays a socket to the eye, with a field underneath.
- * pourquoi : docs/decisions/lancement-et-navigation.md § Search opens the app's keyboard
- */
 @Composable
 private fun SearchField(
     query: String,
@@ -261,7 +232,6 @@ private fun SearchField(
             onValueChange = onQueryChange,
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            // Search only lowers the keyboard: the list is filtered on every keystroke.
             keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = tint),
             cursorBrush = SolidColor(tint),
@@ -292,30 +262,20 @@ private fun SessionCard(
     val host = session.hostName?.let { playerDisplayName(it) }
         ?: stringResource(R.string.finder_host)
 
-    // Only knowable for a game we own: the coordinator publishes a title, not a
-    // console. A guest without the memory stick grant never receives the session
-    // address in PPSSPP.
     val ps2Blocked = rom?.console == Console.PS2 && !rememberPs2Ready()
     val pspBlocked = rom?.console == Console.PSP && !rememberPpssppReady()
     val joinBlocked = ps2Blocked || pspBlocked
 
-    // No `padEntry` here: a `FocusRequester` shared between twelve nodes points at
-    // nothing.
-    // pourquoi : docs/decisions/lancement-et-navigation.md § One named destination per screen
     SoftCard(onClick = onJoin, modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                // On the content, never on the card: animateContentSize opens with a
-                // clipToBounds, and above the card that rectangle cut the cursor's ring
-                // off square on all four sides.
+                // On the content, not the card: animateContentSize clips and would cut the ring.
                 .animateContentSize()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // The cover art when we have the game, the host otherwise: never an
-            // empty square.
             if (rom != null) RomArtwork(rom = rom, size = 64.dp)
             else Avatar(name = host, size = 56.dp)
 
@@ -331,11 +291,7 @@ private fun SessionCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    // The console comes from the local ROM: the coordinator does
-                    // not know it.
                     rom?.let { MetaChip(it.console.label) }
-                    // The ROM's identifier is what tells two editions of the same
-                    // game apart.
                     (rom?.titleIdHex ?: rom?.productCode)?.let { MetaChip(it) }
                     MetaChip(session.code, highlight = true)
                 }
@@ -359,8 +315,6 @@ private fun SessionCard(
                         onClick = onJoin
                     )
                 } else if (joinBlocked) {
-                    // Said here so the session does not look joinable: joining
-                    // would come back with the launch card's refusal.
                     Text(
                         stringResource(
                             if (ps2Blocked) R.string.finder_ps2_profile
@@ -389,7 +343,6 @@ private fun playersLabel(n: Int): String = when (n) {
     else -> stringResource(R.string.finder_n_players, n)
 }
 
-/** "3 sessions en cours" / "3 sessions in progress", plural per language. */
 @Composable
 private fun pluralSessions(count: Int): String {
     val sessions = if (count == 1) stringResource(R.string.finder_one_session, count)
@@ -403,25 +356,15 @@ private fun FinderMessage(
     title: String,
     subtitle: String,
     topPadding: androidx.compose.ui.unit.Dp,
-    /**
-     * The mark then sits in a socket rather than on a plate: the tray's word for
-     * nothing here is the hollow.
-     */
     hollow: Boolean = false
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            // The same margin top and bottom is what centres it: an empty screen has
-            // nothing else to look at, so the offset shows.
-            // pourquoi : docs/decisions/lancement-et-navigation.md § An empty screen is centred on the screen, not under the header
             .padding(top = topPadding, bottom = topPadding, start = 32.dp, end = 32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // A socket only when the screen speaks of an absence, and with its mark
-        // inside: bare, it reads as an icon that failed to load.
-        // pourquoi : docs/decisions/lancement-et-navigation.md § An empty screen is centred on the screen, not under the header
         Box(
             modifier = Modifier
                 .size(88.dp)
@@ -441,8 +384,6 @@ private fun FinderMessage(
         Text(
             title,
             style = MaterialTheme.typography.headlineSmall,
-            // This column sits straight on the wallpaper: a Text with no content
-            // colour falls back to black, invisible on the dark theme.
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
@@ -458,11 +399,6 @@ private fun FinderMessage(
 
 private const val REFRESH_MS = 4000L
 
-/**
- * A metadata pill: console, ROM id, session code. Pills rather than a sentence: a
- * sentence is read whole, pills are scanned.
- * pourquoi : docs/decisions/lancement-et-navigation.md § The session finder polls, it does not listen
- */
 @Composable
 private fun MetaChip(text: String, highlight: Boolean = false) {
     val dark = LocalEmufiiDarkTheme.current
@@ -472,8 +408,6 @@ private fun MetaChip(text: String, highlight: Boolean = false) {
         color = if (highlight) (if (dark) Teal.darkBright else Teal.ink)
                 else MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = 1,
-        // An ellipsis rather than the default hard clip: a word sliced mid-glyph
-        // reads as a rendering fault.
         overflow = TextOverflow.Ellipsis,
         modifier = Modifier
             .clip(RoundedCornerShape(50))

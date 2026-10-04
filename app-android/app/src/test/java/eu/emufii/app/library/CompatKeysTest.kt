@@ -4,10 +4,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * A rating given once has to reach the same game in every language. Each test is a pair
- * of regional dumps that must land on one key, or a pair that must never be confused.
- */
 class CompatKeysTest {
 
     @Test
@@ -23,8 +19,7 @@ class CompatKeysTest {
 
     @Test
     fun `a digital 3DS product code is read from its end, not its prefix`() {
-        // CTR-N- for a download, KTR-P- for a New 3DS title: matching on the prefix
-        // would need a list, and the list would be short one.
+        // CTR-N- is a download, KTR-P- a New 3DS title.
         assertTrue("3ds:ARR" in compatKeys(Console.THREE_DS, "CTR-N-ARRJ", null))
         assertTrue("3ds:ARR" in compatKeys(Console.THREE_DS, "KTR-P-ARRE", null))
     }
@@ -39,8 +34,7 @@ class CompatKeysTest {
 
     @Test
     fun `the DS key ignores the maker code, because no index publishes one`() {
-        // GameTDB keys DS titles on the four-character game code alone: keeping the
-        // maker code would mean the tool never writes a key the app matches.
+        // GameTDB keys DS titles on the four-character code alone.
         val a = compatKeys(Console.DS, "NDS-ADAE-01", null)
         val b = compatKeys(Console.DS, "NDS-ADAE-52", null)
         assertEquals(a, b)
@@ -63,8 +57,6 @@ class CompatKeysTest {
 
     @Test
     fun `the PSP and the PS2 are matched on the exact serial only`() {
-        // No family key: nothing links UCUS-98653 to UCES-00842 but a table, and a rule
-        // invented here would rate a game from its neighbour.
         assertEquals(listOf("psp:UCUS98653"), compatKeys(Console.PSP, "PSP-UCUS98653", null))
         assertEquals(listOf("ps2:SLES-50001"), compatKeys(Console.PS2, "SLES-50001", null))
     }
@@ -79,8 +71,6 @@ class CompatKeysTest {
 
     @Test
     fun `a ROM with no identifier yields no keys rather than a wrong one`() {
-        // Homebrew, or a dump too damaged to read, gets no badge: a fallback key would
-        // file every unreadable game under one verdict.
         assertTrue(compatKeys(Console.THREE_DS, null, null).isEmpty())
         assertTrue(compatKeys(Console.PS2, null, null).isEmpty())
     }

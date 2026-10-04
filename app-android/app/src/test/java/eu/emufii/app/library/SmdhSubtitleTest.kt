@@ -3,18 +3,8 @@ package eu.emufii.app.library
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/**
- * The short SMDH description truncates: A Link Between Worlds is called "The Legend of
- * Zelda" there, so two Zeldas carried the same name and the icon search brought back
- * whichever came first. Taking the long one systematically is worse: it is sometimes
- * cover-art copy.
- */
 class SmdhSubtitleTest {
 
-    /**
-     * The European dump: the separator is a line break, not punctuation. The rule's first
-     * version normalised whitespace before looking for the separator, and missed it.
-     */
     @Test
     fun `the SMDH's line break separates the title from its subtitle`() {
         assertEquals(

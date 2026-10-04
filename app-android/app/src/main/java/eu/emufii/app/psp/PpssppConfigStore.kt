@@ -19,11 +19,7 @@ sealed interface PpssppConfigResult {
     data class Failure(val detail: String) : PpssppConfigResult
 }
 
-/**
- * The one bridge stock PPSSPP exposes to another Android application: the player grants
- * its memory-stick tree once, and we edit only `PSP/SYSTEM/<DISC_ID>_ppsspp.ini`, which
- * PPSSPP loads as the game boots. No broad storage permission, root or fork involved.
- */
+/** Edits PSP/SYSTEM/<DISC_ID>_ppsspp.ini through a SAF grant on PPSSPP's memory stick; PPSSPP loads it at boot. */
 class PpssppConfigStore(context: Context) {
     private val appContext = context.applicationContext
     private val resolver = appContext.contentResolver
@@ -52,8 +48,6 @@ class PpssppConfigStore(context: Context) {
     fun configureRoot(uri: Uri): PpssppConfigResult {
         val previous = rootUri()
         if (previous != null && previous != uri && backupFiles().isNotEmpty()) {
-            // Those backups belong to the old memory stick: forgetting where they came
-            // from would strand its private-session values there.
             return PpssppConfigResult.ActiveOverrides
         }
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
@@ -73,7 +67,6 @@ class PpssppConfigStore(context: Context) {
         displayName: String?,
     ): PpssppConfigResult = apply(productCode, filename, displayName, PpssppIni::privateConfig)
 
-    /** Public ad hoc on PPSSPP's default server; restored like the private values. */
     fun applyPublic(
         productCode: String?,
         filename: String?,
@@ -110,7 +103,6 @@ class PpssppConfigStore(context: Context) {
         }.getOrElse { PpssppConfigResult.Failure(it.message ?: it.javaClass.simpleName) }
     }
 
-    /** Only the four values we borrowed, so changes made during the game survive. */
     fun restorePublic(
         productCode: String?,
         filename: String?,
@@ -159,8 +151,7 @@ class PpssppConfigStore(context: Context) {
         val psp = root.child("PSP")?.takeIf { it.isDirectory } ?: return null
         val system = psp.child("SYSTEM")?.takeIf { it.isDirectory } ?: return null
         val global = system.child("ppsspp.ini")?.takeIf { it.isFile } ?: return null
-        // Stronger than DocumentFile's capability flags, which some providers report
-        // optimistically.
+        // Stronger than DocumentFile's capability flags, which some providers overstate.
         runCatching { resolver.openInputStream(global.uri)?.use { it.read() } }.getOrNull()
             ?: return null
         return system

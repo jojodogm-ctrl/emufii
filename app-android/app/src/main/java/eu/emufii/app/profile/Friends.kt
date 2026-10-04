@@ -9,17 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * [name] is the last pseudo the coordinator reported, kept so the list still reads as
- * names once everyone is offline. It starts null: a friend who has not opened the app
- * has no name to look up.
- */
 data class Friend(
     val code: String,
     val name: String?,
     val addedAt: Long
 ) {
-    /** `E7K2-9QM4-XR8T`, the code as it is shown and shared. */
     val displayCode: String get() = FriendCode.format(code)
 }
 
@@ -41,21 +35,14 @@ data class FriendStatus(
 sealed interface AddFriendResult {
     data class Added(val friend: Friend) : AddFriendResult
 
-    /** Wrong length, stray characters, or a typo the checksum caught. */
     data object Invalid : AddFriendResult
 
     data object AlreadyAdded : AddFriendResult
 
-    /** Their own code: harmless, but it would sit in the list showing them their own game. */
     data object Self : AddFriendResult
 }
 
-/**
- * On this device and nowhere else. There is no server-side social graph: the coordinator
- * is only ever asked "which of these codes is online", and answers from a table it forgets
- * every couple of minutes. The consequence: this list does not follow the user to a new
- * phone.
- */
+/** Local only: no server-side social graph, so the list does not follow the user to a new phone. */
 class FriendStore private constructor(context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -117,13 +104,7 @@ class FriendStore private constructor(context: Context) {
     fun clear() = persist(emptyList())
 
     companion object {
-        /**
-         * One instance for the process: shared preferences are seen by every instance,
-         * the `StateFlow` in front of them is not. A second store built by the presence
-         * watcher wrote a freshly learnt name to disk and the screen went on showing the
-         * code until restart. On the Thor, 24 August: the notification said "Testeur"
-         * while the list still said `EMVF-11TE-ST0S`.
-         */
+        // One instance per process: a second store's StateFlow missed names written by the first.
         @Volatile
         private var instance: FriendStore? = null
 

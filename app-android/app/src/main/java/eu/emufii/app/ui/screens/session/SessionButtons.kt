@@ -84,19 +84,11 @@ import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.edgeColor
 import eu.emufii.app.ui.theme.plate
 
-/**
- * Green once the room is actually joined, not once the emulator was merely opened.
- * pourquoi : docs/decisions/session.md § Two proofs that a room exists, and the second is knowingly weaker
- */
 @Composable
 internal fun AutoSetupNetplayButton(
     session: Session,
     netplayDone: Boolean,
     netplayPrepared: Boolean,
-    /**
-     * The button greys out and says so rather than sending the guest to a room that does not exist.
-     * pourquoi : docs/decisions/session.md § Host then guest is not a comfort detail
-     */
     waitingForHost: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -149,9 +141,6 @@ private fun NetplayButtonContainer(
     val busy = LocalNetplayBusy.current && !netplayDone && !waitingForHost
     val primary = MaterialTheme.colorScheme.primary
     val onPrimary = MaterialTheme.colorScheme.onPrimary
-    // Three looks, all on the tint spring: greyed while the guest waits, the axis while
-    // there is something to do, green once the room exists.
-    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The auto-setup button, host and guest
     val container by animateColorAsState(
         when {
             netplayDone -> good()
@@ -167,9 +156,6 @@ private fun NetplayButtonContainer(
         label = "netplay-content"
     )
 
-    // The guest's own moment: the host has finished, and the greyed button wakes up with a
-    // pop and its sound. Only a change seen on this screen; a button already awake when the
-    // screen opens is simply awake.
     val on = rememberAnimationsEnabled()
     val wake = remember { Animatable(1f) }
     var wasWaiting by remember { mutableStateOf(waitingForHost) }
@@ -204,14 +190,8 @@ private fun NetplayButtonContainer(
                 scaleY = wake.value
             }
             .controlRing(ActionShape)
-            // Greyed out but still reachable: focus says where you are, not that a click lands.
-            // pourquoi : docs/decisions/session.md § Down aims at the first button that answers
             .then(if (enabled) Modifier else Modifier.focusable())
     ) {
-        // Host: the spinner while the automation drives the emulator, then the disc pops
-        // and the tick draws itself with the confirm sound. Guest: a quiet spinner in the
-        // greyed button while the host works.
-        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The auto-setup button, host and guest
         when {
             netplayDone -> {
                 DrawnCheck(
@@ -226,7 +206,6 @@ private fun NetplayButtonContainer(
                     color = content,
                     size = 18.dp,
                     stroke = 2.5.dp,
-                    // A guest may wait minutes on this.
                     fps = if (waitingForHost) 30 else 60,
                     modifier = Modifier.bloom(rememberAppear()::value, blur = 0.dp)
                 )
@@ -242,24 +221,19 @@ private fun NetplayButtonContainer(
                     netplayPrepared -> R.string.session_netplay_again
                     else -> netPlayReadyStrRes
                 },
-                // The emulator this session drives: "Azahar" was hard-coded in the string, so a
-                // Switch session announced the wrong program by name.
+                // Never hard-code the emulator name in the string.
                 session.backend.emulatorName
             )
         )
     }
 }
 
-/** Step 2 wakes once step 1's tick has drawn. */
 private const val WAKE_AFTER_TICK_MS = 380L
 
-/** Where the guest's button starts its wake-up pop: a small dip, then the overshoot. */
 private const val WAKE_FROM = 0.92f
 
-/** True while the automation fills the emulator's netplay form. */
 internal val LocalNetplayBusy = compositionLocalOf { false }
 
-/** A button's label changing: the old one blurs out as the new one blooms in. */
 @Composable
 private fun CrossLabel(text: String) {
     val enter: FiniteAnimationSpec<Float> = Motion.enter()
@@ -276,10 +250,6 @@ private fun CrossLabel(text: String) {
     }
 }
 
-/**
- * PPSSPP has no netplay to drive: this opens the emulator, and the label says exactly that.
- * pourquoi : docs/decisions/session.md § The per-console cards, and what each must prevent
- */
 @Composable
 internal fun PspSetupButton(
     pspOpened: Boolean,
@@ -328,9 +298,6 @@ internal fun LaunchButton(
     onClick: () -> Unit
 ) {
     val enabled = launchEnabled(session, netplayPrepared, directPs2, waitingForHost)
-    // Lights up once step 1 is done rather than switching: the colour runs on the tint
-    // spring, so the eye goes from the tick to this button.
-    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Colours
     val primary = MaterialTheme.colorScheme.primary
     val container by animateColorAsState(
         if (enabled) primary else primary.copy(alpha = 0.16f),
@@ -342,8 +309,6 @@ internal fun LaunchButton(
         Motion.tint(),
         label = "launch-content"
     )
-    // Step 2 lights up as step 1's tick lands: the same wake as the guest's, silent, the
-    // tick having just sounded.
     val on = rememberAnimationsEnabled()
     val wake = remember { Animatable(1f) }
     var wasEnabled by remember { mutableStateOf(enabled) }
@@ -352,7 +317,6 @@ internal fun LaunchButton(
     LaunchedEffect(enabled) {
         if (!wasEnabled && enabled && on) {
             awaitSeen(launchLifecycle)
-            // After the tick of step 1 has drawn, not over it.
             delay(WAKE_AFTER_TICK_MS)
             wake.snapTo(WAKE_FROM)
             wake.animateTo(1f, pop)
@@ -363,7 +327,6 @@ internal fun LaunchButton(
         onClick = sounded(onClick),
         enabled = enabled,
         shape = ActionShape,
-        // Material's grey-on-grey slab read as an absence rather than a button waiting for step 1.
         colors = ButtonDefaults.buttonColors(
             containerColor = container,
             contentColor = content,
@@ -386,40 +349,36 @@ internal fun LaunchButton(
     }
 }
 
-/**
- * pourquoi : docs/decisions/second-ecran.md § The panel takes the steps, because it is touch
- */
 @Composable
 internal fun launchLabel(
     session: Session,
     directPs2: Boolean,
     waitingForHost: Boolean
 ): String = when {
+    waitingForHost && session.backend == Backend.MELONDS ->
+        stringResource(R.string.session_ds_waiting_host)
     waitingForHost -> stringResource(
         R.string.session_netplay_waiting_host,
         session.backend.emulatorName,
     )
-    // Joining a game you do not own is a different case from an unsupported console.
     session.rom == null -> stringResource(R.string.session_no_rom)
     session.backend == Backend.AZAHAR ||
             session.backend == Backend.EDEN ||
             session.backend == Backend.PPSSPP ||
             session.backend == Backend.MELONDS ||
-            // The PS2 is included: ARMSX2's `MainActivity` is exported and takes a `content://`.
             session.backend == Backend.ARMSX2 ->
-        // Numbered only where a step 1 sits above it.
         stringResource(
             if (session.backend.hasNetplay && !directPs2) R.string.session_launch_step2
             else R.string.session_launch_emulation
         )
 
-    // Dolphin has no step 2, and saying so beats "not yet supported".
-    // pourquoi : docs/decisions/session.md § The per-console cards, and what each must prevent
     session.backend == Backend.DOLPHIN -> stringResource(R.string.session_dolphin_lobby)
     else -> stringResource(R.string.session_unsupported_short)
 }
 
-/** Greyed until the room step has run: launching first is what this pair prevents. */
+internal fun launchWaits(session: Session, directPs2: Boolean, waitingForHost: Boolean): Boolean =
+    (directPs2 || session.backend == Backend.MELONDS) && waitingForHost
+
 internal fun launchEnabled(
     session: Session,
     netplayPrepared: Boolean,
@@ -429,15 +388,10 @@ internal fun launchEnabled(
     session.rom != null && session.backend != Backend.NONE && !waitingForHost &&
             (!session.backend.hasNetplay || netplayPrepared || directPs2)
 
-/**
- * What you read out loud to someone else, so it stays visible at all times; a tap copies.
- * pourquoi : docs/decisions/session.md § This screen's drawing decisions
- */
 @Composable
 internal fun SessionCodeChip(code: String, onCopy: () -> Unit) {
     val dark = LocalEmufiiDarkTheme.current
     // Round with an explicit height, or `Surface(onClick)` reserves 48 dp and paints inside it.
-    // pourquoi : docs/decisions/theme-duotone-shelves.md § Session / Join, coral domain
     Surface(
         onClick = sounded(onCopy),
         shape = CircleShape,
@@ -466,8 +420,6 @@ internal fun SessionCodeChip(code: String, onCopy: () -> Unit) {
                 fontWeight = FontWeight.Black,
                 letterSpacing = 2.sp
             )
-            // Writes itself once, the first time the session has a code.
-            // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The session code writes itself
             if (code.isBlank()) Text("—", style = style, color = ink)
             else RevealCode(code, style = style, color = ink)
         }
@@ -490,12 +442,8 @@ internal fun LeaveButton(
     session: Session,
     onLeave: () -> Unit,
     modifier: Modifier = Modifier,
-    /** False in the header, where the button hugs the edge. */
     fillWidth: Boolean = true
 ) {
-    // A moulded pill like everything else pressable: the destructive control must not be the
-    // one made of nothing.
-    // pourquoi : docs/decisions/session.md § This screen's drawing decisions
     val dark = LocalEmufiiDarkTheme.current
     val oled = LocalEmufiiOledTheme.current
     val interaction = remember { MutableInteractionSource() }
@@ -518,11 +466,6 @@ internal fun LeaveButton(
     }
 }
 
-/**
- * Drawn rather than imported: it sits where it is put, where a glyph is centred on its line
- * box rather than its ink.
- * pourquoi : docs/decisions/session.md § This screen's drawing decisions
- */
 @Composable
 private fun CheckMark(color: Color, size: Dp = 18.dp) {
     Canvas(Modifier.size(size)) {

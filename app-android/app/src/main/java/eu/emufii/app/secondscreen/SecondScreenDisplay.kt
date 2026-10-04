@@ -12,14 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 
-/**
- * Measured on the Thor (`docs/PHASE1_SCOUT_THOR_SCREEN2.md`): the second screen is a plain
- * Android display, id 4, named `Screen-2`, 1240 x 1080 in use, carrying `FLAG_PRESENTATION`.
- * That flag is why no vendor SDK is involved, it puts the display in
- * [DisplayManager.DISPLAY_CATEGORY_PRESENTATION], the same route an HDMI dongle takes.
- * Nothing here is Thor-specific: hard-coding id 4 would break on the firmware that
- * renumbers it.
- */
+// Found by FLAG_PRESENTATION, never by id: firmware may renumber the display.
 @Composable
 fun rememberPresentationDisplay(): State<Display?> {
     val context = LocalContext.current
@@ -49,10 +42,7 @@ fun rememberPresentationDisplay(): State<Display?> {
     return state
 }
 
-/**
- * The Thor reports its panel present and `STATE_OFF` when the lid logic turns it down,
- * and a `Presentation` shown on it then throws rather than doing nothing quietly.
- */
+/** Skip STATE_OFF displays: showing a Presentation on one throws. */
 private fun DisplayManager.presentationDisplay(): Display? =
     getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)
         .firstOrNull { it.isValid && it.state == Display.STATE_ON }

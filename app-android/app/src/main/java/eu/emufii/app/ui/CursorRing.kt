@@ -25,12 +25,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-/**
- * The neon-tube cursor: a band around the control, its glow behind, and two white rules
- * giving it thickness. Every measure is a fraction of the band's width, itself a fraction
- * of the control's size. The older ring is one line away, see [FocusRingStyle].
- * pourquoi : docs/decisions/navigation-manette.md § The four layers of the neon cursor
- */
 @Composable
 fun Modifier.neonFocusRing(
     focused: Boolean,
@@ -38,9 +32,7 @@ fun Modifier.neonFocusRing(
     start: Color,
     end: Color,
     minBand: Dp,
-    /** 0.12 suits icons in an airy grid; on our tighter tiles the tube became the subject. */
     bandFraction: Float = 0.12f,
-    /** The ceiling, so a large tile does not end up inside a tube. */
     maxBand: Dp = 24.dp,
     inMs: Int,
     outMs: Int,
@@ -51,38 +43,24 @@ fun Modifier.neonFocusRing(
         animationSpec = tween(if (focused) inMs else outMs),
         label = "neon-ring"
     )
-    // Above the animation, and that is the point: a transition created higher up ran on
-    // all forty controls at once, forty invalidations a frame for one visible cursor.
     if (grow <= 0f) return this
 
-    /**
-     * Read here on purpose, not in the draw lambda: in composition the cursor and the
-     * background land in one pass, so a beat costs one repaint. Deferred to draw they
-     * invalidate separately and the app drew twice a beat, measured 2026-09-02.
-     * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
-     */
+    // Read in composition, not in draw, so cursor and background repaint in one pass.
     val step = rememberFlowStep()
 
     val paints = remember { NeonPaints() }
     return this.drawWithCache {
         val band = bandWidth(size, bandFraction, minBand, maxBand, density) * grow
         val radius = cornerRadiusOf(shape, size, density)
-        // Under 1.5 dp the rule disappears, over 4 it becomes a second band.
         val hair = (0.16f * band).coerceIn(1.5f * density.density, 4f * density.density)
-        // The 14 dp ceiling is what stops the glow becoming fog on large tiles.
         val blur = (0.7f * band).coerceIn(4f * density.density, 14f * density.density)
 
         val w = size.width
         val h = size.height
-        // Laid inwards on a 150 dp tile the band covered 18 dp of cover art per edge. What
-        // kept it in was a `shadow` placed before it in the chain, which clips by default.
-        // pourquoi : docs/decisions/navigation-manette.md § The ring surrounds, it does not clip
         val rOuter = radius + band
         val rInner = radius
 
-        // One rounded rectangle per path, never two: Skia rasterises everything else on
-        // the CPU, and the thickness animates.
-        // pourquoi : docs/decisions/navigation-manette.md § One rounded rectangle per path, never two
+        // One rounded rect per path; other shapes rasterise on the CPU.
         val midline = Path().apply {
             val half = band / 2f
             val r = (rOuter + rInner) / 2f
@@ -99,15 +77,13 @@ fun Modifier.neonFocusRing(
             addRoundRect(RectF(i, i, w - i, h - i), r, r, Path.Direction.CW)
         }
 
-        // Stacked strokes, not a blur: `BlurMaskFilter` has no GPU equivalent, Android
-        // draws the path on the CPU every frame. Three concentric strokes do it in hardware.
+        // Stacked strokes rather than BlurMaskFilter, which has no GPU path.
         val halo = listOf(
             (band + blur * 1.6f) to 0.16f,
             (band + blur * 0.8f) to 0.30f,
             band to 0.55f,
         )
 
-        // The fallback when the shape is too small for a full turn to read.
         val plain = LinearGradient(
             0f, -band, 0f, h + band,
             start.copy(alpha = start.alpha * grow).toArgb(),
@@ -153,18 +129,12 @@ fun Modifier.neonFocusRing(
     }
 }
 
-/** 12 % of the shorter side: a library tile gets a tube, a bar pill a thread. */
 private fun bandWidth(size: Size, fraction: Float, min: Dp, max: Dp, density: Density): Float {
     val floor = with(density) { min.toPx() }
     val ceiling = with(density) { max.toPx() }
     return (fraction * minOf(size.width, size.height)).coerceIn(floor, ceiling)
 }
 
-/**
- * The control's radius, read from its shape: a guessed radius would give a square ring
- * around a round button. Every shape the app draws is a [RoundedCornerShape]; for the
- * rest the outline is computed by the shape itself.
- */
 private fun cornerRadiusOf(shape: Shape, size: Size, density: Density): Float =
     if (shape is RoundedCornerShape) {
         shape.topStart.toPx(size, density)
@@ -177,10 +147,8 @@ private fun cornerRadiusOf(shape: Shape, size: Size, density: Density): Float =
         }
     }
 
-/** The four brushes, kept frame to frame: allocating costs more than drawing. */
 private class NeonPaints {
     val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
-    /** A stroke, not a fill: its thickness follows the arrival animation. */
     val band = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     val outer = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     val inner = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }

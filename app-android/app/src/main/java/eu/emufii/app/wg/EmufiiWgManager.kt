@@ -5,21 +5,13 @@ import android.content.Intent
 import android.net.VpnService
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * Starting a tunnel provisions nothing anywhere: the coordinator hands back an address
- * and how to reach the relay.
- */
 object EmufiiWgManager {
 
     val state: StateFlow<WgState> get() = EmufiiWgService.state
 
     fun prepare(ctx: Context): Intent? = VpnService.prepare(ctx)
 
-    /**
-     * Started as a foreground service, see the note in [EmufiiWgService] about `GoBackend`
-     * starting its own in the background. [announceDns] is true for the PS2 only; see
-     * [WgConfig.render]'s `dns` parameter for what that commits to.
-     */
+    /** Foreground service: GoBackend would otherwise start its own in the background. */
     fun start(ctx: Context, code: String, info: WgTunnelInfo, announceDns: Boolean = false) {
         val configText = WgConfig.render(
             info,

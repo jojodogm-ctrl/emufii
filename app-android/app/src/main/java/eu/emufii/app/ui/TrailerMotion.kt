@@ -55,18 +55,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.sin
 
-/*
- * The trailer's recipes, one function each so no screen copies one by hand.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
- */
-
-/**
- * Transparent, blurred and slightly small to sharp and whole. [progress] is read inside
- * the layer, so the animation redraws without recomposing. The blur exists only while
- * the thing is still arriving: above 0.995 the render effect is dropped, or the layer
- * would be blurred at zero radius for its whole life.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Blur is paid only in flight
- */
 fun Modifier.bloom(
     progress: () -> Float,
     blur: Dp = 12.dp,
@@ -82,19 +70,10 @@ fun Modifier.bloom(
     val r = (1f - a).coerceAtLeast(0f) * blur.toPx()
     val blurring = a < 0.995f && r > 0.5f
     renderEffect = if (blurring) BlurEffect(r, r, TileMode.Decal) else null
-    // Faded per draw, not through an offscreen buffer: a buffer is the layer's own size, and
-    // everything spilling out of it, the plate's shadow first, was cut square until the
-    // fade ended. Only a blur needs the buffer.
+    // Offscreen only while blurring: its buffer clips shadows outside the layer.
     compositingStrategy = if (blurring) CompositingStrategy.Offscreen else CompositingStrategy.ModulateAlpha
 }
 
-/**
- * An `AnimatedContent` child's fade, applied per draw. Compose's own `fadeIn` goes through
- * a buffer the child's size, which cuts the child's shadow square for the whole fade; pair
- * this with `EnterTransition.None` and `ExitTransition.None`, and the transition still
- * waits for it before removing the child.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Blur is paid only in flight
- */
 @Composable
 fun Modifier.fadeInPlace(
     transition: Transition<EnterExitState>,
@@ -111,9 +90,9 @@ fun Modifier.fadeInPlace(
     }
 }
 
-/** [fadeInPlace] as a container, so the shadows inside fade with it. */
+// Don't rename to FadeInPlace: case-insensitive filesystems merge its class with the modifier's.
 @Composable
-fun FadeInPlace(
+fun FadeInPlaceBox(
     transition: Transition<EnterExitState>,
     enter: FiniteAnimationSpec<Float>,
     exit: FiniteAnimationSpec<Float>,
@@ -133,28 +112,14 @@ fun FadeInPlace(
     }
 }
 
-/**
- * When the screen holding this was first composed. A row composed later than its own
- * cascade would have played, scrolled in or recomposed, arrives whole: the cascade is
- * the screen opening, not every row that ever enters the viewport.
- */
 val LocalScreenOpenedAt = compositionLocalOf { 0L }
 
-/** Rows past the eighth arrive with the eighth: a long list must not take seconds to fill. */
 private const val CASCADE_CAP = 7
 
 private const val CASCADE_STEP_MS = 60L
 
-/** Past this, a row joining the screen is not part of its opening any more. */
 private const val CASCADE_WINDOW_MS = 700L
 
-/**
- * One child of a card or list rising into place, [CASCADE_STEP_MS] after the one before;
- * with [pop], scaling up from nothing instead, for the one just added. A container rather
- * than a modifier: the shadows inside have to fade with it, see [LocalShadowFade]. No blur:
- * a list of twelve blurred rows is twelve offscreen layers at once.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Blur is paid only in flight
- */
 @Composable
 fun Cascade(
     index: Int,
@@ -180,7 +145,7 @@ fun Cascade(
             }
         }
     }
-    ShadowsFollow({ a.value }) {
+    ShadowsFollow({ a.value.coerceIn(0f, 1f).let { it * it * it * it } }) {
         Box(
             modifier
                 .bloom({ a.value }, blur = 0.dp, rise = if (pop) 0.dp else 12.dp, from = 0.985f)
@@ -192,17 +157,12 @@ fun Cascade(
     }
 }
 
-/** The shadows inside [content] fade with [progress], on top of any fade already above. */
 @Composable
 fun ShadowsFollow(progress: () -> Float, content: @Composable () -> Unit) {
     val outer = LocalShadowFade.current
     CompositionLocalProvider(LocalShadowFade provides { progress() * outer() }) { content() }
 }
 
-/**
- * Appears with [bloom] when [visible] turns true, leaves the same way, faster. Starts at
- * zero the first time, so a component composed already visible still blooms in.
- */
 @Composable
 fun rememberAppear(visible: Boolean = true, delayMs: Long = 0L): State<Float> {
     val on = rememberAnimationsEnabled()
@@ -220,17 +180,12 @@ fun rememberAppear(visible: Boolean = true, delayMs: Long = 0L): State<Float> {
     return a.asState()
 }
 
-/** True when composed as part of its screen opening, rather than arriving on it later. */
 @Composable
 fun rememberPartOfOpening(): Boolean {
     val openedAt = LocalScreenOpenedAt.current
     return remember { SystemClock.uptimeMillis() - openedAt < SETTLED_WINDOW_MS }
 }
 
-/**
- * Scale from nothing with [Motion.pop], so it passes its size once and settles, opacity
- * with [Motion.enter]. For an avatar joining, a status dot, a badge, a friend's tick.
- */
 @Composable
 fun Modifier.popIn(visible: Boolean = true, settled: Boolean = false): Modifier {
     val on = rememberAnimationsEnabled()
@@ -255,13 +210,6 @@ fun Modifier.popIn(visible: Boolean = true, settled: Boolean = false): Modifier 
     }
 }
 
-/**
- * An indicator that stretches as it travels: the edge in the direction of travel leaves
- * on a stiff spring, the other follows on a soft one, so it lengthens and closes up again
- * instead of sliding as a block. [start] and [end] are the two edges' offsets from the
- * track's origin, [end] already including the width.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The elastic indicator
- */
 class ElasticSpan(private val lead: State<Dp>, private val trail: State<Dp>, private val width: Dp) {
     val start: Dp get() = minOf(lead.value, trail.value)
     val end: Dp get() = maxOf(lead.value, trail.value) + width
@@ -284,19 +232,12 @@ fun rememberElastic(target: Dp, width: Dp): ElasticSpan {
     return remember(width) { ElasticSpan(lead, trail, width) }
 }
 
-/**
- * An arc turning at 420°/s whose length breathes, 60% ± 40% of its base at 5 rad/s. Its
- * own frame clock, not the app's slow one: it lives only on waiting screens, where it is
- * the one thing that moves, and at twelve steps a second it stutters.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Recipes
- */
 @Composable
 fun TrailerSpinner(
     color: Color,
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
     stroke: Dp = 4.dp,
-    /** Every repaint is the whole window's; a spinner left on for minutes asks for fewer. */
     fps: Int = 60,
 ) {
     val on = rememberAnimationsEnabled()
@@ -331,10 +272,6 @@ fun TrailerSpinner(
 
 private const val SPINNER_BASE_SWEEP = 200f
 
-/**
- * The circle pops, and 30 ms later the tick draws itself along its own path. The sound
- * goes with the tick, not the circle: it is the tick that says "done".
- */
 @Composable
 fun DrawnCheck(
     done: Boolean,
@@ -345,8 +282,6 @@ fun DrawnCheck(
     sound: Boolean = true,
 ) {
     val on = rememberAnimationsEnabled()
-    // Already done when the screen opened: it was done before, and is not news. Only a
-    // tick that turns true in front of the player pops, draws and sounds.
     val openedAt = LocalScreenOpenedAt.current
     val settled = remember { done && SystemClock.uptimeMillis() - openedAt < SETTLED_WINDOW_MS }
     val draw = remember { Animatable(if (done && (!on || settled)) 1f else 0f) }
@@ -393,15 +328,8 @@ fun DrawnCheck(
 
 private const val CHECK_AFTER_POP_MS = 30L
 
-/** Composed this soon after its screen: part of the screen, not an event on it. */
 private const val SETTLED_WINDOW_MS = 400L
 
-/**
- * A code writing itself: one character every 115 ms, each dropping 28 dp from a blur of
- * 8 dp onto [Motion.snapIn], with the tick sound. Plays once per code; a code shown again
- * after a recomposition stays written.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The session code writes itself
- */
 @Composable
 fun RevealCode(
     code: String,
@@ -432,17 +360,12 @@ fun RevealCode(
     }
 }
 
-/**
- * One character of a code, landing with [Motion.snapIn]: what the reveal writes and what
- * a keypad press drops into its slot. Starts in the air the first time it is composed.
- */
 @Composable
 fun CodeGlyph(
     text: String,
     landed: Boolean = true,
     style: TextStyle = LocalTextStyle.current,
     color: Color = Color.Unspecified,
-    /** Already in place when composed: a code shown again, not being written. */
     instant: Boolean = false,
 ) {
     val on = rememberAnimationsEnabled()
@@ -468,20 +391,12 @@ fun CodeGlyph(
 
 const val CODE_STEP_MS = 115L
 
-/** Codes already written this process: coming back to a session does not rewrite it. */
 private val revealed = mutableSetOf<String>()
 
-/**
- * Waits until the app is in front, then a beat. A step completes while the player is in
- * the emulator: played at once, its tick drew itself in the background and the player came
- * back to a finished button, never seeing it.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The auto-setup button, host and guest
- */
 suspend fun awaitSeen(lifecycle: Lifecycle) {
     if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return
     lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
     delay(SEEN_BEAT_MS)
 }
 
-/** Long enough for the screen to be looked at again after coming back. */
 private const val SEEN_BEAT_MS = 350L

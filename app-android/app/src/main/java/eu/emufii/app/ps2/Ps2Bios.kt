@@ -5,11 +5,7 @@ import java.nio.ByteOrder
 
 object Ps2Bios {
 
-    /**
-     * Reads `ROMVER` from the BIOS ROMDIR exactly like ARMSX2's BiosTools.cpp: 16-byte
-     * records, payloads from ROM offset zero packed on 16-byte boundaries, `ROMVER` a
-     * 14-byte ASCII string whose first four digits are major/minor (`0220E...`).
-     */
+    /** Reads ROMVER from ROMDIR like ARMSX2's BiosTools.cpp: 16-byte records, 16-byte aligned. */
     fun version(bytes: ByteArray): Int? {
         val directory = findResetRecord(bytes) ?: return null
         var record = directory
@@ -34,7 +30,7 @@ object Ps2Bios {
         return null
     }
 
-    /** The i.Link ID offset selected by ARMSX2's `getNvmLayout()`. */
+    /** Matches ARMSX2's getNvmLayout(). */
     fun ilinkOffset(version: Int): Int = if (version >= NEW_LAYOUT_VERSION) 0x1E0 else 0x1C0
 
     private fun findResetRecord(bytes: ByteArray): Int? {

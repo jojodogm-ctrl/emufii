@@ -117,16 +117,33 @@ room nobody opened. Logged, because both failures are identical from outside, a
 box that fills then refuses, and the only way to tell them apart is knowing which
 button was taken.
 
-## The nickname is written on Eden only
+## The nickname replaces a default, never a choice
 
-Two players with the same nickname cannot share a room, and Eden ships the same
-one to everybody by default: without this, two Emufii players introduce themselves
-there as the same person and the second is refused.
+Two players with the same nickname cannot share a room, and every emulator ships
+the same one to everybody by default: without this, two Emufii players introduce
+themselves as the same person and the second is refused.
 
-On Azahar the plan leaves it null, and that is not an oversight. Emufii used to
-write the profile name there, which replaced a valid nickname with a two-letter
-one the form refused, "Invalid address or name is too short!", a fault blamed on a
-perfectly good address.
+Eden and Dolphin get the profile name every time. Azahar gets it only over its
+default: an empty field, one under Azahar's five-character floor, or the shipped
+names (`AZAHAR`, and `Citra` / `Lime3DS` from older builds). A nickname the player
+set in Azahar stays. Two earlier rules each failed one way: writing the profile name
+unconditionally replaced a valid nickname and once put a two-letter one in, which the
+form refused as "Invalid address or name is too short!"; writing nothing left two
+fresh installs both called `AZAHAR`, refused on 2026-10-01 in a session between two
+AVDs. The profile name is padded to five characters with dots, as for Eden.
+
+## Azahar's update prompt is dismissed, never accepted
+
+Azahar asks about its own updates on opening, in a dialog that sits over every
+screen the driver looks for: nothing moves until someone answers, and the session
+looks frozen. The driver recognises it by Azahar's own `update_available` string, in
+every language Azahar ships, and presses the dialog's negative button. It never
+accepts: updating an emulator is the player's call, and a download mid-session would
+lose the room.
+
+A refused click is also looked at again rather than taken as final: a sheet still
+rising refuses `ACTION_CLICK`, seen on a portrait phone where it travels further. Six
+looks, three seconds, then the driver gives up as before.
 
 ## A recycling list does not contain what you have not seen yet
 

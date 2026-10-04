@@ -26,11 +26,7 @@ object Ps2GameSettings {
             Ps2NetworkProfile.rootUri(context) != null &&
             Ps2NetworkProfile.receipt(context) != null
 
-    /**
-     * A library last scanned by an older build holds ROM entries with no ELF CRC, and no
-     * rescan happens until the folder changes: the direct path then silently stays the old
-     * accessibility one. Hence reading the disc on demand when the fields are empty.
-     */
+    /** Libraries scanned by older builds lack the ELF CRC, so read the disc on demand. */
     suspend fun canConfigureNow(context: Context, rom: RomRef): Boolean = withContext(Dispatchers.IO) {
         rootAndCardPresent(context) && resolvedIdentity(context, rom) != null
     }
@@ -41,10 +37,7 @@ object Ps2GameSettings {
     private fun resolvedIdentity(context: Context, rom: RomRef): Ps2DiscIdentity? =
         identity(rom) ?: DiscImageReader(context).read(rom.uri)?.ps2Identity
 
-    /**
-     * ARMSX2 loads this layer after its global preferences, so network and Slot 1 apply to
-     * this boot alone; every graphics, speedhack and patch override is left untouched.
-     */
+    /** Per-game layer loaded after ARMSX2's globals; only network and Slot 1 are set. */
     fun apply(context: Context, rom: RomRef, plan: NetplayPlan): Outcome = runCatching {
         val identity = resolvedIdentity(context, rom) ?: return Outcome.UnknownDiscIdentity
         val rootUri = Ps2NetworkProfile.rootUri(context) ?: return Outcome.MissingFolderGrant
@@ -73,8 +66,6 @@ object Ps2GameSettings {
                     "EthEnable" to "true",
                     "EthApi" to "Local Link",
                     "LocalLinkHost" to host.toString(),
-                    // ARMSX2 ignores this in host mode; removing a previous guest's value
-                    // keeps the file an exact description.
                     "LocalLinkAddress" to if (host) null else WgConfig.PS2_HOST_NAME,
                     "LocalLinkPort" to plan.port.toString(),
                     "LocalLinkRoomCode" to room,
@@ -86,8 +77,7 @@ object Ps2GameSettings {
             ),
         )
 
-        // Some providers acknowledge a write and then publish a short file, hence a staging
-        // document verified before the existing override is touched.
+        // Some SAF providers ack a write then publish a short file: stage and verify first.
         val tempName = ".emufii-${identity.serial}-${identity.elfCrc}.tmp"
         settings.child(tempName)?.delete()
         val temp = settings.createFile("application/octet-stream", tempName)
@@ -108,17 +98,10 @@ object Ps2GameSettings {
         Outcome.Success(filename)
     }.getOrElse { Outcome.WriteFailed(it.message ?: it.javaClass.simpleName) }
 
-    /**
-     * A provider may rewrite a created document's name from its MIME type: on the Thor,
-     * `text/plain` turned `SLES-53501_02F4B541.ini` into `.ini.txt`, ARMSX2 loaded none of
-     * it, and every launch piled one more ` (1)` copy. `application/octet-stream` leaves the
-     * name alone there, a rename catches any other provider, and a failure is returned:
-     * a name ARMSX2 will not read is a launch with no network.
-     */
+    /** Some providers rename text/plain to .ini.txt, which ARMSX2 ignores. */
     private fun createExactFile(context: Context, dir: DocumentFile, filename: String): DocumentFile? {
         val created = dir.createFile("application/octet-stream", filename) ?: return null
         if (created.name.equals(filename, ignoreCase = true)) {
-            // Earlier runs may have left mangled names nothing will ever read.
             dir.listFiles().forEach { stale ->
                 val name = stale.name ?: return@forEach
                 if (stale.isFile && !name.equals(filename, ignoreCase = true) &&
@@ -149,10 +132,6 @@ object Ps2GameSettings {
         return Ps2DiscIdentity(serial, crc)
     }
 
-    /**
-     * A null value removes a key EmuFii owns; unknown lines, comments, blank lines, sections
-     * and their order are preserved verbatim.
-     */
     internal fun merge(
         original: String,
         changes: LinkedHashMap<String, LinkedHashMap<String, String?>>,

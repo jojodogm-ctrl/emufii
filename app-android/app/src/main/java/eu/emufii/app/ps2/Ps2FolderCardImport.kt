@@ -1,11 +1,5 @@
 package eu.emufii.app.ps2
 
-/**
- * Reads the saves out of a PCSX2 folder memory card, to be written into a card
- * image. `_pcsx2_index` is read for file order and never copied.
- * pourquoi : docs/decisions/ps2-carte-memoire.md § The folder's saves come onto the image, not the other way round
- * pourquoi : docs/decisions/ps2-carte-memoire.md § `_pcsx2_index` is read, never copied
- */
 object Ps2FolderCardImport {
 
     const val SUPERBLOCK = "_pcsx2_superblock"
@@ -13,12 +7,7 @@ object Ps2FolderCardImport {
 
     data class Save(val directory: String, val files: List<Pair<String, ByteArray>>)
 
-    /**
-     * One entry of the flow mapping. Escape both braces: Android compiles regexes
-     * with ICU, which rejects a bare `}` that the JVM accepts, so the desktop test
-     * passes while the device throws `PatternSyntaxException` from a static
-     * initialiser and every folder card reads as empty.
-     */
+    /** Both braces escaped: Android's ICU regex rejects a bare `}` that the JVM accepts. */
     private val ENTRY = Regex("""([^,{}\s][^,{}:]*)\s*:\s*\{([^}]*)\}""")
     private val ORDER = Regex("""\border\s*:\s*(\d+)""")
 

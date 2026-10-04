@@ -37,8 +37,6 @@ class RomHeaderReader(private val context: Context) {
                 partOffMediaUnits * MEDIA_UNIT
             }
             "NCCH" -> 0L
-            // A CIA wears none of the cartridge magics: its own header names the offset
-            // of its first content, and the NCCH starts there.
             else -> if (cia) contentOffset(header, ch.size()) ?: return null else return null
         }
 
@@ -74,15 +72,9 @@ class RomHeaderReader(private val context: Context) {
         )
     }
 
-    /**
-     * A plain `u32` at 0x18, but a file misidentified as a CIA reads garbage there: the
-     * value must land inside the file before anything is read at it, and the NCCH magic
-     * check at the destination does the rest.
-     */
     private fun contentOffset(header: ByteBuffer, fileSize: Long): Long? {
         val offset = header.getInt(0x18).toLong() and 0xFFFFFFFFL
-        // 0x2020 is the smallest real CIA: header + certificate chain + ticket
-        // + TMD, all 0x40-aligned, before a single byte of content.
+        // 0x2020 is the smallest real CIA (header, cert chain, ticket, TMD).
         return offset.takeIf { it in 0x2020 until fileSize }
     }
 

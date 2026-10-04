@@ -10,7 +10,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.Locale
 
-/** One entry of PPSSPP's own public ad hoc server list (`assets/adhoc-servers.json`). */
 data class PspServer(
     val name: String,
     val host: String,
@@ -21,24 +20,16 @@ data class PspServer(
     val statusXml: String? = null,
 )
 
-/** [players] is null when the server publishes no status, not when nobody is there. */
 data class PspServerPick(val server: PspServer, val players: Int?)
 
-/**
- * Picks where to play from who is already there: most servers publish, live, how many
- * players each game has, by disc ID. Servers are general-purpose; what differs is the
- * crowd, and a crowd is what a public lobby needs.
- */
 object PspServers {
 
-    /** PPSSPP's list, fetched fresh: servers come and go faster than our releases. */
     private const val LIST_URL =
         "https://raw.githubusercontent.com/hrydgard/ppsspp/master/assets/adhoc-servers.json"
 
-    /** PPSSPP's `DefaultProAdhocServer()`, and the first of its list. */
+    /** PPSSPP's DefaultProAdhocServer(). */
     const val DEFAULT_HOST = "socom.cc"
 
-    /** Offline or list unreachable: the busiest general servers of PPSSPP's list, 2026-09-28. */
     private val FALLBACK = listOf(
         PspServer("Socom Adhoc Server", "socom.cc", "France", "🇫🇷", "For players looking to play any games",
             statusXml = "https://www.socom.cc/status.xml"),
@@ -49,7 +40,6 @@ object PspServers {
             statusJson = "http://psi-hate.com:27315/data.json"),
     )
 
-    /** The player's pick for the next online launch; null lets [rank]'s first win. */
     @Volatile
     var chosenHost: String? = null
 
@@ -58,7 +48,6 @@ object PspServers {
         val picks = servers.map { server ->
             async(Dispatchers.IO) { PspServerPick(server, playersOn(server, discId, title)) }
         }.awaitAll()
-        // Most players first; unknown counts after known ones; PPSSPP's own order breaks ties.
         picks.withIndex().sortedWith(
             compareByDescending<IndexedValue<PspServerPick>> { it.value.players ?: -1 }
                 .thenBy { it.index }
@@ -105,13 +94,11 @@ object PspServers {
         return total
     }
 
-    /** The XML status carries names only, no disc ID. */
     internal fun countXml(xml: String, title: String): Int =
         Regex("<game name=\"([^\"]*)\" usercount=\"(\\d+)\"").findAll(xml)
             .filter { sameTitle(decode(it.groupValues[1]), title) }
             .sumOf { it.groupValues[2].toInt() }
 
-    /** Loose on purpose: servers name games their own way ("PES 2013: Pro Evolution Soccer"). */
     internal fun sameTitle(a: String, b: String): Boolean {
         val x = fold(a)
         val y = fold(b)

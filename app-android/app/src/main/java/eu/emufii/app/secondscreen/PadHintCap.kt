@@ -1,5 +1,21 @@
 package eu.emufii.app.secondscreen
 
+import androidx.compose.foundation.layout.Spacer
+import eu.emufii.app.ui.Motion
+import eu.emufii.app.ui.FadeInPlaceBox
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,11 +47,8 @@ import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.theme.plateColors
 
-/**
- * The front screen needs the legend too: one drawing of this motif, or the two drift.
- * pourquoi : docs/decisions/second-ecran.md § The legend, and why the symbols are drawn
- */
 @Composable
 fun PadHintRow(hint: PadHint, modifier: Modifier = Modifier) {
     Row(
@@ -52,35 +65,76 @@ fun PadHintRow(hint: PadHint, modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * The same legend at the foot of the front screen, for a machine showing one. The panel
- * carries it whenever there are two, and repeating it a foot apart is what the service
- * lamp already refuses to do.
- * pourquoi : docs/decisions/second-ecran.md § The legend, and why the symbols are drawn
- */
 @Composable
 fun PadLegendBar(legend: PadLegend, modifier: Modifier = Modifier) {
-    if (legend.isEmpty) return
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(18.dp), verticalAlignment = Alignment.CenterVertically) {
-            legend.left.forEach { PadHintRow(it) }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(18.dp), verticalAlignment = Alignment.CenterVertically) {
-            legend.right.forEach { PadHintRow(it) }
+        LegendSide(legend.left)
+        // A spacer, not SpaceBetween: with the left side gone, the right one stays right.
+        Spacer(Modifier.weight(1f))
+        LegendSide(legend.right)
+    }
+}
+
+@Composable
+private fun LegendSide(hints: List<PadHint>) {
+    var shown by remember { mutableStateOf(hints) }
+    if (hints.isNotEmpty()) shown = hints
+    val size = Motion.morph<IntSize>()
+    AnimatedVisibility(
+        visible = hints.isNotEmpty(),
+        enter = EnterTransition.None,
+        exit = ExitTransition.None
+    ) {
+        FadeInPlaceBox(transition, LEGEND_IN, LEGEND_OUT) {
+            LegendPill {
+                AnimatedContent(
+                    targetState = shown,
+                    transitionSpec = {
+                        (EnterTransition.None togetherWith ExitTransition.None)
+                            .using(SizeTransform(clip = false) { _, _ -> size })
+                    },
+                    label = "legend-words"
+                ) { words ->
+                    FadeInPlaceBox(transition, LEGEND_IN, LEGEND_OUT) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(18.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) { words.forEach { PadHintRow(it) } }
+                    }
+                }
+            }
         }
     }
 }
 
+private val LEGEND_OUT = tween<Float>(durationMillis = 110, easing = FastOutLinearInEasing)
+private val LEGEND_IN = tween<Float>(durationMillis = 170, delayMillis = 110, easing = LinearOutSlowInEasing)
+
+@Composable
+private fun LegendPill(content: @Composable () -> Unit) {
+    val dark = LocalEmufiiDarkTheme.current
+    val oled = LocalEmufiiOledTheme.current
+    Box(
+        modifier = Modifier
+            .plate(
+                PillShape,
+                dark = dark,
+                oled = oled,
+                lift = 3.dp,
+                fill = plateColors(dark, oled && dark).first().copy(alpha = LEGEND_FACE)
+            )
+            .padding(start = 6.dp, end = 14.dp, top = 5.dp, bottom = 5.dp),
+        contentAlignment = Alignment.CenterStart
+    ) { content() }
+}
+
+private const val LEGEND_FACE = 0.88f
+
 internal val LEGEND_CAP = 26.dp
 
-/**
- * Moulded like the machine's own: a plate, never a recess.
- * pourquoi : docs/decisions/second-ecran.md § The legend, and why the symbols are drawn
- */
 @Composable
 fun PadKeyCap(hint: PadHint) {
     val dark = LocalEmufiiDarkTheme.current
@@ -95,8 +149,6 @@ fun PadKeyCap(hint: PadHint) {
                 dark = dark,
                 oled = oled,
                 lift = 2.dp,
-                // A hint about holding shows a held button: no lift, no lit edge.
-                // pourquoi : docs/decisions/second-ecran.md § The legend, and why the symbols are drawn
                 pressed = hint.held
             )
     ) {
@@ -105,11 +157,6 @@ fun PadKeyCap(hint: PadHint) {
     }
 }
 
-/**
- * Laying the text out cannot centre a letter on its ink: the glyph is drawn and placed
- * from [android.graphics.Paint.getTextBounds], pen at `w/2 - (left + right)/2`.
- * pourquoi : docs/decisions/second-ecran.md § A letter is centred on its ink, not on its box
- */
 @Composable
 private fun CapLetter(glyph: String, tint: Color) {
     val context = LocalContext.current
@@ -119,8 +166,7 @@ private fun CapLetter(glyph: String, tint: Color) {
             typeface = runCatching { ResourcesCompat.getFont(context, R.font.rounded_bold) }
                 .getOrNull() ?: android.graphics.Typeface.DEFAULT_BOLD
             textSize = with(density) { 14.sp.toPx() }
-            // The pen is positioned from the ink bounds below; CENTER would subtract
-            // half an advance on top of it.
+            // Pen is placed from the ink bounds; CENTER would offset it twice.
             textAlign = android.graphics.Paint.Align.LEFT
             color = tint.toArgb()
         }
@@ -138,14 +184,9 @@ private fun CapLetter(glyph: String, tint: Color) {
     }
 }
 
-/**
- * The d-pad, drawn rather than typed.
- * pourquoi : docs/decisions/second-ecran.md § The legend, and why the symbols are drawn
- */
 @Composable
 private fun DPadGlyph(tint: Color) {
     Canvas(Modifier.size(10.dp)) {
-        // The proportion a moulded d-pad has: thinner reads as a mathematical plus.
         val arm = size.width * 0.38f
         val radius = CornerRadius(size.width * 0.06f, size.width * 0.06f)
         drawRoundRect(
@@ -163,10 +204,6 @@ private fun DPadGlyph(tint: Color) {
     }
 }
 
-/**
- * The Thor's button mode (Standard, Nintendo layout = 0, Xbox = 1), read live from
- * `Settings.System.flip_button_layout`. Absent on other devices: Standard.
- */
 @Composable
 fun rememberButtonsFlipped(): Boolean {
     val resolver = LocalContext.current.applicationContext.contentResolver

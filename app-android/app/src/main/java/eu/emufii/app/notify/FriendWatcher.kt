@@ -23,9 +23,18 @@ class FriendWatcher(context: Context, private val client: CoordinatorClient) {
     private val _statuses = MutableStateFlow<Map<String, FriendStatus>>(emptyMap())
     val statuses: StateFlow<Map<String, FriendStatus>> = _statuses.asStateFlow()
 
-    /** Replay of one: an alert raised just before a screen change must not be lost. */
+    private val _lastGames = MutableStateFlow<Map<String, eu.emufii.app.network.LastGame>>(emptyMap())
+    val lastGames: StateFlow<Map<String, eu.emufii.app.network.LastGame>> = _lastGames.asStateFlow()
+
+    private val avatars = eu.emufii.app.profile.AvatarSync.get(appContext)
+
+    // Replay one so an alert raised just before a screen change is not lost.
     private val _alerts = MutableSharedFlow<FriendEvent>(replay = 1, extraBufferCapacity = 8)
     val alerts: SharedFlow<FriendEvent> = _alerts.asSharedFlow()
+
+    fun debugEmit(event: FriendEvent) {
+        if (eu.emufii.app.BuildConfig.DEBUG) _alerts.tryEmit(event)
+    }
 
     suspend fun run(codes: List<String>) {
         while (true) {
@@ -40,7 +49,8 @@ class FriendWatcher(context: Context, private val client: CoordinatorClient) {
             return
         }
 
-        val fresh = client.friendStatuses(codes).getOrNull() ?: return
+        val reply = client.friendStatuses(codes).getOrNull() ?: return
+        val fresh = reply.present
         val current = codes.associateWith { code ->
             fresh[code]?.let {
                 FriendStatus(
@@ -54,13 +64,14 @@ class FriendWatcher(context: Context, private val client: CoordinatorClient) {
             } ?: FriendStatus.Offline
         }
         _statuses.value = current
+        _lastGames.value = reply.lastGames
+        avatars.syncFriends(client, codes, reply.avatars)
 
         val known = store.friends.value.associate { it.code to it.name }
         val names = codes.associateWith { fresh[it]?.name ?: known[it] }
-        store.noteNames(fresh.mapNotNull { (c, p) -> p.name?.let { c to it } }.toMap())
+        store.noteNames(reply.names + fresh.mapNotNull { (c, p) -> p.name?.let { c to it } }.toMap())
 
-        // The memory advances whether or not anything is announced: alerts switched off
-        // must not come back as a burst of everything that happened meanwhile.
+        // Advance the memory even when alerts are off, or they come back as a burst.
         val events = friendEvents(state.seen(), current, names)
         state.setSeen(seenFrom(current))
 

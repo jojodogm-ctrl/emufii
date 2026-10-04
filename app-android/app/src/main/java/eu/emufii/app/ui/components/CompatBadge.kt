@@ -30,10 +30,6 @@ import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.theme.WarnDark
 import eu.emufii.app.ui.theme.WarnLight
 
-/**
- * Fixed colours, never the chosen accent: a verdict is the same fact for every player.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § The compatibility badge is the documented exception to the single accent
- */
 @Composable
 fun CompatBadge(rating: CompatRating, modifier: Modifier = Modifier) {
     val fill = when (rating) {
@@ -71,11 +67,6 @@ fun CompatBadge(rating: CompatRating, modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * Light cut down to the axis's ink, so the bead reads lit from above with no hex of its
- * own; the glyph stays white, so the top of each pair must carry white.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § Semantics (centralised)
- */
 private val GreenBead = listOf(GoodLight, Teal.ink)
 private val AmberBead = listOf(WarnLight, WarnDark)
 private val RedBead = listOf(ErrorLight, Coral.ink)

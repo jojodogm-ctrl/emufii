@@ -7,13 +7,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-/**
- * Where the app goes for real game icons. Icons, never vertical cover art. Nothing is
- * bundled in the APK and each player brings their own key: with none, no request leaves
- * and the tiles keep their built-in icon.
- * pourquoi : docs/decisions/jaquettes.md § The icon, never the box art
- * pourquoi : docs/decisions/jaquettes.md § Every player brings their own key
- */
 data class SgdbGame(val id: Int, val name: String)
 
 data class SgdbIcon(val url: String, val thumb: String, val px: Int)
@@ -23,14 +16,8 @@ object SteamGridDb {
     private const val BASE = "https://www.steamgriddb.com/api/v2"
     private const val TIMEOUT_MS = 6000
 
-    /** The tiles are ~150 dp: a 64 px icon would be as blurry as the ROM's, with a
-     * network round trip on top. */
     private const val MIN_PX = 128
 
-    /**
-     * Null means "no icon", never "error": network down, quota exceeded, unknown
-     * title all answer the same way, the caller having nothing different to do.
-     */
     suspend fun iconUrl(title: String, apiKey: String): String? = withContext(Dispatchers.IO) {
         if (apiKey.isBlank()) return@withContext null
         runCatching {
@@ -55,10 +42,6 @@ object SteamGridDb {
             }.getOrDefault(emptyList())
         }
 
-    /**
-     * Largest first, and deliberately without [bestIconUrl]'s size filter: here the
-     * player's eye decides, where the automatic choice has nobody to judge.
-     */
     suspend fun icons(gameId: Int, apiKey: String): List<SgdbIcon> =
         withContext(Dispatchers.IO) {
             if (apiKey.isBlank()) return@withContext emptyList()
@@ -87,11 +70,7 @@ object SteamGridDb {
         return data.getJSONObject(0).optInt("id").takeIf { it != 0 }
     }
 
-    /**
-     * Size first, rating only to break ties: the flaw being fixed is resolution, and
-     * a much-loved icon at 64 px fixes nothing. `types=static` rules out animated
-     * ones, twenty tiles moving together being unreadable and battery for nothing.
-     */
+    /** Size first, rating breaks ties. types=static excludes animated icons. */
     private fun bestIconUrl(gameId: Int, apiKey: String): String? {
         val url = "$BASE/icons/game/$gameId?types=static&nsfw=false&humor=false"
         val json = get(url, apiKey) ?: return null
@@ -114,11 +93,7 @@ object SteamGridDb {
         return bestUrl
     }
 
-    /**
-     * Dumps drag their origin along, `(USA)`, `[!]`, `(Rev 1)`, and no game catalogue
-     * carries those marks. The console suffix (`3D`, `3DS`) is kept: it is often part
-     * of the real title ("Ocarina of Time 3D").
-     */
+    /** Strips dump tags like (USA), [!], (Rev 1); keeps console suffixes such as 3D. */
     internal fun searchTerm(title: String): String =
         title
             .replace(Regex("""[\(\[][^)\]]*[\)\]]"""), " ")

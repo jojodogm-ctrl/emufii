@@ -1,13 +1,6 @@
 package eu.emufii.app.library
 
-/**
- * A `.nds` header points at a banner block (offset `0x068`) holding a 32×32 icon, 4 bits
- * per pixel, 8×8 tiles, one 16-colour palette, and the title in up to eight languages: that
- * is where "Pokémon Version Blanche 2" lives, against the `white2.nds` of a filename.
- *
- * Pure, so the tile and palette arithmetic tests without a device; [NdsBannerReader] does
- * the I/O and the Bitmap. Same split as the 3DS side.
- */
+/** Banner block at header `0x068`: 32x32 4bpp tiled icon, 16-colour palette, titles in up to eight languages. */
 object NdsBanner {
 
     const val HEADER_BANNER_OFFSET = 0x068
@@ -23,14 +16,10 @@ object NdsBanner {
     private const val TITLES_OFFSET = 0x240
     private const val TITLE_ENTRY_SIZE = 0x100
 
-    /** Enough to cover the Japanese..Spanish titles every banner version has. */
     const val MIN_BANNER_SIZE = TITLES_OFFSET + 6 * TITLE_ENTRY_SIZE
 
 
-    /**
-     * ARGB_8888, row-major. Palette index 0 is transparent by definition on this hardware,
-     * not by convention: treating it as a colour turns these icons into black squares.
-     */
+    /** Palette index 0 is transparent on this hardware. */
     fun decodeIcon(banner: ByteArray): IntArray? {
         if (banner.size < PALETTE_OFFSET + 32) return null
 
@@ -63,16 +52,7 @@ object NdsBanner {
         return pixels
     }
 
-    /**
-     * The last line is the publisher and the ones before it the title, by convention, and
-     * the shape varies by cartridge. Checked against three real dumps:
-     *
-     * - `Pokémon\nWhite Version 2\nNintendo`      → "Pokémon White Version 2"
-     * - `Pokémon SoulSilver\nNintendo`            → "Pokémon SoulSilver"
-     * - `Inazuma Eleven 2\nBlizzard\nNintendo`    → "Inazuma Eleven 2 Blizzard"
-     *
-     * Taking the first line alone, as this once did, leaves a bare "Pokémon".
-     */
+    /** Last line is the publisher; earlier lines are the title. */
     fun pickTitle(banner: ByteArray): String? {
         for (language in TitleLanguage.ndsBanner) {
             val base = TITLES_OFFSET + language * TITLE_ENTRY_SIZE
@@ -93,10 +73,7 @@ object NdsBanner {
         return null
     }
 
-    /**
-     * Icon cache key: 4-letter game code plus 2-letter maker code, `NDS-IRBO-01`. Distinct
-     * per game *and* region, two regional releases having different icons.
-     */
+    /** Game code plus maker code: regions have different icons. */
     fun cacheKey(header: ByteArray): String? {
         if (header.size < HEADER_MAKER_CODE_OFFSET + 2) return null
         val gameCode = readAscii(header, HEADER_GAME_CODE_OFFSET, 4)
@@ -105,7 +82,6 @@ object NdsBanner {
         return "NDS-$gameCode-$makerCode".filter { it.isLetterOrDigit() || it == '-' }
     }
 
-    /** Where the banner sits, read from the header. Zero means "no banner". */
     fun bannerOffset(header: ByteArray): Long? {
         if (header.size < HEADER_BANNER_OFFSET + 4) return null
         var value = 0L
@@ -115,7 +91,6 @@ object NdsBanner {
         return value.takeIf { it > 0 }
     }
 
-    /** The 12-byte internal title, a usable fallback when the banner is absent. */
     fun internalTitle(header: ByteArray): String? =
         readAscii(header, HEADER_INTERNAL_TITLE_OFFSET, 12).takeIf { it.isNotBlank() }
 
@@ -140,7 +115,7 @@ object NdsBanner {
         return String(data, offset, end - offset, Charsets.UTF_16LE)
     }
 
-    /** DS palettes are 15-bit with red in the low bits: `xBBBBBGGGGGRRRRR`. */
+    /** 15-bit, red in the low bits: `xBBBBBGGGGGRRRRR`. */
     private fun bgr555ToArgb8888(value: Int): Int {
         val r5 = value and 0x1F
         val g5 = (value shr 5) and 0x1F

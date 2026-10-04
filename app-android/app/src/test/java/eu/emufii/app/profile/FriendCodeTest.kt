@@ -39,10 +39,8 @@ class FriendCodeTest {
         assertEquals(code, FriendCode.normalize(messy))
     }
 
-    /** Someone reading a code off a screen types the letter for the digit. */
     @Test
     fun `letters that look like digits are read as digits`() {
-        // Build a code whose body contains 0 and 1, then type it the wrong way.
         val body = "0123456789A"
         val code = FriendCode.normalize(body + checksumOf(body))
             ?: error("fixture should be a valid code")
@@ -53,7 +51,6 @@ class FriendCodeTest {
     @Test
     fun `a single wrong character is rejected`() {
         val code = FriendCode.generate()
-        // Change the first symbol to a different one; the checksum must notice.
         val wrong = FriendCode.ALPHABET.first { it != code[0] }
         assertNull(FriendCode.normalize(wrong + code.drop(1)))
     }
@@ -93,7 +90,6 @@ class FriendCodeTest {
         assertNull(FriendCode.normalize("*" + code.drop(1)))
     }
 
-    /** Mirrors the private checksum, so the fixture above is a real code. */
     private fun checksumOf(body: String): Char {
         var acc = 0
         for ((index, symbol) in body.withIndex()) {

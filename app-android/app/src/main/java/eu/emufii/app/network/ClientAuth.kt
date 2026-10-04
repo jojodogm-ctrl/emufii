@@ -5,32 +5,22 @@ import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-/**
- * What tells Emufii apart from `curl` in the coordinator's eyes. `HMAC-SHA256(secret,
- * method + "\n" + path + "\n" + timestamp + "\n" + SHA-256(body))`, lowercase hex. The
- * body enters the computation; the timestamp bounds replay.
- * pourquoi : docs/decisions/coordinator-et-mise-a-jour.md § Signing the client changes the cost, not the identity
- */
+/** HMAC-SHA256(secret, method\npath\ntimestamp\nSHA-256(body)), lowercase hex. */
 object ClientAuth {
 
     const val HEADER_AUTH = "X-Emufii-Auth"
 
-    /** In seconds. */
     const val HEADER_TIMESTAMP = "X-Emufii-Ts"
 
     const val HEADER_CLIENT = "X-Emufii-Client"
 
-    /**
-     * Empty on a build that received no key: it signs nothing, and the local coordinator
-     * decides to accept it, so development never needs the production secret.
-     */
+    /** Empty on builds without a key: requests go unsigned. */
     private val secret: String get() = BuildConfig.CLIENT_SECRET
 
     val isConfigured: Boolean get() = secret.isNotEmpty()
 
     val clientVersion: String get() = BuildConfig.VERSION_CODE.toString()
 
-    /** [timestampSeconds] is a parameter so the test can freeze the clock; the app never passes it. */
     fun sign(
         method: String,
         path: String,

@@ -5,10 +5,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/**
- * A plan must survive Emufii being killed, which Android did on every emulator launch on
- * the bench, and must not survive the session that justified it: the clock is wound.
- */
 class PlanCodecTest {
 
     private val plan = NetplayPlan(

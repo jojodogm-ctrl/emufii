@@ -4,24 +4,14 @@ import android.graphics.Bitmap
 import kotlin.math.max
 import kotlin.math.min
 
-/**
- * The one colour that stands for a game, pulled out of its own artwork.
- *
- * A flat average gives mud, most artwork being mostly background: pixels are weighted
- * by saturation, which is what makes Pokémon Red read as red rather than as the grey
- * of its border. Pure, and takes an [IntArray], so it is tested off-device.
- */
+/** Saturation-weighted average: a flat one is dominated by background. */
 object IconAccent {
 
-    /** Ignore near-transparent pixels: DS icons use index 0 as a hole. */
+    /** DS icons use index 0 as transparency. */
     private const val MIN_ALPHA = 128
 
     private const val MIN_SATURATION = 0.18f
 
-    /**
-     * A saturation-weighted average of [pixels] (ARGB_8888), or null for artwork with no
-     * colour worth borrowing: a black-and-white icon falls back to the neutral chrome.
-     */
     fun fromPixels(pixels: IntArray): Int? {
         var weightSum = 0f
         var r = 0f
@@ -43,7 +33,6 @@ object IconAccent {
             val saturation = (maxC - minC).toFloat() / maxC
             if (saturation < MIN_SATURATION) continue
 
-            // Squared so a genuinely vivid pixel outvotes a dozen washed-out ones.
             val weight = saturation * saturation
             weightSum += weight
             r += pr * weight
@@ -61,8 +50,6 @@ object IconAccent {
     }
 
     fun fromBitmap(bitmap: Bitmap): Int? {
-        // A 32x32 sample is plenty for an average and costs nothing: DS icons are
-        // that size already, and 3DS ones are 48x48.
         val width = minOf(bitmap.width, 48)
         val height = minOf(bitmap.height, 48)
         if (width <= 0 || height <= 0) return null

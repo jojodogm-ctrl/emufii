@@ -10,22 +10,11 @@ import eu.emufii.app.azahar.NetplayPlan
 import eu.emufii.app.azahar.NetplayProgress
 import eu.emufii.app.netplay.NetplayLabels
 
-/**
- * Fills Dolphin's Netplay Setup screen with the address Emufii already knows.
- * Separate from the Azahar/Eden walk on purpose, so a Dolphin change cannot
- * break a 3DS or Switch session. Best-effort, like its sibling.
- * pourquoi : docs/decisions/pilotes-emulateurs.md § Reading a Compose form with no id at all
- */
 class DolphinNetplayDriver(
     private val context: Context,
     private val onFinished: (success: Boolean) -> Unit
 ) {
 
-    /**
-     * Resolved labels, read once: each costs ~30 lookups across every locale
-     * Dolphin might run in, and they cannot change while it runs.
-     * pourquoi : docs/decisions/pilotes-emulateurs.md § The labels are resolved once
-     */
     private val labels = HashMap<String, List<String>>()
 
     private var navClicks = 0
@@ -33,11 +22,8 @@ class DolphinNetplayDriver(
 
     private var lobbyClicks = 0
 
-    /** Returns true if this pass advanced the flow. */
     fun step(root: AccessibilityNodeInfo, pkg: String, plan: NetplayPlan): Boolean {
-        // Reset before the screen is read: the furthest-along steps come first, so
-        // a ceiling inherited from the previous session would block the lobby on the
-        // very first pass.
+        // Reset before reading the screen, or a ceiling from the last session blocks the lobby.
         if (navPlan !== plan) {
             navPlan = plan
             navClicks = 0
@@ -48,19 +34,13 @@ class DolphinNetplayDriver(
         val nodes = flatten(root)
         val direct = labelsFor(pkg, DolphinTarget.LABEL_DIRECT_CONNECTION)
         val traversal = labelsFor(pkg, DolphinTarget.LABEL_TRAVERSAL_SERVER)
-        // Without this trace, a silent driver and a driver that was never called are
-        // indistinguishable.
         Log.d(TAG, "pass: ${nodes.size} nodes, direct=${direct.size} labels")
 
-        // The lobby FIRST because it is the last screen: the form is behind us and
-        // must not be touched again.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The order of the screens, and the two traps it avoids
+        // Lobby first: it is the last screen and the form must not be touched again.
         val gameField = DolphinScreen.fieldFor(nodes, labelsFor(pkg, DolphinTarget.LABEL_GAME))
         if (gameField != null) return settleLobby(gameField, plan)
 
-        // `lobbyClicks > 0` is NOT a detail: without it this fires on Dolphin's
-        // start-up grid and launches the game.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The order of the screens, and the two traps it avoids
+        // `lobbyClicks > 0` matters: without it this fires on the start-up grid and launches the game.
         val wantedGame = plan.preferredGame
         if (wantedGame != null && lobbyClicks > 0 && nodes.none { it.isField }) {
             DolphinScreen.looseOption(nodes, wantedGame)?.let {
@@ -69,9 +49,7 @@ class DolphinNetplayDriver(
             }
         }
 
-        // Direct connection, never Traversal: it would route through Dolphin's STUN
-        // server and remove the port field entirely.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The order of the screens, and the two traps it avoids
+        // Direct connection, never Traversal: Traversal removes the port field.
         if (DolphinScreen.isDropdownOpen(nodes, direct, traversal)) {
             val option = DolphinScreen.option(nodes, direct)
             if (option == null) {
@@ -87,17 +65,12 @@ class DolphinNetplayDriver(
             return fillForm(nodes, pkg, plan, direct)
         }
 
-        // Capped below here: we are walking the player towards a screen they did not
-        // ask for. The ceiling is the moment to photograph.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The navigation cap is the moment to photograph
         if (navClicks >= MAX_NAV_CLICKS) {
             DolphinTreeDump.capture(context, pkg, nodes, "plafond de $MAX_NAV_CLICKS clics de navigation atteint")
             return false
         }
 
-        // The netplay row by TEXT not by id: appcompat renders titles into a view
-        // carrying `id/title`, so the item id never reaches the tree.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The overflow button is found by its shape
+        // By text: appcompat renders menu titles into `id/title`, so the item id is not in the tree.
         DolphinScreen.option(nodes, labelsFor(pkg, DolphinTarget.LABEL_MENU_NETPLAY))?.let {
             Log.d(TAG, "opening netplay from the grid menu")
             NetplayAutomation.report(NetplayProgress.OpeningMenu)
@@ -117,10 +90,6 @@ class DolphinNetplayDriver(
         return overflow.live.click()
     }
 
-    /**
-     * Never click "Start": that is the host's decision, not ours.
-     * pourquoi : docs/decisions/pilotes-emulateurs.md § The order of the screens, and the two traps it avoids
-     */
     private fun settleLobby(gameField: Node, plan: NetplayPlan): Boolean {
         val wanted = plan.preferredGame
         // The guest does not choose the game: for them the lobby is the destination.
@@ -134,8 +103,6 @@ class DolphinNetplayDriver(
             finishInLobby()
             return true
         }
-        // If the list does not open, or the title is not in it, stop clicking the
-        // field under the player's nose: the connection itself is made.
         if (lobbyClicks >= MAX_LOBBY_CLICKS) {
             Log.w(TAG, "game \"$wanted\" not in the list, room left as is")
             finishInLobby()
@@ -165,9 +132,7 @@ class DolphinNetplayDriver(
         )
         val ipLabels = labelsFor(pkg, DolphinTarget.LABEL_IP_ADDRESS)
 
-        // Connect and Host are two different forms, and the host's has no address
-        // field at all, which is what tells them apart without reading a tab: typing
-        // first would put the address into whichever form was showing.
+        // The host form has no address field; that is how the tabs are told apart.
         val onHostTab = DolphinScreen.fieldFor(nodes, ipLabels) == null
         if (onHostTab != hosting) {
             val tab = DolphinScreen.tab(nodes, roleLabels)
@@ -180,9 +145,7 @@ class DolphinNetplayDriver(
             return tab.live.click()
         }
 
-        // Connection type BEFORE anything is typed: switching it rebuilds the form.
-        // One shared setting behind both tabs, so set once.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The order of the screens, and the two traps it avoids
+        // Set connection type before typing: switching it rebuilds the form.
         val typeField = DolphinScreen.fieldFor(
             nodes,
             labelsFor(pkg, DolphinTarget.LABEL_CONNECTION_TYPE)
@@ -209,15 +172,11 @@ class DolphinNetplayDriver(
         DolphinScreen.fieldFor(nodes, labelsFor(pkg, DolphinTarget.LABEL_PORT))
             ?.live?.fillText(plan.port.toString())
 
-        // Dolphin gives everyone the same default nickname, "Player": two of those in
-        // one lobby and neither player can tell who is who.
         plan.username?.let { name ->
             DolphinScreen.fieldFor(nodes, labelsFor(pkg, DolphinTarget.LABEL_NICKNAME))
                 ?.live?.fillText(name)
         }
 
-        // A field that refused the write is the failure that looked like a success on
-        // the Azahar side.
         if (!wrote) {
             Log.w(TAG, "the address field refused ACTION_SET_TEXT")
             giveUp(plan, R.string.netplay_automation_stopped)
@@ -231,15 +190,12 @@ class DolphinNetplayDriver(
         }
         NetplayAutomation.report(NetplayProgress.Confirming)
         commit.live.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SHOW_ON_SCREEN.id)
-        // A click the emulator ignores is not a success: Eden's OK button reports
-        // itself clickable and still does nothing.
+        // Eden's OK reports clickable and still does nothing, so check the result.
         if (!commit.live.click()) {
             giveUp(plan, R.string.netplay_fields_filled)
             return true
         }
-        // No `Done` here: it clears the plan, disarming the driver just before the
-        // lobby it still has to handle.
-        // pourquoi : docs/decisions/pilotes-emulateurs.md § The order of the screens, and the two traps it avoids
+        // No `Done` here: it clears the plan before the lobby is handled.
         Log.d(TAG, "form submitted, waiting for the room")
         return true
     }
@@ -252,8 +208,6 @@ class DolphinNetplayDriver(
     }
 
     private fun labelsFor(pkg: String, name: String): List<String> =
-        // Keyed on the package *and* the name: the same string is read from Dolphin
-        // and from us, and a name-only key would return the first for the second.
         labels.getOrPut("$pkg/$name") { NetplayLabels.of(context, pkg, name) }
 
     private fun flatten(root: AccessibilityNodeInfo): List<Node> =
@@ -299,7 +253,6 @@ class DolphinNetplayDriver(
         return out
     }
 
-    /** Only ever absent in a test's synthetic tree. */
     private val Node.live: AccessibilityNodeInfo
         get() = handle as AccessibilityNodeInfo
 
@@ -317,11 +270,7 @@ class DolphinNetplayDriver(
         return false
     }
 
-    /**
-     * Not named `setText`: a member beats an extension in Kotlin, which cost the
-     * Azahar side months.
-     * pourquoi : docs/decisions/pilotes-emulateurs.md § `typeText` and not `setText`: a year of a green test proving nothing
-     */
+    /** Not named `setText`: a member function would shadow this extension. */
     private fun AccessibilityNodeInfo.fillText(value: String): Boolean {
         val args = Bundle().apply {
             putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, value)
@@ -337,7 +286,6 @@ class DolphinNetplayDriver(
         const val MAX_NAV_CLICKS = 4
         const val MAX_LOBBY_CLICKS = 3
 
-        /** A Compose tree is deep; a bound keeps a pathological screen from stalling us. */
         const val MAX_NODES = 600
     }
 }

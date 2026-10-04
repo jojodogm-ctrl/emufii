@@ -43,8 +43,8 @@ import eu.emufii.app.profile.Profile
 import eu.emufii.app.profile.playerDisplayName
 import eu.emufii.app.ui.focusRing
 import eu.emufii.app.ui.theme.plate
+import eu.emufii.app.ui.theme.plateColors
 import eu.emufii.app.ui.glass
-import eu.emufii.app.ui.theme.shelfFill
 import eu.emufii.app.ui.theme.LocalEmufiiOledTheme
 import eu.emufii.app.ui.theme.LocalAccent
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
@@ -53,30 +53,16 @@ import eu.emufii.app.ui.theme.PlateDark
 import eu.emufii.app.ui.theme.PlateLight
 import eu.emufii.app.ui.tap
 
-/**
- * The glyph chips. The two ends of the header are anchors at [ANCHOR_SIZE], the avatar
- * opening it and the session button closing it; what sits between them stays a chip.
- * pourquoi : docs/decisions/direction-visuelle.md § The top bar's chips are one family
- */
 private val CHIP_SIZE = 46.dp
 
-/** You are not a third glyph: the avatar anchors the row's far end. */
 private val ANCHOR_SIZE = 52.dp
 
-/**
- * No Material indication: its state layer also covers focus, which a gamepad grants
- * permanently, leaving a "disabled"-looking wash.
- * pourquoi : docs/decisions/direction-visuelle.md § No Material indication: a press animation
- */
+/** No Material indication: a gamepad keeps focus, so its state layer looks disabled. */
 @Composable
 fun TopBarChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = CHIP_SIZE,
-    /**
-     * How the rear panel learns what is aimed at.
-     * pourquoi : docs/decisions/second-ecran.md § What travels to the panel
-     */
     onFocused: (Boolean) -> Unit = {},
     content: @Composable () -> Unit
 ) {
@@ -89,8 +75,6 @@ fun TopBarChip(
         label = "chip-scale"
     )
 
-    // The grid hands back to the top bar going up from the first row: without a ring
-    // the cursor became invisible there.
     val focused by interaction.collectIsFocusedAsState()
     LaunchedEffect(focused) { onFocused(focused) }
 
@@ -100,18 +84,13 @@ fun TopBarChip(
             .scale(scale)
             .focusRing(focused, CircleShape, width = 2.5.dp, glowRadius = 10.dp)
             .then(
-                // A plate even on the frosted header: blurring a pane already blurred
-                // costs a layer and shows nothing.
-                // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Frosted header
                 run {
                     Modifier.plate(
                         shape = CircleShape,
                         dark = dark,
                         oled = LocalEmufiiOledTheme.current,
                         lift = 3.dp,
-                        // The same face as the shelf it sits on: what separates it is its
-                        // shadow, not a lighter fill.
-                        fill = shelfFill(dark, LocalEmufiiOledTheme.current && dark),
+                        fill = plateColors(dark, LocalEmufiiOledTheme.current && dark).first(),
                         pressed = pressed
                     )
                 }
@@ -121,10 +100,6 @@ fun TopBarChip(
     ) { content() }
 }
 
-/**
- * Just the avatar, never a badge that would change the chip's width with its state.
- * pourquoi : docs/decisions/direction-visuelle.md § The top bar's chips are one family
- */
 @Composable
 fun ProfileChip(
     profile: Profile,
@@ -145,7 +120,6 @@ fun ProfileChip(
     }
 }
 
-/** pourquoi : docs/decisions/direction-visuelle.md § The top bar's chips are one family */
 @Composable
 fun FriendsChip(
     onClick: () -> Unit,
@@ -153,22 +127,15 @@ fun FriendsChip(
     onFocused: (Boolean) -> Unit = {}
 ) {
     TopBarChip(onClick = onClick, modifier = modifier, onFocused = onFocused) {
-        // The icon system's silhouette, the one the finder's empty state carries.
-        // pourquoi : docs/decisions/direction-visuelle.md § The glyphs say "other players" the way the rest of the app does
         PersonMark(size = 22.dp, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
-/**
- * Two linked screens, not two people: discs are people here.
- * pourquoi : docs/decisions/direction-visuelle.md § The glyphs say "other players" the way the rest of the app does
- */
 @Composable
 fun SessionsChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFocused: (Boolean) -> Unit = {},
-    /** Coral contour and coral glyph: what the app is for, named without being filled. */
     outlined: Boolean = false
 ) {
     val dark = LocalEmufiiDarkTheme.current
@@ -177,9 +144,6 @@ fun SessionsChip(
     TopBarChip(
         onClick = onClick,
         modifier = if (outlined) modifier.border(2.dp, coral, CircleShape) else modifier,
-        // The far end of the header, and it answers the avatar at the near end: the two
-        // were 52 and 46 dp, so the row ended on a smaller disc set further in than the
-        // one it started on, and the header read as unfinished on the right.
         size = ANCHOR_SIZE,
         onFocused = onFocused
     ) {
@@ -191,7 +155,6 @@ fun SessionsChip(
             val stroke = Stroke(width = w * 0.10f)
             val radius = androidx.compose.ui.geometry.CornerRadius(w * 0.09f)
 
-            // Offset diagonally: two consoles side by side read as one object cut in half.
             drawRoundRect(
                 color = tint,
                 topLeft = Offset(0f, 0f),
@@ -206,7 +169,6 @@ fun SessionsChip(
                 cornerRadius = radius,
                 style = stroke
             )
-            // The link is dotted: a session goes over the network, not down a cable.
             drawLine(
                 color = tint,
                 start = Offset(screenW * 0.55f, screenH * 1.25f),
@@ -219,21 +181,12 @@ fun SessionsChip(
     }
 }
 
-/**
- * Blank on purpose: the empty state is what most installs show.
- * pourquoi : docs/decisions/direction-visuelle.md § The glyphs say "other players" the way the rest of the app does
- */
 @Composable
 private fun FriendsAvatars(modifier: Modifier = Modifier) {
     val dark = LocalEmufiiDarkTheme.current
     val ring = if (dark) PlateDark else PlateLight
 
-    // By offset from the centre, never corner alignment: the overlap is the shape.
-    // pourquoi : docs/decisions/direction-visuelle.md § The glyphs say "other players" the way the rest of the app does
     Box(modifier = modifier.size(34.dp), contentAlignment = Alignment.Center) {
-        // Behind: muted, so the two read as depth. The depth comes from value, not
-        // from temperature.
-        // pourquoi : docs/decisions/theme-duotone-shelves.md § Two semantic axes
         val muted = MaterialTheme.colorScheme.onSurfaceVariant
         val ground = MaterialTheme.colorScheme.surfaceVariant
         Disc(
@@ -241,7 +194,6 @@ private fun FriendsAvatars(modifier: Modifier = Modifier) {
             ring = ring,
             modifier = Modifier.offset(x = 6.dp, y = (-4).dp)
         )
-        // pourquoi : docs/decisions/direction-visuelle.md § The glyphs say "other players" the way the rest of the app does
         val accent = LocalAccent.current
         Disc(
             colors = listOf(accent.bright, accent.deep),

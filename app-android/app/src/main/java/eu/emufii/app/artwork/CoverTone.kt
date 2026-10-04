@@ -12,22 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-/**
- * The colour a cover glows with. Only the icons embedded in 3DS and DS files carried an
- * accent (`Rom.accentArgb`); every downloaded cover had none, so the coloured shadow never
- * showed on most of a library. It is read here from the picture actually displayed, once,
- * off the main thread, and kept for the process.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Shadows take the game's colour
- */
 object CoverTone {
 
-    /**
-     * Plain map, plus one counter that says "a tone arrived". Never a state made on read:
-     * a composition already running (the lazy list prefetches in its own snapshot) cannot
-     * see a state born after it, and reading one crashed the app twice on 2026-09-26. The
-     * counter is made at application start, before any composition; the tone is read at
-     * draw time, so an arrival repaints a shadow and recomposes nothing.
-     */
+    /** Plain map plus a counter created at app start: a state born during composition crashed the lazy list prefetch. */
     private val tones = ConcurrentHashMap<Any, Color>()
     private val pending: MutableSet<Any> = ConcurrentHashMap.newKeySet()
     private val arrived = Snapshot.global { mutableIntStateOf(0) }
@@ -55,19 +42,13 @@ object CoverTone {
             }.getOrNull()
             if (tone != null) {
                 tones[model] = tone
-                Snapshot.withMutableSnapshot { arrived.intValue++ }
+                // Straight into the global snapshot: nested per-decode snapshots failed to apply when two covers landed together.
+                synchronized(arrived) { arrived.intValue++ }
             }
         }
     }
 
-    /**
-     * The hue that covers the most of the picture, not the brightest one. Weighing pixels
-     * by saturation times brightness let a small vivid logo win over the colour the cover is
-     * actually made of: Luigi's Mansion glowed yellow for its face. Here a pixel weighs its
-     * saturation squared, so skin and washed tones lose to real colour, neighbouring hues
-     * pool together, and a cover with too little colour gives nothing. Checked against the
-     * 48 icons cached on the Thor: Luigi green, Kid Icarus blue, Yo-kai purple.
-     */
+    /** Dominant hue, weighted by saturation squared, so a small vivid logo does not win. */
     private fun dominant(bitmap: Bitmap): Color? {
         val weight = FloatArray(BUCKETS)
         val sums = Array(BUCKETS) { FloatArray(3) }
@@ -114,12 +95,5 @@ object CoverTone {
     private const val MIN_COLOURED = 0.06f
 }
 
-/**
- * One size for every cover request, the grid's, the carousel's, the card's and the panel's.
- * With the size left to layout, Coil looks the memory cache up only once measured, so a
- * tile arriving at the end of a flight drew its bare white plate for a frame before its
- * cover: the flash. A fixed size makes the lookup synchronous, and one size makes every
- * place hit the same entry. 640 covers the carousel's card at the Thor's density.
- * pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
- */
+/** One fixed size everywhere: it makes Coil's memory-cache lookup synchronous and shared (no white flash). */
 const val COVER_REQUEST_PX = 640

@@ -5,11 +5,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The index-title overlay, and the rule it may never break: it replaces a filename,
- * never a title read out of the file or a name the player chose. Pure strings, the
- * readers having their own tests.
- */
 class GameTitlesTest {
 
     @Test fun `a filename-derived name is replaced by the index title`() {
@@ -49,9 +44,8 @@ class GameTitlesTest {
         )
     }
 
+    // The coordinator silently answers at most 500 keys.
     @Test fun `a library too big for one request is asked for in several`() {
-        // The coordinator answers 500 keys and no more, silently. A single request was
-        // therefore losing every title past the 500th without anything failing.
         val keys = (1..1300).map { "switch:%016X".format(it) }
         val batches = GameTitles.batches(keys)
 

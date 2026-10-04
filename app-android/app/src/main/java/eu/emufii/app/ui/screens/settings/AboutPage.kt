@@ -32,12 +32,6 @@ import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.PrimaryButton
 import eu.emufii.app.ui.components.padEntry
 
-/**
- * What the app is, and where to join it. Two cards side by side and nothing else. A
- * third listed the seven consoles served; it was written then removed, since this page
- * is visited for a version or a link, and the console list is everywhere else already.
- * pourquoi : docs/decisions/reglages-ecran.md § The two outbound links, and their order
- */
 @Composable
 internal fun AboutPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -58,11 +52,7 @@ internal fun AboutPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
     ) {
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             if (maxWidth >= 700.dp) {
-                // Both cards start at the same top edge and end level: measure both,
-                // then impose the taller as a minimum on both.
-                // `Modifier.height(IntrinsicSize.Min)` was the obvious answer and is
-                // wrong, the minimum intrinsic height being the shorter of the two.
-                // pourquoi : docs/decisions/reglages-ecran.md § Aligning two columns means measuring, not intrinsics
+                // Measure both cards and impose the taller; IntrinsicSize.Min would pick the shorter.
                 var leftHeight by remember { mutableIntStateOf(0) }
                 var rightHeight by remember { mutableIntStateOf(0) }
                 val density = LocalDensity.current
@@ -119,10 +109,6 @@ private fun JoinBlock(open: (String) -> Unit, modifier: Modifier = Modifier) {
         spread = true,
         footer = {
             DetailActions {
-                // Discord first, and filled: it is the only one of the two that gives
-                // the player anything. Support is offered, never pushed: an app that
-                // asks for money louder than it offers help reads as a till.
-                // pourquoi : docs/decisions/reglages-ecran.md § The two outbound links, and their order
                 PrimaryButton(
                     label = stringResource(R.string.settings_about_discord),
                     onClick = { open(DISCORD_URL) },
@@ -138,24 +124,13 @@ private fun JoinBlock(open: (String) -> Unit, modifier: Modifier = Modifier) {
             }
         }
     ) {
-        // No text: two buttons whose labels already carry their destination explain
-        // nothing. The paragraph that lived here said what Discord is for and where the
-        // money goes, and nobody read it before pressing the button it capped.
-        // pourquoi : docs/decisions/reglages-ecran.md § The two outbound links, and their order
     }
 }
 
 private const val DISCORD_URL = "https://discord.gg/tvWcb28vBZ"
 
-/** Never in a dialog, never at launch: here and nowhere else. */
 private const val KOFI_URL = "https://ko-fi.com/emufii"
 
-/**
- * An outside service's mark, in its own colour. Untinted by the accent deliberately: it
- * names an elsewhere, so it is content, like a console icon or cover art. The
- * single-accent rule covers the chrome, not what the chrome shows.
- * pourquoi : docs/decisions/direction-visuelle.md § Three floors, one accent, and nothing else has a hue
- */
 @Composable
 private fun BrandMark(res: Int) {
     Image(

@@ -7,14 +7,7 @@ import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-/**
- * The vectors shared with `coordinator/client-auth.test.js`. The day the server and the app
- * stop computing the same thing, every client is refused at once and the symptom says
- * nothing; hardcoding both sides makes a format change break here first.
- *
- * `ClientAuth.sign` reads `BuildConfig`, null in a JVM test, so the computation is
- * reproduced rather than called.
- */
+/** Same vectors as coordinator/client-auth.test.js; sign() reads BuildConfig, so it's reimplemented here. */
 class ClientAuthTest {
 
     private val secret = "secret-de-test-partage"
@@ -42,8 +35,6 @@ class ClientAuthTest {
 
     @Test
     fun `the body goes into the computation`() {
-        // Without it a signature valid for one request is valid for every request at the
-        // same path.
         val a = sign("POST", "/sessions", """{"code":"UN"}""", 1_770_000_000L)
         val b = sign("POST", "/sessions", """{"code":"DEUX"}""", 1_770_000_000L)
         assertNotEquals(a, b)
@@ -65,8 +56,6 @@ class ClientAuthTest {
 
     @Test
     fun `an absent body and an empty body sign the same`() {
-        // A GET request has no body, and the app then sends null where the server
-        // reads the empty string.
         assertEquals(
             sign("GET", "/sessions", null, 1_770_000_000L),
             sign("GET", "/sessions", "", 1_770_000_000L)

@@ -4,10 +4,6 @@ import android.content.Context
 import androidx.core.content.edit
 import org.json.JSONObject
 
-/**
- * Shared by the app and the background job: with one memory each, the job would
- * re-announce half an hour later the friend the player watched arrive on screen.
- */
 class WatchState(context: Context) {
 
     private val prefs = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

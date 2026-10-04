@@ -56,23 +56,13 @@ import eu.emufii.app.wfc.MelonDs
 import eu.emufii.app.wfc.WfcManager
 import eu.emufii.app.wfc.WfcState
 
-/**
- * The diagonal coral-to-teal edge light: the signature of the waiting and connecting
- * flows, a slanted stroke on the neutral card's corner.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § Onboarding / Preparing
- */
 @Composable
 private fun good() = if (LocalEmufiiDarkTheme.current) GoodDark else GoodLight
 
 
-/**
- * DS online play: no session and no code. melonDS stays on "auto-obtain DNS", so Android's
- * resolver decides where `nintendowifi.net` goes; Emufii answers it.
- */
 @Composable
 fun WfcScreen(
     rom: Rom,
-    /** Android runs one VpnService at a time; see [eu.emufii.app.tunnel.tunnelHolder]. */
     onRequestTunnelSlot: (proceed: () -> Unit) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -86,8 +76,6 @@ fun WfcScreen(
         when (val result = melon.launchGame(rom.uri)) {
             LaunchResult.Success -> status = context.getString(R.string.wfc_launched)
             LaunchResult.NotInstalled -> status = context.getString(R.string.wfc_not_installed)
-            // Unreachable: WFC goes through Kaeru, not a netplay dialog. Named rather than
-            // folded into `else` so a future melonDS netplay path decides here.
             is LaunchResult.NoNetplayUi -> status = context.getString(R.string.wfc_not_installed)
             is LaunchResult.Error -> status = result.message
         }
@@ -107,26 +95,19 @@ fun WfcScreen(
         onBack()
     }
 
-    // The social domain: the pad cursor turns coral here.
-    // pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
     CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
     EmufiiScaffold(
         title = stringResource(R.string.wfc_title),
         modifier = modifier,
         onBack = leave,
-        // Nothing rises under the header: the fade margin would be one more empty band.
         contentScrolls = false
     ) { _ ->
-        // Centred on the screen, not under the header: `topPadding` put the card 37 dp too
-        // low, this card being about 250 dp of the device's 468.
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 12.dp),
             contentAlignment = Alignment.Center
         ) {
-        // A card, not a full-width column: on the Thor that came out 784 dp wide, one line
-        // of text spanning the screen.
         SoftCard(modifier = Modifier.widthIn(max = 648.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(24.dp),
@@ -176,9 +157,6 @@ fun WfcScreen(
 
                     WfcStateChip(state)
 
-            // One button, two jobs: a blue Start left on screen invited a second launch.
-            // Red, because stopping loses a console still in a game its way to Kaeru;
-            // Unreachable counts as running.
             val active = state is WfcState.Active || state is WfcState.Unreachable
             Button(
                 onClick = sounded {
@@ -229,10 +207,6 @@ fun WfcScreen(
     }
 }
 
-/**
- * Asked of the system rather than hardcoded: the Thor carries a rebrand ("melonDS DualS").
- * A vanished package leaves the raw identifier, and only an uninstall mid-redirection does that.
- */
 @Composable
 private fun appLabel(packageName: String): String {
     val pm = LocalContext.current.packageManager

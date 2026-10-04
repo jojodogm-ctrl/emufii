@@ -3,12 +3,7 @@ package eu.emufii.app.library.switchfs
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/**
- * The plaintext table of contents at the head of every NSP, which needs no keys: an NSP
- * announces its own names, offsets and sizes, and only what they point at is encrypted.
- * A Switch dump can therefore be recognised, and its title id read off a `.tik`
- * filename, on a device that has never seen a console key.
- */
+/** NSP's plaintext table of contents: readable without console keys. */
 object Pfs0 {
 
     data class Entry(val name: String, val offset: Long, val size: Long)
@@ -20,7 +15,6 @@ object Pfs0 {
 
     private const val MAGIC = "PFS0"
 
-    /** Sanity ceilings: a real NSP has a handful of entries and short names. */
     private const val MAX_ENTRIES = 512
     private const val MAX_STRING_TABLE = 64 * 1024
 

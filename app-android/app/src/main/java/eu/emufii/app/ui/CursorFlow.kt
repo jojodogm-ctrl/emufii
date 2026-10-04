@@ -16,30 +16,15 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-/**
- * The gradient flowing around the cursor. Not an angular sweep: each pixel is reduced
- * to its arc-length position along the perimeter, so the colour advances at the same
- * speed on a straight edge and in a corner. Rendered into a stretched bitmap and
- * cached.
- * pourquoi : docs/decisions/performance-rendu.md § The cursor gradient is not an angular sweep
- */
 internal object CursorFlow {
 
-    /** One more step is not one more bitmap, it is one more repainted window. */
     const val STEPS = 22
 
-    /**
-     * Derived, never written twice: 27 steps over 1800 ms against an 83 ms beat advanced
-     * 1.245 steps a tick, so the gradient went 1, 1, 1, 2 and read as judder rather than
-     * as a low frame rate. One step per beat costs the same repaints and is even.
-     * pourquoi : docs/decisions/performance-rendu.md § One clock for everything that moves continuously
-     */
+    /** One step per frame beat; a fractional rate judders. */
     const val PERIOD_MS = (STEPS * FRAME_INTERVAL_MS).toInt()
 
-    /** Stretched to the real size by the shader: a gradient has no fine detail to lose. */
     private const val MAX_SIDE = 192
 
-    /** Without it a cursor on a tile recomputes 45 bitmaps per cycle, forever. */
     private val cache = object : LinkedHashMap<Key, BitmapShader>(16, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Key, BitmapShader>) =
             size > 96
@@ -55,7 +40,6 @@ internal object CursorFlow {
         val step: Int,
     )
 
-    /** [w] and [h] cover the control plus a band on each side; [step] is in `0 until STEPS`. */
     fun shader(
         w: Float,
         h: Float,
@@ -81,7 +65,6 @@ internal object CursorFlow {
         val bw = max(2, (w * scale).roundToInt())
         val bh = max(2, (h * scale).roundToInt())
 
-        // The band's midline, which the gradient runs along.
         val half = band / 2f
         val hx = max(1f, w / 2f - half)
         val hy = max(1f, h / 2f - half)
@@ -92,8 +75,6 @@ internal object CursorFlow {
         val perimeter = 4f * (ax + ay + quarter)
         if (perimeter <= 0f) return null
 
-        // Cumulative bounds, clockwise from the middle of the top edge; the origin is
-        // arbitrary, the cycle being closed.
         val s1 = ax
         val s2 = s1 + quarter
         val s3 = s2 + 2f * ay
@@ -127,8 +108,7 @@ internal object CursorFlow {
         shader.setLocalMatrix(
             Matrix().apply {
                 setScale(w / bw, h / bh)
-                // The cursor box's origin is at (-band, -band): without this the gradient
-                // sits one band down and right.
+                // The cursor box origin is at (-band, -band).
                 postTranslate(-band, -band)
             }
         )
@@ -136,11 +116,6 @@ internal object CursorFlow {
         return shader
     }
 
-    /**
-     * Distance along the perimeter for a point in centred coordinates, folded onto the
-     * midline: its projection on a straight edge, its angle from the arc's centre in a
-     * corner. Pixels far from the band get a value never read, the band's path clips them.
-     */
     private fun arcLength(
         x: Float,
         y: Float,
@@ -158,7 +133,6 @@ internal object CursorFlow {
     ): Float {
         val halfPi = (PI / 2.0).toFloat()
         return when {
-            // The four straight edges, then the four arcs measured from their own centre.
             x in -ax..ax && y < 0f -> if (x >= 0f) x else perimeter + x
             x > ax && y in -ay..ay -> s2 + (y + ay)
             x in -ax..ax && y > 0f -> s4 + (ax - x)
@@ -175,11 +149,6 @@ internal object CursorFlow {
     }
 }
 
-/**
- * The current phase step, written only when it changes. An `InfiniteTransition` publishes
- * every screen frame, 120 times a second on the Thor, each write redrawing the app; this
- * writes 25 times a second, the number of positions the gradient has.
- */
 @Composable
 internal fun rememberFlowStep(): Int {
     val millis = rememberSlowMillis()

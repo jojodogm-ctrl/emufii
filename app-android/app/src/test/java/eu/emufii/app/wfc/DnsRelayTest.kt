@@ -52,7 +52,6 @@ class DnsRelayTest {
         assertEquals(1, upstream.seen.size)
         assertArrayEquals(query, upstream.seen[0])
 
-        // The reply comes back from the resolver we advertised, to the port that asked.
         val parsed = Ipv4Udp.parse(reply)!!
         assertArrayEquals(sentinel, parsed.source)
         assertArrayEquals(client, parsed.destination)
@@ -122,8 +121,7 @@ class DnsRelayTest {
         val upstream = RecordingUpstream(answer)
         val relay = DnsRelay(sentinel, upstream)
 
-        // A reused read buffer keeps stale bytes past the packet: trusting the array
-        // length would forward garbage.
+        // A reused buffer keeps stale bytes past the packet; the array length is not the packet length.
         val request = Ipv4Udp.build(client, sentinel, 45678, 53, query)
         val buffer = request.copyOf(request.size + 64).also { buf ->
             for (i in request.size until buf.size) buf[i] = 0x7F
@@ -163,8 +161,6 @@ class DnsRelayTest {
         val request = Ipv4Udp.build(client, sentinel, 45678, 53, query)
 
         relay.handle(request)
-        // Dropped before upstream is asked: if a drop reset the run, background chatter
-        // would mask a dead server.
         relay.handle(Ipv4Udp.build(client, elsewhere, 45678, 53, query))
         relay.handle(request)
 

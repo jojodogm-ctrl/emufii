@@ -13,18 +13,8 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
-/**
- * What has to be done for the grid to open complete. None of it is essential: every
- * step is wrapped, and a warm-up that stopped you getting in would be worse than none.
- * pourquoi : docs/decisions/jaquettes.md § The grid opens complete, or it fills in under the player's eyes
- */
 object ArtworkPreload {
 
-    /**
-     * How many covers are decoded ahead. Two screens of grid: what the player sees on
-     * arrival, plus the row the first movement uncovers. Beyond that we would fill
-     * memory with images nobody looks at.
-     */
     private const val DECODED_AHEAD = 24
 
     private const val TILE_PX = 360
@@ -38,8 +28,6 @@ object ArtworkPreload {
         val frontend = settings.artworkFrontend.value
         val store = ArtworkStore(app)
 
-        // Every address: this is where the folder indexes are built, once per console
-        // rather than once per console's first tile.
         val models = roms.map { rom ->
             runCatching {
                 val local = if (store.chosenFor(rom) == null) {
@@ -51,9 +39,7 @@ object ArtworkPreload {
             }.getOrNull()
         }
 
-        // Decoding, at the tile's size rather than `ORIGINAL`: the loader keeps what it
-        // decoded, and one full-resolution cover per game would fill memory with
-        // bitmaps the tile shrinks anyway. The single loader, never a new one.
+        // Decode at tile size, not ORIGINAL: the loader keeps what it decoded.
         val loader = SingletonImageLoader.get(app)
         coroutineScope {
             models.take(DECODED_AHEAD).map { model ->

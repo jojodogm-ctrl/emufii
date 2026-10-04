@@ -13,33 +13,13 @@ import eu.emufii.app.netplay.NetplayTarget
 import eu.emufii.app.library.Console
 import eu.emufii.app.library.EmulatorPick
 
-/**
- * Eden's launch contract is the best of the three backends: `EmulationActivity`
- * is exported, with an `ACTION_VIEW` filter on `content:` +
- * `application/octet-stream`. A SAF uri is therefore enough, no file copy, no
- * permission dance beyond the read grant.
- *
- * The class name kept in [ACTIVITY] is `org.yuzu.…`, not `dev.eden.…`: Eden
- * descends from yuzu and never renamed its Java packages. Read from the real
- * APK's manifest, not guessed.
- */
+/** Eden still uses yuzu's `org.yuzu.*` package names; `EmulationActivity` takes a SAF uri via ACTION_VIEW. */
 class EdenLauncher(private val context: Context) {
 
-    /**
-     * Which Eden variant Emufii drives when the player has several: the last
-     * installed, by `lastUpdateTime`. On equal dates [NetplayTarget.EDEN]'s order
-     * decides. Overridable through [EmulatorPick].
-     * pourquoi : docs/decisions/pilotes-emulateurs.md § Eden: the most recently installed wins
-     */
     fun installedPackage(): String? = EmulatorPick.packageFor(context, Console.SWITCH)
 
     fun isInstalled(): Boolean = installedPackage() != null
 
-    /**
-     * Unlike Azahar, arming is useful before or after the launch: Eden's multiplayer
-     * lives in the app's settings, not in an in-game drawer, so nothing here depends
-     * on the game having started.
-     */
     fun launchGame(romUri: Uri, plan: NetplayPlan? = null, automationOn: Boolean = false): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
         val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -57,7 +37,6 @@ class EdenLauncher(private val context: Context) {
         }.getOrElse { LaunchResult.Error(it.message ?: "Unknown launch error") }
     }
 
-    /** Same two-step flow as Azahar: join the room first, boot the game second. */
     fun openForNetplay(plan: NetplayPlan): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
         if (!NetplayUiSupport.isPresent(context, pkg)) {
@@ -85,9 +64,6 @@ class EdenLauncher(private val context: Context) {
     }
 }
 
-/**
- * Kept apart from the `PackageManager` so it can be exercised. `maxByOrNull` returns
- * the first of the ties, and the order of the list received puts our fork first.
- */
+/** `maxByOrNull` keeps the first tie, and the list puts our fork first. */
 internal fun pickEden(installed: List<Pair<String, Long>>): String? =
     installed.maxByOrNull { it.second }?.first

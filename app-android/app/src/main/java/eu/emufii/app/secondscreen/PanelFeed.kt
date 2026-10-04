@@ -4,20 +4,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * The front screen keeps every alert it had; this adds the case it cannot serve, a game
- * running with Emufii behind the emulator. Process-scoped like [SecondScreen]: a feed
- * held in a composition would go silent exactly when the emulator takes the front screen.
- */
 object PanelFeed {
 
-    /**
-     * [id] lets the coroutine that showed a note retire it without retiring the one that
-     * replaced it meanwhile; the race is two friends coming online a second apart.
-     */
+    /** [id] lets a coroutine retire its own note without retiring the one that replaced it. */
     data class Note(
         val text: String,
         val kind: Kind,
+        /** The friend event behind a [Kind.FRIEND] note, so the strip can draw its badge. */
+        val event: eu.emufii.app.notify.FriendEvent? = null,
         val id: Long = nextId(),
     )
 
@@ -26,9 +20,9 @@ object PanelFeed {
     private val _note = MutableStateFlow<Note?>(null)
     val note: StateFlow<Note?> = _note.asStateFlow()
 
-    fun post(text: String, kind: Kind = Kind.INFO) {
+    fun post(text: String, kind: Kind = Kind.INFO, event: eu.emufii.app.notify.FriendEvent? = null) {
         if (text.isBlank()) return
-        _note.value = Note(text = text, kind = kind)
+        _note.value = Note(text = text, kind = kind, event = event)
     }
 
     fun dismiss(id: Long) {

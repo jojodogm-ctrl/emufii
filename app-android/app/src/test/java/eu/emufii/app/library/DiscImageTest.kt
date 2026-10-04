@@ -5,14 +5,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Which console an `.iso` belongs to, when the extension refuses to say. The offsets
- * were measured on the disc images on this machine: six PSP rips stayed on the PSP,
- * eleven RVZ files came out as Wii, the one Dreamcast `.chd` did not move.
- *
- * A wrong "yes" moves a game onto an emulator that cannot open it, a wrong "no" leaves
- * it where it was; the assertions weigh accordingly.
- */
 class DiscImageTest {
 
     private fun header(build: ByteArray.() -> Unit) =
@@ -59,8 +51,6 @@ class DiscImageTest {
 
     @Test
     fun `an unknown disc type falls back to the copy of the real header`() {
-        // The container copies the disc's first 0x80 bytes verbatim at 0x58: the Wii
-        // magic shows up at 0x70 in a hex dump.
         assertEquals(
             Console.WII,
             DiscImage.identify(
@@ -92,11 +82,6 @@ class DiscImageTest {
         assertEquals(Console.PSP, Console.forExtension("pbp"))
     }
 
-    /**
-     * A disc as far as the ISO9660 volume descriptor. The values come from the Thor's
-     * real files on 2026-08-17: TimeSplitters 2 (PS2) is `PLAYSTATION` / `SLES_50877`,
-     * WipEout Pulse (PSP) is `PSP GAME` / `SCEE`.
-     */
     private fun disc(systemId: String, volumeId: String = "") =
         ByteArray(DiscImage.PVD_BYTES).apply {
             this[0x8000] = 1
@@ -112,8 +97,6 @@ class DiscImageTest {
 
     @Test
     fun `a UMD rip stays with the PSP, even read as far as the descriptor`() {
-        // On the Thor the six PS2 games and the six PSP games are all `.iso`: only the
-        // descriptor settles one the folder did not speak for.
         assertEquals(Console.PSP, DiscImage.identify(disc("PSP GAME", "SCEE")))
     }
 
@@ -146,7 +129,6 @@ class DiscImageTest {
 
     @Test
     fun `a console folder name settles the console`() {
-        // The player sorted the file themselves: the folder outranks any extension clash.
         assertEquals(Console.PS2, Console.forFolder("ps2"))
         assertEquals(Console.PS2, Console.forFolder("PlayStation 2"))
         assertEquals(Console.PSP, Console.forFolder("PSP"))

@@ -7,10 +7,6 @@ import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.runtime.withFrameNanos
 
-/**
- * A modal layer opens over a scaffold that has already placed its cursor elsewhere.
- * pourquoi : docs/decisions/coquille-ecrans.md § The cursor arrives with the screen
- */
 @Composable
 fun LandOn(target: FocusRequester, key: Any? = Unit, enabled: Boolean = true) {
     val inputMode = LocalInputModeManager.current
@@ -24,8 +20,5 @@ fun LandOn(target: FocusRequester, key: Any? = Unit, enabled: Boolean = true) {
     }
 }
 
-/**
- * Six frames, about a hundred milliseconds: a modal layer often arrives with an entrance
- * animation, and the target node is only placed once that is done.
- */
+/** About 100 ms: the target is placed only after the layer's entrance animation. */
 private const val LANDING_FRAMES = 6

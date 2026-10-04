@@ -51,22 +51,13 @@ import eu.emufii.app.ui.theme.Teal
 @Composable
 fun PreparingScreen(
     label: String,
-    /** Null when the caller has no safe exit to offer; nothing is then shown. */
     onGiveUp: (() -> Unit)? = null
 ) {
-    // On a plain surface this screen read as a different app for the ten seconds it is up.
     TrayBackdrop(modifier = Modifier.fillMaxSize(), dark = LocalEmufiiDarkTheme.current)
 
-    // On an already-up tunnel this screen comes and goes in a few frames: cut hard, that
-    // read as a glitch. Holding the content back for 400 ms instead only traded the
-    // flashing spinner for a blank backdrop.
     var shown by remember(label) { mutableStateOf(false) }
     LaunchedEffect(label) { shown = true }
 
-    /**
-     * Twenty seconds: beyond what a cold tunnel needs, under the forty-five of the guard
-     * delay, so the player takes back control before the code gives up for them.
-     */
     var overdue by remember(label) { mutableStateOf(false) }
     LaunchedEffect(label) {
         delay(OVERDUE_MS)
@@ -88,8 +79,6 @@ fun PreparingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(18.dp)
             ) {
-                // Material's default 40 dp on a 4 dp stroke is sized for a spinner passing
-                // through a list corner; here it is stared at for ten seconds.
                 TrailerSpinner(
                     color = MaterialTheme.colorScheme.primary,
                     size = 54.dp,
@@ -100,7 +89,6 @@ fun PreparingScreen(
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )
-                // "A little slow the first time" is true at ten seconds and a lie at thirty.
                 Text(
                     stringResource(
                         if (overdue) R.string.prep_taking_long else R.string.prep_first_time
@@ -109,8 +97,6 @@ fun PreparingScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
-                // Offered from the first second it would invite giving up on a normal
-                // wait; offered never, Home is the only way out.
                 if (onGiveUp != null && overdue) {
                     Button(
                         onClick = sounded(onGiveUp),

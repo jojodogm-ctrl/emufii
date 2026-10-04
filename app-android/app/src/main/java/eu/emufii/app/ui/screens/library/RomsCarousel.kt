@@ -42,29 +42,13 @@ import kotlin.math.abs
 
 private const val CAROUSEL_CARD_FRACTION = 0.38f
 
-/** What the title claims under the card: two lines, plus the gap. */
 private val CAROUSEL_TITLE_ROOM = 66.dp
 
-/**
- * The active card carries the cursor's 7 % scale and its ring, which spill past its
- * layout bounds and would cross the title's first line. A drawing offset, not a layout
- * one, or the active card would grow the row and re-centre its neighbours at every step.
- *
- * Follows [CAROUSEL_TILE_BAND]: the band lost about 5 dp, so the title climbs by as much
- * rather than keep clearing a ring that is no longer there.
- */
+/** A draw offset, not a layout one: the active card's 7% scale and ring would otherwise reflow the row. */
 private val CAROUSEL_TITLE_DROP = 13.dp
 
-/**
- * The band is a share of the card's smaller side, and a carousel card is around 300 dp
- * where a grid tile is a third of that: at the grid's share the ring read as a tube around
- * the cover rather than a cursor on it.
- */
 private const val CAROUSEL_TILE_BAND = 0.055f
 
-/**
- * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
- */
 @Composable
 internal fun RomsCarousel(
     entries: List<Entry>,
@@ -78,7 +62,6 @@ internal fun RomsCarousel(
     canGoBack: Boolean,
     gridFocus: FocusRequester,
     contentPadding: PaddingValues,
-    /** Where the cursor starts: the first game in a folder, the folder you left outside. */
     startAt: Int = 0,
 ) {
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = startAt)
@@ -97,33 +80,18 @@ internal fun RomsCarousel(
         if (menuFor == null) runCatching { gridFocus.requestFocus() }
     }
 
-    /**
-     * To the centre, not "somewhere on screen".
-     * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
-     */
-    // Centre-following must be off while *we* scroll, or a double press computes
-    // from a passing card.
+    // Centre-following must be off while we scroll, or a double press computes from a passing card.
     var settling by remember { mutableStateOf(false) }
 
-    /**
-     * Which reveal is the current one. Held fast, one press lands several: an older
-     * reveal reaching its end would otherwise lower [settling] under the newer one still
-     * animating, and the centre-follower wrote the card being passed back over the
-     * cursor. The cell was then lit, unlit and lit again, and rang each time.
-     * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
-     */
     val revealId = remember { mutableIntStateOf(0) }
 
     fun reveal(index: Int) {
-        // Raised here and not in the coroutine: a `launch` lands a frame later, and in
-        // that frame the row has not moved yet, so the centre was still the old card.
+        // Raised here, not in the coroutine: a launch lands a frame late, with the old card still centred.
         settling = true
         val id = ++revealId.intValue
         scope.launch {
             val info = listState.layoutInfo
-            // Leading padding is already in `animateScrollToItem`'s frame;
-            // passing it again applied it twice.
-            // pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
+            // Leading padding is already in animateScrollToItem's frame; passing it again doubles it.
             val viewport = info.viewportEndOffset - info.viewportStartOffset
             val itemWidth = info.visibleItemsInfo.firstOrNull()?.size ?: 0
             val offset = ((viewport - itemWidth) / 2 - info.beforeContentPadding)
@@ -136,10 +104,6 @@ internal fun RomsCarousel(
         }
     }
 
-    /**
-     * The card nearest the middle, whatever put it there.
-     * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
-     */
     val centred by remember {
         derivedStateOf {
             val info = listState.layoutInfo
@@ -150,17 +114,11 @@ internal fun RomsCarousel(
         }
     }
 
-    // While the finger has it, the cursor is whatever is in the middle: the card grows
-    // as it arrives rather than after the fact.
     LaunchedEffect(centred, settling) {
         val index = centred
         if (!settling && index != null && index in entries.indices) cursor = index
     }
 
-    /**
-     * A drag is the only honest signal that a person moved the row.
-     * pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
-     */
     var dragged by remember { mutableStateOf(false) }
     LaunchedEffect(listState.interactionSource) {
         listState.interactionSource.interactions.collect { interaction ->
@@ -183,6 +141,8 @@ internal fun RomsCarousel(
         return true
     }
 
+    val exitBottom = LocalLibraryExitBottom.current
+
     val hold = rememberConfirmHold()
     val onKey = entryKeys(
         entries = entries,
@@ -199,9 +159,10 @@ internal fun RomsCarousel(
             Key.DirectionUp -> {
                 onExitTop(HeaderSide.RIGHT); true
             }
-            // Letting it through hands control back to Compose's traversal, which hunts
-            // for a focusable elsewhere.
-            Key.DirectionDown -> true
+            // Consumed either way, or Compose's traversal hunts for a focusable elsewhere.
+            Key.DirectionDown -> {
+                exitBottom(); true
+            }
             else -> null
         }
     }
@@ -215,10 +176,6 @@ internal fun RomsCarousel(
             .onPreviewKeyEvent(onKey),
         contentAlignment = Alignment.Center
     ) {
-        /**
-         * The height actually free, never the screen's: landscape punishes that.
-         * pourquoi : docs/decisions/bibliotheque.md § Three carousel measurements, all corrected from a screenshot
-         */
         val free = maxHeight -
             contentPadding.calculateTopPadding() -
             contentPadding.calculateBottomPadding() -
@@ -226,10 +183,6 @@ internal fun RomsCarousel(
         val cardSize = minOf(maxWidth * CAROUSEL_CARD_FRACTION, free)
             .coerceIn(120.dp, 300.dp)
 
-        /**
-         * What lets the first and last card reach the centre.
-         * pourquoi : docs/decisions/bibliotheque.md § Three carousel measurements, all corrected from a screenshot
-         */
         val sidePad = ((maxWidth - cardSize) / 2).coerceAtLeast(16.dp)
 
         LaunchedEffect(cardSize) { reveal(cursor) }
@@ -239,9 +192,6 @@ internal fun RomsCarousel(
             contentPadding = PaddingValues(
                 start = sidePad,
                 end = sidePad,
-                // The card is centred, not the column: the title's room is
-                // *moved* bottom to top, and only half of it.
-                // pourquoi : docs/decisions/bibliotheque.md § Three carousel measurements, all corrected from a screenshot
                 top = contentPadding.calculateTopPadding() + CAROUSEL_TITLE_ROOM / 2,
                 bottom = (contentPadding.calculateBottomPadding() - CAROUSEL_TITLE_ROOM / 2)
                     .coerceAtLeast(16.dp)
@@ -253,18 +203,12 @@ internal fun RomsCarousel(
                 val entry = entries[i]
                 // Without it one cursor step recomposes every visible card to change two.
                 val active by remember(i) { derivedStateOf { i == cursorState.intValue } }
-                // Equally-sized cards read as a one-line grid, nothing pointing at the
-                // one about to be launched.
-                // Neighbours shrink on the morph spring, and keep their colour: greyed,
-                // they read as unavailable, which they are not.
-                // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
                 val recede by animateFloatAsState(
                     targetValue = if (active) 1f else 0.86f,
                     animationSpec = Motion.morph(),
                     label = "carousel-recede"
                 )
                 Box(modifier = Modifier.width(cardSize)) {
-                    // pourquoi : docs/decisions/bibliotheque.md § The carousel has to follow the finger without turning on the gamepad
                     val onTap = { if (active) onSelect(entry) else moveTo(i); Unit }
                     when (entry) {
                         is Entry.Folder -> FolderTile(

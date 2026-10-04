@@ -21,19 +21,11 @@ private const val ICON_DIM = 48
 
 data class SmdhData(val icon: Bitmap?, val title: String?)
 
-/** The em dash is the one translated Japanese cover art uses. */
 private val SUBTITLE_SEPARATORS = charArrayOf(':', '-', '\u2013', '\u2014', '\n')
 
-/** What gives away a tagline rather than a subtitle. */
 private val SENTENCE_ENDINGS = charArrayOf('!', '.', '?')
 
-/**
- * The SMDH short description truncates: A Link Between Worlds is called "The Legend of
- * Zelda" there, so two Zeldas carried the same name. The long one is sometimes cover-art
- * copy, so it is kept only when it extends the short one. The separator that matters is
- * the line break, Nintendo writing the series on one line and the subtitle on the next:
- * normalising whitespace before looking for it erases the very sign to read.
- */
+/** Short description truncates; the long one is used only when it extends it. Split on the raw line break, before normalising. */
 internal fun fullTitle(shortDesc: String, longDesc: String): String {
     val short = shortDesc.collapse()
     if (!longDesc.startsWith(shortDesc.trim(), ignoreCase = true)) return short
@@ -45,8 +37,6 @@ internal fun fullTitle(shortDesc: String, longDesc: String): String {
     val subtitle = rest.dropWhile { it.isWhitespace() || it in SUBTITLE_SEPARATORS }.collapse()
     if (subtitle.isEmpty()) return short
 
-    // A second line is sometimes a tagline ("Race your friends!"); the closing
-    // punctuation is the only sign short of understanding the language.
     if (subtitle.last() in SENTENCE_ENDINGS) return short
 
     return "$short: $subtitle"
@@ -92,7 +82,7 @@ class SmdhReader(private val context: Context) {
         return null
     }
 
-    /** An SMDH entry carries three fields per language: short description, long description, publisher. */
+    /** Each language entry: short description, long description, publisher. */
     private fun pickTitle(smdh: ByteBuffer): String? {
         val buf = smdh.array()
         for (lang in TitleLanguage.smdh) {

@@ -50,18 +50,10 @@ import eu.emufii.app.ui.wallpaper.TrayBackdrop
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
-/**
- * [MIN_MS] avoids a flicker when the cache is warm, [MAX_MS] gives way when the run
- * drags on. Not focusable: nothing to aim at, so nothing to signal.
- * pourquoi : docs/decisions/lancement-et-navigation.md § The opening screen holds the logo between two durations
- */
 @Composable
 fun SplashScreen(ready: Boolean, onDone: () -> Unit) {
     val dark = LocalEmufiiDarkTheme.current
 
-    // The library composes underneath throughout startup, which is the opaque logo's
-    // point: everything is painted by the time it clears.
-    // pourquoi : docs/decisions/second-ecran.md § A stack rather than one more publication
     DisposableEffect(Unit) {
         val token = SecondScreen.putAside(SecondScreenModel.Idle)
         onDispose { SecondScreen.takeBack(token) }
@@ -69,8 +61,6 @@ fun SplashScreen(ready: Boolean, onDone: () -> Unit) {
 
     TrayBackdrop(modifier = Modifier.fillMaxSize(), dark = dark)
 
-    // The minimum runs from the first frame, alongside the scan: a floor, not a wait
-    // that adds on top.
     var floorPassed by remember { mutableStateOf(false) }
     var expired by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -83,8 +73,6 @@ fun SplashScreen(ready: Boolean, onDone: () -> Unit) {
         if ((ready && floorPassed) || expired) onDone()
     }
 
-    // A fade on its own reads as an image slow to load; the scale, even at 6 %,
-    // makes the logo enter.
     var shown by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { shown = true }
     val appearance by animateFloatAsState(
@@ -93,8 +81,6 @@ fun SplashScreen(ready: Boolean, onDone: () -> Unit) {
         label = "splash-appearance"
     )
 
-    // The logo is centred alone: stacked, it was the pair that centred.
-    // pourquoi : docs/decisions/lancement-et-navigation.md § The logo is centred alone, and the status bar does not exist
     val view = LocalView.current
     DisposableEffect(view) {
         val controller = WindowCompat.getInsetsController(
@@ -127,11 +113,6 @@ fun SplashScreen(ready: Boolean, onDone: () -> Unit) {
     }
 }
 
-/**
- * A `CircularProgressIndicator` carries Material's colours and reads as a control; a
- * gradient-filled rectangle reads as a web page. The charge moves back and forth with
- * a bell-shaped falloff, so no hard edge and no seam to hide at the turnaround.
- */
 @Composable
 private fun SignalPips(modifier: Modifier = Modifier) {
     val transition = rememberInfiniteTransition(label = "splash-pips")
@@ -156,8 +137,6 @@ private fun SignalPips(modifier: Modifier = Modifier) {
         repeat(PIP_COUNT) { index ->
             val stop = index / (PIP_COUNT - 1).toFloat()
             val tint = lerp(LogoPink, LogoBlue, stop)
-            // One and a half pip-pitches of reach: neighbours catch the light, the
-            // far end stays dark.
             val distance = abs(travel - stop) * (PIP_COUNT - 1)
             val charge = (1f - distance / 1.5f).coerceIn(0f, 1f)
             Pip(tint = tint, charge = charge, shape = shape, dark = dark)
@@ -173,8 +152,6 @@ private fun Pip(tint: Color, charge: Float, shape: Shape, dark: Boolean) {
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val radius = size.minDimension / 2f
-            // The unlit pip stays a deep ember of its own colour: the row reads as
-            // five lights, not four gaps plus a light.
             drawCircle(color = tint.copy(alpha = 0.16f + 0.14f * charge), radius = radius)
             if (charge > 0f) {
                 drawCircle(
@@ -191,29 +168,18 @@ private fun Pip(tint: Color, charge: Float, shape: Shape, dark: Boolean) {
     }
 }
 
-/** Resampled from `emufii_logo_v3.png`: the coral tile top-left, the teal bottom-right. */
 private val LogoPink = eu.emufii.app.ui.theme.Coral.bright
 private val LogoBlue = eu.emufii.app.ui.theme.Teal.bright
 
 private val LOGO_SIZE = 232.dp
 
-/**
- * The V3 mark is a square icon. Says where the logo ends so the pips hook below it,
- * which the layout can no longer say now that the two are not stacked.
- */
 private const val LOGO_ASPECT = 1f
 
-/**
- * At 40 dp the row floated: the V3 mark's mass sits low, so the bottom of its layout
- * box is far below the last visible pixel, and the 40 dp added to that.
- */
 private val BAR_GAP = 25.dp
 private val PIP_COUNT = 5
 private val PIP_SIZE = 12.dp
 private val PIP_GAP = 14.dp
 
-/** Below it the opening reads as a flicker. */
 private const val MIN_MS = 4000L
 
-/** Past it the library fills up better in plain sight. */
 private const val MAX_MS = 12000L

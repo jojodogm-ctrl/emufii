@@ -3,10 +3,6 @@ package eu.emufii.app.ui.components
 import eu.emufii.app.R
 import eu.emufii.app.library.Console
 
-/**
- * Null by design: a newly added console shows its name rather than another machine's picture.
- * pourquoi : docs/decisions/bibliotheque.md § The console folders
- */
 internal fun consoleArtwork(console: Console, dark: Boolean): Int? = when (console) {
     Console.THREE_DS -> if (dark) R.drawable.console_three_ds_dark else R.drawable.console_three_ds_light
     Console.DS -> if (dark) R.drawable.console_ds_dark else R.drawable.console_ds_light

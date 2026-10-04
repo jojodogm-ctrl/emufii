@@ -11,17 +11,12 @@ import eu.emufii.app.ps2.Ps2Target
 import eu.emufii.app.psp.PpssppPackage
 import eu.emufii.app.wfc.MelonDsPackage
 
-/**
- * Read from the system, not from a table here: the version cannot go stale, and the icon
- * stays the emulator's own rather than a copy of someone else's mark in our resources.
- */
 data class EmulatorInfo(
     val console: Console,
     val name: String,
     val installedPackage: String?,
     val version: String?,
     val icon: ImageBitmap?,
-    /** Every installed build, not only the one that will open. */
     val variants: List<EmulatorVariant> = emptyList(),
     val chosenExplicitly: Boolean = false
 ) {
@@ -30,10 +25,6 @@ data class EmulatorInfo(
     val variant: EmulatorVariant? get() = variants.firstOrNull { it.packageName == installedPackage }
 }
 
-/**
- * The per-backend lists stay the authority: duplicating them here is how the accessibility
- * service and `<queries>` drifted apart once, and a test now pins the two together.
- */
 val Console.emulatorPackages: List<String>
     get() = when (this) {
         Console.THREE_DS -> NetplayTarget.AZAHAR.packages
@@ -44,17 +35,11 @@ val Console.emulatorPackages: List<String>
         Console.PS2 -> Ps2Target.packages
     }
 
-/**
- * The first installed variant wins, as the launchers pick. A package can vanish between
- * the query and the read, so an unreadable emulator reads as an absent one.
- */
 fun emulatorInfo(context: Context, console: Console): EmulatorInfo {
     val pm = context.packageManager
     val variants = EmulatorPick.variants(context, console)
     val pkg = EmulatorPick.packageFor(context, console)
-    val version = pkg?.let {
-        runCatching { pm.getPackageInfo(it, 0).versionName }.getOrNull()
-    }
+    val version = pkg?.let { packageVersion(context, it) }
     val icon = pkg?.let {
         runCatching {
             pm.getApplicationIcon(it).toBitmap(ICON_PX, ICON_PX).asImageBitmap()
@@ -71,12 +56,13 @@ fun emulatorInfo(context: Context, console: Console): EmulatorInfo {
     )
 }
 
-/**
- * GameCube and Wii both answer Dolphin and stay two lines: someone holding only Wii dumps
- * should not have to infer that the GameCube row covers them.
- */
+fun emulatorVersion(context: Context, console: Console): String? =
+    EmulatorPick.packageFor(context, console)?.let { packageVersion(context, it) }
+
+private fun packageVersion(context: Context, pkg: String): String? =
+    runCatching { context.packageManager.getPackageInfo(pkg, 0).versionName }.getOrNull()
+
 fun allEmulators(context: Context): List<EmulatorInfo> =
     Console.entries.map { emulatorInfo(context, it) }
 
-/** The emulator list is the largest place it is drawn; a launcher icon is often adaptive. */
 private const val ICON_PX = 144

@@ -2,19 +2,9 @@ package eu.emufii.app.library
 
 import android.content.Context
 
-/**
- * Which language a cartridge says its name in: the one the app speaks. [tag]
- * exists because titles are cached on disk, and two languages of one cartridge
- * are two strings under the same game code.
- * pourquoi : docs/decisions/scan-bibliotheque.md § A cartridge's language is the app's
- */
 object TitleLanguage {
 
-    /**
-     * The language Emufii is displayed in, not the device's: `Locale.getDefault()` ignores
-     * the per-app locale, so a French app on an English phone listed the library in English
-     * under French labels. Read once per scan, from the resources configuration.
-     */
+    /** The app's language, not the device's: `Locale.getDefault()` ignores the per-app locale. */
     @Volatile
     private var current: String = "en"
 
@@ -30,23 +20,15 @@ object TitleLanguage {
 
     private val isFrench: Boolean get() = tag == "fr"
 
-    /**
-     * SMDH title slots: 0 Japanese, 1 English, 2 French, 3 German, 4 Italian,
-     * 5 Spanish, 6 Simplified Chinese, 7 Korean, 8 Dutch, 9 Portuguese,
-     * 10 Russian, 11 Traditional Chinese.
-     */
+    /** SMDH slots: 0 ja, 1 en, 2 fr, 3 de, 4 it, 5 es, 6 zh-Hans, 7 ko, 8 nl, 9 pt, 10 ru, 11 zh-Hant. */
     val smdh: IntArray
         get() = if (isFrench) intArrayOf(2, 1, 0, 3, 4, 5, 8, 9, 10, 6, 11, 7)
         else intArrayOf(1, 2, 0, 3, 4, 5, 8, 9, 10, 6, 11, 7)
 
-    /** DS banner title slots: 0 Japanese, 1 English, 2 French, 3 German, 4 Italian, 5 Spanish. */
+    /** 0 ja, 1 en, 2 fr, 3 de, 4 it, 5 es. */
     val ndsBanner: IntArray
         get() = if (isFrench) intArrayOf(2, 1, 0, 3, 4, 5) else intArrayOf(1, 2, 0, 3, 4, 5)
 
-    /**
-     * Named rather than numbered: `icon_French.dat`. Both English variants are tried, a
-     * European dump often carrying only the British one.
-     */
     val switch: List<String>
         get() = if (isFrench) {
             listOf("French", "CanadianFrench", "BritishEnglish", "AmericanEnglish", "Spanish", "German", "Italian", "Japanese")
@@ -54,19 +36,11 @@ object TitleLanguage {
             listOf("AmericanEnglish", "BritishEnglish", "French", "CanadianFrench", "Spanish", "German", "Italian", "Japanese")
         }
 
-    /**
-     * GameCube `BNR2` slots: 0 English, 1 German, 2 French, 3 Spanish,
-     * 4 Italian, 5 Dutch. `BNR1` carries a single title and ignores this.
-     */
+    /** BNR2 slots: 0 en, 1 de, 2 fr, 3 es, 4 it, 5 nl. BNR1 has one title. */
     val gcBanner: IntArray
         get() = if (isFrench) intArrayOf(2, 0, 1, 3, 4, 5) else intArrayOf(0, 2, 1, 3, 4, 5)
 
-    /**
-     * Wii `IMET` slots: 0 Japanese, 1 English, 2 German, 3 French, 4 Spanish,
-     * 5 Italian, 6 Dutch, 7 Simplified Chinese, 8 Traditional Chinese, 9 Korean.
-     *
-     * Not [gcBanner]'s order: slot 2 is French on a GameCube disc, German on a Wii one.
-     */
+    /** IMET slots: 0 ja, 1 en, 2 de, 3 fr, 4 es, 5 it, 6 nl, 7 zh-Hans, 8 zh-Hant, 9 ko. */
     val wiiImet: IntArray
         get() = if (isFrench) intArrayOf(3, 1, 0, 2, 4, 5, 6) else intArrayOf(1, 3, 0, 2, 4, 5, 6)
 }

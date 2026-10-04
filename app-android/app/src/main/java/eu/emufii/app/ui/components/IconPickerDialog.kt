@@ -61,10 +61,6 @@ import eu.emufii.app.ui.theme.PlateLightLow
 import eu.emufii.app.ui.tap
 import eu.emufii.app.ui.SilenceSystemSfx
 
-/**
- * Automatic matching takes the catalogue's first result for the filename and often lands
- * on the wrong game: hence searching for another game, not only for another icon.
- */
 @Composable
 fun IconPickerDialog(
     rom: Rom,
@@ -101,8 +97,7 @@ fun IconPickerDialog(
         loadingIcons = false
     }
 
-    // In landscape the IME opens fullscreen (extract mode) and covers every icon: an
-    // invisible anchor takes focus so the search field never does.
+    // Landscape IME opens in extract mode and hides the grid: an invisible anchor takes focus instead.
     val anchor = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { anchor.requestFocus() } }
 
@@ -118,8 +113,6 @@ fun IconPickerDialog(
             modifier = Modifier
                 .padding(24.dp)
                 .widthIn(max = 560.dp)
-                // Otherwise the grid pushes the buttons off screen and only a tap
-                // outside closes the window.
                 .heightIn(max = (screenHeight * 0.92f).dp)
         ) {
             Column(
@@ -132,8 +125,6 @@ fun IconPickerDialog(
                     style = MaterialTheme.typography.headlineSmall
                 )
 
-                // `PadTextField`: the frame is the traversal step and A enters, so the
-                // pad crosses the box without raising the IME.
                 PadTextField(
                     value = query,
                     onValueChange = { query = it },
@@ -254,7 +245,6 @@ private fun GameChip(label: String, selected: Boolean, onClick: () -> Unit) {
     }
 }
 
-/** Many icons are transparent: on a solid ground emptiness cannot be told from white. */
 @Composable
 private fun IconChoice(icon: SgdbIcon, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

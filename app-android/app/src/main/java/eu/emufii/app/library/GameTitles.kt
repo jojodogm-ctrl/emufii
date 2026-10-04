@@ -10,11 +10,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-/**
- * Served and cached like `/compat` and `/meta`. The overlay replaces a name derived from
- * the filename, never one read out of the file.
- * pourquoi : docs/decisions/scan-bibliotheque.md § A name the file does not give is asked of the index
- */
 object GameTitles {
 
     private fun fileFor(lang: String) = "game_titles-$lang.json"
@@ -22,7 +17,6 @@ object GameTitles {
     @Volatile
     private var caches: Map<String, Map<String, String>> = emptyMap()
 
-    /** Never touches the network. */
     fun cached(context: Context, lang: String = TitleLanguage.tag): Map<String, String> {
         caches[lang]?.let { return it }
         val read = runCatching {
@@ -40,7 +34,6 @@ object GameTitles {
         return rom.copy(displayName = name)
     }
 
-    /** Split out of [Rom] like `compatKeys`: pure string work, no `Uri` to drag into a test. */
     fun resolve(
         titles: Map<String, String>,
         displayName: String,
@@ -51,10 +44,6 @@ object GameTitles {
         return keys.firstNotNullOfOrNull { titles[it] }
     }
 
-    /**
-     * A title the index does not know is asked for again next launch: remembering the
-     * absence would mean a second cache to invalidate when a title is published.
-     */
     suspend fun refresh(
         context: Context,
         roms: List<Rom>,
@@ -69,8 +58,6 @@ object GameTitles {
 
         val known = cached(context, lang)
         val answer = HashMap<String, String>()
-        // A batch that comes back empty does not sink the others: what did arrive is
-        // kept, and a key with no answer is asked again next launch regardless.
         for (batch in batches(keys)) {
             answer += fetch(baseUrl, lang, batch) ?: continue
         }
@@ -87,16 +74,9 @@ object GameTitles {
         roms.any { apply(merged, it).displayName != it.displayName }
     }
 
-    /**
-     * Two ceilings, and one request honoured neither. The coordinator answers the first
-     * 500 keys and says nothing about the rest, and Node shuts the connection past 16 KB
-     * of request line. Measured on the VPS on 2026-09-03: a library of 1717 keys made an
-     * URL of 21657 characters and came back with nothing at all. Between the two limits
-     * is the worse case, an answer that looks whole and is not.
-     */
+    /** The coordinator answers at most 500 keys and Node drops request lines past 16 KB. */
     private const val KEYS_PER_REQUEST = 400
 
-    /** Null on anything but a 200: an unreachable index reads as "we do not know". */
     private fun fetch(baseUrl: String, lang: String, keys: List<String>): Map<String, String>? =
         runCatching {
             val query = URLEncoder.encode(keys.joinToString(","), "UTF-8")
@@ -113,7 +93,6 @@ object GameTitles {
             }
         }.getOrNull()
 
-    /** Split out like [resolve]: the batching is a rule to pin, not a network call. */
     fun batches(keys: List<String>): List<List<String>> = keys.chunked(KEYS_PER_REQUEST)
 
     private fun parse(raw: String): Map<String, String> = runCatching {

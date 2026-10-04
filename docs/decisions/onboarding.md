@@ -59,8 +59,13 @@ procedure, the one you read while settling in and the one you re-read when it
 does not work.
 
 Deliberate consequence: everything is done from within onboarding, importing the
-PS2 network profile into the memory card included. The three blocks are therefore
-`internal` rather than private.
+PS2 network profile into the memory card included.
+
+Since 2026-10-01 the onboarding draws PPSSPP and ARMSX2 as fact sheets, not as the
+settings blocks. What stays single is the procedure: the pickers, the preparation and
+the error messages live in `settings/EmulatorSetups.kt` (`rememberPpssppSetup`,
+`rememberPs2Setup`), and both drawings call them. Two drawings of one procedure, never
+two procedures.
 
 ## Everything can be skipped, except the nickname
 
@@ -104,3 +109,25 @@ tunnel".
 The rule that comes out of it: English realigns on the revised meaning, never on
 the French sentence, or it inherits the same stiffness the other way round. And a
 badge label, a page title or a numbered step is read aloud before being written.
+
+## Every page is a fact sheet that fits the screen
+
+Rebuilt on 2026-10-01 in the session cards' format (`components/FactSheet.kt`): state
+as tiles, numbered steps with the words that matter in the accent, one warning bar for
+what must not be missed. In landscape nothing scrolls. The sheet gets the height left
+between the rail and the buttons, and `FitColumn` drops its optional lines, in strict
+order: once one gives way, every later one does too, so a short note never outlives the
+warning above it.
+
+Two traps paid for on the way. A line drawn outside its layout box (a negative offset,
+a zero-height mark) is cut during the page change: the fade draws the page in a layer,
+and the layer clips. Room is made inside the box instead, a spacer under the words as
+tall as the mark above them, which keeps the words centred on the card. And the pages
+are centred, not aligned to the top: the player asked for it after trying both.
+
+## The welcome card answers "what does it do"
+
+A list of facts ("7 consoles, 2 minutes, skippable") was rejected as filler. The card
+shows the seven consoles by their library artwork, which exists whether the emulator is
+installed or not (an emulator icon left holes on a fresh device), then a session in three
+steps: a code, the friend types it, local multiplayer each at home.

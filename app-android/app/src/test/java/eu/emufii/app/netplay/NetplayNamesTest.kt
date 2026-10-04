@@ -3,11 +3,11 @@ package eu.emufii.app.netplay
 import eu.emufii.app.profile.Profile
 import org.junit.Assert.assertTrue
 import eu.emufii.app.library.Backend
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/** A name the emulator rejects shows up as a connection that silently never happens. */
 class NetplayNamesTest {
 
     @Test
@@ -24,24 +24,27 @@ class NetplayNamesTest {
 
     @Test
     fun `the default profile name already clears the pseudo floor`() {
-        // The onboarding pre-fills with it: tapping straight through must not leave a
-        // name the emulator bounces.
         assertTrue(Profile.DEFAULT_NAME.length >= Profile.MIN_NAME_LENGTH)
     }
 
     @Test
-    fun `Azahar never has its nickname rewritten`() {
-        // Emufii had replaced a valid Azahar nickname with the profile name, and the
-        // form refused the whole dialog while blaming the address.
-        assertNull(NetplayNames.usernameFor(Backend.AZAHAR, "Clossv"))
+    fun `Azahar gets the nickname only over its default`() {
+        assertEquals("Clossv", NetplayNames.usernameFor(Backend.AZAHAR, "Clossv"))
+        assertTrue(NetplayNames.isDefaultUsername("AZAHAR"))
+        assertTrue(NetplayNames.isDefaultUsername(""))
+        assertTrue(NetplayNames.isDefaultUsername(null))
+        assertTrue(NetplayNames.isDefaultUsername("Jo"))
+        assertFalse(NetplayNames.isDefaultUsername("Clossv"))
+    }
+
+    @Test
+    fun `backends without a nickname field get none`() {
         assertNull(NetplayNames.usernameFor(Backend.PPSSPP, "Clossv"))
         assertNull(NetplayNames.usernameFor(Backend.MELONDS, "Clossv"))
     }
 
     @Test
     fun `Eden gets the profile nickname`() {
-        // Eden does not state it: two players with the same nickname cannot share a
-        // room, and its default nickname is the same for everybody.
         assertEquals("Clossv", NetplayNames.usernameFor(Backend.EDEN, "Clossv"))
     }
 

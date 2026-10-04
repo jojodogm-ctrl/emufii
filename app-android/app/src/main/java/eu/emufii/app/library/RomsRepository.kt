@@ -13,22 +13,13 @@ private const val TAG = "RomsRepository"
 private const val PREFS = "emufii_library"
 private const val KEY_FOLDER_URI = "roms_folder_uri"
 
-/** A separate key, not a list: migrating [KEY_FOLDER_URI] would empty older builds' libraries. */
+/** Separate key: migrating [KEY_FOLDER_URI] would empty older builds' libraries. */
 private const val KEY_FOLDER_URI_2 = "roms_folder_uri_2"
 
-/**
- * How deep to walk: every extra level costs a query per directory.
- * pourquoi : docs/decisions/scan-bibliotheque.md § Walking the tree
- */
 private const val MAX_DEPTH = 6
 
 private const val MAX_FILES = 5000
 
-/**
- * A container the PSP shares with other consoles enters the library only once
- * recognised as a PSP game.
- * pourquoi : docs/decisions/scan-bibliotheque.md § A decision chain, cheapest first
- */
 class RomsRepository private constructor(private val context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -49,10 +40,6 @@ class RomsRepository private constructor(private val context: Context) {
 
     private fun folderUris(): List<Uri> = listOfNotNull(savedFolderUri(), secondFolderUri())
 
-    /**
-     * Something the user can recognise, not the raw tree URI.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § What the player sees of the chosen folder
-     */
     fun savedFolderLabel(): String? = label(savedFolderUri())
 
     fun secondFolderLabel(): String? = label(secondFolderUri())
@@ -66,7 +53,6 @@ class RomsRepository private constructor(private val context: Context) {
 
     fun setFolder(uri: Uri) = setFolder(KEY_FOLDER_URI, uri)
 
-    /** The same tree as the first is refused: the two walks would cross on every file. */
     fun setSecondFolder(uri: Uri): Boolean {
         if (uri == savedFolderUri()) return false
         setFolder(KEY_FOLDER_URI_2, uri)
@@ -80,7 +66,6 @@ class RomsRepository private constructor(private val context: Context) {
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
         }
-        // This key's old tree is no longer read: release it, unless the other key uses it.
         val previous = prefs.getString(key, null)?.let(Uri::parse)
         prefs.edit { putString(key, uri.toString()) }
         if (previous != null && previous != uri) release(previous)
@@ -110,20 +95,11 @@ class RomsRepository private constructor(private val context: Context) {
         }
     }
 
-    /**
-     * Last scan's result, shared across instances.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § The cache belongs to the process, not to the screen
-     */
     companion object {
         @Volatile
         private var cachedRoms: List<Rom>? = null
         private val scanLock = Any()
 
-        /**
-         * `RomsRepository` holds reader and cache state; building one per screen let
-         * two scans race the same folder. Same pattern as
-         * [eu.emufii.app.settings.SettingsStore].
-         */
         @Volatile
         private var instance: RomsRepository? = null
 
@@ -136,11 +112,9 @@ class RomsRepository private constructor(private val context: Context) {
     fun cachedOrScan(): List<Rom> = cachedRoms?.let(::named) ?: scan()
 
     fun scan(force: Boolean = false): List<Rom> = synchronized(scanLock) {
-        // Changing the language recreates the activity but not this process-level cache,
-        // and every title in it is then the wrong string.
+        // The language change recreates the activity but not this cache.
         TitleLanguage.apply(context)
         val staleLanguage = scannedLanguage != null && scannedLanguage != TitleLanguage.tag
-        // Another thread may have finished while we waited on the lock.
         if (!force && !staleLanguage) cachedRoms?.let { return named(it) }
         return doScan()
     }
@@ -148,20 +122,15 @@ class RomsRepository private constructor(private val context: Context) {
     private var scannedLanguage: String? = null
 
     private fun doScan(): List<Rom> {
-        // Titles come out of the cartridges in the language asked for: settle it before
-        // reading one, and re-read it each scan, since changing it is what triggers one.
         TitleLanguage.apply(context)
         scannedLanguage = TitleLanguage.tag
         val folders = folderUris()
         if (folders.isEmpty()) return emptyList()
-        // An unreadable folder must not take the other with it.
         val found = folders.flatMap { uri ->
             runCatching { walk(uri) }
                 .onFailure { Log.w(TAG, "scan failed for $uri", it) }
                 .getOrDefault(emptyList())
         }
-            // The second folder can be a subfolder of the first, or the same volume
-            // mounted twice.
             .distinctBy { it.uri.toString() }
 
         Log.i(TAG, "walked ${found.size} candidate file(s) in ${folders.size} folder(s), titles in ${TitleLanguage.tag}")
@@ -172,14 +141,7 @@ class RomsRepository private constructor(private val context: Context) {
             .let(::named)
     }
 
-    /**
-     * The player's chosen names, laid over the scanned list on the way out, never baked
-     * into the cache. The sort belongs here too.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § Player-chosen names are applied on the way out, never into the cache
-     */
     private fun named(roms: List<Rom>): List<Rom> {
-        // Index titles only ever replace a filename, never a title read out of the file
-        // or a name someone typed, hence their place before the player's choices.
         val titles = GameTitles.cached(context)
         return roms.filterNot(hiddenRoms::isHidden)
             .map { GameTitles.apply(titles, it) }
@@ -195,15 +157,9 @@ class RomsRepository private constructor(private val context: Context) {
         val size: Long,
     )
 
-    /**
-     * Queries [DocumentsContract] directly, breadth-first so shallow folders come first.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § Walking the tree
-     */
     private fun walk(treeUri: Uri): List<Candidate> {
         val resolver = context.contentResolver
         val out = mutableListOf<Candidate>()
-        // The third element is the folder's own name, "" at the root: it settles a file's
-        // console before any byte is read.
         val queue = ArrayDeque<Triple<String, Int, String>>()
         val seen = mutableSetOf<String>()
 
@@ -218,9 +174,7 @@ class RomsRepository private constructor(private val context: Context) {
                 DocumentsContract.Document.COLUMN_DOCUMENT_ID,
                 DocumentsContract.Document.COLUMN_DISPLAY_NAME,
                 DocumentsContract.Document.COLUMN_MIME_TYPE,
-                // A document provider exposes no creation date, and this is the
-                // "recently added" sort's only source; fetching it afterwards would
-                // cost one round trip per file.
+                // Only source for "recently added"; providers expose no creation date.
                 DocumentsContract.Document.COLUMN_LAST_MODIFIED,
                 DocumentsContract.Document.COLUMN_SIZE,
             )
@@ -237,8 +191,6 @@ class RomsRepository private constructor(private val context: Context) {
                     val mime = it.getString(2)
 
                     if (mime == DocumentsContract.Document.MIME_TYPE_DIR) {
-                        // Dot-folders are emulator caches, save states and `.git`
-                        // checkouts: nothing playable, and big.
                         if (depth + 1 <= MAX_DEPTH && !name.startsWith(".")) {
                             queue += Triple(docId, depth + 1, name)
                         }
@@ -247,11 +199,7 @@ class RomsRepository private constructor(private val context: Context) {
 
                     val extLower = name.substringAfterLast('.', "").lowercase()
                     val uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, docId)
-                    // Cheapest truth first: folder name, extension, then bytes.
-                    // pourquoi : docs/decisions/scan-bibliotheque.md § A decision chain, cheapest first
                     val console = if (extLower == NdsArchive.EXTENSION) {
-                        // An archive is a DS game or nothing: no other backend of ours opens one.
-                        // pourquoi : docs/decisions/scan-bibliotheque.md § A zipped cartridge stays zipped
                         if (holdsDsRom(uri)) Console.DS else continue
                     } else {
                         val byName = Console.forExtension(extLower) ?: continue
@@ -269,8 +217,7 @@ class RomsRepository private constructor(private val context: Context) {
                         uri = uri,
                         name = name,
                         console = console,
-                        // `getLong` on a null column returns 0 on some providers and
-                        // throws on others.
+                        // getLong on a null column returns 0 on some providers and throws on others.
                         addedAt = if (it.isNull(3)) 0L else it.getLong(3),
                         size = if (it.isNull(4)) 0L else it.getLong(4),
                     )
@@ -288,36 +235,21 @@ class RomsRepository private constructor(private val context: Context) {
         context.contentResolver.openInputStream(uri)?.use { NdsArchive.openRom(it) != null }
     }.onFailure { Log.w(TAG, "cannot read archive $uri", it) }.getOrNull() ?: false
 
-    /**
-     * 3DS and DS files get opened; a disc image takes its title from the filename and
-     * its identity from the disc.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § What we open, and what we cannot open
-     */
     private fun Candidate.toRom(): Rom? = readRom()?.copy(addedAt = addedAt)
 
-    /**
-     * The title read out of the file, which is what gets cached: the chosen name is laid
-     * over it in [named], never here.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § Player-chosen names are applied on the way out, never into the cache
-     */
     private fun Candidate.readRom(): Rom? {
         if (console == Console.DS) return toDsRom()
         if (console == Console.SWITCH) return toSwitchRom()
 
         if (console == Console.PSP) return toPspRom()
 
-        // Same path as the Nintendo discs, the number exactly as ARMSX2 displays it.
-        // pourquoi : docs/decisions/scan-bibliotheque.md § `productCode` and `titleIdHex` do not play the same role
         if (console == Console.GAMECUBE || console == Console.WII || console == Console.PS2) {
             return toDiscRom()
         }
 
-        // What is left no path can serve, and a grid whose function is to open sessions
-        // has no business showing it.
         if (console != Console.THREE_DS) return null
 
-        // The cartridge formats announce themselves by magic, the CIA does not: only the
-        // caller knows what the file claimed to be.
+        // CIA has no magic: only the extension says what it is.
         val header = headerReader.read(uri, cia = name.substringAfterLast('.', "").equals("cia", true))
         val smdh = header?.let { readSmdhWithCache(uri, it) }
         val iconFile = header?.let { h -> iconCache.fileFor(h.titleIdHex).takeIf { it.exists() } }
@@ -334,11 +266,6 @@ class RomsRepository private constructor(private val context: Context) {
         )
     }
 
-    /**
-     * Title and icon read from `PSP_GAME`, a few kilobytes on a disc weighing a million.
-     * Disc id is the cache key, never the session identity.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § `productCode` and `titleIdHex` do not play the same role
-     */
     private fun Candidate.toPspRom(): Rom? {
         val fallback = Rom(
             uri = uri,
@@ -362,13 +289,8 @@ class RomsRepository private constructor(private val context: Context) {
         }
 
         val data = pspReader.read(uri)
-        // `.iso`/`.chd` must prove they are PSP by a `PSP_GAME` entry; `.pbp` and `.cso`
-        // are admitted on their extension alone.
-        // pourquoi : docs/decisions/scan-bibliotheque.md § A decision chain, cheapest first
         val ambiguous = name.substringAfterLast('.', "").lowercase() in DiscImage.AMBIGUOUS_EXTENSIONS
         if (ambiguous && !data.recognised) return null
-        // A homebrew can have an icon and no disc id; the filename stands in, being
-        // stable from one scan to the next.
         val key = data.cacheKey ?: "PSP-F%08x".format(name.lowercase().hashCode())
         if (data.icon == null && data.title == null) return fallback
         ndsKeyCache[uri.toString()] = key
@@ -387,11 +309,6 @@ class RomsRepository private constructor(private val context: Context) {
         )
     }
 
-    /**
-     * The icon lands under the cartridge's game code, so a rescan does not re-decode
-     * every banner.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § What we open, and what we cannot open
-     */
     private fun Candidate.toDsRom(): Rom {
         val fallback = Rom(
             uri = uri,
@@ -432,10 +349,6 @@ class RomsRepository private constructor(private val context: Context) {
         )
     }
 
-    /**
-     * Filed under `productCode`, never `titleIdHex`.
-     * pourquoi : docs/decisions/scan-bibliotheque.md § `productCode` and `titleIdHex` do not play the same role
-     */
     private fun Candidate.toDiscRom(): Rom {
         val fallback = Rom(
             uri = uri,
@@ -444,8 +357,6 @@ class RomsRepository private constructor(private val context: Context) {
             console = console
         )
         val info = discImages.read(uri, addedAt, size) ?: return fallback
-        // The console read back wins: it tells a GameCube RVZ from a Wii RVZ, which the
-        // extension cannot.
         return fallback.copy(
             console = info.console,
             productCode = info.gameId,
@@ -453,11 +364,6 @@ class RomsRepository private constructor(private val context: Context) {
         )
     }
 
-    /**
-     * A title id off the plaintext table of contents, nothing else out of the file: the
-     * name comes from [GameTitles] and the icon from the artwork sources. Icons cached
-     * from an era of console keys keep showing, being on disk and still true.
-     */
     private fun Candidate.toSwitchRom(): Rom {
         val fallback = Rom(
             uri = uri,
@@ -490,7 +396,6 @@ class RomsRepository private constructor(private val context: Context) {
         )
     }
 
-    /** Avoids re-reading a header just to learn where its icon was filed. */
     private val ndsKeyCache = HashMap<String, String>()
 
     private fun readSmdhWithCache(uri: Uri, header: RomHeader): SmdhData {

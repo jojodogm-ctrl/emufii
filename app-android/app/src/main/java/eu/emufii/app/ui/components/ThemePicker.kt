@@ -68,25 +68,17 @@ import eu.emufii.app.ui.rememberElastic
 import eu.emufii.app.ui.Motion
 import eu.emufii.app.ui.DrawnCheck
 
-/**
- * Four trays to compare, in place of nine named lines the settings had to scroll past.
- * pourquoi : docs/decisions/reglages-ecran.md § One hub and seven pages, plus an accordion
- */
 @Composable
 fun ThemeSwatches(
     theme: AppTheme,
     onTheme: (AppTheme) -> Unit,
     modifier: Modifier = Modifier,
-    /** True when the first tray is the page's first control. */
     firstIsEntry: Boolean = false
 ) {
-    // Hardcoded: there is no configurable accent any more.
     val cuts = TealCuts
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val count = AppTheme.entries.size
         val cell = (maxWidth - SWATCH_GAP * (count - 1)) / count
-        // Under the names, a bar that stretches from one theme to the next and closes up.
-        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The elastic indicator
         val bar = rememberElastic(
             target = (cell + SWATCH_GAP) * AppTheme.entries.indexOf(theme) + cell * 0.3f,
             width = cell * 0.4f
@@ -128,12 +120,6 @@ private fun ThemeSwatch(
     entry: Boolean = false
 ) {
     val panelDark = LocalEmufiiDarkTheme.current
-    /**
-     * The ring belongs to the cursor and keeps one weight everywhere; read here as well
-     * as in [controlRing] because only layout can pass the thumbnail in front of its
-     * neighbours before the band is drawn.
-     * pourquoi : docs/decisions/navigation-manette.md § The ring keeps the same weight everywhere
-     */
     var ringed by remember { mutableStateOf(false) }
     val mark by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
@@ -141,8 +127,7 @@ private fun ThemeSwatch(
         label = "theme-swatch-mark"
     )
     Column(
-        // The cursor's band spills past the thumbnail and a `Row` draws its children in
-        // order, so the right thumbnail passed over the left one's band and cut it off.
+        // A Row draws in order, so the right thumbnail covered the left one's ring.
         modifier = modifier.zIndex(if (ringed) 1f else 0f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -152,8 +137,6 @@ private fun ThemeSwatch(
                 .aspectRatio(1.3f)
                 .then(if (entry) Modifier.padEntry() else Modifier)
                 .onFocusEvent { ringed = it.hasFocus }
-                // Thinner than elsewhere: the thumbnails are 10 dp apart and carry their
-                // name just below, so the default share bit into both.
                 .controlRing(
                     InsetShape,
                     width = 3.dp,
@@ -165,10 +148,6 @@ private fun ThemeSwatch(
         ) {
             when (theme) {
                 AppTheme.SYSTEM -> {
-                    // One plate per side: drawing both halves complete gave four plates
-                    // in a thumbnail, read as two thumbnails pushed together. And a
-                    // weight only settles the width, so without `fillMaxHeight` the
-                    // halves wrap their content and the swatch is a 16 dp strip.
                     Row(Modifier.fillMaxSize()) {
                         TrayHalf(
                             AppTheme.LIGHT, accent, Plates.CURSOR,
@@ -182,23 +161,16 @@ private fun ThemeSwatch(
                 }
                 else -> TrayHalf(theme, accent, Plates.BOTH, Modifier.fillMaxSize())
             }
-            // Over the whole swatch, after the halves, so the split theme gets one
-            // outline instead of two touching rectangles.
             Box(
                 Modifier
                     .fillMaxSize()
                     .border(
                         width = 1.dp,
-                        // Follows the panel, not the theme depicted: `EdgeLight` is a
-                        // dark hairline, and on the dark panel the unselected swatches
-                        // lost their bounds and the dark one became a hole.
+                        // Follows the panel, not the depicted theme, or swatches lose their edge.
                         color = if (panelDark) EdgeDark else EdgeLight,
                         shape = InsetShape
                     )
             )
-            // It grows as it settles: choosing a theme repaints the whole panel behind
-            // it, and a mark appearing at once would read as a second event.
-            // The disc pops and the tick draws itself; silent, a theme is not a step done.
             DrawnCheck(
                 done = selected,
                 disc = accent.bright,
@@ -218,14 +190,11 @@ private fun ThemeSwatch(
             else MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            // 12 dp, not 6: the cursor's band runs below the thumbnail and the name
-            // read through it.
             modifier = Modifier.padding(top = 12.dp)
         )
     }
 }
 
-/** Which of the two plates a half draws; see [AppTheme.SYSTEM] above. */
 private enum class Plates { BOTH, CURSOR, PLAIN }
 
 @Composable
@@ -250,7 +219,6 @@ private fun TrayHalf(
         modifier = modifier.background(Brush.verticalGradient(shell)),
         contentAlignment = Alignment.Center
     ) {
-        // The smallest arrangement still reading as this app, not a colour sample.
         Row(
             horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -285,7 +253,6 @@ internal val AppTheme.labelRes: Int
         AppTheme.OLED -> R.string.settings_theme_oled
     }
 
-/** For the swatches, where "OLED (true black)" is three lines wide. */
 internal val AppTheme.labelShortRes: Int
     get() = when (this) {
         AppTheme.SYSTEM -> R.string.settings_theme_short_system

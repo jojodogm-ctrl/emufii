@@ -10,11 +10,6 @@ import eu.emufii.app.ui.theme.VioletDark
 import eu.emufii.app.ui.theme.WarnLight
 import kotlin.math.abs
 
-/**
- * Remixed from the logo's two axes and their neighbouring semantic tones: no invented
- * hue.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § CONSTRAINTS (no hard-coded hex)
- */
 private val PALETTE = listOf(
     Teal.bright to Teal.deep,
     Coral.bright to Coral.deep,

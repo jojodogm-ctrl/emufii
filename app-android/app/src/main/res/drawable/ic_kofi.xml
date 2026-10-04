@@ -1,7 +1,6 @@
 <!-- The Ko-fi cup, redrawn in the app's icon language: 24 unit box, single
      stroke, round caps and joins. It is not the Ko-fi logo and does not claim
-     to be; the service name is spelt out next to it.
-     pourquoi : docs/decisions/reglages-ecran.md § The two outbound links, and their order -->
+     to be; the service name is spelt out next to it. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"

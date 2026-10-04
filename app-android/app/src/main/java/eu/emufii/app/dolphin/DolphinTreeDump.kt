@@ -15,26 +15,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * The only test bench is the Thor, and a remote player with no PC has no logcat to
- * send: two hypotheses were already spent guessing on their behalf, the build and the
- * node ceiling, both wrong. The file goes into the public Downloads rather than the
- * app's private storage, `getExternalFilesDir` having been invisible since Android 11.
- * Off unless [BuildConfig.TREE_DUMP]: the dump names the games in the grid.
- */
+/** Written to public Downloads (`getExternalFilesDir` is not user-visible since Android 11). Debug only: it names the user's games. */
 object DolphinTreeDump {
 
-    /**
-     * One dump per plan: the driver passes over a stuck screen several times a second,
-     * and would otherwise fill Downloads with copies of the same tree.
-     */
     private var written = false
 
     fun reset() {
         written = false
     }
 
-    /** [reason] says at which fork the driver gave up, and leads the file. */
     fun capture(context: Context, pkg: String, nodes: List<Node>, reason: String) {
         if (!BuildConfig.TREE_DUMP || written) return
         written = true
@@ -61,8 +50,6 @@ object DolphinTreeDump {
             false
         }
 
-        // The player does not read logs, that being this file's premise: unless told
-        // on screen they never know they have something to send.
         val message =
             if (ok) "Emufii: diagnostic written to Downloads/$name"
             else "Emufii: the diagnostic could not be written"
@@ -88,9 +75,6 @@ object DolphinTreeDump {
         appendLine("nodes        : ${nodes.size}")
         appendLine()
 
-        // One unresolved label explains a silent driver by itself, half the cases.
-        // Zero translations for a name means the string does not exist in this Dolphin
-        // build; a full list means the tree is what does not contain it.
         appendLine("--- labels resolved in the resources of $pkg ---")
         for (name in LABELS) {
             val values = NetplayLabels.of(context, pkg, name)
@@ -98,7 +82,7 @@ object DolphinTreeDump {
         }
         appendLine()
 
-        appendLine("--- nœuds ---")
+        appendLine("--- nodes ---")
         nodes.forEachIndexed { i, n ->
             appendLine(
                 "[$i] ${n.className}" +

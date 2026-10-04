@@ -1,6 +1,5 @@
 package eu.emufii.app.library
 
-/** The two values ARMSX2 uses to name one game's native settings file. */
 data class Ps2DiscIdentity(
     val serial: String,
     /** Eight uppercase hexadecimal digits; this is PCSX2's ELF XOR, not CRC32. */
@@ -9,11 +8,6 @@ data class Ps2DiscIdentity(
     val settingsFilename: String get() = "${serial}_${elfCrc}.ini"
 }
 
-/**
- * [Reader] is smaller than a file API on purpose: a plain ISO implements it with one
- * seekable channel, a CHD over decoded hunks. Nothing is extracted, only SYSTEM.CNF, its
- * directories and the boot ELF are read.
- */
 object Ps2DiscIdentityReader {
 
     fun interface Reader {

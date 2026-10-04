@@ -9,10 +9,6 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 
-/**
- * [recognised] says the file really is a PSP game: a PS2 or Xbox `.iso` carries the same
- * extension and used to land in the grid under its filename.
- */
 data class PspData(
     val icon: Bitmap?,
     val title: String?,
@@ -20,19 +16,12 @@ data class PspData(
     val recognised: Boolean = false
 )
 
-/**
- * Five reads, about ten kilobytes on a disc weighing a million: cheap enough for the
- * library scan. The UMD (`.iso`) is an ordinary ISO9660, decoded by [UmdIso]; the
- * `EBOOT.PBP` carries an address table up front. `.cso` and `.chd` are compressed, their
- * table of contents unreadable as it stands, and those tiles keep their initials.
- */
 class PspUmdReader(private val context: Context) {
 
     private companion object {
         val ICON_PATH = listOf("PSP_GAME", "ICON0.PNG")
         val SFO_PATH = listOf("PSP_GAME", "PARAM.SFO")
 
-        /** `\0PBP`: an EBOOT's signature. */
         const val PBP_MAGIC = 0x50425000
 
         const val PBP_SFO_AT = 0x08
@@ -41,10 +30,7 @@ class PspUmdReader(private val context: Context) {
         const val MAX_ICON = 512 * 1024
         const val MAX_SFO = 64 * 1024
 
-        /**
-         * A UMD's icon is 144x80 and the grid draws without smoothing, right for a DS's
-         * 32 pixels, wrong for PSP artwork: scaled up here once, smoothed.
-         */
+        /** 144x80 icons are drawn unsmoothed by the grid, so upscale once here. */
         const val UPSCALE = 3
     }
 
@@ -67,8 +53,7 @@ class PspUmdReader(private val context: Context) {
         val bitmap = payload.icon?.let { bytes ->
             BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.let(::upscale)
         }
-        // A `PARAM.SFO` title often wraps to fit the console's thumbnail
-        // ("WipEout\nPulse"); in a grid those breaks are holes in the name.
+        // `PARAM.SFO` titles often contain line breaks.
         val title = fields["TITLE"]
             ?.replace(Regex("\\s+"), " ")
             ?.trim()
@@ -100,7 +85,6 @@ class PspUmdReader(private val context: Context) {
         )
     }
 
-    /** Every offset in a PBP is followed by the next piece's, so the size comes for free. */
     private fun pbpPayload(source: UmdIso.Source): Payload? {
         val header = source.read(0, 40) ?: return null
         if (header.size < 40) return null

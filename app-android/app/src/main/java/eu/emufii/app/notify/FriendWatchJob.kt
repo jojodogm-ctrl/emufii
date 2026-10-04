@@ -16,11 +16,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-/**
- * No push: we ask, every fifteen minutes at best. `JobScheduler` rather than
- * WorkManager, which would cost a database for one periodic job.
- * pourquoi : docs/decisions/amis-et-notifications.md § What background watching can promise, and what it cannot
- */
 class FriendWatchJob : JobService() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -29,8 +24,6 @@ class FriendWatchJob : JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
         work = scope.launch {
             runCatching { sweep(applicationContext) }
-            // Never rescheduled on failure: the next tick is a quarter of an hour away
-            // and asks the same question.
             jobFinished(params, false)
         }
         return true
@@ -64,10 +57,6 @@ class FriendWatchJob : JobService() {
             )
         }
 
-        /**
-         * Lives here rather than in the service so the open app runs the same pass
-         * against the same memory: two implementations of "what is new" would drift.
-         */
         suspend fun sweep(context: Context) {
             val settings = SettingsStore.get(context)
             val state = WatchState(context)
@@ -79,7 +68,7 @@ class FriendWatchJob : JobService() {
             if (friends.isEmpty()) return
 
             val codes = friends.map { it.code }
-            val fresh = CoordinatorClient().friendStatuses(codes).getOrNull() ?: return
+            val fresh = CoordinatorClient().friendStatuses(codes).getOrNull()?.present ?: return
 
             val current = codes.associateWith { code ->
                 fresh[code]?.let {

@@ -6,12 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Every vector is measured, not derived: on 2026-08-20 a PS2 formatted a card through
- * ARMSX2 and Midnight Club 3's network utility wrote its configuration to it, under
- * i.Link ID `30 27 D4 20 57 06 94 80`. The round trip proves the shift table, the word
- * order and the odd-byte tail: one wrong shift garbles its word visibly.
- */
+/** Vectors measured from a real card written by Midnight Club 3, i.Link ID 30 27 D4 20 57 06 94 80. */
 class Ps2NetcnfConfigTest {
 
     private val benchId = hex("3027d42057 0694 80".replace(" ", ""))
@@ -75,8 +70,6 @@ class Ps2NetcnfConfigTest {
 
     @Test
     fun `two files encrypted for one console share their prefix when their text does`() {
-        // A 38-byte header common to both plaintexts, a shift table repeating every 24
-        // words (48 bytes): the first 47 bytes of the two shipped files match.
         val ifc = Ps2NetcnfConfig.ifcDat(benchId)
         val dev = Ps2NetcnfConfig.devDat(benchId)
         var shared = 0

@@ -22,12 +22,6 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
-/**
- * A tunnel that only answers DNS, so DS online play lands on Kaeru. Kept separate from
- * [eu.emufii.app.wg.EmufiiWgService]: no session code and no hub, and Android runs one
- * VpnService at a time, so the two modes are mutually exclusive anyway. Scoped to melonDS
- * via [VpnService.Builder.addAllowedApplication], so nothing else is moved.
- */
 class WfcDnsService : VpnService() {
 
     companion object {
@@ -39,10 +33,6 @@ class WfcDnsService : VpnService() {
 
         private const val UPSTREAM_TIMEOUT_MS = 4000
 
-        /**
-         * Three in a row is a server that is gone: roughly twelve seconds at the timeout
-         * above, shorter than the console's patience, so Emufii names the cause first.
-         */
         private const val UNREACHABLE_AFTER_FAILURES = 3
 
         private val _state = MutableStateFlow(WfcState.Idle as WfcState)
@@ -95,8 +85,7 @@ class WfcDnsService : VpnService() {
 
             val established = Builder()
                 .addAddress(KaeruWfc.TUN_ADDRESS, 32)
-                // One host route, for the resolver advertised: everything else keeps
-                // using the real network, this tunnel moves DNS, not traffic.
+                // Only the resolver is routed: this tunnel moves DNS, not traffic.
                 .addRoute(KaeruWfc.SENTINEL_DNS, 32)
                 .addDnsServer(KaeruWfc.SENTINEL_DNS)
                 .addAllowedApplication(melonPackage)
@@ -158,7 +147,6 @@ class WfcDnsService : VpnService() {
                 }
             }
         } catch (e: Exception) {
-            // Closing the descriptor to stop the service lands here: the normal way out.
             Log.d(TAG, "relay loop ended: ${e.message}")
         }
         Log.d(TAG, "relay loop stopped")
@@ -197,11 +185,7 @@ class WfcDnsService : VpnService() {
         try { stopForeground(STOP_FOREGROUND_REMOVE) } catch (_: Exception) {}
     }
 
-    /**
-     * Unconditional, and `stopSelf` counts as much as [stopTunnel]: it clears the sticky
-     * restart.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § Swiping the app out of recents cuts the tunnel
-     */
+    /** stopSelf also clears the sticky restart. */
     override fun onTaskRemoved(rootIntent: Intent?) {
         Log.d(TAG, "Emufii swiped away, taking the WFC tunnel down")
         stopTunnel()
@@ -250,10 +234,6 @@ sealed interface WfcState {
     data object Idle : WfcState
     data class Active(val scopedTo: String) : WfcState
 
-    /**
-     * Separate from [Error]: nothing on this side is broken, the redirection serves again
-     * the moment Kaeru comes back.
-     */
     data class Unreachable(val scopedTo: String) : WfcState
     data object Stopping : WfcState
     data class Error(val message: String) : WfcState

@@ -6,10 +6,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The tunnel trusts whatever we write back: nothing else stands between a checksum slip
- * and DNS silently not working on device.
- */
 class Ipv4UdpTest {
 
     private fun ip(a: Int, b: Int, c: Int, d: Int) =
@@ -40,10 +36,6 @@ class Ipv4UdpTest {
         assertEquals(0, Ipv4Udp.checksum(packet, 0, 20))
     }
 
-    /**
-     * Verifies a UDP checksum the way a receiver does: pseudo-header plus the
-     * datagram with its checksum left in place, which sums to all-ones.
-     */
     private fun udpChecksumVerifies(packet: ByteArray): Boolean {
         var sum = 0
         for (i in 12 until 20 step 2) sum += Ipv4Udp.readShort(packet, i)
@@ -60,8 +52,7 @@ class Ipv4UdpTest {
         return (sum and 0xFFFF) == 0xFFFF
     }
 
-    // The three expected values come from a separate one's-complement sum written in
-    // Python against the same inputs: a checksum that agrees with itself proves nothing.
+    // Expected values computed independently in Python.
     @Test
     fun `header checksum matches an independently computed value`() {
         // 45 00 00 21 00 00 40 00 40 11 .. .. 0a 42 35 02 0a 42 35 35
@@ -79,8 +70,7 @@ class Ipv4UdpTest {
 
     @Test
     fun `udp checksum handles an odd-length payload`() {
-        // The odd trailing byte is padded for the sum but must not change the declared
-        // length, which is itself summed: the two packets must NOT match.
+        // The odd trailing byte is padded for the sum but not counted in the declared length.
         val odd = Ipv4Udp.build(client, sentinel, 1234, 53, byteArrayOf(1, 2, 3))
         val even = Ipv4Udp.build(client, sentinel, 1234, 53, byteArrayOf(1, 2, 3, 0))
 
@@ -120,7 +110,6 @@ class Ipv4UdpTest {
     fun `rejects what it should not try to answer`() {
         val good = Ipv4Udp.build(client, sentinel, 40000, 53, ByteArray(16))
 
-        // Truncated below an IP header.
         assertNull(Ipv4Udp.parse(good, 12))
 
         val v6 = good.copyOf().also { it[0] = 0x60 }
@@ -129,14 +118,12 @@ class Ipv4UdpTest {
         val tcp = good.copyOf().also { it[9] = 6 }
         assertNull(Ipv4Udp.parse(tcp))
 
-        // Claims more length than the buffer holds.
         assertNull(Ipv4Udp.parse(good, good.size - 4))
 
         // A fragment: reassembly is not our job.
         val fragment = good.copyOf().also { it[6] = 0x20 }  // more-fragments set
         assertNull(Ipv4Udp.parse(fragment))
 
-        // A UDP length that does not fit inside the IP total length.
         val lying = good.copyOf().also { it[25] = (it[25] + 40).toByte() }
         assertNull(Ipv4Udp.parse(lying))
 

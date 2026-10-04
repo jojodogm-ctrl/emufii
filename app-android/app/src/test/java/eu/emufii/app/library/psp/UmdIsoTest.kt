@@ -4,19 +4,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/**
- * Three ISO9660 traps, each showing up as the same symptom, "file not found" on a disc
- * that contains it: the `;1` stuck after filenames, the end-of-sector padding that cuts a
- * large directory in two, and a path that crosses a directory.
- */
 class UmdIsoTest {
 
     private val sector = UmdIso.SECTOR
 
-    /**
-     * With [padded], the directory occupies two sectors and its files are pushed into the
-     * second behind the zero padding: the shape any directory past 2048 bytes takes.
-     */
     private class Disc(
         dirName: String,
         files: Map<String, ByteArray>,
@@ -42,8 +33,6 @@ class UmdIsoTest {
             at += record(at, "\u0000", 17, s, dir = true)
             record(at, dirName, 18, dirSectors * s, dir = true)
 
-            // In [padded] mode the entries start at the next sector, the first staying
-            // empty behind its "." entry.
             at = 18 * s
             at += record(at, "\u0000", 18, dirSectors * s, dir = true)
             if (padded) at = 19 * s
@@ -121,8 +110,6 @@ class UmdIsoTest {
     fun `a folder requested as a file does not get through`() {
         val disc = Disc("PSP_GAME", mapOf("ICON0.PNG" to ByteArray(8)))
 
-        // "PSP_GAME" exists, but as a directory: read as an icon it gives table-of-contents
-        // bytes dressed up as an image.
         assertNull(UmdIso.find(sourceOf(disc.bytes), listOf("PSP_GAME")))
     }
 
@@ -135,8 +122,7 @@ class UmdIsoTest {
 
     @Test
     fun `a PS2 disc has no PSP_GAME, and that is how it is recognised`() {
-        // A PS2 burns a valid ISO9660, `SYSTEM.CNF` at the root and no `PSP_GAME`; the
-        // `.iso` extension is a UMD's too, so this null is what keeps it out of the library.
+        // A PS2 ISO is valid ISO9660 too (SYSTEM.CNF, no PSP_GAME); this null keeps it out.
         val ps2 = Disc("SYSTEM", mapOf("SYSTEM.CNF" to ByteArray(64)))
         val source = sourceOf(ps2.bytes)
 
@@ -154,7 +140,6 @@ class UmdIsoTest {
     }
 }
 
-/** The `PARAM.SFO`, which gives the game its name and its disc id. */
 class ParamSfoTest {
 
     private fun sfo(fields: Map<String, String>): ByteArray {

@@ -28,10 +28,6 @@ import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.copyToClipboard
 import eu.emufii.app.ui.tap
 
-/**
- * Shown when the automatic path can't reach the emulator: the same values the driver would
- * fill are listed here so the player can type them in themselves.
- */
 @Composable
 internal fun SessionManualDialog(
     plan: NetplayPlan,

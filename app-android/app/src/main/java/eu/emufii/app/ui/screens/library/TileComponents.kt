@@ -37,15 +37,8 @@ import eu.emufii.app.library.Console
 import eu.emufii.app.library.shortLabel
 import eu.emufii.app.ui.theme.InkText
 
-/**
- * Fades out at the end when it overflows. Two lines always reserved.
- * pourquoi : docs/decisions/bibliotheque.md § Holding A, and the title that fades out
- */
 @Composable
 internal fun TileTitle(title: String, modifier: Modifier = Modifier) {
-    // Two lines and an ellipsis. The fade over a third line left "Spyro: Dawn of" reading
-    // as a whole title, and cost an offscreen layer on every tile that overflowed.
-    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Library
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -65,8 +58,6 @@ internal fun TileTitle(title: String, modifier: Modifier = Modifier) {
 
 @Composable
 internal fun ConsoleBadge(console: Console, modifier: Modifier = Modifier) {
-    // A dark translucent chip vanished on dark box art; the white contour holds over
-    // artwork we do not control.
     Surface(
         shape = RoundedCornerShape(9.dp),
         color = InkText,

@@ -1,5 +1,7 @@
 package eu.emufii.app.ui.screens
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.unit.Dp
 import eu.emufii.app.ui.theme.Teal
 import eu.emufii.app.ui.sounded
 import androidx.compose.foundation.background
@@ -71,11 +73,6 @@ private const val CODE_LENGTH = 6
 
 private fun coralCut(dark: Boolean) = if (dark) Teal.darkBright else Teal.deep
 
-/**
- * Six boxes rather than a form. The app's own keypad replaces the invisible field.
- * pourquoi : docs/decisions/coquille-ecrans.md § Join: the app's keyboard rather than an invisible field
- * pourquoi : docs/decisions/coquille-ecrans.md § Six slots rather than a field
- */
 @Composable
 fun JoinScreen(
     rom: RomRef,
@@ -90,33 +87,25 @@ fun JoinScreen(
     val landing = remember { FocusRequester() }
 
     // B erases a box and leaves the screen only once the code is empty: the keypad has no delete key.
-    // pourquoi : docs/decisions/coquille-ecrans.md § The code keyboard is not the search keyboard
     BackHandler(enabled = code.isNotEmpty()) { code = code.dropLast(1) }
 
-    // The social domain: the pad cursor turns coral here.
-    // pourquoi : docs/decisions/theme-duotone-shelves.md § GAMEPAD FOCUS
     CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
     EmufiiScaffold(
         title = stringResource(R.string.join_title),
         modifier = modifier,
         onBack = onBack,
         contentScrolls = false,
-        // The scaffold would put the cursor on the first control, the Join button.
         autoFocus = false
     ) { _ ->
         LandOn(landing)
 
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 24.dp, end = 24.dp, top = 28.dp, bottom = 14.dp),
-            horizontalArrangement = Arrangement.spacedBy(22.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        val configuration = LocalConfiguration.current
+        val portrait = configuration.screenHeightDp > configuration.screenWidthDp
+        val codeColumn: @Composable (Modifier) -> Unit = { columnModifier ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier.weight(1f)
+                modifier = columnModifier
             ) {
                 Text(
                     rom.displayName,
@@ -127,7 +116,6 @@ fun JoinScreen(
                     textAlign = TextAlign.Center
                 )
 
-                // Above the boxes: under them the template read as a seventh, fainter line.
                 Text(
                     stringResource(R.string.join_code_example),
                     style = MaterialTheme.typography.bodySmall,
@@ -141,7 +129,6 @@ fun JoinScreen(
                     repeat(CODE_LENGTH) { i ->
                         CodeSlot(
                             char = code.getOrNull(i),
-                            // The current box, the last once the code is complete: the accent has to land somewhere.
                             active = i == code.length.coerceAtMost(CODE_LENGTH - 1)
                         )
                         if (i == 2) Separator()
@@ -156,8 +143,6 @@ fun JoinScreen(
                     onClick = sounded { onSubmitCode(SessionCodes.normalize(code)) },
                     enabled = complete,
                     shape = PillShape,
-                    // Joining is a link: a coral pill, the deep cut on light, the bright one on dark.
-                    // pourquoi : docs/decisions/theme-duotone-shelves.md § Two semantic axes
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (dark) Teal.bright else Teal.deep,
                         contentColor = if (dark) Teal.ink else Color.White,
@@ -166,7 +151,6 @@ fun JoinScreen(
                     ),
                     modifier = Modifier.width(240.dp).height(50.dp).controlRing(PillShape).padEntry()
                 ) {
-                    // The disabled button says what is missing; a grey "Join" did not say why.
                     Text(
                         if (complete) stringResource(R.string.join_action)
                         else pluralStringResource(
@@ -177,31 +161,49 @@ fun JoinScreen(
                     )
                 }
             }
-
-            // The keypad carries the cursor on arrival: the only thing here to press.
-            Box(modifier = Modifier.weight(1.05f)) {
+        }
+        val keypad: @Composable (Modifier, Dp) -> Unit = { keypadModifier, keypadMaxHeight ->
+            Box(modifier = keypadModifier) {
                 EmufiiCodeKeyboard(
                     firstKeyFocus = landing,
                     onKey = { c -> if (code.length < CODE_LENGTH) code += c },
-                    maxHeight = LocalConfiguration.current.screenHeightDp.dp * 0.70f
+                    maxHeight = keypadMaxHeight
                 )
+            }
+        }
+        if (portrait) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                codeColumn(Modifier.fillMaxWidth())
+                keypad(Modifier.fillMaxWidth(), configuration.screenHeightDp.dp * 0.42f)
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 24.dp, end = 24.dp, top = 28.dp, bottom = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(22.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                codeColumn(Modifier.weight(1f))
+                keypad(Modifier.weight(1.05f), configuration.screenHeightDp.dp * 0.70f)
             }
         }
     }
     }
 }
 
-/**
- * A recess rather than a plate: a code is typed into something.
- * pourquoi : docs/decisions/coquille-ecrans.md § Six slots rather than a field
- */
 @Composable
 private fun CodeSlot(char: Char?, active: Boolean) {
     val dark = LocalEmufiiDarkTheme.current
     val shape = RoundedCornerShape(16.dp)
     Box(
         modifier = Modifier
-            // Sized for the left column: at 56 dp, six sockets and their dash overflowed it.
             .size(width = 48.dp, height = 66.dp)
             .focusRing(active, shape, width = 3.dp, glowRadius = 16.dp)
             .socket(shape, dark)
@@ -211,7 +213,6 @@ private fun CodeSlot(char: Char?, active: Boolean) {
         contentAlignment = Alignment.Center
     ) {
         if (char != null) {
-            // Keyed on the character, so a correction drops the new one in again.
             key(char) {
                 CodeGlyph(
                     char.toString(),
@@ -220,7 +221,6 @@ private fun CodeSlot(char: Char?, active: Boolean) {
                 )
             }
         } else if (active) {
-            // The empty active slot used to paint a pale block the size of a glyph.
             Caret()
         }
     }

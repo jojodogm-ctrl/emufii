@@ -6,18 +6,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!--
-      Required by the notification watch, and only by it: Android refuses a
-      persisted periodic job without it. Nothing runs at boot on its own; the
-      permission is what lets the already-scheduled job survive a restart, which
-      a handheld does every day.
-    -->
+    <!-- Lets the persisted periodic notification job survive a reboot. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!--
-      Keeping the Wi-Fi radio awake during a session. Measured between two
-      Thors: 25% loss at one packet per second, 0% at three, which is Wi-Fi
-      power saving, and Switch LDN does not tolerate it. See EmufiiWgService.
-    -->
+    <!-- Wi-Fi power saving drops packets; Switch LDN does not tolerate it. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
@@ -34,35 +25,18 @@
         <package android:name="me.magnum.melondualds.dev" />
         <package android:name="dev.eden.eden_emulator" />
         <package android:name="dev.eden.eden_emulator.nightly" />
-        <!-- "Eden Optimized": the same app, under Genshin Impact's identity,
-             which some phones treat better. So the name does not say Eden, and
-             it really is a Switch emulator. -->
+        <!-- "Eden Optimized" ships under this package name. -->
         <package android:name="com.miHoYo.Yuanshen" />
         <package android:name="com.miHoYo.Yuanshen.nightly" />
         <package android:name="dev.legacy.eden_emulator" />
-        <!-- Our fork, installed alongside Eden. Without this declaration
-             Android 11's package visibility filtering hides it, and Emufii
-             concludes no Switch emulator is present. -->
         <package android:name="dev.eden.eden_emulator.emufii" />
-        <!-- Dolphin. One package name for all three channels: the 2606-302 dev
-             build replaced the 2606a release *in place* on the Thor, same
-             package and same certificate. Only the developer build is
-             suffixed. -->
         <package android:name="org.dolphinemu.dolphinemu" />
         <package android:name="org.dolphinemu.dolphinemu.debug" />
-        <!--
-          ARMSX2, for the PS2. `xyz.aethersx2.android` is deliberately not
-          declared: that is the original AetherSX2, with no network layer, and the
-          two live side by side on the Thor.
-        -->
+        <!-- `xyz.aethersx2.android` (AetherSX2, no network) is deliberately not declared. -->
         <package android:name="com.armsx2" />
     </queries>
 
-    <!--
-      The system's predictive back: without it the platform runs the old, opaque path and
-      a `PredictiveBackHandler` never sees the finger's progress. On by default from
-      Android 16, declared here because minSdk is 33.
-    -->
+    <!-- Needed for `PredictiveBackHandler` progress below Android 16. -->
     <application
         android:enableOnBackInvokedCallback="true"
         android:name=".EmufiiApplication"
@@ -75,19 +49,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Emufii">
-        <!--
-          Android's callback on the install session. Not exported: only the
-          PendingIntent we created ourselves reaches it.
-        -->
-        <receiver
-            android:name=".update.UpdateInstallReceiver"
-            android:exported="false" />
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Emufii"
+            android:screenOrientation="sensorLandscape"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -96,11 +63,6 @@
             </intent-filter>
         </activity>
 
-        <!--
-          The watch that runs while Emufii is closed: friends coming online and
-          new versions. Periodic, network-bound, and persisted across reboots.
-          Bound by the platform, so it carries the scheduler's own permission.
-        -->
         <service
             android:name=".notify.FriendWatchJob"
             android:exported="false"
@@ -119,11 +81,7 @@
             </intent-filter>
         </service>
 
-        <!--
-          DNS-only tunnel for DS online play. Separate from the session tunnel service
-          on purpose: the Kaeru route shares nothing with it, and Android runs one
-          VpnService at a time anyway. Scoped to melonDS alone at runtime.
-        -->
+        <!-- DNS-only tunnel for DS online play, scoped to melonDS. -->
         <service
             android:name=".wfc.WfcDnsService"
             android:exported="false"
@@ -138,11 +96,6 @@
         </service>
 
 
-        <!--
-          Optional. Fills the connection address into Azahar's multiplayer
-          dialog. Off unless the user enables it in Android's accessibility
-          settings; everything works without it, just with manual typing.
-        -->
         <service
             android:name=".azahar.AzaharNetplayService"
             android:exported="false"
@@ -156,6 +109,10 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/azahar_netplay_service" />
         </service>
+        <!-- Android 16 ignores orientation on large screens without this opt-out (honoured up to targetSdk 36). -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
     </application>
 
 </manifest>

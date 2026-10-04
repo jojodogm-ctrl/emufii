@@ -1,6 +1,5 @@
 <!-- Discord's official mark, as Discord publishes it. It keeps its brand blue:
-     a link to somewhere else is content, not chrome, like the console icons.
-     pourquoi : docs/decisions/reglages-ecran.md § The two outbound links, and their order -->
+     a link to somewhere else is content, not chrome, like the console icons. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"

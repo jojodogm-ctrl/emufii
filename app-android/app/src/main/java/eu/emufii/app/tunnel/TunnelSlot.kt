@@ -3,17 +3,9 @@ package eu.emufii.app.tunnel
 import eu.emufii.app.wfc.WfcState
 import eu.emufii.app.wg.WgState
 
-/**
- * Android runs one `VpnService` at a time and Emufii has two: whichever calls `establish()`
- * second wins, silently.
- * pourquoi : docs/decisions/tunnel-wireguard.md § Android has one VPN slot, and Emufii has two tunnels
- */
+/** Android runs one VpnService at a time; the second establish() wins silently. */
 enum class TunnelHolder { NONE, SESSION, WFC }
 
-/**
- * `Starting` counts as held; SESSION wins ties.
- * pourquoi : docs/decisions/tunnel-wireguard.md § Android has one VPN slot, and Emufii has two tunnels
- */
 fun tunnelHolder(
     session: WgState,
     wfc: WfcState
@@ -24,10 +16,6 @@ fun tunnelHolder(
     else -> TunnelHolder.NONE
 }
 
-/**
- * Whether [want] can take the slot without cutting anything: asking for the one you hold is free.
- * pourquoi : docs/decisions/tunnel-wireguard.md § Android has one VPN slot, and Emufii has two tunnels
- */
 fun slotIsFree(
     session: WgState,
     wfc: WfcState,

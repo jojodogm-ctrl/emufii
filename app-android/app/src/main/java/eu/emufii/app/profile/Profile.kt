@@ -11,10 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 import kotlin.math.abs
 
-/**
- * [id] doubles as the friend code, so adding a friend needs no server-side directory.
- * pourquoi : docs/decisions/identite-et-dumps.md § The friend code is the identity, and it is public by design
- */
 data class Profile(
     val id: String,
     val name: String,
@@ -22,30 +18,17 @@ data class Profile(
 ) {
     val isNamed: Boolean get() = name.isNotBlank() && name != DEFAULT_NAME
 
-    /** Shown as `E7K2-9QM4-XR8T`. */
     val friendCode: String get() = FriendCode.format(id)
 
     companion object {
-        /**
-         * A fixed sentinel, never a resource: translated at the point of display.
-         * pourquoi : docs/decisions/identite-et-dumps.md § The nickname is constrained where it is entered
-         */
         const val DEFAULT_NAME = "Joueur"
         const val MAX_NAME_LENGTH = 20
 
-        /**
-         * Azahar's netplay form rejects a shorter pseudo; observed on the device, the
-         * validator lives in Azahar's DEX and its message omits the number.
-         * pourquoi : docs/decisions/identite-et-dumps.md § The nickname is constrained where it is entered
-         */
+        /** Azahar's netplay form rejects shorter nicknames (validator in its DEX). */
         const val MIN_NAME_LENGTH = 4
     }
 }
 
-/**
- * Device-bound: a reinstall is a new person, and the picture never leaves the device.
- * pourquoi : docs/decisions/identite-et-dumps.md § The friend code is the identity, and it is public by design
- */
 class ProfileStore(context: Context) {
 
     private val prefs = context.getSharedPreferences("emufii_profile", Context.MODE_PRIVATE)
@@ -56,8 +39,6 @@ class ProfileStore(context: Context) {
     val profile: StateFlow<Profile> = _profile.asStateFlow()
 
     private fun load(): Profile {
-        // Early builds stored a UUID here; nothing durable hangs off it, so such a
-        // profile is reissued a shareable code.
         val stored = prefs.getString(KEY_ID, null)
         val id = stored?.takeIf { FriendCode.isValid(it) }
             ?: FriendCode.generate().also { prefs.edit { putString(KEY_ID, it) } }
@@ -68,10 +49,6 @@ class ProfileStore(context: Context) {
         )
     }
 
-    /**
-     * The backstop for callers that do not go through a form.
-     * pourquoi : docs/decisions/identite-et-dumps.md § The nickname is constrained where it is entered
-     */
     fun setName(name: String) {
         val trimmed = name.trim()
         val usable = if (trimmed.length < Profile.MIN_NAME_LENGTH) "" else trimmed
@@ -80,11 +57,7 @@ class ProfileStore(context: Context) {
         _profile.value = _profile.value.copy(name = clean)
     }
 
-    /**
-     * Copied and downscaled: the picker's SAF grant is not persisted, and a phone
-     * photo is 50 megapixels.
-     * pourquoi : docs/decisions/identite-et-dumps.md § The avatar is copied, never referenced
-     */
+    /** Copied and downscaled: the SAF grant is not persisted, and phone photos are huge. */
     fun setAvatar(source: Uri): Result<Unit> = runCatching {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         appContext.contentResolver.openInputStream(source).use {
@@ -111,8 +84,7 @@ class ProfileStore(context: Context) {
         }
         decoded.recycle()
 
-        // New File instance so Compose sees a changed value at an identical path,
-        // otherwise the picture updates only on restart.
+        // New File instance so Compose sees a change at the same path.
         _profile.value = _profile.value.copy(avatarFile = File(avatarTarget.path))
     }
 
@@ -121,10 +93,6 @@ class ProfileStore(context: Context) {
         _profile.value = _profile.value.copy(avatarFile = null)
     }
 
-    /**
-     * The new code is unrelated, which also cuts you off from your own friends list.
-     * pourquoi : docs/decisions/identite-et-dumps.md § The friend code is the identity, and it is public by design
-     */
     fun reset() {
         avatarTarget.delete()
         prefs.edit { clear() }
@@ -149,6 +117,5 @@ fun initialsFor(name: String): String {
     }
 }
 
-/** Stable for a given name, so a player keeps the same colour between sessions. */
 fun avatarPaletteFor(name: String, paletteSize: Int): Int =
     if (paletteSize <= 0) 0 else abs(name.hashCode()) % paletteSize

@@ -17,16 +17,11 @@ import eu.emufii.app.R
 import eu.emufii.app.crashlogger.CrashLog
 import eu.emufii.app.ui.components.BugMark
 
-/**
- * A stacked column of reports. Not lazy: CrashLogger caps at ten items, and lazy would
- * only cost focus traversal predictability for no gain.
- */
 @Composable
 fun CrashLogsList(
     crashLogs: List<CrashLog>,
     onCrashClick: (CrashLog) -> Unit,
     modifier: Modifier = Modifier,
-    /** True to make the first row the page's pad entry. Off when the caller carries it. */
     firstRowIsEntry: Boolean = true
 ) {
     Column(
@@ -45,8 +40,6 @@ fun CrashLogsList(
 
 @Composable
 fun EmptyCrashLogsView(modifier: Modifier = Modifier) {
-    // 16 dp, not 48: with the page's own margins the empty state alone ran past the
-    // bottom of a landscape handheld, and the report button was sliced off there.
     Box(
         modifier = modifier.fillMaxWidth().padding(vertical = 16.dp),
         contentAlignment = Alignment.Center

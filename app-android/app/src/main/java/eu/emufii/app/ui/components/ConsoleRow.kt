@@ -82,8 +82,6 @@ fun ConsoleRow(
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
-                // The abbreviation rather than a question mark: an absent emulator is the
-                // ordinary case.
                 Text(
                     info.console.shortLabel,
                     style = MaterialTheme.typography.labelSmall,
@@ -100,7 +98,6 @@ fun ConsoleRow(
             overflow = TextOverflow.Ellipsis
         )
 
-        // On the name's line: under it, seven consoles gained seven lines.
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -172,8 +169,6 @@ private fun VariantChip(
             color = tint,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            // The name gives way, never the number: a wide pill clipped "Dolphin
-            // Emulator 26…".
             modifier = Modifier.weight(1f, fill = false)
         )
         variant.version?.let {
@@ -194,6 +189,6 @@ private fun absentLine(info: EmulatorInfo): String =
 private val ROW_SHAPE = RoundedCornerShape(16.dp)
 private val CHIP_SHAPE = RoundedCornerShape(9.dp)
 
-/** PPSSPP names its builds "v1.20.4", already carrying the letter we would add. */
+/** PPSSPP versions already start with "v". */
 private fun shortVersion(version: String): String =
     version.removePrefix("v").removePrefix("V")

@@ -4,10 +4,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/**
- * The rule pinned is not "find a region", it is never invent one: a wrong region on a
- * panel the player cannot argue with sends them looking for a dump they already have.
- */
 class RomTagsTest {
 
     @Test fun `a Sony serial names its own region`() {
@@ -40,9 +36,6 @@ class RomTagsTest {
     @Test fun `the filename answers when the serial cannot`() {
         val tags = RomTagReader.read(Console.SWITCH, null, "0100152000022000", "Game (Europe) (Rev 1).nsp")
         assertEquals("Europe", tags.region)
-        // And the revision is deliberately not read: `Rev 1` and `v0` are the
-        // only things a filename ever yields, and neither is a fact a player
-        // can act on. See RomTags.kt.
         assertEquals("Europe", tags.line())
     }
 
@@ -53,7 +46,6 @@ class RomTagsTest {
     }
 
     @Test fun `a title in brackets is not a region`() {
-        // The failure this guards: any word between brackets taken for a region.
         assertNull(RomTagReader.read(Console.SWITCH, null, null, "Disney's Aladdin.nsp").region)
     }
 }

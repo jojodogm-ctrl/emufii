@@ -4,16 +4,8 @@ import androidx.annotation.StringRes
 import eu.emufii.app.R
 import eu.emufii.app.library.Console
 
-/**
- * What a player needs to know about playing one machine together, as facts and not as a
- * story: the kind of multiplayer, whether there is a code to share, which games,
- * and at most one warning. [warning] is for what would otherwise be discovered as a
- * fault, not for nuance.
- * pourquoi : docs/decisions/second-ecran.md § A console card fits in two lines and a warning
- */
 data class ConsoleBrief(
     @StringRes val mode: Int,
-    /** Whether the friend has to type a session code. The DS has none: WFC has no room. */
     val sessionCode: Boolean,
     @StringRes val games: Int,
     @StringRes val warning: Int? = null,

@@ -10,11 +10,7 @@ internal val PRIVATE_NETWORK = linkedMapOf(
     "AdhocServerRelayMode" to "2",
 )
 
-/**
- * PPSSPP's own defaults for public ad hoc: `socom.cc` is `DefaultProAdhocServer()` in
- * `Core/Config.cpp`, and Auto relay is what its `aemu_postoffice` relay wants. The same
- * four keys as [PRIVATE_NETWORK], so one backup covers both modes.
- */
+/** PPSSPP's defaults for public ad hoc: socom.cc is DefaultProAdhocServer() in Core/Config.cpp. */
 internal val PUBLIC_NETWORK = linkedMapOf(
     "EnableWlan" to "True",
     "EnableAdhocServer" to "True",
@@ -29,10 +25,7 @@ internal data class PpssppNetworkSnapshot(
     val values: Map<String, PpssppIniValue>,
 )
 
-/**
- * A line-preserving editor, not an INI serializer: PPSSPP owns these files, so comments,
- * unknown settings, section order and line endings must survive our four-key change.
- */
+/** Line-preserving editor: comments, unknown keys, order and line endings must survive. */
 internal object PpssppIni {
     private val section = Regex("^\\s*\\[([^]]+)]\\s*(?:[;#].*)?$")
     private val assignment = Regex("^\\s*([^;#][^=]*?)\\s*=\\s*(.*)$")
@@ -71,10 +64,7 @@ internal object PpssppIni {
         .lineSequence()
         .none { assignment.matchEntire(it) != null }
 
-    /**
-     * PPSSPP names a game config from DISC_ID (ULUS10277). ISO and PBP metadata gives
-     * `PSP-<DISC_ID>`, compressed containers give nothing, hence the filename fallback.
-     */
+    /** PPSSPP names game configs by DISC_ID; compressed containers carry none, hence the filename fallback. */
     fun resolveDiscId(productCode: String?, filename: String?, displayName: String?): String? {
         val fromProduct = productCode
             ?.trim()
@@ -103,8 +93,7 @@ internal object PpssppIni {
             val match = assignment.matchEntire(line) ?: continue
             val key = match.groupValues[1].trim().lowercase(Locale.ROOT)
             if (PRIVATE_NETWORK.keys.any { it.equals(key, ignoreCase = true) }) {
-                // PPSSPP resolves duplicates in file order: the last value is the one
-                // the emulator sees.
+                // PPSSPP takes the last duplicate in file order.
                 out[key] = match.groupValues[2]
             }
         }
@@ -133,8 +122,7 @@ internal object PpssppIni {
             return lines.joinToString(newline) + if (trailingNewline) newline else ""
         }
 
-        // A hand-edited file can hold several [Network] sections, a later one overriding
-        // the first: owned keys go out of every earlier section, one copy into the last.
+        // Several [Network] sections are possible; owned keys go out of all but the last.
         val finalNetworkStart = networkStarts.last()
         val finalNetworkEnd = (finalNetworkStart + 1 until lines.size).firstOrNull { index ->
             section.matchEntire(lines[index]) != null

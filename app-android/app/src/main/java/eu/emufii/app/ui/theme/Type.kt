@@ -8,12 +8,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import eu.emufii.app.R
 
-/**
- * Rounded M+ (M PLUS Rounded 1c), under the OFL: `assets/ROUNDED-MPLUS-OFL.txt`.
- *
- * Shipped Latin-subset (~105 KB a weight instead of 3.4 MB): the family carries the
- * whole of Japanese, and the app speaks French and English.
- */
+/** Rounded M+ (OFL), Latin subset only: ~105 KB a weight instead of 3.4 MB. */
 private val Rounded = FontFamily(
     Font(R.font.rounded_regular, FontWeight.Normal),
     Font(R.font.rounded_medium, FontWeight.Medium),

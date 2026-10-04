@@ -27,11 +27,6 @@ import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.PadDialog
 import eu.emufii.app.ui.screens.settings.dangerInk
 
-/**
- * The full report in a scrollable monospace panel. Delete lives here rather than inline
- * on each row so the list keeps one focus target per item and directional traversal on a
- * gamepad never doubles back.
- */
 @Composable
 fun CrashLogsDetailView(
     crash: CrashLog,

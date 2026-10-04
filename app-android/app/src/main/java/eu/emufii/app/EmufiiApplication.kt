@@ -16,8 +16,10 @@ class EmufiiApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         CrashLogger.initialize(this)
+        eu.emufii.app.network.RelayRegions.init(this)
+        eu.emufii.app.network.CoordinatorClient.identityKey =
+            eu.emufii.app.profile.AvatarSync.get(this).ownerKey()
         // Its state has to exist before the first composition.
-        // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § Cover tones
         CoverTone.warm()
     }
 

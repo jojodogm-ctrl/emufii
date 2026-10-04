@@ -2,292 +2,336 @@ package eu.emufii.app.ui.screens.session
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import eu.emufii.app.R
 import eu.emufii.app.dolphin.DolphinTarget
 import eu.emufii.app.library.Backend
+import eu.emufii.app.library.Console
+import eu.emufii.app.library.EmulatorInfo
+import eu.emufii.app.library.emulatorInfo
 import eu.emufii.app.ps2.Ps2GameSettings
 import eu.emufii.app.ps2.Ps2Target
 import eu.emufii.app.psp.HOST_SENTINEL
 import eu.emufii.app.session.Session
+import eu.emufii.app.ui.components.FactTile
+import eu.emufii.app.ui.components.FitColumn
+import eu.emufii.app.ui.components.LocalSheetMaxHeight
+import eu.emufii.app.ui.components.Optional
+import androidx.compose.ui.unit.Dp
 import eu.emufii.app.ui.components.GhostButton
 import eu.emufii.app.ui.components.SectionHeader
+import eu.emufii.app.ui.components.SheetHeader
+import eu.emufii.app.ui.components.SheetLabel
+import eu.emufii.app.ui.components.SheetStep
+import eu.emufii.app.ui.components.SheetWarning
 import eu.emufii.app.ui.components.SoftCard
-import eu.emufii.app.ui.components.WarnIcon
+import eu.emufii.app.ui.components.accented
 import eu.emufii.app.ui.copyToClipboard
+import eu.emufii.app.ui.theme.Coral
 import eu.emufii.app.ui.theme.LocalEmufiiDarkTheme
-import eu.emufii.app.ui.theme.socket
+import eu.emufii.app.ui.theme.Teal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-/** One definition, so the two layouts cannot drift apart. */
 @Composable
 internal fun EmulatorHintCard(
     session: Session,
     automationOn: Boolean,
+    players: Int = 0,
 ) {
     if (session.rom == null) {
         MissingRomCard()
         return
     }
+    val isHost = session.role == Session.Role.HOST
     when (session.backend) {
         Backend.AZAHAR -> AzaharHintCard(
+            console = session.console,
             automationOn = automationOn,
-            hostIp = session.hostIp,
-            port = session.port
+            isHost = isHost,
+            address = "${session.hostIp}:${session.port}",
+            players = players
         )
-        // Unreachable from the library, which routes DS to the Kaeru screen; a session joined
-        // from the finder carries whatever console the host had.
         Backend.EDEN -> EdenHintCard(
+            console = session.console,
             automationOn = automationOn,
-            // With a room on the VPS the host joins like everyone else: "Create" would open a
-            // second, empty room next to the one where their guest waits.
-            isHost = session.role == Session.Role.HOST && session.room == null,
-            // What the player would type by hand: the room when there is one, the host otherwise.
-            hostIp = session.room?.host ?: session.hostIp,
-            port = session.room?.port?.toString() ?: session.port
+            // With a VPS room the host joins too; Create would open a second, empty room.
+            isHost = isHost && session.room == null,
+            shownHost = isHost,
+            address = "${session.room?.host ?: session.hostIp}:" +
+                (session.room?.port?.toString() ?: session.port),
+            players = players,
+            onServer = session.room != null
         )
 
         Backend.DOLPHIN -> DolphinHintCard(
+            console = session.console,
             automationOn = automationOn,
-            isHost = session.role == Session.Role.HOST,
-            hostIp = session.hostIp,
-            port = DolphinTarget.DEFAULT_PORT.toString()
+            isHost = isHost,
+            address = "${session.hostIp}:${DolphinTarget.DEFAULT_PORT}",
+            players = players
         )
 
         Backend.ARMSX2 -> Ps2HintCard(
+            console = session.console,
             automationOn = session.rom.let {
                 Ps2GameSettings.canConfigure(LocalContext.current, it)
             },
-            isHost = session.role == Session.Role.HOST,
-            hostIp = session.hostIp,
-            port = Ps2Target.DEFAULT_PORT.toString()
+            isHost = isHost,
+            address = "${session.hostIp}:${Ps2Target.DEFAULT_PORT}",
+            players = players
         )
 
         Backend.PPSSPP -> Unit
-        // nothing to type: the address travels in the launch
-        Backend.MELONDS -> Unit
+        // Nothing to type, the address travels in the launch; what is left is the order.
+        Backend.MELONDS -> DsWirelessHintCard(isHost = isHost, players = players)
         Backend.NONE -> UnsupportedHintCard(session.console?.label)
     }
 }
 
-/**
- * A line the player cannot afford to skim, inside a card of lines they can.
- * pourquoi : docs/decisions/session.md § This screen's drawing decisions
- */
+private data class SheetInks(val accent: Color, val alarm: Color)
+
 @Composable
-private fun ImportantNote(text: String) {
-    // A recess, ordinary ink, a drawn bead, never a red field: red is spent exactly twice in
-    // the whole app.
-    // pourquoi : docs/decisions/session.md § This screen's drawing decisions
+private fun sheetInks(): SheetInks {
     val dark = LocalEmufiiDarkTheme.current
-    val shape = RoundedCornerShape(14.dp)
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .socket(shape, dark)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(11.dp)
-    ) {
-        WarnIcon(
-            size = 17.dp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            // Aligned to the first line's ink, not centred on the block: a mark that drifts to
-            // the middle of a three-line note reads as decoration.
-            modifier = Modifier.padding(top = 2.dp)
-        )
-        Text(
-            text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+    return SheetInks(
+        accent = if (dark) Teal.darkBright else Teal.deep,
+        alarm = if (dark) Coral.darkBright else Coral.deep,
+    )
+}
+
+@Composable
+private fun HintSheet(
+    console: Console?,
+    title: String,
+    subtitle: String? = null,
+    content: @Composable (SheetInks) -> Unit,
+) {
+    val context = LocalContext.current
+    val inks = sheetInks()
+    // Off the main thread: an icon decode is not free.
+    val emulator by produceState<EmulatorInfo?>(null, console) {
+        value = console?.let {
+            withContext(Dispatchers.IO) { runCatching { emulatorInfo(context, it) }.getOrNull() }
+        }
     }
+    val maxHeight = LocalSheetMaxHeight.current
+    SoftCard {
+        FitColumn(
+            maxHeight = if (maxHeight == Dp.Unspecified) maxHeight else maxHeight - SheetPadV * 2,
+            spacing = 12.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = SheetPadV),
+        ) {
+            val installed = emulator?.installed
+            SheetHeader(
+                icon = emulator?.icon,
+                fallbackLetter = title.take(1),
+                title = title,
+                subtitle = if (installed == false) stringResource(R.string.console_sheet_not_installed)
+                else subtitle ?: emulator?.version,
+                accent = inks.accent,
+                subtitleInk = if (installed == false) inks.alarm else inks.accent,
+                iconSize = 44.dp,
+            )
+            content(inks)
+        }
+    }
+}
+
+private val SheetPadV = 16.dp
+
+private fun maxPlayers(backend: Backend): Int = when (backend) {
+    Backend.MELONDS -> eu.emufii.app.wfc.MelonDsPackage.MAX_NETPLAY_PLAYERS
+    Backend.DOLPHIN -> 4
+    else -> 8
+}
+
+@Composable
+private fun PlayersTile(players: Int, max: Int, modifier: Modifier) {
+    FactTile(
+        label = stringResource(R.string.hint_sheet_players),
+        value = stringResource(R.string.hint_ds_players, players, max),
+        ink = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun RoleSetupTiles(
+    isHost: Boolean,
+    automatic: Boolean,
+    inks: SheetInks,
+    address: String? = null,
+    players: Int = 0,
+    maxPlayers: Int = 0,
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        FactTile(
+            label = stringResource(R.string.hint_sheet_role),
+            value = stringResource(if (isHost) R.string.hint_sheet_host else R.string.hint_sheet_guest),
+            ink = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        FactTile(
+            label = stringResource(R.string.hint_sheet_setup),
+            value = stringResource(if (automatic) R.string.hint_sheet_auto else R.string.hint_sheet_manual),
+            ink = inks.accent,
+            modifier = Modifier.weight(1f)
+        )
+        if (!automatic && address != null) {
+            FactTile(
+                label = stringResource(R.string.hint_sheet_address),
+                value = address,
+                ink = inks.accent,
+                modifier = Modifier.weight(1.4f)
+            )
+        }
+        if (players > 0 && maxPlayers > 0) PlayersTile(players, maxPlayers, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun Tip(text: String, inks: SheetInks) {
+    Text(
+        accented(text, inks.accent),
+        style = MaterialTheme.typography.bodyMedium,
+        lineHeight = 20.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun Lead(text: String, inks: SheetInks) {
+    Text(
+        accented(text, inks.accent),
+        style = MaterialTheme.typography.bodyLarge,
+        lineHeight = 22.sp,
+        color = MaterialTheme.colorScheme.onSurface
+    )
 }
 
 @Composable
 private fun AzaharHintCard(
+    console: Console?,
     automationOn: Boolean,
-    hostIp: String,
-    port: String,
+    isHost: Boolean,
+    address: String,
+    players: Int,
 ) {
-    SoftCard {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            SectionHeader(stringResource(R.string.hint_azahar_title))
-            // Loud on both paths: getting it wrong produces an error that accuses the address.
-            // pourquoi : docs/decisions/session.md § What is done by hand is said before the button, never after
-            ImportantNote(stringResource(R.string.hint_azahar_username))
-            ImportantNote(stringResource(R.string.hint_same_version))
-            if (automationOn) {
-                Text(
-                    stringResource(R.string.hint_azahar_automated),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            } else {
-                Text(
-                    stringResource(
-                        R.string.hint_azahar_manual,
-                        "$hostIp:$port"
-                    ),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
+    HintSheet(console, "Azahar") { inks ->
+        RoleSetupTiles(isHost, automationOn, inks, address, players = players, maxPlayers = maxPlayers(Backend.AZAHAR))
+        if (!automationOn) Lead(stringResource(R.string.hint_azahar_manual), inks)
+        // Loud on both paths: getting it wrong produces an error that accuses the address.
+        SheetWarning(stringResource(R.string.hint_azahar_username), inks.alarm)
+        SheetWarning(stringResource(R.string.hint_same_version), inks.alarm)
+        Optional { SheetWarning(stringResource(R.string.brief_3ds_warning), inks.alarm) }
+        Optional { Tip(stringResource(R.string.hint_azahar_blame), inks) }
     }
 }
 
-/**
- * Eden's multiplayer is in the app's own settings, not a game drawer; host is told to Create
- * and guest to Join, the same words would put both on one side.
- * pourquoi : docs/decisions/session.md § The per-console cards, and what each must prevent
- */
 @Composable
 private fun EdenHintCard(
+    console: Console?,
     automationOn: Boolean,
     isHost: Boolean,
-    hostIp: String,
-    port: String,
+    shownHost: Boolean,
+    address: String,
+    players: Int,
+    onServer: Boolean,
 ) {
-    SoftCard {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            SectionHeader(stringResource(R.string.hint_eden_title))
-            Text(
-                stringResource(
-                    if (isHost) R.string.hint_eden_host else R.string.hint_eden_guest
-                ),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            // A prerequisite the emulator does not mention: a differing game version lets the
-            // room form, then the game never starts, and nothing points at the cause.
-            ImportantNote(stringResource(R.string.hint_same_version))
-            if (automationOn) {
-                Text(
-                    stringResource(R.string.hint_eden_automated),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    stringResource(R.string.hint_eden_username),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                Text(
-                    stringResource(R.string.hint_eden_manual, "$hostIp:$port"),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
+    HintSheet(console, "Eden") { inks ->
+        RoleSetupTiles(shownHost, automationOn, inks, address, players = players, maxPlayers = maxPlayers(Backend.EDEN))
+        Lead(
+            stringResource(if (isHost) R.string.hint_eden_host else R.string.hint_eden_guest),
+            inks
+        )
+        // A differing game version lets the room form, then the game never starts.
+        SheetWarning(stringResource(R.string.hint_same_version), inks.alarm)
+        Optional { SheetWarning(stringResource(R.string.hint_eden_nickname), inks.alarm) }
+        if (onServer) Optional { Tip(stringResource(R.string.hint_eden_server), inks) }
     }
 }
 
-/**
- * One step where the others are two, the game being picked in the lobby; both sides need the
- * same dump, byte for byte.
- * pourquoi : docs/decisions/session.md § The Dolphin prerequisite nobody checks
- */
 @Composable
 private fun DolphinHintCard(
+    console: Console?,
     automationOn: Boolean,
     isHost: Boolean,
-    hostIp: String,
-    port: String,
+    address: String,
+    players: Int,
 ) {
-    SoftCard {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            SectionHeader(stringResource(R.string.hint_dolphin_title))
-            Text(
-                stringResource(
-                    if (isHost) R.string.hint_dolphin_host else R.string.hint_dolphin_guest
-                ),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            ImportantNote(stringResource(R.string.hint_dolphin_same_dump))
-            // Worse than the dump: nobody checks the save, and mismatched saves desync
-            // silently. We warn, we cannot act.
-            // pourquoi : docs/decisions/session.md § The Dolphin prerequisite nobody checks
-            ImportantNote(stringResource(R.string.hint_dolphin_same_save))
-            if (automationOn) {
-                Text(
-                    stringResource(R.string.hint_dolphin_automated),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            } else {
-                Text(
-                    stringResource(R.string.hint_dolphin_manual, "$hostIp:$port"),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
+    HintSheet(console, "Dolphin") { inks ->
+        RoleSetupTiles(isHost, automationOn, inks, address, players = players, maxPlayers = maxPlayers(Backend.DOLPHIN))
+        if (!automationOn) Lead(stringResource(R.string.hint_dolphin_manual), inks)
+        Lead(
+            stringResource(if (isHost) R.string.hint_dolphin_host else R.string.hint_dolphin_guest),
+            inks
+        )
+        SheetWarning(stringResource(R.string.hint_dolphin_same_dump), inks.alarm)
+        // Mismatched saves desync silently.
+        SheetWarning(stringResource(R.string.hint_dolphin_same_save), inks.alarm)
+        Optional { Tip(stringResource(R.string.hint_dolphin_together), inks) }
     }
 }
 
-/**
- * ARMSX2 has two unrelated multiplayers and Emufii serves only the local one.
- * pourquoi : docs/decisions/session.md § The per-console cards, and what each must prevent
- */
 @Composable
 private fun Ps2HintCard(
+    console: Console?,
     automationOn: Boolean,
     isHost: Boolean,
-    hostIp: String,
-    port: String,
+    address: String,
+    players: Int,
 ) {
-    SoftCard {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            SectionHeader(stringResource(R.string.hint_ps2_title))
-            ImportantNote(stringResource(R.string.hint_ps2_lan_only))
-            Text(
-                stringResource(if (isHost) R.string.hint_ps2_host else R.string.hint_ps2_guest),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            // Said by ARMSX2 itself: with the network adapter attached some games stop
-            // responding to the pad, which reads as a frozen app.
-            ImportantNote(stringResource(R.string.hint_ps2_pad))
-            if (automationOn) {
-                Text(
-                    stringResource(R.string.hint_ps2_automated),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+    HintSheet(console, "ARMSX2") { inks ->
+        RoleSetupTiles(isHost, automationOn, inks, address, players = players, maxPlayers = maxPlayers(Backend.ARMSX2))
+        if (!automationOn) Lead(stringResource(R.string.hint_ps2_manual), inks)
+        Lead(stringResource(if (isHost) R.string.hint_ps2_host else R.string.hint_ps2_guest), inks)
+        SheetWarning(stringResource(R.string.hint_ps2_lan_only), inks.alarm)
+        // Per ARMSX2: with the network adapter attached some games stop responding to the pad.
+        SheetWarning(stringResource(R.string.hint_ps2_pad), inks.alarm)
+        Optional { Tip(stringResource(R.string.hint_ps2_online), inks) }
+    }
+}
+
+@Composable
+private fun DsWirelessHintCard(isHost: Boolean, players: Int) {
+    HintSheet(Console.DS, stringResource(R.string.hint_ds_title), "WatermelonDS") { inks ->
+        RoleSetupTiles(
+            isHost, automatic = true, inks = inks,
+            players = players, maxPlayers = maxPlayers(Backend.MELONDS)
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SheetLabel(stringResource(R.string.hint_sheet_steps))
+            val steps = if (isHost) {
+                listOf(R.string.hint_ds_host_1, R.string.hint_ds_host_2)
             } else {
-                Text(
-                    stringResource(R.string.hint_ps2_manual, "$hostIp:$port"),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                listOf(R.string.hint_ds_guest_1, R.string.hint_ds_guest_2)
             }
+            steps.forEachIndexed { i, res -> SheetStep(i + 1, stringResource(res), inks.accent) }
         }
+        SheetWarning(stringResource(R.string.hint_ds_same_rom), inks.alarm)
     }
 }
 
@@ -309,11 +353,6 @@ private fun MissingRomCard() {
     }
 }
 
-/**
- * Deliberately not an error: a running game keeps running, only the presence list stops
- * being trustworthy.
- * pourquoi : docs/decisions/session.md § Only a 404 proves a room is closed
- */
 @Composable
 internal fun OfflineCard() {
     SoftCard {
@@ -332,100 +371,63 @@ internal fun OfflineCard() {
     }
 }
 
-/**
- * The address is copied on *display* rather than on tap: the player is about to leave for PPSSPP.
- * pourquoi : docs/decisions/session.md § The per-console cards, and what each must prevent
- */
 @Composable
-internal fun PspHintCard(automatic: Boolean) {
+internal fun PspHintCard(automatic: Boolean, players: Int = 0) {
     val context = LocalContext.current
-    var copied by remember { mutableStateOf(false) }
     LaunchedEffect(automatic) {
-        if (!automatic) {
-            copyToClipboard(context, "Emufii", HOST_SENTINEL)
-            copied = true
-        }
+        if (!automatic) copyToClipboard(context, "Emufii", HOST_SENTINEL)
     }
-    SoftCard {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            SectionHeader(stringResource(R.string.hint_psp_title))
-            Text(
-                stringResource(
-                    if (automatic) R.string.hint_psp_automated
-                    else R.string.hint_psp_body
+    HintSheet(Console.PSP, "PPSSPP") { inks ->
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            FactTile(
+                label = stringResource(R.string.hint_sheet_setup),
+                value = stringResource(
+                    if (automatic) R.string.hint_sheet_auto else R.string.hint_sheet_manual
                 ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                ink = inks.accent,
+                modifier = Modifier.weight(1f)
             )
-            if (automatic) {
-                Text(
-                    stringResource(R.string.hint_psp_automatic_ready),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = good()
-                )
-                Text(
-                    stringResource(R.string.hint_psp_step4),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
-                Text(
-                    HOST_SENTINEL,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = coralText()
-                )
-                for (step in listOf(
+            FactTile(
+                label = stringResource(R.string.hint_sheet_address),
+                value = HOST_SENTINEL,
+                ink = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+            if (players > 0) PlayersTile(players, maxPlayers(Backend.PPSSPP), Modifier.weight(1f))
+        }
+        if (automatic) {
+            Text(
+                stringResource(R.string.hint_psp_automatic_ready),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = good()
+            )
+        } else {
+            // Once, in PPSSPP's own menus: it draws its own interface and cannot be driven.
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(
                     stringResource(R.string.hint_psp_step1),
                     stringResource(R.string.hint_psp_step2, HOST_SENTINEL),
                     stringResource(R.string.hint_psp_step2b),
                     stringResource(R.string.hint_psp_step3),
-                    stringResource(R.string.hint_psp_step4)
-                )) {
-                    Text("· $step", style = MaterialTheme.typography.bodyMedium)
-                }
-                Text(
-                    stringResource(R.string.hint_psp_relay_why),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    stringResource(R.string.hint_psp_why),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                if (copied) {
-                    Text(
-                        stringResource(R.string.hint_psp_copied),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = good()
-                    )
-                }
-                GhostButton(
-                    label = stringResource(R.string.hint_psp_copy),
-                    onClick = { copyToClipboard(context, "Emufii", HOST_SENTINEL) }
-                )
+                ).forEachIndexed { i, step -> SheetStep(i + 1, step, inks.accent) }
             }
-            Text(
-                stringResource(R.string.hint_psp_exit_before_switch),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-            )
-
-            // Neither an ImportantNote, reserved for what stops you playing, nor the grey
-            // advisory voice.
-            // pourquoi : docs/decisions/session.md § This screen's drawing decisions
-            SectionHeader(stringResource(R.string.hint_psp_wifi_title))
-            Text(
-                stringResource(R.string.hint_psp_wifi),
-                style = MaterialTheme.typography.bodyMedium
+            GhostButton(
+                label = stringResource(R.string.hint_psp_copy),
+                onClick = { copyToClipboard(context, "Emufii", HOST_SENTINEL) }
             )
         }
+        SheetWarning(stringResource(R.string.hint_psp_exit_before_switch), inks.alarm)
+        // The one setting that changes how the game feels, and it is not in the emulator.
+        Optional { Tip(stringResource(R.string.hint_psp_step4), inks) }
+        Optional {
+            Text(
+                stringResource(R.string.hint_psp_wifi),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Optional { Tip(stringResource(R.string.hint_psp_wifi_why), inks) }
     }
 }
 

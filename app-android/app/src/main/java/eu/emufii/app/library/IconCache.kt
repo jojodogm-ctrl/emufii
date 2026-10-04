@@ -11,12 +11,7 @@ class IconCache(context: Context) {
     private val dir: File = File(context.filesDir, "icons").apply { mkdirs() }
 
     fun fileFor(titleIdHex: String): File = File(dir, "$titleIdHex.png")
-    /**
-     * Titles are cached per language: the same cartridge has a different name in each.
-     * [TITLE_FORMAT] goes up at every change in the way a title is read, failing which
-     * libraries already scanned go on serving the old one; v2 shipped without the SMDH
-     * line-break rule and wrote the truncated "The Legend of Zelda" into the cache.
-     */
+    /** Bump [TITLE_FORMAT] whenever title parsing changes, or stale titles stay cached. */
     private fun titleFileFor(titleIdHex: String, lang: String): File =
         File(dir, "$titleIdHex.title.$TITLE_FORMAT.$lang")
     private fun accentFileFor(titleIdHex: String): File = File(dir, "$titleIdHex.accent")

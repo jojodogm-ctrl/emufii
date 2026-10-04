@@ -17,14 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import eu.emufii.app.R
 
-/**
- * SteamGridDB's mark, shown at the two places that ask for its key: the onboarding step
- * and the settings card.
- *
- * Nominative use: the logo names the service, neither modified nor recoloured, and nothing
- * here suggests SteamGridDB endorses Emufii. Hence the original dark background kept inside
- * its own pill rather than being cut out to match the theme.
- */
 @Composable
 fun SteamGridDbMark(modifier: Modifier = Modifier) {
     Row(

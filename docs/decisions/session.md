@@ -202,12 +202,11 @@ Azahar: both roles point at the host's tunnel address, the guest to reach it, th
 host because `netPlayCreateRoom` binds and joins itself on the same address (see
 `PHASE0_AZAHAR.md`). Its own tunnel IP is the only value that works for both.
 
-The nickname, on Eden only, and for both roles: two players with the same nickname
-cannot share a room, and Eden ships the same one to everybody by default, so two
-Emufii players would introduce themselves there as the same person. Azahar keeps
-its own: Emufii used to write the profile name there, which replaced a valid
-nickname with a two-letter one the form refused, with a message blaming the
-address.
+The nickname, for both roles: two players with the same nickname cannot share a
+room, and every emulator ships the same one to everybody by default. Eden and
+Dolphin always get the profile name; Azahar gets it only while its field still holds
+the default, so a nickname the player chose there stays (`pilotes-emulateurs.md`,
+the nickname section).
 
 The session code doubles as the room code on PS2: ARMSX2 demands one, identical on
 both sides, and negotiates nothing. It is the secret both players already share.

@@ -4,12 +4,7 @@ import android.content.Context
 import com.wireguard.crypto.Key
 import com.wireguard.crypto.KeyPair
 
-/**
- * This device's WireGuard identity, generated once and kept: the
- * coordinator is idempotent on the public key, so the same key always gets the
- * same address. Not in the keystore: WireGuard needs the raw private key.
- * pourquoi : docs/decisions/tunnel-wireguard.md § The WireGuard identity must persist
- */
+// Raw key in prefs, not the keystore: WireGuard needs it. Same key, same address.
 object WgKeys {
 
     private const val PREFS = "emufii_wg"
@@ -25,8 +20,7 @@ object WgKeys {
             val prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val stored = prefs.getString(KEY_PRIVATE, null)
             val pair = stored?.let { existing ->
-                // A corrupt value must not brick the tunnel: mint a new identity, at the
-                // cost of one new address from the coordinator.
+                // A corrupt value mints a new identity instead of bricking the tunnel.
                 runCatching { KeyPair(Key.fromBase64(existing)) }.getOrNull()
             } ?: KeyPair().also {
                 prefs.edit().putString(KEY_PRIVATE, it.privateKey.toBase64()).apply()
@@ -40,11 +34,6 @@ object WgKeys {
 
     fun privateKeyBase64(ctx: Context): String = keyPair(ctx).privateKey.toBase64()
 
-    /**
-     * Drops the identity. Belongs with deleting the profile: the public key is a
-     * stable identifier the coordinator sees.
-     * pourquoi : docs/decisions/tunnel-wireguard.md § The WireGuard identity must persist
-     */
     fun reset(ctx: Context) {
         synchronized(this) {
             cached = null

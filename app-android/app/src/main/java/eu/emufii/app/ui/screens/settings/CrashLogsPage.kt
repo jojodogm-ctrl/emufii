@@ -35,10 +35,6 @@ import eu.emufii.app.ui.components.padEntry
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 
-/**
- * The crash logger page: a block holding the reports the app has kept since it last
- * started throwing. Follows the settings page shell, so back returns to the hub.
- */
 @Composable
 internal fun CrashLogsPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -59,7 +55,6 @@ internal fun CrashLogsPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
         title = stringResource(R.string.settings_page_crash_logs),
         onBack = onBack,
         modifier = modifier,
-        // One block on the page, and it fits: centred, and the page does not scroll.
         centred = true
     ) {
         SettingsBlock(title = null) {
@@ -82,8 +77,6 @@ internal fun CrashLogsPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
             }
 
             DetailActions {
-                // The list, when it exists, is the natural first stop: what the player
-                // came here to see. Otherwise the report link inherits the pad entry.
                 val reportModifier = if (crashLogs.isEmpty()) {
                     Modifier.padEntry().fillMaxWidth()
                 } else {
@@ -111,8 +104,6 @@ internal fun CrashLogsPage(onBack: () -> Unit, modifier: Modifier = Modifier) {
                         fillWidth = true
                     )
                 }
-                // Debug builds only: trip the uncaught-exception handler so the whole
-                // flow can be verified end-to-end. Never shipped.
                 if (BuildConfig.DEBUG) {
                     GhostButton(
                         label = stringResource(R.string.crash_logs_test_crash),

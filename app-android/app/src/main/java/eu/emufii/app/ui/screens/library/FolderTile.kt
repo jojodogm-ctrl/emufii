@@ -55,22 +55,13 @@ import eu.emufii.app.ui.theme.PillShape
 import eu.emufii.app.ui.theme.TileShape
 import eu.emufii.app.ui.theme.liftShadow
 
-/**
- * pourquoi : docs/decisions/bibliotheque.md § The console folders
- */
 @Composable
 internal fun FolderTile(
     folder: Entry.Folder,
     onClick: () -> Unit,
     selected: Boolean,
     padHeld: Boolean,
-    /**
-     * As on the game tile: the carousel's card is large and sends a smaller share. The
-     * default is the grid's own, not the 0.12 of an airy icon -- sorted by console the
-     * grid is made of these, and they wore a tube twice the width of their neighbours'.
-     */
     band: Float = TILE_BAND,
-    /** As on the game tile: the carousel's recession, applied inside. */
     rest: () -> Float = { 1f },
     modifier: Modifier = Modifier,
 ) {
@@ -89,7 +80,6 @@ internal fun FolderTile(
         animationSpec = Motion.press(),
         label = "folder-scale"
     )
-    // pourquoi : docs/decisions/theme-duotone-shelves.md § The diagonal staircase
     val riseX = TILE_RISE * mark
     val riseY = TILE_RISE * mark
 
@@ -114,7 +104,6 @@ internal fun FolderTile(
                     lift = if (selected) 10.dp else 4.dp,
                     dark = LocalEmufiiDarkTheme.current,
                     oled = LocalEmufiiOledTheme.current,
-                    // The console's own colour, like a game's cover.
                     tint = paletteFor(folder.console.name).first,
                     tinted = { mark }
                 )
@@ -131,12 +120,9 @@ internal fun FolderTile(
                 Image(
                     painter = painterResource(plate),
                     contentDescription = folder.console.label,
-                    // The tile is square like the source, so nothing is cut; Fit leaves a
-                    // hairline of gradient whatever rounding the grid gives the cell.
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
-                // Its own ground: a bare label was legible on three consoles out of seven.
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -180,7 +166,6 @@ internal fun FolderTile(
             }
         }
         Spacer(Modifier.height(8.dp))
-        // pourquoi : docs/decisions/bibliotheque.md § The console folders
         Spacer(Modifier.height(32.dp))
     }
 }

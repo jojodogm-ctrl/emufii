@@ -6,13 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-/**
- * With a room on the VPS nobody hosts, both players join it; with no room the old path
- * has to stay intact, it is what serves the 3DS and every session already under way.
- *
- * The ROM is left null: building one would need a `Uri`, absent outside Android, and no
- * decision checked here depends on it.
- */
+/** ROM left null: building one needs a `Uri`, unavailable off-device. */
 class NetplayPlanForRoomTest {
 
     private fun session(

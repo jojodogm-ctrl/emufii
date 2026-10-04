@@ -6,18 +6,9 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
-/**
- * The title id is the one thing a Switch dump says without a console key: title and icon
- * live in an encrypted NCA, and the titles now come from the public index instead (see
- * `GameTitles`). One small read of the NSP's plaintext table of contents, no decryption.
- * A cartridge dump (`.xci`) carries no ticket and is named by its filename, cleaned.
- */
 class SwitchReader(private val context: Context) {
 
-    /**
-     * Read off the ticket or certificate entry name, which an NSP carries in clear
-     * (`0100cd801ce5e0000000000000000011.tik`), never off the file name on disk.
-     */
+    /** From the ticket/cert entry name in the NSP's plaintext PFS0 table, not the filename. */
     fun titleId(uri: Uri): String? = runCatching {
         context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
             FileInputStream(pfd.fileDescriptor).channel.use { channel ->

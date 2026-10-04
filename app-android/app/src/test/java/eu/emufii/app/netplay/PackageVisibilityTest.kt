@@ -8,11 +8,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-/**
- * Since Android 11 a package left out of `<queries>` is invisible: `getPackageInfo`
- * throws and the launcher concludes the emulator isn't installed. Eden failed its first
- * device run that way, the only trace being one `AppsFilter … BLOCKED` line in logcat.
- */
+// Since Android 11 a package missing from <queries> is invisible to getPackageInfo.
 class PackageVisibilityTest {
 
     private val manifest: String by lazy {

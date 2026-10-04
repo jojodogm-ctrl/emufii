@@ -14,8 +14,6 @@ class SecondScreenTest {
 
     @Test fun `the panel follows the app when there is no session`() {
         assertTrue(secondScreenWanted(enabled = true, foreground = true, model = SecondScreenModel.Idle))
-        // The defect this rule exists for: Emufii left for the home screen, its process
-        // still alive, and the rear panel still lit.
         assertFalse(secondScreenWanted(enabled = true, foreground = false, model = SecondScreenModel.Idle))
     }
 
@@ -59,8 +57,6 @@ class SecondScreenTest {
     }
 
     @Test fun `a folder claims only the keys that do something`() {
-        // The grid's long press asks for a game, so the hold is inert on a folder: a
-        // legend printing it would claim a key the machine ignores.
         val legend = SecondScreenModel.ConsoleFolder(Console.PS2).legend
         assertEquals(listOf(PadHint.BACK), legend.left)
         assertEquals(listOf(PadHint.CONFIRM), legend.right)

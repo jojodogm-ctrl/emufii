@@ -15,12 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 /** How long A is held before the tile's menu opens, matching touch's own delay. */
 private const val HOLD_TO_MENU_MS = 480L
 
-/**
- * A press does exactly one thing: menu on the hold, or launch on release.
- * pourquoi : docs/decisions/bibliotheque.md § Holding A, and the title that fades out
- */
 internal class ConfirmHold(private val scope: CoroutineScope) {
-    /** Compose state, not a plain field: the tile reads it to sink while held. */
     var down by mutableStateOf(false)
         private set
     private var fired = false

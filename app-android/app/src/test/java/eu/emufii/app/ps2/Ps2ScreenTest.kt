@@ -8,10 +8,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * Pinned against ARMSX2 2.6.6.7's real tree, taken with `uiautomator` on the
- * Thor on 2026-08-17. The bounds below are copied from the dump, not invented.
- */
+/** Bounds copied from a `uiautomator` dump of ARMSX2 2.6.6.7. */
 class Ps2ScreenTest {
 
     private fun text(t: String, b: Bounds, clickable: Boolean = false) =
@@ -73,7 +70,6 @@ class Ps2ScreenTest {
         assertEquals(Bounds(437, 532, 669, 590), Ps2Screen.modeButton(nodes, "Host local game")?.bounds)
     }
 
-    /** ARMSX2's keyboard, as it is drawn: 42 keys, not one field. */
     private val keyboard = listOf(
         text("10671", Bounds(69, 300, 400, 358)),
         text("1", Bounds(51, 507, 222, 627), clickable = true),
@@ -88,8 +84,6 @@ class Ps2ScreenTest {
 
     @Test
     fun `the Generate button is not mistaken for the room code`() {
-        // The infinite loop of 2026-08-17: "Generate" is further right than the
-        // code, and neither is clickable in the tree.
         val row = listOf(
             text("Room code", Bounds(69, 183, 250, 241)),
             text("DNW757", Bounds(1532, 183, 1658, 241)),
@@ -113,8 +107,7 @@ class Ps2ScreenTest {
 
     @Test
     fun `an IPv4 address cannot be typed, and that must be known before trying`() {
-        // The wall measured on 2026-08-17: no dot key, no automatic insertion.
-        // Typing "10671" displays "10671".
+        // ARMSX2's keyboard has no dot key.
         assertFalse(Ps2Screen.canType("10.67.1.2"))
         assertTrue(Ps2Screen.canType("KHYZF3W6"))
         assertTrue(Ps2Screen.canType("19072"))

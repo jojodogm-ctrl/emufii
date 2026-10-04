@@ -9,11 +9,6 @@ import eu.emufii.app.ui.components.DetailTone
 import eu.emufii.app.ui.components.ThemeSwatches
 import eu.emufii.app.ui.components.labelRes
 
-/**
- * The theme, and that is all: Material You could not repaint both axes, so the accent beads
- * and the system colour went.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § Settings
- */
 @Composable
 internal fun AppearancePage(
     theme: AppTheme,

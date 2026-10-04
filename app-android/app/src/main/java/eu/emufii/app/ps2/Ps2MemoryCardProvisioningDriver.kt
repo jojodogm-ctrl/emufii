@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
 
-/** Drives ARMSX2's global Memory Cards screen to assign one published clone. */
 class Ps2MemoryCardProvisioningDriver(
     context: Context,
     private val goBack: () -> Boolean,
@@ -55,9 +54,7 @@ class Ps2MemoryCardProvisioningDriver(
             .firstNotNullOfOrNull { text(nodes, it) }
         val drawerManagerMarker = (setupAgainLabels + biosLocationLabels)
             .firstNotNullOfOrNull { text(nodes, it) }
-        // "Memory Cards" sits below the logo and four rows, off the Thor's landscape
-        // viewport: recognising the drawer by that target let the Home menu button win
-        // instead, opening and closing the top-left drawer forever.
+        // "Memory Cards" is below the landscape viewport; match the drawer by other rows or Home's button wins.
         val hasDrawerMarker = drawerTopMarker != null || drawerManagerMarker != null
         if (hasDrawerMarker) drawerSeen = true
         val inDrawer = hasDrawerMarker || (drawerSeen && !onManager)
@@ -127,8 +124,7 @@ class Ps2MemoryCardProvisioningDriver(
             return fail("Card $desiredName does not appear in ARMSX2.")
         }
 
-        // A Memory Cards screen already open may be a per-game manager: back out exactly
-        // once. Re-clicking Back while Compose animates was the Thor's top-left loop.
+        // Back out exactly once: re-clicking Back during the Compose animation loops.
         if (navigation == Ps2ProvisioningRoute.Action.BACK_TO_HOME) {
             if (navClicks++ >= MAX_NAV_CLICKS) return fail("Could not get back to the global ARMSX2 manager.")
             val changed = goBack()
@@ -162,8 +158,7 @@ class Ps2MemoryCardProvisioningDriver(
                 return fail("The ARMSX2 menu shows Memory Cards, but refuses to open it.")
             }
 
-            // ARMSX2's drawer is a `Column.verticalScroll()`: walk up from a drawer-only
-            // row, or the Home grid underneath takes the scroll.
+            // The drawer is a `Column.verticalScroll()`: walk up from a drawer-only row.
             val drawerScrollable = (drawerTopMarker ?: drawerManagerMarker)
                 ?.ancestorScrollable()
             if (drawerScrollable != null && drawerScrolls++ < MAX_DRAWER_SCROLLS &&

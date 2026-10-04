@@ -37,6 +37,8 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,11 +47,6 @@ import eu.emufii.app.ui.controlRing
 import eu.emufii.app.ui.ringColor
 import eu.emufii.app.ui.Sfx
 
-/**
- * The field is not a step in the traversal, its frame is: confirm on the frame opens
- * the field.
- * pourquoi : docs/decisions/coquille-ecrans.md § A text field must not be a cursor stop
- */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PadTextField(
@@ -62,9 +59,12 @@ fun PadTextField(
     isError: Boolean = false,
     singleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
-    shape: Shape = RoundedCornerShape(FIELD_CORNER)
+    shape: Shape = RoundedCornerShape(FIELD_CORNER),
+    selectAllOnEdit: Boolean = false
 ) {
     var editing by remember { mutableStateOf(false) }
+    var fieldValue by remember { mutableStateOf(TextFieldValue(value)) }
+    if (fieldValue.text != value) fieldValue = TextFieldValue(value, TextRange(value.length))
     val frame = remember { FocusRequester() }
     val field = remember { FocusRequester() }
     val interaction = remember { MutableInteractionSource() }
@@ -74,6 +74,7 @@ fun PadTextField(
 
     LaunchedEffect(editing) {
         if (editing) {
+            if (selectAllOnEdit) fieldValue = fieldValue.copy(selection = TextRange(0, fieldValue.text.length))
             runCatching { field.requestFocus() }
             keyboard?.show()
         } else {
@@ -81,14 +82,12 @@ fun PadTextField(
         }
     }
 
-    // Without it, closing the keyboard left focus in a field that had stopped editing.
     BackHandler(enabled = editing) {
         editing = false
         runCatching { frame.requestFocus() }
     }
 
     // The keyboard swallows the first B, so its disappearance ends the edit.
-    // pourquoi : docs/decisions/coquille-ecrans.md § It is the keyboard disappearing that ends editing, not the key
     val imeVisible = WindowInsets.isImeVisible
     var opened by remember { mutableStateOf(false) }
     LaunchedEffect(editing, imeVisible) {
@@ -103,8 +102,6 @@ fun PadTextField(
     }
 
     Column(modifier = modifier) {
-        // Above the frame, not in it: `OutlinedTextField` reserves room for its own label.
-        // pourquoi : docs/decisions/coquille-ecrans.md § The ring is the field's outline, and it is the only arrangement that holds
         if (label != null) {
             Text(
                 label,
@@ -116,18 +113,13 @@ fun PadTextField(
         }
         Box(
             modifier = Modifier
-                // One outline at a time, so there is nothing left to align; before the fill.
-                // pourquoi : docs/decisions/coquille-ecrans.md § The ring is the field's outline, and it is the only arrangement that holds
                 .controlRing(shape, enabled = !editing)
-                // Opaque, or the glow shows through: the cursor's glow is a shadow.
-                // pourquoi : docs/decisions/reglages-ecran.md § The opaque fill exists for the cursor, not for the look
                 .cardSliceFill(shape)
                 .focusRequester(frame)
                 .focusable(interactionSource = interaction)
                 .onKeyEvent { event ->
                     if (editing) return@onKeyEvent false
                     if (event.key in CONFIRM_KEYS) {
-                        // The key-down is swallowed so one press counts once.
                         if (event.type == KeyEventType.KeyUp) { Sfx.click(); editing = true }
                         true
                     } else {
@@ -136,16 +128,17 @@ fun PadTextField(
                 }
         ) {
             OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange,
+                value = fieldValue,
+                onValueChange = {
+                    fieldValue = it
+                    if (it.text != value) onValueChange(it.text)
+                },
                 label = null,
                 placeholder = placeholder?.let { { Text(it) } },
                 isError = isError,
                 singleLine = singleLine,
                 shape = shape,
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                // Transparent exactly when the ring is drawn, so the two never show at once.
-                // pourquoi : docs/decisions/theme-duotone-shelves.md § Session / Join, coral domain
                 colors = OutlinedTextFieldDefaults.colors(
                     cursorColor = ringColor(),
                     focusedBorderColor = ringColor(),
@@ -155,8 +148,6 @@ fun PadTextField(
                     disabledBorderColor =
                         if (framed) Color.Transparent
                         else MaterialTheme.colorScheme.outline,
-                    // Cleared like the others: Material puts the error outline ahead of the three.
-                    // pourquoi : docs/decisions/coquille-ecrans.md § The ring is the field's outline, and it is the only arrangement that holds
                     errorBorderColor =
                         if (framed) Color.Transparent
                         else MaterialTheme.colorScheme.error
@@ -165,12 +156,10 @@ fun PadTextField(
                     .fillMaxWidth()
                     .focusRequester(field)
                     .focusProperties { canFocus = editing }
-                    // Focus can leave other than through B, the system gesture for instance.
                     .onFocusChanged { if (editing && !it.isFocused) editing = false }
             )
 
             // Compose tests children first, and the field consumed taps it did nothing with.
-            // pourquoi : docs/decisions/coquille-ecrans.md § The finger could not reach the frame
             if (!editing) {
                 Box(
                     modifier = Modifier

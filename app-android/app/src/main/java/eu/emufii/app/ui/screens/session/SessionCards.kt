@@ -83,7 +83,6 @@ internal fun CodeCard(code: String, isHost: Boolean) {
     }
 }
 
-/** pourquoi : docs/decisions/session.md § This screen's drawing decisions */
 @Composable
 internal fun PresenceCard(
     youName: String,
@@ -91,16 +90,10 @@ internal fun PresenceCard(
     isHost: Boolean,
     live: Boolean,
     modifier: Modifier = Modifier,
-    /**
-     * True only in the pane: the single-column page already scrolls, and Compose throws when
-     * measuring scrolling content unbounded.
-     * pourquoi : docs/decisions/session.md § This screen's drawing decisions
-     */
+    /** Compose throws when measuring unbounded scrolling content inside the scrolling page. */
     scrollable: Boolean = false
 ) {
     val scroll = rememberScrollState()
-    // A line cut in half reads as a rendering glitch, one fading into the card's background as
-    // "there is more"; lit only when something is left below the fold.
     val fill = softCardFill()
     val fade = scrollable && scroll.canScrollForward
 
@@ -108,17 +101,11 @@ internal fun PresenceCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                // BEFORE the scroll: after, it works in the unrolled content's coordinates
-                // and lands below the fold, invisible.
-                // pourquoi : docs/decisions/session.md § This screen's drawing decisions
                 .then(
                     if (!fade) Modifier else Modifier.drawWithContent {
                         drawContent()
                         val h = FADE_HEIGHT.toPx()
                         drawRect(
-                            // Opaque before the edge, not at it: a linear run left the last
-                            // line legible and sliced.
-                            // pourquoi : docs/decisions/session.md § This screen's drawing decisions
                             brush = Brush.verticalGradient(
                                 colorStops = arrayOf(
                                     0f to Color.Transparent,
@@ -146,8 +133,6 @@ internal fun PresenceCard(
                     )
                 )
                 Spacer(Modifier.weight(1f))
-                // Nothing is live while we are not hearing back: the dot would vouch for a list
-                // we can no longer refresh.
                 if (others.isNotEmpty() && live) LiveDot()
             }
             Spacer(Modifier.height(12.dp))
@@ -201,10 +186,6 @@ internal fun PresenceCard(
     }
 }
 
-/**
- * Enough to erase a whole line and its leading: 28 dp left the cut line half legible.
- * pourquoi : docs/decisions/session.md § This screen's drawing decisions
- */
 private val FADE_HEIGHT = 44.dp
 
 @Composable
@@ -237,14 +218,8 @@ private fun LiveDot() {
 internal fun ConnectionCard(
     hostIp: String,
     addressLabel: String,
-    /** Null when the console does not ask for one, the column then disappears. */
     port: String?,
     romName: String?,
-    /**
-     * False in the pane, where its forty dp are what clipped the card, and a game name is not
-     * a state you act on.
-     * pourquoi : docs/decisions/session.md § This screen's drawing decisions
-     */
     showGame: Boolean = true
 ) {
     SoftCard {
@@ -273,12 +248,10 @@ internal fun ConnectionCard(
                 }
             }
             // No copy buttons: Emufii fills the form, and the clipboard holds one value at a time.
-            // pourquoi : docs/decisions/session.md § Copying the address stopped making sense once Emufii fills it in
         }
     }
 }
 
-/** ICU does it: the conjunction and the comma placement differ per locale. */
 @Composable
 private fun nameList(names: List<String>): String {
     val locale = LocalConfiguration.current.locales[0]

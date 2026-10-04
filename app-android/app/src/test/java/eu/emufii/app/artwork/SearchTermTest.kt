@@ -3,11 +3,6 @@ package eu.emufii.app.artwork
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/**
- * A dump's name is not a game title: it drags its region and revision along, and
- * "Mario Kart 7 (USA) (Rev 1)" brings nothing back. A game that cannot be found is the
- * cache's most expensive case, producing no image to remember.
- */
 class SearchTermTest {
 
     @Test
@@ -25,7 +20,6 @@ class SearchTermTest {
         assertEquals("Kirby Planet Robobot", SteamGridDb.searchTerm("Kirby.Planet_Robobot"))
     }
 
-    /** The suffix is part of the real title: removing it would break the search. */
     @Test
     fun `keeps the console suffix`() {
         assertEquals(

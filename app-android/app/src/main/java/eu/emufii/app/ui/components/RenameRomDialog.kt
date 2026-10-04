@@ -11,11 +11,6 @@ import eu.emufii.app.R
 import eu.emufii.app.library.Rom
 import eu.emufii.app.library.RomNames
 
-/**
- * The file on disk is not touched: the ROM keeps its name, its saves stay paired with it,
- * and a third-party emulator knowing it by path sees nothing change. Last resort when the
- * SMDH or banner title is truncated, Japanese, or a tagline; no rule catches every case.
- */
 @Composable
 fun RenameRomDialog(
     rom: Rom,
@@ -44,9 +39,7 @@ fun RenameRomDialog(
         }
     ) {
         PadDialogText(stringResource(R.string.rename_body))
-        // Not a bare `OutlinedTextField`: a field that merely takes focus opens the soft
-        // keyboard, so on a pad the cursor passing over it covered the dialog and swallowed
-        // the directions. The frame is the traversal step; A goes in, B comes back out.
+        // Not a bare OutlinedTextField: focus alone would open the keyboard under the pad cursor.
         PadTextField(
             value = name,
             onValueChange = { name = it },

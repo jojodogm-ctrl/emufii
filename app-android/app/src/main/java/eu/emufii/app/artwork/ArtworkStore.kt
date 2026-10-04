@@ -9,16 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-/**
- * Failures are remembered too: a title the catalogue does not know is the one we would
- * ask about forever, so the miss is marked, and expires after [MISS_TTL_MS]. Only the URL
- * is kept; the bytes are Coil's cache, and a second one here would age on its own.
- */
 class ArtworkStore(context: Context) {
 
     private val prefs = context.getSharedPreferences("artwork", Context.MODE_PRIVATE)
 
-    /** One search at a time: thirty tiles appear all at once. */
     private val lock = Mutex()
 
     suspend fun iconUrl(rom: Rom, apiKey: String): String? {
@@ -39,10 +33,6 @@ class ArtworkStore(context: Context) {
         }
     }
 
-    /**
-     * Kept under its own prefix and never overwritten by the automatic one: a manual
-     * choice survives a new key, an expired cache, a catalogue that changes its mind.
-     */
     fun chosen(key: String): String? =
         prefs.getString(PICK_PREFIX + key, null)?.takeIf { it.isNotBlank() }
 
@@ -58,7 +48,7 @@ class ArtworkStore(context: Context) {
 
     fun chosenFor(rom: Rom): String? = chosen(key(rom))
 
-    /** The URL; the empty string for "searched, found nothing"; null for "never searched". */
+    /** URL, "" for searched-and-missed, null for never searched. */
     private fun cached(key: String): String? {
         val url = prefs.getString(URL_PREFIX + key, null) ?: return null
         if (url.isNotBlank()) return url
@@ -74,11 +64,9 @@ class ArtworkStore(context: Context) {
         }
     }
 
-    /** By title id where the console has one: two dumps share an entry, a rename costs nothing. */
     fun key(rom: Rom): String = rom.sessionId ?: rom.displayName
 
     companion object {
-        /** Observed by the tiles: the corrected one repaints as the picker closes. */
         private val _revision = MutableStateFlow(0)
         val revision: StateFlow<Int> = _revision.asStateFlow()
 

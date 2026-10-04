@@ -1,17 +1,11 @@
 package eu.emufii.app.wfc
 
-/**
- * A `VpnService` tunnel hands over raw IP packets, so the DNS relay does its own parsing
- * and checksums; free of Android types, so every rule is covered by JVM tests. No
- * fragmentation and no IPv6: a packet not understood is dropped rather than guessed at.
- */
 object Ipv4Udp {
 
     const val PROTO_UDP = 17
     private const val MIN_IP_HEADER = 20
     private const val UDP_HEADER = 8
 
-    /** Addresses kept as raw 4-byte big-endian. */
     data class Datagram(
         val source: ByteArray,
         val destination: ByteArray,
@@ -40,10 +34,6 @@ object Ipv4Udp {
         }
     }
 
-    /**
-     * Null for anything else: wrong version, not UDP, truncated, fragmented, or claiming
-     * a length the buffer does not back up.
-     */
     fun parse(packet: ByteArray, length: Int = packet.size): Datagram? {
         if (length < MIN_IP_HEADER) return null
 
@@ -77,10 +67,7 @@ object Ipv4Udp {
         )
     }
 
-    /**
-     * The UDP checksum is optional in IPv4, but a wrong-but-present one shows up as "DNS
-     * silently doesn't work", so it is computed and tested.
-     */
+    /** UDP checksum is optional in IPv4, but a wrong one silently breaks DNS, so it is always computed. */
     fun build(
         source: ByteArray,
         destination: ByteArray,
@@ -102,7 +89,6 @@ object Ipv4Udp {
         writeShort(packet, 6, 0x4000)          // don't fragment
         packet[8] = 64                         // TTL
         packet[9] = PROTO_UDP.toByte()
-        // 10..11 header checksum, filled below
         source.copyInto(packet, 12)
         destination.copyInto(packet, 16)
         writeShort(packet, 10, checksum(packet, 0, MIN_IP_HEADER))
@@ -110,7 +96,6 @@ object Ipv4Udp {
         writeShort(packet, 20, sourcePort)
         writeShort(packet, 22, destinationPort)
         writeShort(packet, 24, udpLength)
-        // 26..27 UDP checksum, filled below
         payload.copyInto(packet, 28)
         writeShort(packet, 26, udpChecksum(packet))
 

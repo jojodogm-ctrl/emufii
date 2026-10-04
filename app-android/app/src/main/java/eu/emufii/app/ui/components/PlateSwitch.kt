@@ -37,21 +37,12 @@ import androidx.compose.ui.unit.IntOffset
 import eu.emufii.app.ui.Sfx
 import eu.emufii.app.ui.rememberElastic
 
-/**
- * Not Material's `Switch`: its tinted track reads as a sticker on a moulded plate, and its
- * focus veil reads as "disabled" on a console where the cursor is always somewhere.
- * pourquoi : docs/decisions/reglages-ecran.md § A setting with only two states is a switch
- */
 private val TRACK_WIDTH = 52.dp
 private val TRACK_HEIGHT = 30.dp
 private val KNOB = 24.dp
 private val PAD = 3.dp
 
-/**
- * The whole row is the finger's target, but focus lives on the switch alone
- * (`canFocus = false` on the row): a ring around a label reads as a selection, not a cursor.
- * pourquoi : docs/decisions/reglages-ecran.md § A setting with only two states is a switch
- */
+/** The row takes the touch, but only the switch takes focus (canFocus = false on the row). */
 @Composable
 fun SwitchRow(
     label: String,
@@ -93,18 +84,10 @@ fun SwitchRow(
     }
 }
 
-/**
- * The switch without its click or its ring, the row carrying it having both; published
- * because the launch card has its own.
- * pourquoi : docs/decisions/theme-duotone-shelves.md § Hollows become notches
- */
 @Composable
 fun SwitchFace(checked: Boolean) {
     val dark = LocalEmufiiDarkTheme.current
     val axis = ringColor()
-    // Elastic: the edge in the direction of travel leaves first, the other follows, so
-    // the thumb stretches into a pill and closes up again.
-    // pourquoi : docs/decisions/matiere-et-mouvement-trailer.md § The elastic indicator
     val knob = rememberElastic(
         target = if (checked) TRACK_WIDTH - KNOB - PAD else PAD,
         width = KNOB
@@ -121,9 +104,6 @@ fun SwitchFace(checked: Boolean) {
             .background(fill, CircleShape),
         contentAlignment = Alignment.CenterStart
     ) {
-        // The thumb is always the light plate: dark on a dark theme, it read as one more
-        // hole in the socket rather than the thumb sliding in it.
-        // pourquoi : docs/decisions/reglages-ecran.md § A setting with only two states is a switch
         Box(
             modifier = Modifier
                 .offset { IntOffset(knob.start.roundToPx(), 0) }

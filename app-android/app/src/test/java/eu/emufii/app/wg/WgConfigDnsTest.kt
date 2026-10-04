@@ -5,11 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * The tunnel's DNS: present for the PS2, absent everywhere else. Announcing a DNS sends
- * the device's entire resolution through the relay, so adding it to a 3DS, Switch or PSP
- * session puts a fresh point of failure on consoles that work, silently.
- */
+/** DNS in the tunnel routes all resolution through the relay, so only PS2 sessions get it. */
 class WgConfigDnsTest {
 
     private val info = WgTunnelInfo(

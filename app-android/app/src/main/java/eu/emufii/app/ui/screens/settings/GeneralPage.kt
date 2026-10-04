@@ -43,8 +43,6 @@ internal fun GeneralPage(
                     title = stringResource(R.string.settings_language),
                     state = BlockState(DetailTone.GOOD, stringResource(language.labelRes))
                 ) {
-                    // Tighter than the block's ordinary gap: three choices from one list
-                    // are a single object, and the gap between two subjects made them float.
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     AppLanguage.entries.forEachIndexed { index, option ->
                         ChoiceRow(
@@ -73,19 +71,13 @@ internal fun GeneralPage(
     }
 }
 
-/**
- * Off-store there is no notification service: an alert can arrive a quarter of an hour
- * late, and the status line says so.
- * pourquoi : docs/decisions/reglages-ecran.md § The status lines, and what nobody would guess
- */
 @Composable
 private fun NotificationsBlock(
     friends: Boolean,
     onSetFriends: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
-    // Asked at composition rather than remembered: a cached answer would still show the
-    // refusal the player just lifted in Android's settings.
+    // Asked at composition, not cached: the player may just have granted it in Android settings.
     val allowed = Notifications.allowed(context)
 
     SettingsBlock(
@@ -105,9 +97,6 @@ private fun NotificationsBlock(
             )
         )
     ) {
-        // A switch, not two buttons with changing labels: "Friends off" does not say
-        // whether it describes the state or the action.
-        // pourquoi : docs/decisions/reglages-ecran.md § A setting with only two states is a switch
         SwitchRow(
             label = stringResource(R.string.settings_notify_friends),
             checked = friends,
@@ -134,11 +123,6 @@ private fun NotificationsBlock(
     }
 }
 
-/**
- * Without the status line the player turns it on, nothing happens, and a broken feature
- * looks like a one-screen device.
- * pourquoi : docs/decisions/reglages-ecran.md § The status lines, and what nobody would guess
- */
 @Composable
 private fun SecondScreenBlock(
     enabled: Boolean,

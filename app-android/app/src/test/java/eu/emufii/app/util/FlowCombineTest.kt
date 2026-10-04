@@ -12,10 +12,6 @@ import org.junit.Test
 
 class FlowCombineTest {
 
-    /**
-     * Fifteen state flows carrying different types: the library screen combines this
-     * many, and a helper that dropped emissions would silently freeze the grid.
-     */
     @Test
     fun `emits once per source update across all fifteen inputs`() = runBlocking(Dispatchers.Default) {
         val f1 = MutableStateFlow(0)
@@ -45,7 +41,6 @@ class FlowCombineTest {
             }.collect { emissions.add(it) }
         }
 
-        // Initial combined emission — waits until every source has produced a value.
         awaitCount(emissions, 1)
         val start = emissions.size
 
@@ -76,7 +71,6 @@ class FlowCombineTest {
         }
 
         job.cancel()
-        // Fourteen distinct updates on top of the initial value → fourteen new emissions.
         assertEquals(14, emissions.size - start)
         assertTrue(emissions.last().startsWith("42|x|true|7|123|"))
     }
