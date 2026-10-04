@@ -102,8 +102,7 @@ Wi-Fi. If you're playing with friends, keep the session private.
 ## License
 
 [AGPL-3.0](LICENSE) (details in [NOTICE.md](NOTICE.md)). The app's source code
-is in this repository, but the session server and relay are private. The
-license doesn't cover the Emufii name or logo.
+is in this repository, but the session server and relay are private.
 
 If you find a security issue, please report it privately on
 [Discord](https://discord.gg/tvWcb28vBZ).
