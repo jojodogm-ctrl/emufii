@@ -357,7 +357,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             relayEndpoint = relay.getString("endpoint"),
             relayPublicKey = relay.getString("public_key"),
             relayAllowedIps = relay.getString("allowed_ips")
-        )
+        ).also(::checkTunnelInfo)
     }
 
     private suspend fun request(
@@ -442,3 +442,19 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
 }
 
 private const val AVATAR_MAX_BYTES = 48 * 1024
+
+/** These go into the WireGuard config as text: no line breaks, and the tunnel only ever covers 10.0.0.0/8. */
+internal fun checkTunnelInfo(info: WgTunnelInfo) {
+    val fields = listOfNotNull(
+        info.address, info.hairpinAddress, info.subnet,
+        info.relayEndpoint, info.relayPublicKey, info.relayAllowedIps
+    )
+    require(fields.none { it.contains('\n') || it.contains('\r') }) { "line break in tunnel info" }
+    val private = Regex("""10\.\d{1,3}\.\d{1,3}\.\d{1,3}(/(\d{1,2}))?""")
+    fun inTen(v: String) = private.matchEntire(v.trim())?.let { m ->
+        (m.groupValues[2].toIntOrNull() ?: 32) in 8..32
+    } == true
+    require(inTen(info.address)) { "tunnel address outside 10.0.0.0/8" }
+    info.hairpinAddress?.let { require(inTen(it)) { "hairpin address outside 10.0.0.0/8" } }
+    require(info.relayAllowedIps.split(',').all { inTen(it) }) { "allowed IPs outside 10.0.0.0/8" }
+}

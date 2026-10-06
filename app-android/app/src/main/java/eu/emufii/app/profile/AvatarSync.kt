@@ -60,9 +60,10 @@ class AvatarSync private constructor(context: Context) {
     suspend fun syncFriends(client: CoordinatorClient, codes: List<String>, hashes: Map<String, String>) {
         withContext(Dispatchers.IO) {
             for (code in codes) {
-                val hash = hashes[code]
+                val hash = hashes[code]?.takeIf { it.matches(HASH_RE) }
+                if (hash == null || !code.matches(CODE_RE)) continue
                 val target = File(cacheDir, "$code-$hash.webp")
-                if (hash == null || target.exists() || target.name in rejected) continue
+                if (target.exists() || target.name in rejected) continue
                 val bytes = client.fetchAvatar(code).getOrNull() ?: continue
                 if (!isSanePicture(bytes)) {
                     rejected += target.name // refetched every poll otherwise, until the hash changes
@@ -113,6 +114,8 @@ class AvatarSync private constructor(context: Context) {
     companion object {
         private const val KEY_OWNER = "owner_key"
         private const val KEY_SENT = "sent_signature"
+        private val HASH_RE = Regex("[0-9a-f]{8,128}")
+        private val CODE_RE = Regex("[0-9A-Z]{12}")
         private const val SIDE = 256
         private const val MEMBER_TTL_MS = 7L * 24 * 3600 * 1000
         private const val MAX_BYTES = 40 * 1024
