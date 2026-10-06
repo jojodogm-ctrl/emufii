@@ -9,11 +9,11 @@ No ports to open, no IP address to share. Built for Android handhelds.
 
 [![Download](https://img.shields.io/badge/Download-APK-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![Version](https://img.shields.io/badge/Version-1.13-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
-[![Android](https://img.shields.io/badge/Android-13--15-2BB5A6?style=flat-square&logo=android&logoColor=white)](#install)
+[![Android](https://img.shields.io/badge/Android-13--15-3DDC84?style=flat-square&logo=android&logoColor=white)](#install)
 [![Games](https://img.shields.io/badge/Games-Compatible_list-2BB5A6?style=flat-square)](COMPATIBLE-GAMES.md)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-5B6EE1?style=flat-square)](LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Join-5B6EE1?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-5B6EE1?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/emufii)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-13C3FF?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/emufii)
 
 **[What it is](#what-emufii-is-and-isnt)** · **[How it works](#how-it-works)** · **[Consoles](#consoles)** · **[Install](#install)** · **[Privacy](#privacy)**
 
