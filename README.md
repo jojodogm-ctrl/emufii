@@ -132,7 +132,7 @@ apksigner verify --print-certs Emufii-1.13.apk
 |---|---|
 | Session code, nickname, game | On the server for the length of the session, deleted when it ends |
 | Profile picture | On the server, seen by your friends and the players in your sessions. Removing it in the app deletes it |
-| Online status, last game | Seen by your friends only |
+| Online status, last game | Seen by anyone who has your friend code |
 | Friend code | Never shown to the other players of a session |
 | Network traffic | Only game traffic goes through Emufii's network |
 | Games, BIOS, keys | Never included. Use your own dumps |
