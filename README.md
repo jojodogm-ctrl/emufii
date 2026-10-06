@@ -194,3 +194,17 @@ contributing to the project.
 If that sounds good to you,
 **[grab the latest version](https://github.com/jojodogm-ctrl/emufii/releases/latest)**
 and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
+
+<br>
+
+## Credits
+
+**Emulators.** Emufii only exists because of the people who build these emulators and their multiplayer: [Eden](https://eden-emu.dev), [Azahar](https://azahar-emu.org), [Dolphin](https://dolphin-emu.org), [PPSSPP](https://www.ppsspp.org), [ARMSX2](https://github.com/ARMSX2/ARMSX2), [melonDS](https://melonds.kuribo64.net) and its [Android port](https://github.com/rafaelvcaetano/melonDS-android) by rafaelvcaetano, and [WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS) by SapphireRhodonite.
+
+**Online services.** [Kaeru WFC](https://kaeru.world), which keeps Nintendo Wi-Fi Connection alive for DS games.
+
+**Contributors.** [@sofianeelhor](https://github.com/sofianeelhor) for the PPSSPP and ARMSX2 network automation, and [@BrianJr03](https://github.com/BrianJr03) for the manual session setup and uncropped covers.
+
+**Libraries.** [WireGuard](https://www.wireguard.com) for the tunnel, [Coil](https://coil-kt.github.io/coil/) for images, and the [Rounded M+](https://github.com/google/fonts) font (OFL).
+
+And everyone on the [Discord](https://discord.gg/tvWcb28vBZ) who tests, reports bugs and plays.
