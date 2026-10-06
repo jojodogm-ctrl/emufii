@@ -199,10 +199,24 @@ and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
 
 ## Credits
 
-| | |
-|---|---|
-| **Emulators** | [Eden](https://eden-emu.dev) · [Azahar](https://azahar-emu.org) · [Dolphin](https://dolphin-emu.org) · [PPSSPP](https://www.ppsspp.org) · [ARMSX2](https://github.com/ARMSX2/ARMSX2) · [melonDS](https://melonds.kuribo64.net) · [melonDS Android](https://github.com/rafaelvcaetano/melonDS-android) · [WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS) |
-| **DS online** | [Kaeru WFC](https://kaeru.world) |
-| **Contributors** | [@sofianeelhor](https://github.com/sofianeelhor) · [@BrianJr03](https://github.com/BrianJr03) |
-| **Libraries** | [WireGuard](https://www.wireguard.com) · [Coil](https://coil-kt.github.io/coil/) · [Rounded M+](https://github.com/google/fonts) |
-| **Community** | Everyone on the [Discord](https://discord.gg/tvWcb28vBZ) who tests and reports bugs |
+Emufii is built on other people's work. Thank you to all of them.
+
+#### Emulators
+The teams behind [Eden](https://eden-emu.dev), [Azahar](https://azahar-emu.org), [Dolphin](https://dolphin-emu.org), [PPSSPP](https://www.ppsspp.org), [ARMSX2](https://github.com/ARMSX2/ARMSX2) and [melonDS](https://melonds.kuribo64.net), who built the multiplayer Emufii connects. Thanks also to rafaelvcaetano for [melonDS Android](https://github.com/rafaelvcaetano/melonDS-android), and to SapphireRhodonite for [WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS).
+
+#### DS online
+[Kaeru WFC](https://kaeru.world), for keeping Nintendo Wi-Fi Connection alive.
+
+#### Contributors
+[@sofianeelhor](https://github.com/sofianeelhor), who automated the network setup of PPSSPP and ARMSX2, and [@BrianJr03](https://github.com/BrianJr03), who added the manual session setup and uncropped covers.
+
+#### Libraries
+[WireGuard](https://www.wireguard.com) for the tunnel, [Coil](https://coil-kt.github.io/coil/) for images, and the [Rounded M+](https://github.com/google/fonts) font.
+
+<br>
+
+<div align="center">
+
+And everyone on the [Discord](https://discord.gg/tvWcb28vBZ) who tests, reports bugs and plays.
+
+</div>
