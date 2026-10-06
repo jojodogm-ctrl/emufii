@@ -7,8 +7,6 @@
 **Play your emulators online with friends, using a six-character code.**<br>
 No ports to open, no IP address to share. Built for Android handhelds.
 
-<br>
-
 [![Discord](https://img.shields.io/badge/Discord-Join_the_server-5865F2?logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
 [![Download](https://img.shields.io/badge/Download-APK-2b4c8c)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![Games](https://img.shields.io/badge/Games-Compatible_list-2b4c8c)](COMPATIBLE-GAMES.md)
@@ -18,7 +16,27 @@ No ports to open, no IP address to share. Built for Android handhelds.
 
 </div>
 
----
+> [!IMPORTANT]
+> **DS local wireless needs WatermelonDS Emufii Edition.** Starting with Emufii 2.0, DS games can be played over local wireless with friends far away. This only works with [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest), a fork of WatermelonDS that adds the netplay this needs. It installs next to the official WatermelonDS, so you keep your saves and settings. Once the official WatermelonDS includes the netplay, the fork won't be needed anymore. Online play through Kaeru WFC still works with any melonDS or WatermelonDS.
+
+## What Emufii is (and isn't)
+
+Emufii is an Android app that connects your emulators to your friends' emulators over the internet. The emulators think everyone is on the same Wi-Fi, so their own local multiplayer just works.
+
+**What it does**
+
+- Creates a private network between the players for the length of a session, through Android's VPN feature. Only game traffic goes through it.
+- Opens your emulator on its multiplayer screen and fills in the connection details for you.
+- Shows the games from your own ROM folder, with covers and a compatibility badge, so you can start a session from them.
+- Lets you add friends with a code, see who's online and what they're playing, and join their sessions.
+
+**What it isn't**
+
+- **Not an emulator.** Every game runs in the emulator you already use (Eden, Azahar, Dolphin, PPSSPP, ARMSX2, melonDS or WatermelonDS). Emufii doesn't run any game itself.
+- **Not a frontend.** The game library is there to start multiplayer sessions. It doesn't replace your usual launcher.
+- **Not a store or a downloader.** Emufii doesn't include, download or install games, BIOS files, keys or emulators. You install the emulators yourself and use your own dumps.
+- **Not streaming.** Each player runs their own copy of the game on their own device. Nothing is streamed.
+- **Not a way back to official servers.** Emufii never connects to Nintendo's or Sony's servers. Games that needed them for online play don't work, except DS games through the Kaeru WFC revival server.
 
 ## How it works
 
@@ -27,19 +45,17 @@ No ports to open, no IP address to share. Built for Android handhelds.
 3. **Emufii** opens the emulator on its multiplayer screen and fills in the connection details.
 4. **You play**, as if you were all on the same Wi-Fi.
 
-Emufii doesn't emulate anything itself. It connects your devices, then each
-emulator uses the multiplayer it already has.
-
 ## Features
 
-- 🎮 **7 consoles**: Switch, 3DS, Wii, GameCube, PSP, PS2 and DS
-- 🔑 **One code to join**, with private sessions or a public list
-- ⚡ **Automatic setup**: Emufii opens the emulator and types the address for you
-- 📚 **Game library** with covers, search, and grid, carousel or list views
-- 🟢 **Compatibility badge** on every game, based on a list of [3,400+ games](COMPATIBLE-GAMES.md)
-- 🕹️ **Built for gamepads**, with touch support too
-- 🖥️ **Second screen** support on the AYN Thor
-- 🎨 **Light, dark and OLED themes**, in English and French
+- **7 consoles**: Switch, 3DS, Wii, GameCube, PSP, PS2 and DS
+- **One code to join**, with private sessions or a public list
+- **Automatic setup**: Emufii opens the emulator and types the address for you
+- **Friends**, with profile pictures, online status and the game they're playing
+- **Game library** with covers, search, and grid, carousel or list views
+- **Compatibility badge** on every game, based on a list of [3,400+ games](COMPATIBLE-GAMES.md)
+- **Built for gamepads**, with touch support too
+- **Second screen** support on the AYN Thor
+- **Light, dark and OLED themes**, in English and French
 
 ## Consoles
 
@@ -50,31 +66,25 @@ emulator uses the multiplayer it already has.
 | **Wii / GameCube** | [Dolphin](https://dolphin-emu.org) | Netplay | Android build `2606a` |
 | **PSP** | [PPSSPP](https://www.ppsspp.org) | Ad hoc | Any recent version |
 | **PS2** | [ARMSX2](https://github.com/ARMSX2/ARMSX2) | System Link / LAN | Any recent version |
-| **DS** | [melonDS](https://melonds.kuribo64.net) | Online via [Kaeru WFC](https://kaeru.world) | Any recent version |
+| **DS** | [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest) | Local wireless | 0.8.0.rc2-emufii |
+| **DS** | [melonDS](https://melonds.kuribo64.net) or WatermelonDS | Online via [Kaeru WFC](https://kaeru.world) | Any recent version |
 
-**Which games work?** Games that had local multiplayer on the original console.
-For the DS, it's games that used Nintendo Wi-Fi Connection. Games that needed
-Nintendo's or Sony's online servers don't work.<br>
-**➜ [Full list of compatible games](COMPATIBLE-GAMES.md)**
+**Which games work?** Games that had local multiplayer on the original console, and for the DS online mode, games that used Nintendo Wi-Fi Connection. Games that needed Nintendo's or Sony's online servers don't work. See the [full list of compatible games](COMPATIBLE-GAMES.md).
 
 Every player needs the same emulator version and the same copy of the game.
 
 ## Install
 
-> ⚠️ **Beta.** Works on Android 13, 14 and 15. Expect bugs, and
-> please report them on [Discord](https://discord.gg/tvWcb28vBZ).
+> [!NOTE]
+> **Beta.** Works on Android 13, 14 and 15. Expect bugs, and please report them on [Discord](https://discord.gg/tvWcb28vBZ).
 
 1. Install the emulators you want to use.
 2. [Download the latest APK](https://github.com/jojodogm-ctrl/emufii/releases/latest) and install it.
 3. Open Emufii and follow the setup.
 
-**Is the autofill option greyed out?** Android blocks it for apps installed
-outside a store. Go to **App info → ⋮ → Allow restricted settings**, then turn
-Emufii on in **Settings → Accessibility**.
+**Is the autofill option greyed out?** Android blocks it for apps installed outside a store. Go to **App info → ⋮ → Allow restricted settings**, then turn Emufii on in **Settings → Accessibility**.
 
-**To update**, download the new APK from the
-[releases page](https://github.com/jojodogm-ctrl/emufii/releases) and install it
-over the old one. Your settings are kept.
+**To update**, download the new APK from the [releases page](https://github.com/jojodogm-ctrl/emufii/releases) and install it over the old one. Your settings are kept.
 
 <details>
 <summary><b>Check the APK signature</b></summary>
@@ -91,21 +101,19 @@ apksigner verify --print-certs Emufii-1.13.apk
 
 ## Privacy
 
-- Your profile picture and friends list stay on your device.
-- The server only sees the session code, your nickname and the game, and deletes them when the session ends.
-- Only game traffic goes through Emufii.
+- The server sees the session code, your nickname and the game, and deletes them when the session ends.
+- Your profile picture, if you set one, is stored on the server so your friends and the players in your sessions can see it. Removing it in the app deletes it from the server.
+- Your friends see whether you're online and the last game you played. Your friend code is never shown to the other players of a session.
+- Only game traffic goes through Emufii's network.
 - Emufii includes no games, BIOS files or keys, so use your own dumps.
 
-In a public session, other players' devices can reach yours, like on shared
-Wi-Fi. If you're playing with friends, keep the session private.
+In a public session, other players' devices can reach yours, like on shared Wi-Fi. If you're playing with friends, keep the session private.
 
 ## License
 
-[AGPL-3.0](LICENSE) (details in [NOTICE.md](NOTICE.md)). The app's source code
-is in this repository, but the session server and relay are private.
+[AGPL-3.0](LICENSE) (details in [NOTICE.md](NOTICE.md)). The app's source code is in this repository, but the session server and relay are private.
 
-If you find a security issue, please report it privately on
-[Discord](https://discord.gg/tvWcb28vBZ).
+If you find a security issue, please report it privately on [Discord](https://discord.gg/tvWcb28vBZ).
 
 ## How it was built
 
