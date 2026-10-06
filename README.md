@@ -14,36 +14,61 @@ No ports to open, no IP address to share. Built for Android handhelds.
 [![License](https://img.shields.io/badge/License-AGPL--3.0-0b7fbf)](LICENSE)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-13C3FF?logo=kofi&logoColor=white)](https://ko-fi.com/emufii)
 
+**[What it is](#what-emufii-is-and-isnt)** · **[How it works](#how-it-works)** · **[Consoles](#consoles)** · **[Install](#install)** · **[Privacy](#privacy)**
+
 </div>
 
 > [!IMPORTANT]
-> **DS local wireless needs WatermelonDS Emufii Edition.** Starting with Emufii 2.0, DS local wireless games can be played online. This only works with [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest), a fork of WatermelonDS that adds the netplay this needs. It installs next to the official WatermelonDS, so you keep your saves and settings. Once the official WatermelonDS includes the netplay, the fork won't be needed anymore. Online play through Kaeru WFC still works with any melonDS or WatermelonDS.
+> **DS local wireless needs WatermelonDS Emufii Edition.**
+> Starting with Emufii 2.0, DS local wireless games can be played online. This only works with [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest), a fork of WatermelonDS that adds the netplay this needs.
+>
+> It installs next to the official WatermelonDS, so you keep your saves and settings. Once the official WatermelonDS includes the netplay, the fork won't be needed anymore. Online play through Kaeru WFC still works with any melonDS or WatermelonDS.
 
 ## What Emufii is (and isn't)
 
 Emufii is an Android app that connects your emulators to your friends' emulators over the internet. The emulators think everyone is on the same Wi-Fi, so their own local multiplayer just works.
 
-**What it does**
+<table>
+<tr>
+<th width="50%">What it does</th>
+<th width="50%">What it isn't</th>
+</tr>
+<tr>
+<td valign="top">
 
-- Creates a private network between the players for the length of a session, through Android's VPN feature. Only game traffic goes through it.
-- Opens your emulator on its multiplayer screen and fills in the connection details for you.
-- Shows the games from your own ROM folder, with covers and a compatibility badge, so you can start a session from them.
-- Lets you add friends with a code, see who's online and what they're playing, and join their sessions.
+**Connects the players.** A private network between the players for the length of a session, through Android's VPN feature. Only game traffic goes through it.
 
-**What it isn't**
+**Sets up the emulator.** Opens it on its multiplayer screen and fills in the connection details for you.
 
-- **Not an emulator.** Every game runs in the emulator you already use (Eden, Azahar, Dolphin, PPSSPP, ARMSX2, melonDS or WatermelonDS). Emufii doesn't run any game itself.
-- **Not a frontend.** The game library is there to start multiplayer sessions. It doesn't replace your usual launcher.
-- **Not a store or a downloader.** Emufii doesn't include, download or install games, BIOS files, keys or emulators. You install the emulators yourself and use your own dumps.
-- **Not streaming.** Each player runs their own copy of the game on their own device. Nothing is streamed.
-- **Not a way back to official servers.** Emufii never connects to Nintendo's or Sony's servers. Games that needed them for online play don't work, except DS games through the Kaeru WFC revival server.
+**Shows your games.** The games from your own ROM folder, with covers and a compatibility badge, to start a session from.
+
+**Brings your friends.** Add them with a code, see who's online and what they're playing, and join their sessions.
+
+</td>
+<td valign="top">
+
+**Not an emulator.** Every game runs in the emulator you already use. Emufii doesn't run any game itself.
+
+**Not a frontend.** The game library is there to start multiplayer sessions. It doesn't replace your usual launcher.
+
+**Not a downloader.** Emufii doesn't include, download or install games, BIOS files, keys or emulators. You install the emulators and use your own dumps.
+
+**Not streaming.** Each player runs their own copy of the game on their own device.
+
+**Not a way back to official servers.** Emufii never connects to Nintendo's or Sony's servers, so games that needed them don't work online. DS games through the Kaeru WFC revival server are the exception.
+
+</td>
+</tr>
+</table>
 
 ## How it works
 
-1. **The host** picks a game and gets a code.
-2. **Friends** enter the code, or find the game in the list of public sessions.
-3. **Emufii** opens the emulator on its multiplayer screen and fills in the connection details.
-4. **You play**, as if you were all on the same Wi-Fi.
+| | | |
+|:---:|---|---|
+| **1** | **Host** | Pick a game and get a six-character code. |
+| **2** | **Join** | Friends enter the code, or find the game in the list of public sessions. |
+| **3** | **Connect** | Emufii opens the emulator on its multiplayer screen and fills in the connection details. |
+| **4** | **Play** | As if you were all on the same Wi-Fi. |
 
 ## Consoles
 
@@ -57,25 +82,39 @@ Emufii is an Android app that connects your emulators to your friends' emulators
 | **DS** | [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest) | Local wireless | 0.8.0.rc2-emufii |
 | **DS** | [melonDS](https://melonds.kuribo64.net) or WatermelonDS | Online via [Kaeru WFC](https://kaeru.world) | Any recent version |
 
-**Which games work?** Games that had local multiplayer on the original console, and for the DS online mode, games that used Nintendo Wi-Fi Connection. Games that needed Nintendo's or Sony's online servers don't work. See the [full list of compatible games](COMPATIBLE-GAMES.md).
-
-Every player needs the same emulator version and the same copy of the game.
+> [!NOTE]
+> **Which games work?** Games that had local multiplayer on the original console, and for the DS online mode, games that used Nintendo Wi-Fi Connection. See the [full list of compatible games](COMPATIBLE-GAMES.md).
+>
+> Every player needs the same emulator version and the same copy of the game.
 
 ## Install
 
-> [!NOTE]
+> [!WARNING]
 > **Beta.** Works on Android 13, 14 and 15. Expect bugs, and please report them on [Discord](https://discord.gg/tvWcb28vBZ).
 
 1. Install the emulators you want to use.
 2. [Download the latest APK](https://github.com/jojodogm-ctrl/emufii/releases/latest) and install it.
 3. Open Emufii and follow the setup.
 
-**Is the autofill option greyed out?** Android blocks it for apps installed outside a store. Go to **App info → ⋮ → Allow restricted settings**, then turn Emufii on in **Settings → Accessibility**.
+<details>
+<summary><b>The autofill option is greyed out</b></summary>
+<br>
 
-**To update**, download the new APK from the [releases page](https://github.com/jojodogm-ctrl/emufii/releases) and install it over the old one. Your settings are kept.
+Android blocks it for apps installed outside a store. Go to **App info → ⋮ → Allow restricted settings**, then turn Emufii on in **Settings → Accessibility**.
+
+</details>
 
 <details>
-<summary><b>Check the APK signature</b></summary>
+<summary><b>Updating</b></summary>
+<br>
+
+Download the new APK from the [releases page](https://github.com/jojodogm-ctrl/emufii/releases) and install it over the old one. Your settings are kept.
+
+</details>
+
+<details>
+<summary><b>Checking the APK signature</b></summary>
+<br>
 
 ```
 21:EF:2D:D6:11:E0:96:5A:70:8F:61:F6:00:77:DE:97:D4:0D:59:FD:56:2F:1D:C5:F6:EF:6C:87:77:5E:81:D5
@@ -89,13 +128,17 @@ apksigner verify --print-certs Emufii-1.13.apk
 
 ## Privacy
 
-- The server sees the session code, your nickname and the game, and deletes them when the session ends.
-- Your profile picture, if you set one, is stored on the server so your friends and the players in your sessions can see it. Removing it in the app deletes it from the server.
-- Your friends see whether you're online and the last game you played. Your friend code is never shown to the other players of a session.
-- Only game traffic goes through Emufii's network.
-- Emufii includes no games, BIOS files or keys, so use your own dumps.
+| What | Where it goes |
+|---|---|
+| Session code, nickname, game | On the server for the length of the session, deleted when it ends |
+| Profile picture | On the server, seen by your friends and the players in your sessions. Removing it in the app deletes it |
+| Online status, last game | Seen by your friends only |
+| Friend code | Never shown to the other players of a session |
+| Network traffic | Only game traffic goes through Emufii's network |
+| Games, BIOS, keys | Never included. Use your own dumps |
 
-In a public session, other players' devices can reach yours, like on shared Wi-Fi. If you're playing with friends, keep the session private.
+> [!CAUTION]
+> In a public session, other players' devices can reach yours, like on shared Wi-Fi. If you're playing with friends, keep the session private.
 
 ## License
 
