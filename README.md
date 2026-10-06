@@ -187,8 +187,7 @@ That doesn't mean nobody is in charge. I decide the design and how the project
 is built and tested, I review the code that goes in, and I test every feature on
 real hardware before it ships.
 
-Since then, a large part of the code has been rewritten and cleaned up by hand,
-so today it reads a lot more like something a person wrote.
+Since then, part of the code has been rewritten.
 
 **If you're not comfortable with software made this way, that's completely
 fair.** Just know that the app and the servers have had a security review, with
