@@ -13,17 +13,8 @@
 coordinator/
 relay/
 scripts/
-# `docs/` reste dehors — les notes de travail, les scouts, le deploiement — a
-# une exception ouverte le 2026-08-24 : `docs/decisions/` porte le *pourquoi* du
-# code publie ici, cite depuis les commentaires eux-memes. L'exclure casserait
-# chaque renvoi. Noter la forme : `docs/*` et non `docs/`, sans quoi git n'entre
-# pas dans le dossier et l'exception ne peut pas s'appliquer.
-docs/*
-!docs/decisions/
-!docs/STYLE_COMMENTAIRES.md
-# The README's screenshots. Same trap as above: the exception only bites
-# because the rule is `docs/*` and not `docs/`.
-!docs/images/
+# Les notes de travail et les décisions restent privées.
+docs/
 CLAUDE.md
 .claude/
 # L'outillage de la passe de commentaires du 2026-09-02 : le contrat de forme, le
