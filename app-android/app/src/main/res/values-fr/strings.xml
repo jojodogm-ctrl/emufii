@@ -703,6 +703,8 @@
     <string name="psp_server_nobody">Personne sur ce jeu pour l’instant</string>
     <string name="psp_server_unknown">Pas de compteur en direct</string>
     <string name="launch_ppsspp_setup_hint">Réglages → Paramétrage automatique PPSSPP</string>
+    <string name="launch_ds_edition_missing">Le sans-fil demande WatermelonDS Emufii Edition</string>
+    <string name="launch_ds_edition_hint">Une fois installé, choisis-le pour la DS dans Réglages → Émulateurs</string>
     <string name="launch_ps2_profile_hint">Réglages → Profil réseau PS2</string>
     <string name="onb_tile_state">État</string>
     <string name="onb_tile_folder">Dossier</string>

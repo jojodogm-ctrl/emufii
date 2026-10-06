@@ -1,5 +1,6 @@
 package eu.emufii.app.secondscreen
 
+import android.annotation.SuppressLint
 import android.app.LocaleManager
 import android.app.Presentation
 import android.content.Context
@@ -61,6 +62,7 @@ private class EmufiiPresentation(
     private val owner = SecondScreenWindowOwner()
 
     /** A `Presentation` is a `Dialog`, and a `Dialog` closes on back. */
+    @SuppressLint("GestureBackNavigation")
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
     }

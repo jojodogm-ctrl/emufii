@@ -1,5 +1,6 @@
 package eu.emufii.app.secondscreen
 
+import android.annotation.SuppressLint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.coroutineScope
 import androidx.compose.foundation.layout.Spacer
@@ -1088,6 +1089,7 @@ private val DETAILS_COVER = 96.dp
 
 
 /** Read from this window's configuration, not the process default. */
+@SuppressLint("LocalContextConfigurationRead")
 @Composable
 private fun panelLocale(): java.util.Locale {
     val context = LocalContext.current

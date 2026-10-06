@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,40 +88,18 @@ internal fun CodeCard(code: String, isHost: Boolean) {
 internal fun PresenceCard(
     youName: String,
     others: List<Member>,
+    youPicture: java.io.File? = null,
     isHost: Boolean,
     live: Boolean,
     modifier: Modifier = Modifier,
-    /** Compose throws when measuring unbounded scrolling content inside the scrolling page. */
-    scrollable: Boolean = false
+    /** Bounded height (landscape column): the "since" lines that do not fit are left out, nothing scrolls. */
+    fitted: Boolean = false
 ) {
-    val scroll = rememberScrollState()
-    val fill = softCardFill()
-    val fade = scrollable && scroll.canScrollForward
 
     SoftCard(modifier = modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .then(
-                    if (!fade) Modifier else Modifier.drawWithContent {
-                        drawContent()
-                        val h = FADE_HEIGHT.toPx()
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colorStops = arrayOf(
-                                    0f to Color.Transparent,
-                                    0.65f to fill,
-                                    1f to fill
-                                ),
-                                startY = size.height - h,
-                                endY = size.height
-                            ),
-                            topLeft = Offset(0f, size.height - h),
-                            size = Size(size.width, h)
-                        )
-                    }
-                )
-                .then(if (scrollable) Modifier.verticalScroll(scroll) else Modifier)
                 .padding(20.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -138,8 +117,11 @@ internal fun PresenceCard(
             Spacer(Modifier.height(12.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val context = androidx.compose.ui.platform.LocalContext.current
+                val pictures by eu.emufii.app.profile.AvatarSync.get(context).memberFiles.collectAsState()
                 AvatarStack(
                     names = listOf(playerDisplayName(youName)) + others.map { playerDisplayName(it.name) },
+                    pictures = listOf(youPicture) + others.map { pictures[it.id] },
                     size = 40.dp
                 )
                 Spacer(Modifier.width(14.dp))
@@ -165,10 +147,10 @@ internal fun PresenceCard(
 
             AnimatedVisibility(
                 visible = others.isNotEmpty(),
-                enter = fadeIn() + expandVertically()
+                enter = fadeIn() + expandVertically(),
+                modifier = if (fitted) Modifier.weight(1f, fill = false) else Modifier
             ) {
-                Column {
-                    Spacer(Modifier.height(12.dp))
+                FitLines(Modifier.padding(top = 12.dp)) {
                     others.forEach { m ->
                         Text(
                             stringResource(
@@ -186,7 +168,22 @@ internal fun PresenceCard(
     }
 }
 
-private val FADE_HEIGHT = 44.dp
+/** A column that only places the lines that fit whole in its height. */
+@Composable
+private fun FitLines(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    androidx.compose.ui.layout.Layout(content, modifier) { measurables, constraints ->
+        val loose = constraints.copy(minHeight = 0, maxHeight = androidx.compose.ui.unit.Constraints.Infinity)
+        val placeables = measurables.map { it.measure(loose) }
+        var height = 0
+        val shown = placeables.takeWhile { p ->
+            (height + p.height <= constraints.maxHeight).also { if (it) height += p.height }
+        }
+        layout(shown.maxOfOrNull { it.width } ?: 0, height) {
+            var y = 0
+            shown.forEach { it.place(0, y); y += it.height }
+        }
+    }
+}
 
 @Composable
 private fun LiveDot() {

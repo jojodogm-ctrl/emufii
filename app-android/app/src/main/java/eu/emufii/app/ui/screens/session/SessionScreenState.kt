@@ -190,6 +190,7 @@ internal class SessionScreenState(
                 client.getSession(session.code)
                     .onSuccess {
                         _members.value = it.members
+                        eu.emufii.app.profile.AvatarSync.get(context).syncMembers(client, session.code, it.members)
                         if (!dsGuestGated) _hostReady.value = it.hostReady
                         else if (it.hostReady && dsGateJob == null) dsGateJob = scope.launch {
                             delay(DS_GUEST_DELAY_MS.milliseconds)

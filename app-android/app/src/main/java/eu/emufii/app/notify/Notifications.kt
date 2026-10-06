@@ -1,5 +1,6 @@
 package eu.emufii.app.notify
 
+import android.annotation.SuppressLint
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -109,6 +110,8 @@ object Notifications {
             .setAutoCancel(true)
             .setContentIntent(pending)
             .build()
+
+        @SuppressLint("MissingPermission") // runCatching absorbs the SecurityException
 
         runCatching { NotificationManagerCompat.from(context).notify(id, notification) }
     }

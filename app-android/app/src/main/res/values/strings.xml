@@ -701,6 +701,8 @@
     <string name="psp_server_nobody">Nobody on this game right now</string>
     <string name="psp_server_unknown">No live count</string>
     <string name="launch_ppsspp_setup_hint">Settings → Automatic PPSSPP setup</string>
+    <string name="launch_ds_edition_missing">Wireless play needs WatermelonDS Emufii Edition</string>
+    <string name="launch_ds_edition_hint">Pick it for DS in Settings → Emulators once installed</string>
     <string name="launch_ps2_profile_hint">Settings → PS2 network profile</string>
     <string name="onb_tile_state">Status</string>
     <string name="onb_tile_folder">Folder</string>

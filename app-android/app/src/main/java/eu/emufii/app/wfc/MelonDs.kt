@@ -17,7 +17,11 @@ object MelonDsPackage {
 
     const val DUALS_DEV = "me.magnum.melondualds.dev"
 
-    val candidates = listOf(DUALS_DEV, MAIN, DEBUG, DUALS)
+    // WatermelonDS Emufii Edition: carries the netplay, installed next to the official app.
+    const val DUALS_EMUFII = "me.magnum.melondualds.emufii"
+    const val EDITION_URL = "https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest"
+
+    val candidates = listOf(DUALS_EMUFII, DUALS_DEV, MAIN, DEBUG, DUALS)
 
     const val NETPLAY_PORT = 8070
 

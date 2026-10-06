@@ -20,6 +20,9 @@ class AvatarSync private constructor(context: Context) {
     private val prefs = appContext.getSharedPreferences("avatar_sync", Context.MODE_PRIVATE)
     private val cacheDir = File(appContext.filesDir, "friend_avatars").apply { mkdirs() }
 
+    @Volatile
+    private var verified = false
+
     private val rejected: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
     private val _friendFiles = MutableStateFlow(scanCache())
@@ -41,7 +44,13 @@ class AvatarSync private constructor(context: Context) {
             return@withContext
         }
         val signature = "${file.lastModified()}:${file.length()}"
-        if (signature == sent) return@withContext
+        if (signature == sent && !verified) {
+            // A server that lost the picture (or never stored it) must get it again.
+            val missing = client.fetchAvatar(profile.id).exceptionOrNull() is eu.emufii.app.network.CoordinatorError.NotFound
+            if (!missing) verified = true
+            else prefs.edit { remove(KEY_SENT) }
+        }
+        if (signature == prefs.getString(KEY_SENT, null)) return@withContext
         val webp = withContext(Dispatchers.Default) { encode(file) } ?: return@withContext
         if (client.uploadAvatar(profile.id, ownerKey(), webp).isSuccess) {
             prefs.edit { putString(KEY_SENT, signature) }
@@ -70,6 +79,32 @@ class AvatarSync private constructor(context: Context) {
         _friendFiles.value = scanCache()
     }
 
+    private val memberDir = File(appContext.filesDir, "member_avatars").apply { mkdirs() }
+
+    private val _memberFiles = MutableStateFlow<Map<String, File>>(emptyMap())
+    /** Session handle to picture, for the members of the current session. */
+    val memberFiles: StateFlow<Map<String, File>> = _memberFiles.asStateFlow()
+
+    suspend fun syncMembers(client: CoordinatorClient, code: String, members: List<eu.emufii.app.network.Member>) {
+        withContext(Dispatchers.IO) {
+            val files = mutableMapOf<String, File>()
+            for (m in members) {
+                val hash = m.avatar?.takeIf { it.matches(Regex("[0-9a-f]{8,128}")) } ?: continue
+                val target = File(memberDir, "$hash.webp")
+                if (!target.exists()) {
+                    if (target.name in rejected) continue
+                    val bytes = client.fetchMemberAvatar(code, m.id).getOrNull() ?: continue
+                    if (!isSanePicture(bytes)) { rejected += target.name; continue }
+                    File(memberDir, "$hash.tmp").apply { writeBytes(bytes) }.renameTo(target)
+                }
+                files[m.id] = target
+            }
+            val keep = files.values.map { it.name }.toSet()
+            memberDir.listFiles()?.forEach { if (it.name !in keep && it.lastModified() < System.currentTimeMillis() - MEMBER_TTL_MS) it.delete() }
+            _memberFiles.value = files
+        }
+    }
+
     private fun scanCache(): Map<String, File> =
         cacheDir.listFiles { f -> f.name.endsWith(".webp") }
             ?.associateBy { it.name.substringBefore('-') }
@@ -79,6 +114,7 @@ class AvatarSync private constructor(context: Context) {
         private const val KEY_OWNER = "owner_key"
         private const val KEY_SENT = "sent_signature"
         private const val SIDE = 256
+        private const val MEMBER_TTL_MS = 7L * 24 * 3600 * 1000
         private const val MAX_BYTES = 40 * 1024
 
         @Volatile

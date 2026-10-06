@@ -373,6 +373,7 @@ fun GhostButton(
 fun AvatarStack(
     names: List<String>,
     modifier: Modifier = Modifier,
+    pictures: List<java.io.File?> = emptyList(),
     size: Dp = 32.dp,
     max: Int = 4
 ) {
@@ -389,6 +390,7 @@ fun AvatarStack(
             key(name) {
                 Avatar(
                     name = name,
+                    imageFile = pictures.getOrNull(i),
                     size = size,
                     ring = ring,
                     modifier = Modifier

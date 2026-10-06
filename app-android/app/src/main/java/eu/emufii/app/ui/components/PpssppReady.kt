@@ -18,3 +18,13 @@ fun rememberPpssppReady(): Boolean {
     }
     return ready
 }
+
+/** DS local wireless only runs on the Emufii Edition of WatermelonDS (or its dev build). */
+@Composable
+fun rememberDsEditionPicked(): Boolean {
+    val context = LocalContext.current
+    return androidx.compose.runtime.remember(context) {
+        eu.emufii.app.library.EmulatorPick.packageFor(context, eu.emufii.app.library.Console.DS) in
+            setOf(eu.emufii.app.wfc.MelonDsPackage.DUALS_EMUFII, eu.emufii.app.wfc.MelonDsPackage.DUALS_DEV)
+    }
+}

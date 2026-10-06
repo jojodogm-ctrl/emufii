@@ -99,10 +99,11 @@ internal fun SessionLandscapeLayout(
         ) {
             PresenceCard(
                 youName = profile.name,
+                youPicture = profile.avatarFile,
                 others = others,
                 isHost = session.role == Session.Role.HOST,
                 live = !offline,
-                scrollable = true,
+                fitted = true,
                 modifier = Modifier.weight(1f, fill = false)
             )
             if (!panelLive) {

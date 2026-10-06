@@ -213,6 +213,9 @@ fun SessionScreen(
     val panelCursor by SecondScreen.stepCursor.collectAsStateWithLifecycle()
 
     var joinedName by remember { mutableStateOf<String?>(null) }
+    var joinedId by remember { mutableStateOf<String?>(null) }
+    val memberPictures by eu.emufii.app.profile.AvatarSync.get(androidx.compose.ui.platform.LocalContext.current)
+        .memberFiles.collectAsStateWithLifecycle()
     var seenMembers by remember { mutableStateOf<Set<String>?>(null) }
     val memberIds = others.map { it.id }.toSet()
     LaunchedEffect(memberIds) {
@@ -222,6 +225,7 @@ fun SessionScreen(
             others.firstOrNull { it.id !in before }?.let {
                 Sfx.pop()
                 joinedName = it.name
+                joinedId = it.id
             }
         }
     }
@@ -332,6 +336,7 @@ fun SessionScreen(
 
                 PresenceCard(
                     youName = profile.name,
+                    youPicture = profile.avatarFile,
                     others = others,
                     isHost = session.role == Session.Role.HOST,
                     live = !offline
@@ -425,6 +430,7 @@ fun SessionScreen(
         EventToast(
             message = joinedShown?.let { stringResource(R.string.session_player_joined, it) },
             who = joinedShown,
+            whoPicture = joinedId?.let { memberPictures[it] },
             onGone = { joinedName = null }
         )
       }

@@ -23,6 +23,7 @@
         <package android:name="me.magnum.melonds.debug" />
         <package android:name="me.magnum.melondualds" />
         <package android:name="me.magnum.melondualds.dev" />
+        <package android:name="me.magnum.melondualds.emufii" />
         <package android:name="dev.eden.eden_emulator" />
         <package android:name="dev.eden.eden_emulator.nightly" />
         <!-- "Eden Optimized" ships under this package name. -->

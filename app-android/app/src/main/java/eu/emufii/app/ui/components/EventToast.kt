@@ -36,6 +36,7 @@ fun EventToast(
     message: String?,
     modifier: Modifier = Modifier,
     who: String? = null,
+    whoPicture: java.io.File? = null,
     onGone: () -> Unit,
 ) {
     LaunchedEffect(message) {
@@ -63,7 +64,7 @@ fun EventToast(
                     .padding(start = if (shown?.second != null) 8.dp else 18.dp, end = 18.dp)
                     .padding(vertical = 8.dp)
             ) {
-                shown?.second?.let { Avatar(name = it, size = 30.dp, modifier = Modifier.popIn()) }
+                shown?.second?.let { Avatar(name = it, imageFile = whoPicture, size = 30.dp, modifier = Modifier.popIn()) }
                 Text(
                     shown?.first.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,

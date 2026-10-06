@@ -200,7 +200,8 @@ fun GameLaunchDialog(
     }
     val incompatible = compat?.rating == CompatRating.BROKEN
     val hasModes = onPlayOnline != null && listed?.rating != CompatRating.BROKEN
-    val setupBlocked = ps2Blocked || pspBlocked || incompatible
+    val dsEditionMissing = rom.console == Console.DS && !publicMode && !rememberDsEditionPicked()
+    val setupBlocked = ps2Blocked || pspBlocked || incompatible || dsEditionMissing
 
     LaunchedEffect(starting) {
         if (starting) {
@@ -474,6 +475,8 @@ fun GameLaunchDialog(
                                 Ps2ProfileMissing()
                             } else if (pspBlocked) {
                                 PpssppSetupMissing()
+                            } else if (dsEditionMissing) {
+                                DsEditionMissing()
                             } else {
                                 PrimaryAction(
                                     label = primaryLabel,
@@ -578,6 +581,8 @@ fun GameLaunchDialog(
                     Ps2ProfileMissing()
                 } else if (pspBlocked) {
                     PpssppSetupMissing()
+                } else if (dsEditionMissing) {
+                    DsEditionMissing()
                 } else {
                     PrimaryAction(
                         label = primaryLabel,
@@ -836,6 +841,60 @@ private fun IncompatibleNotice() {
             fontWeight = FontWeight.SemiBold,
             color = Color.White
         )
+    }
+}
+
+@Composable
+private fun DsEditionMissing(modifier: Modifier = Modifier) {
+    val dark = LocalEmufiiDarkTheme.current
+    val red = if (dark) ErrorDark else ErrorLight
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val shape = RoundedCornerShape(18.dp)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(red)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Box(
+            Modifier.size(22.dp).clip(CircleShape).background(Color.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("!", fontSize = 14.sp, fontWeight = FontWeight.Black, color = red)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Text(
+                stringResource(R.string.launch_ds_edition_missing),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
+            Text(
+                eu.emufii.app.wfc.MelonDsPackage.EDITION_URL.removePrefix("https://"),
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.SemiBold,
+                textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                color = Color(0xFFBFE6FF),
+                modifier = Modifier.clickable {
+                    runCatching {
+                        context.startActivity(
+                            android.content.Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse(eu.emufii.app.wfc.MelonDsPackage.EDITION_URL)
+                            ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    }
+                }
+            )
+            Text(
+                stringResource(R.string.launch_ds_edition_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.9f)
+            )
+        }
     }
 }
 

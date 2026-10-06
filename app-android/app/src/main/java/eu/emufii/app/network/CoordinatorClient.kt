@@ -28,7 +28,8 @@ sealed class CoordinatorError(message: String) : Exception(message) {
     class Http(val status: Int) : CoordinatorError("HTTP $status")
 }
 
-data class Member(val id: String, val name: String, val forSeconds: Int)
+/** [id] is the per-session handle; [avatar] the picture hash, null without one. */
+data class Member(val id: String, val name: String, val forSeconds: Int, val avatar: String? = null)
 
 data class Heartbeat(
     val players: Int,
@@ -176,7 +177,8 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                     Member(
                         id = m.getString("id"),
                         name = m.optString("name", Profile.DEFAULT_NAME),
-                        forSeconds = m.optInt("for_s", 0)
+                        forSeconds = m.optInt("for_s", 0),
+                        avatar = m.stringOrNull("avatar")
                     )
                 }
             )
@@ -284,6 +286,9 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
     /** Bounded: the coordinator refuses more than 48 KB, so anything larger is not its. */
     suspend fun fetchAvatar(id: String): Result<ByteArray> =
         requestBytes(path = "/avatars/$id", method = "GET", maxBytes = AVATAR_MAX_BYTES)
+
+    suspend fun fetchMemberAvatar(code: String, handle: String): Result<ByteArray> =
+        requestBytes(path = "/sessions/$code/members/$handle/avatar", method = "GET", maxBytes = AVATAR_MAX_BYTES)
 
     suspend fun friendStatuses(codes: List<String>): Result<FriendsReply> {
         if (codes.isEmpty()) return Result.success(FriendsReply(emptyMap(), emptyMap()))
