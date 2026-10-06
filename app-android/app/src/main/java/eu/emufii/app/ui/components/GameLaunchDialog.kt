@@ -380,7 +380,7 @@ fun GameLaunchDialog(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        RomArtwork(rom, size = 134.dp)
+                        RomArtwork(rom, size = 134.dp, landedGlow = false)
                         val noteSize = Motion.morph<IntSize>()
                         AnimatedContent(
             targetState = compat?.rating,
@@ -533,7 +533,7 @@ fun GameLaunchDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 14.dp)
                 ) {
-                    RomArtwork(rom, size = if (compact) 72.dp else 104.dp)
+                    RomArtwork(rom, size = if (compact) 72.dp else 104.dp, landedGlow = false)
 
                     TitleBlock(rom, online, compat)
                 }

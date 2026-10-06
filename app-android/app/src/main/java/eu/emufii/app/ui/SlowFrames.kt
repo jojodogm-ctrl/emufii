@@ -31,3 +31,14 @@ internal const val FRAME_INTERVAL_MS = 1_000L / 12
 
 /** Not zero: at zero the waves show nothing. */
 private const val FROZEN_MS = 8_000.0
+
+/** A 0.6..0.95 glow breathing over 1.8 s, on the shared 12 fps clock: an infinite transition redraws every display frame. */
+@Composable
+fun rememberSlowBreath(): Float {
+    val phase = (rememberSlowMillis() % (2 * BREATH_MS)) / BREATH_MS
+    val t = if (phase <= 1.0) phase else 2.0 - phase
+    val eased = 1.0 - (1.0 - t) * (1.0 - t)
+    return (0.6 + 0.35 * eased).toFloat()
+}
+
+private const val BREATH_MS = 1_800.0

@@ -100,8 +100,13 @@ fun EmufiiTheme(
                     else -> lightScheme(cuts)
                 },
                 typography = Typography,
-                content = content
-            )
+            ) {
+                // Text and icons without a color outside a Surface default to black, whatever the theme.
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.material3.LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+                    content = content
+                )
+            }
         }
     }
 }

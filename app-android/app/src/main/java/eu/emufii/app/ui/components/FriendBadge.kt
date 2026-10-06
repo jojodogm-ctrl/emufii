@@ -80,12 +80,7 @@ fun FriendBadge(event: FriendEvent, size: Dp, modifier: Modifier = Modifier) {
 @Composable
 private fun OnlineBead(size: Dp, modifier: Modifier = Modifier) {
     val tone = if (LocalEmufiiDarkTheme.current) GoodDark else GoodLight
-    val breath by rememberInfiniteTransition(label = "bead").animateFloat(
-        initialValue = 0.6f,
-        targetValue = 0.95f,
-        animationSpec = infiniteRepeatable(tween(1800, easing = LinearOutSlowInEasing), RepeatMode.Reverse),
-        label = "bead-breath"
-    )
+    val breath = eu.emufii.app.ui.rememberSlowBreath()
     val ring = MaterialTheme.colorScheme.surface
     Box(
         modifier

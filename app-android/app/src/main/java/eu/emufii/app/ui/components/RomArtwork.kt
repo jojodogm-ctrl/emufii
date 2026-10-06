@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -33,8 +34,16 @@ import eu.emufii.app.ui.theme.InkText
 import eu.emufii.app.ui.theme.TileShape
 
 @Composable
-fun RomArtwork(rom: Rom, size: Dp, modifier: Modifier = Modifier) {
+fun RomArtwork(rom: Rom, size: Dp, modifier: Modifier = Modifier, landedGlow: Boolean = true) {
     val context = LocalContext.current
+    // Off during the flight, lit once landed: the card clips the glow the moment the cover lands.
+    val glowFade = remember { androidx.compose.animation.core.Animatable(if (landedGlow) 1f else 0f) }
+    if (!landedGlow) {
+        androidx.compose.runtime.LaunchedEffect(Unit) {
+            kotlinx.coroutines.delay(GLOW_FADE_MS.toLong())
+            glowFade.animateTo(1f, androidx.compose.animation.core.tween(GLOW_BACK_MS))
+        }
+    }
     val accent = rom.accentArgb?.let { Color(it) }
     val art by rememberTileArt(rom)
     Box(
@@ -46,7 +55,8 @@ fun RomArtwork(rom: Rom, size: Dp, modifier: Modifier = Modifier) {
                 lift = if (size >= 100.dp) 16.dp else 6.dp,
                 dark = LocalEmufiiDarkTheme.current,
                 oled = LocalEmufiiOledTheme.current,
-                tintNow = { CoverTone.of(art.model) ?: accent }
+                tintNow = { CoverTone.of(art.model) ?: accent },
+                fade = { glowFade.value }
             )
             .clip(TileShape)
             .background(tilePlate())
@@ -69,3 +79,6 @@ fun RomArtwork(rom: Rom, size: Dp, modifier: Modifier = Modifier) {
         }
     }
 }
+
+private const val GLOW_FADE_MS = 300
+private const val GLOW_BACK_MS = 300

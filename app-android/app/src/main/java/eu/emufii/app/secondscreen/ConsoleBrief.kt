@@ -30,8 +30,9 @@ fun consoleBrief(console: Console): ConsoleBrief = when (console) {
     )
     Console.DS -> ConsoleBrief(
         mode = R.string.console_mode_ds,
-        sessionCode = false,
+        sessionCode = true,
         games = R.string.console_games_ds,
+        warning = R.string.brief_ds_warning,
     )
     Console.PS2 -> ConsoleBrief(
         mode = R.string.console_mode_ps2,

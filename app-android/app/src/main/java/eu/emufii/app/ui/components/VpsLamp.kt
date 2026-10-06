@@ -221,12 +221,7 @@ fun VpsLamp(modifier: Modifier = Modifier, dotSize: Dp = 15.dp, mode: LampMode =
         VpsState.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     val tone by animateColorAsState(target, tween(500), label = "lamp-tone")
-    val breath by rememberInfiniteTransition(label = "lamp-breath").animateFloat(
-        initialValue = 0.6f,
-        targetValue = 0.95f,
-        animationSpec = infiniteRepeatable(tween(1800, easing = LinearOutSlowInEasing), RepeatMode.Reverse),
-        label = "lamp-breath-v"
-    )
+    val breath = eu.emufii.app.ui.rememberSlowBreath()
     val glow = if (state == VpsState.UNKNOWN) 0f else breath
 
     val interaction = remember { MutableInteractionSource() }

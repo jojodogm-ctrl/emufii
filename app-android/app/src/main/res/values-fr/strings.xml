@@ -516,6 +516,7 @@
 
     <!-- Second ecran : ce que fait Emufii sur chaque machine, quand le curseur est sur son dossier -->
     <string name="brief_3ds_warning">Il faut une *pre-release* d\'Azahar : la version stable n\'a pas d\'écran multijoueur.</string>
+    <string name="brief_ds_warning">Le sans fil local demande *WatermelonDS Emufii Edition* : l\'app officielle n\'a pas le netplay</string>
     <string name="brief_dolphin_warning">Les deux joueurs doivent lancer *exactement le même dump*, sinon Dolphin refuse la partie.</string>
     <!-- Settings: the setup steps, split out of the two paragraph walls -->
     <string name="settings_ppsspp_step1">Choisis la racine de la Memory Stick de PPSSPP : le dossier qui contient PSP/SYSTEM/ppsspp.ini. Android ne donne accès qu\'à celui-là.</string>
@@ -688,13 +689,13 @@
     <string name="console_mode_3ds">Sans fil local</string>
     <string name="console_mode_switch">Sans fil local (LDN)</string>
     <string name="console_mode_psp">Ad hoc</string>
-    <string name="console_mode_ds">Nintendo WFC</string>
+    <string name="console_mode_ds">Sans fil local · Nintendo WFC</string>
     <string name="console_mode_ps2">LAN (Local Link)</string>
     <string name="console_mode_dolphin">Netplay Dolphin</string>
     <string name="console_games_3ds">Les jeux au mode *sans fil local* : Mario Kart 7, Monster Hunter 4 Ultimate…</string>
     <string name="console_games_switch">Les jeux au mode *sans fil local* : Mario Kart 8 Deluxe, Smash Bros. Ultimate…</string>
     <string name="console_games_psp">Les jeux au mode *ad hoc* : Monster Hunter, Tekken…</string>
-    <string name="console_games_ds">Les jeux *Nintendo Wi-Fi Connection* : Mario Kart DS, Pokémon…</string>
+    <string name="console_games_ds">Les jeux au mode *sans fil local*, désormais à distance, et les jeux *Nintendo Wi-Fi Connection*</string>
     <string name="console_games_ps2">La *soixantaine* de jeux au mode LAN</string>
     <string name="console_games_dolphin">Tous les jeux *multijoueur en local* : Smash Bros. Brawl, Mario Kart…</string>
     <string name="psp_server_label">Serveur</string>

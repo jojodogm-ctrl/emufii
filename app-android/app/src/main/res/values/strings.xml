@@ -492,6 +492,7 @@
 
     <!-- Second screen: what Emufii does on each machine, when the cursor is on its folder -->
     <string name="brief_3ds_warning">Azahar must be a *pre-release*: the stable build has no multiplayer screen.</string>
+    <string name="brief_ds_warning">Local wireless needs *WatermelonDS Emufii Edition*: the official app doesn\'t have netplay</string>
     <string name="brief_dolphin_warning">Both players must launch the *very same dump*, or Dolphin refuses the match.</string>
     <!-- Settings: the hub and its seven pages -->
     <string name="settings_page_profile">Profile</string>
@@ -686,13 +687,13 @@
     <string name="console_mode_3ds">Local wireless</string>
     <string name="console_mode_switch">Local wireless (LDN)</string>
     <string name="console_mode_psp">Ad hoc</string>
-    <string name="console_mode_ds">Nintendo WFC</string>
+    <string name="console_mode_ds">Local wireless · Nintendo WFC</string>
     <string name="console_mode_ps2">LAN (Local Link)</string>
     <string name="console_mode_dolphin">Dolphin Netplay</string>
     <string name="console_games_3ds">Games with *local wireless* play: Mario Kart 7, Monster Hunter 4 Ultimate…</string>
     <string name="console_games_switch">Games with *local wireless* play: Mario Kart 8 Deluxe, Smash Bros. Ultimate…</string>
     <string name="console_games_psp">Games with an *ad hoc* mode: Monster Hunter, Tekken…</string>
-    <string name="console_games_ds">Games with *Nintendo Wi-Fi Connection*: Mario Kart DS, Pokémon…</string>
+    <string name="console_games_ds">Games with *local wireless* play, now remote, and games with *Nintendo Wi-Fi Connection*</string>
     <string name="console_games_ps2">The *60 or so* games with a LAN mode</string>
     <string name="console_games_dolphin">Every game with *local multiplayer*: Smash Bros. Brawl, Mario Kart…</string>
     <string name="psp_server_label">Server</string>
