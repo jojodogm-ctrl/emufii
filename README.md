@@ -187,10 +187,10 @@ That doesn't mean nobody is in charge. I decide the design and how the project
 is built and tested, I review the code that goes in, and I test every feature on
 real hardware before it ships.
 
-Since then, part of the code has been rewritten.
+Since then, a big part of the code has been rewritten.
 
 **If you're not comfortable with software made this way, that's completely
-fair.** Just know that the app and the servers have had a security review, with
+fair.** Just know that the app and the servers have had security reviews, with
 every issue found fixed, and that experienced developers have started
 contributing to the project.
 
