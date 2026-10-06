@@ -63,12 +63,26 @@ Emufii is an Android app that connects your emulators to your friends' emulators
 
 ## How it works
 
-| | | |
-|:---:|---|---|
-| **1** | **Host** | Pick a game and get a six-character code. |
-| **2** | **Join** | Friends enter the code, or find the game in the list of public sessions. |
-| **3** | **Connect** | Emufii opens the emulator on its multiplayer screen and fills in the connection details. |
-| **4** | **Play** | As if you were all on the same Wi-Fi. |
+<table>
+<tr>
+<td align="center" width="25%" valign="top">
+<h3>1. Host</h3>
+Pick a game and get a six-character code.
+</td>
+<td align="center" width="25%" valign="top">
+<h3>2. Join</h3>
+Friends enter the code, or find the game in the public sessions.
+</td>
+<td align="center" width="25%" valign="top">
+<h3>3. Connect</h3>
+Emufii opens the emulator on its multiplayer screen and fills in the details.
+</td>
+<td align="center" width="25%" valign="top">
+<h3>4. Play</h3>
+As if you were all on the same Wi-Fi.
+</td>
+</tr>
+</table>
 
 ## Consoles
 
