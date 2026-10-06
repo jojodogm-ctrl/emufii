@@ -45,18 +45,6 @@ Emufii is an Android app that connects your emulators to your friends' emulators
 3. **Emufii** opens the emulator on its multiplayer screen and fills in the connection details.
 4. **You play**, as if you were all on the same Wi-Fi.
 
-## Features
-
-- **7 consoles**: Switch, 3DS, Wii, GameCube, PSP, PS2 and DS
-- **One code to join**, with private sessions or a public list
-- **Automatic setup**: Emufii opens the emulator and types the address for you
-- **Friends**, with profile pictures, online status and the game they're playing
-- **Game library** with covers, search, and grid, carousel or list views
-- **Compatibility badge** on every game, based on a list of [3,400+ games](COMPATIBLE-GAMES.md)
-- **Built for gamepads**, with touch support too
-- **Second screen** support on the AYN Thor
-- **Light, dark and OLED themes**, in English and French
-
 ## Consoles
 
 | Console | Emulator | Multiplayer mode | Version needed |
