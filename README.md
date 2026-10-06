@@ -17,7 +17,7 @@ No ports to open, no IP address to share. Built for Android handhelds.
 </div>
 
 > [!IMPORTANT]
-> **DS local wireless needs WatermelonDS Emufii Edition.** Starting with Emufii 2.0, DS games can be played over local wireless with friends far away. This only works with [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest), a fork of WatermelonDS that adds the netplay this needs. It installs next to the official WatermelonDS, so you keep your saves and settings. Once the official WatermelonDS includes the netplay, the fork won't be needed anymore. Online play through Kaeru WFC still works with any melonDS or WatermelonDS.
+> **DS local wireless needs WatermelonDS Emufii Edition.** Starting with Emufii 2.0, DS local wireless games can be played online. This only works with [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest), a fork of WatermelonDS that adds the netplay this needs. It installs next to the official WatermelonDS, so you keep your saves and settings. Once the official WatermelonDS includes the netplay, the fork won't be needed anymore. Online play through Kaeru WFC still works with any melonDS or WatermelonDS.
 
 ## What Emufii is (and isn't)
 
