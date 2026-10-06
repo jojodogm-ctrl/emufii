@@ -206,10 +206,10 @@ and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
 
 <br>
 
-**Special thanks**<br>
-SapphireRhodonite for [WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS)<br>
-rafaelvcaetano for [melonDS Android](https://github.com/rafaelvcaetano/melonDS-android)<br>
-[Kaeru WFC](https://kaeru.world) for keeping Nintendo Wi-Fi Connection alive
+**Also built on**<br>
+[WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS) by SapphireRhodonite<br>
+[melonDS Android](https://github.com/rafaelvcaetano/melonDS-android) by rafaelvcaetano<br>
+[Kaeru WFC](https://kaeru.world), the Nintendo Wi-Fi Connection revival
 
 <br>
 
