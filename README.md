@@ -209,13 +209,6 @@ and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
 
 <br>
 
-**Also built on**<br>
-[WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS) by SapphireRhodonite<br>
-[melonDS Android](https://github.com/rafaelvcaetano/melonDS-android) by rafaelvcaetano<br>
-[Kaeru WFC](https://kaeru.world), the Nintendo Wi-Fi Connection revival
-
-<br>
-
 **Contributors**<br>
 [@sofianeelhor](https://github.com/sofianeelhor) for the PPSSPP and ARMSX2 network automation<br>
 [@BrianJr03](https://github.com/BrianJr03) for the manual session setup and uncropped covers
@@ -224,6 +217,13 @@ and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
 
 **Built with**<br>
 [WireGuard](https://www.wireguard.com) · [Coil](https://coil-kt.github.io/coil/) · [Rounded M+](https://github.com/google/fonts)
+
+<br>
+
+**Also built on**<br>
+[WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS) by SapphireRhodonite<br>
+[melonDS Android](https://github.com/rafaelvcaetano/melonDS-android) by rafaelvcaetano<br>
+[Kaeru WFC](https://kaeru.world), the Nintendo Wi-Fi Connection revival
 
 <br>
 
