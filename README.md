@@ -199,24 +199,31 @@ and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
 
 ## Credits
 
-Emufii is built on other people's work. Thank you to all of them.
+<div align="center">
 
-#### Emulators
-The teams behind [Eden](https://eden-emu.dev), [Azahar](https://azahar-emu.org), [Dolphin](https://dolphin-emu.org), [PPSSPP](https://www.ppsspp.org), [ARMSX2](https://github.com/ARMSX2/ARMSX2) and [melonDS](https://melonds.kuribo64.net), who built the multiplayer Emufii connects. Thanks also to rafaelvcaetano for [melonDS Android](https://github.com/rafaelvcaetano/melonDS-android), and to SapphireRhodonite for [WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS).
-
-#### DS online
-[Kaeru WFC](https://kaeru.world), for keeping Nintendo Wi-Fi Connection alive.
-
-#### Contributors
-[@sofianeelhor](https://github.com/sofianeelhor), who automated the network setup of PPSSPP and ARMSX2, and [@BrianJr03](https://github.com/BrianJr03), who added the manual session setup and uncropped covers.
-
-#### Libraries
-[WireGuard](https://www.wireguard.com) for the tunnel, [Coil](https://coil-kt.github.io/coil/) for images, and the [Rounded M+](https://github.com/google/fonts) font.
+**Emulators**<br>
+[Eden](https://eden-emu.dev) · [Azahar](https://azahar-emu.org) · [Dolphin](https://dolphin-emu.org) · [PPSSPP](https://www.ppsspp.org) · [ARMSX2](https://github.com/ARMSX2/ARMSX2) · [melonDS](https://melonds.kuribo64.net)
 
 <br>
 
-<div align="center">
+**Special thanks**<br>
+SapphireRhodonite for [WatermelonDS](https://github.com/SapphireRhodonite/WatermelonDS)<br>
+rafaelvcaetano for [melonDS Android](https://github.com/rafaelvcaetano/melonDS-android)<br>
+[Kaeru WFC](https://kaeru.world) for keeping Nintendo Wi-Fi Connection alive
 
-And everyone on the [Discord](https://discord.gg/tvWcb28vBZ) who tests, reports bugs and plays.
+<br>
+
+**Contributors**<br>
+[@sofianeelhor](https://github.com/sofianeelhor) for the PPSSPP and ARMSX2 network automation<br>
+[@BrianJr03](https://github.com/BrianJr03) for the manual session setup and uncropped covers
+
+<br>
+
+**Built with**<br>
+[WireGuard](https://www.wireguard.com) · [Coil](https://coil-kt.github.io/coil/) · [Rounded M+](https://github.com/google/fonts)
+
+<br>
+
+<sub>And everyone on the <a href="https://discord.gg/tvWcb28vBZ">Discord</a> who tests, reports bugs and plays.</sub>
 
 </div>
