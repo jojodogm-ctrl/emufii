@@ -2,6 +2,7 @@ package eu.emufii.app.compat
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CompatDbTest {
@@ -71,5 +72,24 @@ class CompatDbTest {
     fun `junk parses to an empty database rather than throwing`() {
         assertEquals(0, CompatDb.parse("<html>captive portal</html>").size)
         assertEquals(0, CompatDb.parse("").size)
+    }
+
+    @Test
+    fun `a PS2 entry carries its servers and live count sources`() {
+        val db = CompatDb.parse(
+            """{"games":[{"name":"SOCOM II","rating":"broken","online":"perfect","keys":["ps2:SCUS-97275"],
+               "servers":["psrewired","ps2online"],"live":{"psrewired":[10472,10481],"ps2online":["SOCOM II"]}}]}"""
+        )
+        val entry = db.ratingFor(listOf("ps2:SCUS-97275"))!!
+        assertEquals(listOf("psrewired", "ps2online"), entry.servers)
+        assertEquals(listOf(10472, 10481), entry.psrewiredApps)
+        assertEquals(listOf("SOCOM II"), entry.ps2onlineRows)
+    }
+
+    @Test
+    fun `an entry without live sources parses as before`() {
+        val entry = CompatDb.parse("""{"games":[{"name":"X","rating":"perfect","keys":["ps2:SLUS-00001"]}]}""")
+            .ratingFor(listOf("ps2:SLUS-00001"))!!
+        assertTrue(entry.servers.isEmpty() && entry.psrewiredApps.isEmpty() && entry.ps2onlineRows.isEmpty())
     }
 }

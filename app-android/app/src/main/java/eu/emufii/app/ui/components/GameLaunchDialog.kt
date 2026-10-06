@@ -176,23 +176,36 @@ fun GameLaunchDialog(
     val wide = configuration.screenWidthDp > configuration.screenHeightDp
     val compact = !wide && configuration.screenHeightDp < 520
 
-    var publicMode by remember { mutableStateOf(false) }
+    val listed = LocalCompatDb.current.ratingFor(rom.compatKeys())
+    val ps2Served = Ps2Revival.picks(listed?.servers.orEmpty()).isNotEmpty()
+    val wirelessVerdict = listed?.let { it.wireless ?: it.rating }
+    val onlineVerdict = when (rom.console) {
+        Console.DS -> listed?.let { it.online ?: it.rating }
+        Console.PS2 -> if (ps2Served) listed?.online else CompatRating.BROKEN
+        else -> wirelessVerdict
+    }
+    val hasModes = onPlayOnline != null && listed?.rating != CompatRating.BROKEN
+
+    // A game that only works online opens on Online.
+    var publicMode by remember {
+        mutableStateOf(
+            hasModes && wirelessVerdict == CompatRating.BROKEN && onlineVerdict != CompatRating.BROKEN
+        )
+    }
     val online = publicMode
     val kaeru = publicMode && rom.console == Console.DS
 
     val ppssppReady = rom.console == Console.PSP && rememberPpssppReady()
     val pspBlocked = rom.console == Console.PSP && !ppssppReady
 
-    val listed = LocalCompatDb.current.ratingFor(rom.compatKeys())
-    val ps2Online = publicMode && rom.console == Console.PS2 && !ps2Blocked &&
-        Ps2Revival.picks(listed?.servers.orEmpty()).isNotEmpty()
+    val ps2Online = publicMode && rom.console == Console.PS2 && !ps2Blocked && ps2Served
     val pickingServer = publicMode && rom.console == Console.PSP && ppssppReady || ps2Online
     var servers by remember { mutableStateOf<List<PspServerPick>?>(null) }
     var chosenHost by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(pickingServer) {
         if (pickingServer && servers == null) {
             servers = if (rom.console == Console.PS2) {
-                Ps2Revival.picks(listed?.servers.orEmpty())
+                eu.emufii.app.ps2.Ps2LiveCount.rank(listed)
             } else {
                 val discId = PpssppIni.resolveDiscId(rom.productCode, rom.filename, rom.displayName)
                 PspServers.rank(discId, rom.displayName)
@@ -204,19 +217,13 @@ fun GameLaunchDialog(
         if (rom.console == Console.PS2) Ps2Revival.chosenDns = shownServer?.server?.host
         else PspServers.chosenHost = shownServer?.server?.host
     }
-    val compat = listed?.let {
-        val mode = when {
-            kaeru -> it.online
-            publicMode && rom.console == Console.PS2 -> it.online ?: CompatRating.BROKEN
-            else -> it.wireless
-        }
-        mode?.let { verdict -> it.copy(rating = verdict) } ?: it
-    }
-    // A PS2 game no listed revival serves has nothing to connect to: same red card as the DS.
-    val ps2Unserved = publicMode && rom.console == Console.PS2 &&
-        Ps2Revival.picks(listed?.servers.orEmpty()).isEmpty()
-    val incompatible = compat?.rating == CompatRating.BROKEN || ps2Unserved
-    val hasModes = onPlayOnline != null && listed?.rating != CompatRating.BROKEN
+    val modeVerdict = if (publicMode) onlineVerdict else wirelessVerdict
+    val compat = listed?.let { entry -> modeVerdict?.let { entry.copy(rating = it) } ?: entry }
+    val incompatible = compat?.rating == CompatRating.BROKEN ||
+        publicMode && rom.console == Console.PS2 && !ps2Served
+    // Broken in this mode only: name the mode that works instead of calling the game incompatible.
+    val otherModeWorks = hasModes && incompatible &&
+        (if (publicMode) wirelessVerdict else onlineVerdict).let { it != null && it != CompatRating.BROKEN }
     val dsEditionMissing = rom.console == Console.DS && !publicMode && !rememberDsEditionPicked()
     val setupBlocked = ps2Blocked || pspBlocked || incompatible || dsEditionMissing
 
@@ -457,7 +464,7 @@ fun GameLaunchDialog(
                                     .fillMaxWidth()
                                     .padding(vertical = 20.dp),
                                 contentAlignment = Alignment.Center
-                            ) { IncompatibleNotice() }
+                            ) { IncompatibleNotice(if (otherModeWorks) publicMode else null) }
                         } else {
 
                         Column {
@@ -593,7 +600,7 @@ fun GameLaunchDialog(
                     label = "launch-verdict-compact"
                 ) { shownIncompatible ->
                 if (shownIncompatible) {
-                    IncompatibleNotice()
+                    IncompatibleNotice(if (otherModeWorks) publicMode else null)
                 } else if (ps2Blocked) {
                     Ps2ProfileMissing()
                 } else if (pspBlocked) {
@@ -839,7 +846,7 @@ private fun ModeSegment(
 private fun Ps2ProfileMissing() = SetupNotice(R.string.launch_ps2_profile_missing, R.string.launch_ps2_profile_hint)
 
 @Composable
-private fun IncompatibleNotice() {
+private fun IncompatibleNotice(brokenOnline: Boolean?) {
     val dark = LocalEmufiiDarkTheme.current
     val red = if (dark) ErrorDark else ErrorLight
     Row(
@@ -853,7 +860,19 @@ private fun IncompatibleNotice() {
     ) {
         CrossIcon(size = 18.dp, color = Color.White)
         Text(
-            stringResource(R.string.launch_incompatible),
+            when (brokenOnline) {
+                null -> stringResource(R.string.launch_incompatible)
+                true -> stringResource(
+                    R.string.launch_incompatible_mode,
+                    stringResource(R.string.lib_mode_public),
+                    stringResource(R.string.lib_mode_friends)
+                )
+                false -> stringResource(
+                    R.string.launch_incompatible_mode,
+                    stringResource(R.string.lib_mode_friends),
+                    stringResource(R.string.lib_mode_public)
+                )
+            },
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = Color.White

@@ -15,7 +15,7 @@ object Ps2Revival {
     /** Keyed by the ids `scripts/ps2-online.mjs` writes into the compat base. */
     val servers = linkedMapOf(
         "psrewired" to PspServer("PSRewired", "67.222.156.250", "", "", ""),
-        "ps2online" to PspServer("PS2 Online Revival", "104.237.9.163", "", "", ""),
+        "ps2online" to PspServer("PS2 Online Revival", "45.7.228.197", "", "", ""),
         "mholdschool" to PspServer("MH Oldschool", "34.75.107.68", "", "", ""),
     )
 

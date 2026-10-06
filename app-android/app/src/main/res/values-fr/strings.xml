@@ -675,6 +675,7 @@
     <string name="lib_online">%1$d amis en ligne</string>
     <string name="lib_online_none">Aucun ami en ligne</string>
     <string name="launch_incompatible">Ce jeu est incompatible et ne fonctionnera donc pas avec Emufii.</string>
+    <string name="launch_incompatible_mode">Ce jeu ne fonctionne pas en mode %1$s, mais le mode %2$s est disponible.</string>
     <string name="panel_screenshots">Captures d\'écran (%1$d)</string>
     <string name="pad_hint_screenshots">Captures d\'écran</string>
     <string name="pad_hint_browse">Parcourir</string>

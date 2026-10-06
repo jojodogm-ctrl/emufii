@@ -673,6 +673,7 @@
     <string name="lib_online">%1$d friends online</string>
     <string name="lib_online_none">No friends online</string>
     <string name="launch_incompatible">This game is incompatible and won\'t work with Emufii.</string>
+    <string name="launch_incompatible_mode">This game doesn\'t work with %1$s, but %2$s is available.</string>
     <string name="panel_screenshots">Screenshots (%1$d)</string>
     <string name="pad_hint_screenshots">Screenshots</string>
     <string name="pad_hint_browse">Browse</string>

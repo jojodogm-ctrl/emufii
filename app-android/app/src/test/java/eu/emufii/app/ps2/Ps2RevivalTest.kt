@@ -27,7 +27,7 @@ class Ps2RevivalTest {
     @Test
     fun picksKeepTheBaseOrderAndDropUnknownIds() {
         val picks = Ps2Revival.picks(listOf("ps2online", "nope", "psrewired"))
-        assertEquals(listOf("104.237.9.163", "67.222.156.250"), picks.map { it.server.host })
+        assertEquals(listOf("45.7.228.197", "67.222.156.250"), picks.map { it.server.host })
         assertTrue(Ps2Revival.picks(emptyList()).isEmpty())
     }
 
