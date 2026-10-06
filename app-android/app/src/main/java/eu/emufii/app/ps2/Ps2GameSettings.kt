@@ -38,7 +38,44 @@ object Ps2GameSettings {
         identity(rom) ?: DiscImageReader(context).read(rom.uri)?.ps2Identity
 
     /** Per-game layer loaded after ARMSX2's globals; only network and Slot 1 are set. */
-    fun apply(context: Context, rom: RomRef, plan: NetplayPlan): Outcome = runCatching {
+    fun apply(context: Context, rom: RomRef, plan: NetplayPlan): Outcome {
+        val room = plan.password.orEmpty().filter { it.isLetterOrDigit() && it.code < 128 }
+            .take(Ps2Target.ROOM_CODE_LENGTH.last)
+            .takeIf { it.length >= Ps2Target.ROOM_CODE_LENGTH.first }
+            ?: return Outcome.WriteFailed("the ARMSX2 room code is invalid")
+        val host = plan.role == NetplayPlan.Role.Host
+        return write(
+            context, rom,
+            linkedMapOf(
+                "EthEnable" to "true",
+                "EthApi" to "Local Link",
+                "LocalLinkHost" to host.toString(),
+                "LocalLinkAddress" to if (host) null else WgConfig.PS2_HOST_NAME,
+                "LocalLinkPort" to plan.port.toString(),
+                "LocalLinkRoomCode" to room,
+            ),
+        )
+    }
+
+    /** Sockets mode forces ARMSX2's internal DHCP, which hands the game ModeDNS1/DNS1. */
+    fun applyOnline(context: Context, rom: RomRef, dns: String): Outcome {
+        if (!Ps2Revival.isUsable(dns)) return Outcome.WriteFailed("the revival DNS $dns is invalid")
+        return write(
+            context, rom,
+            linkedMapOf(
+                "EthEnable" to "true",
+                "EthApi" to "Sockets",
+                "EthDevice" to "Auto",
+                "InterceptDHCP" to "true",
+                "ModeDNS1" to "Manual",
+                "DNS1" to dns,
+                "ModeDNS2" to "Manual",
+                "DNS2" to dns,
+            ),
+        )
+    }
+
+    private fun write(context: Context, rom: RomRef, eth: LinkedHashMap<String, String?>): Outcome = runCatching {
         val identity = resolvedIdentity(context, rom) ?: return Outcome.UnknownDiscIdentity
         val rootUri = Ps2NetworkProfile.rootUri(context) ?: return Outcome.MissingFolderGrant
         val receipt = Ps2NetworkProfile.receipt(context) ?: return Outcome.MissingPreparedCard
@@ -54,22 +91,10 @@ object Ps2GameSettings {
         val filename = identity.settingsFilename
         val target = settings.child(filename)
         val original = target?.let { readText(context, it) }.orEmpty()
-        val room = plan.password.orEmpty().filter { it.isLetterOrDigit() && it.code < 128 }
-            .take(Ps2Target.ROOM_CODE_LENGTH.last)
-            .takeIf { it.length >= Ps2Target.ROOM_CODE_LENGTH.first }
-            ?: return Outcome.WriteFailed("the ARMSX2 room code is invalid")
-        val host = plan.role == NetplayPlan.Role.Host
         val merged = merge(
             original,
             linkedMapOf(
-                "DEV9/Eth" to linkedMapOf(
-                    "EthEnable" to "true",
-                    "EthApi" to "Local Link",
-                    "LocalLinkHost" to host.toString(),
-                    "LocalLinkAddress" to if (host) null else WgConfig.PS2_HOST_NAME,
-                    "LocalLinkPort" to plan.port.toString(),
-                    "LocalLinkRoomCode" to room,
-                ),
+                "DEV9/Eth" to eth,
                 "MemoryCards" to linkedMapOf(
                     "Slot1_Enable" to "true",
                     "Slot1_Filename" to receipt.cardName,

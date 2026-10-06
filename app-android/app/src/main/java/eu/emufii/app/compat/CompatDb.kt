@@ -30,7 +30,9 @@ data class CompatEntry(
     val note: String? = null,
     val keys: List<String>,
     val online: CompatRating? = null,
-    val wireless: CompatRating? = null
+    val wireless: CompatRating? = null,
+    /** PS2 only: ids of the revival resolvers serving this game (`Ps2Revival`). */
+    val servers: List<String> = emptyList()
 )
 
 private val RANK = listOf(CompatRating.PERFECT, CompatRating.PARTIAL, CompatRating.UNTESTED, CompatRating.BROKEN)
@@ -69,7 +71,10 @@ class CompatDb private constructor(
                     note = obj.optString("note").takeIf { it.isNotBlank() && it != "null" },
                     keys = keys,
                     online = online,
-                    wireless = rating.takeIf { online != null }
+                    wireless = rating.takeIf { online != null },
+                    servers = obj.optJSONArray("servers")?.let { a ->
+                        (0 until a.length()).mapNotNull { a.optString(it).takeIf(String::isNotBlank) }
+                    }.orEmpty()
                 )
                 for (key in keys) map.putIfAbsent(key, entry)
             }

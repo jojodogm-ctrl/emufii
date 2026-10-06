@@ -446,7 +446,8 @@ fun LibraryScreen(
                 onPrimary = { private -> onCreate(rom, private) },
                 onJoinWithCode = { state.clearSelection(); onJoinWith(rom) },
                 onPlayOnline =
-                    if (rom.console.backend == Backend.PPSSPP || rom.console.backend == Backend.MELONDS)
+                    if (rom.console.backend == Backend.PPSSPP || rom.console.backend == Backend.MELONDS ||
+                        rom.console.backend == Backend.ARMSX2)
                         ({ onPlayPublic(rom) })
                     else null
             )

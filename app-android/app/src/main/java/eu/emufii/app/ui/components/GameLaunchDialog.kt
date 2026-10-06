@@ -27,6 +27,7 @@ import androidx.compose.material3.DropdownMenu
 import eu.emufii.app.psp.PpssppIni
 import eu.emufii.app.psp.PspServerPick
 import eu.emufii.app.psp.PspServers
+import eu.emufii.app.ps2.Ps2Revival
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.Offset
@@ -182,23 +183,39 @@ fun GameLaunchDialog(
     val ppssppReady = rom.console == Console.PSP && rememberPpssppReady()
     val pspBlocked = rom.console == Console.PSP && !ppssppReady
 
-    val pickingServer = publicMode && rom.console == Console.PSP && ppssppReady
+    val listed = LocalCompatDb.current.ratingFor(rom.compatKeys())
+    val ps2Online = publicMode && rom.console == Console.PS2 && !ps2Blocked &&
+        Ps2Revival.picks(listed?.servers.orEmpty()).isNotEmpty()
+    val pickingServer = publicMode && rom.console == Console.PSP && ppssppReady || ps2Online
     var servers by remember { mutableStateOf<List<PspServerPick>?>(null) }
     var chosenHost by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(pickingServer) {
         if (pickingServer && servers == null) {
-            val discId = PpssppIni.resolveDiscId(rom.productCode, rom.filename, rom.displayName)
-            servers = PspServers.rank(discId, rom.displayName)
+            servers = if (rom.console == Console.PS2) {
+                Ps2Revival.picks(listed?.servers.orEmpty())
+            } else {
+                val discId = PpssppIni.resolveDiscId(rom.productCode, rom.filename, rom.displayName)
+                PspServers.rank(discId, rom.displayName)
+            }
         }
     }
     val shownServer = servers?.let { list -> list.firstOrNull { it.server.host == chosenHost } ?: list.firstOrNull() }
-    SideEffect { PspServers.chosenHost = shownServer?.server?.host }
-    val listed = LocalCompatDb.current.ratingFor(rom.compatKeys())
+    SideEffect {
+        if (rom.console == Console.PS2) Ps2Revival.chosenDns = shownServer?.server?.host
+        else PspServers.chosenHost = shownServer?.server?.host
+    }
     val compat = listed?.let {
-        val mode = if (kaeru) it.online else it.wireless
+        val mode = when {
+            kaeru -> it.online
+            publicMode && rom.console == Console.PS2 -> it.online ?: CompatRating.BROKEN
+            else -> it.wireless
+        }
         mode?.let { verdict -> it.copy(rating = verdict) } ?: it
     }
-    val incompatible = compat?.rating == CompatRating.BROKEN
+    // A PS2 game no listed revival serves has nothing to connect to: same red card as the DS.
+    val ps2Unserved = publicMode && rom.console == Console.PS2 &&
+        Ps2Revival.picks(listed?.servers.orEmpty()).isEmpty()
+    val incompatible = compat?.rating == CompatRating.BROKEN || ps2Unserved
     val hasModes = onPlayOnline != null && listed?.rating != CompatRating.BROKEN
     val dsEditionMissing = rom.console == Console.DS && !publicMode && !rememberDsEditionPicked()
     val setupBlocked = ps2Blocked || pspBlocked || incompatible || dsEditionMissing
@@ -359,7 +376,7 @@ fun GameLaunchDialog(
             val primaryLabel = stringResource(
                 when {
                     kaeru -> R.string.lib_play_online
-                    publicMode -> if (ppssppReady) R.string.lib_play_online else R.string.lib_open_emulator
+                    publicMode -> if (ppssppReady || rom.console == Console.PS2) R.string.lib_play_online else R.string.lib_open_emulator
                     online -> R.string.lib_play_online
                     else -> R.string.lib_create_session
                 }

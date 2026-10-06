@@ -776,6 +776,18 @@ fun EmufiiApp(settings: SettingsStore) {
                 onPlayPublic = { rom ->
                     if (rom.console == Console.DS) {
                         screen = Screen.Wfc(rom)
+                    } else if (rom.console == Console.PS2) {
+                        scope.launch {
+                            val dns = eu.emufii.app.ps2.Ps2Revival.chosenDns ?: eu.emufii.app.ps2.Ps2Revival.DEFAULT_DNS
+                            when (val launched = eu.emufii.app.ps2.Ps2Launcher(context).launchOnlineGame(rom.toRef(), dns)) {
+                                eu.emufii.app.azahar.LaunchResult.Success -> launched(rom)
+                                eu.emufii.app.azahar.LaunchResult.NotInstalled ->
+                                    fail(context.getString(R.string.err_not_installed, "ARMSX2"))
+                                is eu.emufii.app.azahar.LaunchResult.Error ->
+                                    fail(context.getString(R.string.err_generic, launched.message))
+                                else -> Unit
+                            }
+                        }
                     } else {
                         when (val launched = eu.emufii.app.psp.PpssppLauncher(context).launchAutoPublic(rom)) {
                             null -> screen = Screen.PspOnline(rom)

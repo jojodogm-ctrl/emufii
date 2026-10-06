@@ -65,11 +65,15 @@ class Ps2Launcher(private val context: Context) {
     }
 
     /** ARMSX2 reads this per-game file after its global prefs and before DEV9 initialises. */
-    suspend fun launchPrivateGame(rom: RomRef, plan: NetplayPlan): LaunchResult {
+    suspend fun launchPrivateGame(rom: RomRef, plan: NetplayPlan): LaunchResult =
+        launchConfigured(rom) { Ps2GameSettings.apply(context, rom, plan) }
+
+    suspend fun launchOnlineGame(rom: RomRef, dns: String): LaunchResult =
+        launchConfigured(rom) { Ps2GameSettings.applyOnline(context, rom, dns) }
+
+    private suspend fun launchConfigured(rom: RomRef, configure: () -> Ps2GameSettings.Outcome): LaunchResult {
         val pkg = installedPackage() ?: return LaunchResult.NotInstalled
-        when (val configured = withContext(Dispatchers.IO) {
-            Ps2GameSettings.apply(context, rom, plan)
-        }) {
+        when (val configured = withContext(Dispatchers.IO) { configure() }) {
             is Ps2GameSettings.Outcome.Success -> Unit
             Ps2GameSettings.Outcome.MissingFolderGrant ->
                 return LaunchResult.Error("ARMSX2 folder access is missing")
