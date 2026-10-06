@@ -8,7 +8,7 @@
 No ports to open, no IP address to share. Built for Android handhelds.
 
 [![Download](https://img.shields.io/badge/Download-APK-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
-[![Version](https://img.shields.io/badge/Version-1.13-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
+[![Version](https://img.shields.io/badge/Version-2.0-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![Android](https://img.shields.io/badge/Android-13--15-3DDC84?style=flat-square&logo=android&logoColor=white)](#install)
 [![Games](https://img.shields.io/badge/Games-Compatible_list-2BB5A6?style=flat-square)](COMPATIBLE-GAMES.md)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-5B6EE1?style=flat-square)](LICENSE)
@@ -146,7 +146,7 @@ Download the new APK from the [releases page](https://github.com/jojodogm-ctrl/e
 ```
 
 ```sh
-apksigner verify --print-certs Emufii-1.13.apk
+apksigner verify --print-certs Emufii-2.0.apk
 ```
 
 </details>
