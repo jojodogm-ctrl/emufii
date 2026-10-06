@@ -18,11 +18,15 @@ No ports to open, no IP address to share. Built for Android handhelds.
 
 </div>
 
+<br>
+
 > [!IMPORTANT]
 > **DS local wireless needs WatermelonDS Emufii Edition.**
 > Starting with Emufii 2.0, DS local wireless games can be played online. This only works with [WatermelonDS Emufii Edition](https://github.com/jojodogm-ctrl/WatermelonDS/releases/latest), a fork of WatermelonDS that adds the netplay this needs.
 >
 > It installs next to the official WatermelonDS, so you keep your saves and settings. Once the official WatermelonDS includes the netplay, the fork won't be needed anymore. Online play through Kaeru WFC still works with any melonDS or WatermelonDS.
+
+<br>
 
 ## What Emufii is (and isn't)
 
@@ -61,28 +65,32 @@ Emufii is an Android app that connects your emulators to your friends' emulators
 </tr>
 </table>
 
+<br>
+
 ## How it works
 
 <table>
 <tr>
 <td align="center" width="25%" valign="top">
 <h3>1. Host</h3>
-Pick a game and get a six-character code.
+Pick a game and share the six-character code.
 </td>
 <td align="center" width="25%" valign="top">
 <h3>2. Join</h3>
-Friends enter the code, or find the game in the public sessions.
+Friends enter the code or pick a public session.
 </td>
 <td align="center" width="25%" valign="top">
 <h3>3. Connect</h3>
-Emufii opens the emulator on its multiplayer screen and fills in the details.
+Emufii opens the emulator and fills in the address.
 </td>
 <td align="center" width="25%" valign="top">
 <h3>4. Play</h3>
-As if you were all on the same Wi-Fi.
+Everyone plays as if on the same Wi-Fi.
 </td>
 </tr>
 </table>
+
+<br>
 
 ## Consoles
 
@@ -100,6 +108,8 @@ As if you were all on the same Wi-Fi.
 > **Which games work?** Games that had local multiplayer on the original console, and for the DS online mode, games that used Nintendo Wi-Fi Connection. See the [full list of compatible games](COMPATIBLE-GAMES.md).
 >
 > Every player needs the same emulator version and the same copy of the game.
+
+<br>
 
 ## Install
 
@@ -140,6 +150,8 @@ apksigner verify --print-certs Emufii-1.13.apk
 
 </details>
 
+<br>
+
 ## Privacy
 
 | What | Where it goes |
@@ -154,11 +166,15 @@ apksigner verify --print-certs Emufii-1.13.apk
 > [!CAUTION]
 > In a public session, other players' devices can reach yours, like on shared Wi-Fi. If you're playing with friends, keep the session private.
 
+<br>
+
 ## License
 
 [AGPL-3.0](LICENSE) (details in [NOTICE.md](NOTICE.md)). The app's source code is in this repository, but the session server and relay are private.
 
 If you find a security issue, please report it privately on [Discord](https://discord.gg/tvWcb28vBZ).
+
+<br>
 
 ## How it was built
 
