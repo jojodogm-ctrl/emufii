@@ -392,6 +392,25 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
         bearer: String? = null,
         maxBytes: Int = Int.MAX_VALUE,
     ): Result<ByteArray> = withContext(Dispatchers.IO) {
+        // Replayed once, re-signed, when a refusal came with a server clock far from ours.
+        val serverDate = LongArray(1)
+        val sentAt = System.currentTimeMillis()
+        val first = sendOnce(path, method, body, readTimeout, bearer, maxBytes, serverDate)
+        val clockMoved = ClientAuth.learnServerClock(serverDate[0], sentAt, System.currentTimeMillis())
+        val refused = (first.exceptionOrNull() as? CoordinatorError.Http)?.status == 403
+        if (refused && clockMoved) sendOnce(path, method, body, readTimeout, bearer, maxBytes, serverDate)
+        else first
+    }
+
+    private fun sendOnce(
+        path: String,
+        method: String,
+        body: JSONObject?,
+        readTimeout: Int,
+        bearer: String?,
+        maxBytes: Int,
+        serverDate: LongArray,
+    ): Result<ByteArray> =
         runCatching {
             val payload = body?.toString()
             val conn = (URL("$baseUrl$path").openConnection() as HttpURLConnection).apply {
@@ -413,6 +432,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                 // Sign `payload`, not `body.toString()`: two serialisations of one JSONObject need not match.
                 payload?.let { conn.outputStream.use { out -> out.write(it.toByteArray(Charsets.UTF_8)) } }
                 val status = conn.responseCode
+                serverDate[0] = conn.getHeaderFieldDate("Date", 0L)
                 when {
                     status == 404 -> throw CoordinatorError.NotFound()
                     status !in 200..299 -> throw CoordinatorError.Http(status)
@@ -436,7 +456,6 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
         }.recoverCatching { err ->
             throw err as? CoordinatorError ?: CoordinatorError.Unreachable(err)
         }
-    }
 
     private fun JSONObject.stringOrNull(key: String): String? =
         if (has(key) && !isNull(key)) getString(key) else null

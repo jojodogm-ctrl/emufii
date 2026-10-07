@@ -21,11 +21,33 @@ object ClientAuth {
 
     val clientVersion: String get() = BuildConfig.VERSION_CODE.toString()
 
+    /**
+     * Server clock minus this device's, learned from the Date header of every reply.
+     * A phone set hours off had all its requests refused as replays, silently (2026-10-07).
+     */
+    @Volatile
+    var clockOffsetMs: Long = 0L
+        private set
+
+    fun nowSeconds(): Long = (System.currentTimeMillis() + clockOffsetMs) / 1000
+
+    /** True when the offset moved: a request refused on its timestamp is worth one more try. */
+    fun learnServerClock(serverDateMs: Long, sentAtMs: Long, receivedAtMs: Long): Boolean {
+        if (serverDateMs <= 0L) return false
+        val offset = serverDateMs - (sentAtMs + receivedAtMs) / 2
+        // Date counts whole seconds: smaller corrections are noise.
+        if (kotlin.math.abs(offset - clockOffsetMs) < CLOCK_TOLERANCE_MS) return false
+        clockOffsetMs = offset
+        return true
+    }
+
+    private const val CLOCK_TOLERANCE_MS = 5_000L
+
     fun sign(
         method: String,
         path: String,
         body: String?,
-        timestampSeconds: Long = System.currentTimeMillis() / 1000
+        timestampSeconds: Long = nowSeconds()
     ): Signature? {
         if (!isConfigured) return null
         val payload = buildString {
