@@ -65,7 +65,8 @@ class FriendWatcher(context: Context, private val client: CoordinatorClient) {
         }
         _statuses.value = current
         _lastGames.value = reply.lastGames
-        avatars.syncFriends(client, codes, reply.avatars)
+        runCatching { avatars.syncFriends(client, codes, reply.avatars) }
+            .onFailure { if (it is kotlinx.coroutines.CancellationException) throw it }
 
         val known = store.friends.value.associate { it.code to it.name }
         val names = codes.associateWith { fresh[it]?.name ?: known[it] }

@@ -399,7 +399,9 @@ fun EmufiiApp(settings: SettingsStore) {
             screen = Screen.Preparing(context.getString(R.string.flow_finding_session))
             scope.launch {
                 val back = if (rom != null) Screen.Join(rom) else Screen.Finder
+                val report = { reason: String -> scope.launch { client.reportJoinFailure(reason, rom?.console?.name?.lowercase(), code) } }
                 val remote = client.getSession(code).getOrElse { err ->
+                    if (err is CoordinatorError.NotFound) report("not_found")
                     return@launch fail(
                         if (err is CoordinatorError.NotFound) R.string.flow_session_not_found
                         else R.string.flow_coordinator_unreachable,
@@ -452,6 +454,7 @@ fun EmufiiApp(settings: SettingsStore) {
 
                                     else -> R.string.flow_tunnel_failed
                                 }
+                                report("claim_failed")
                                 return@launch fail(why)
                             }
                             EmufiiWgManager.start(
@@ -460,11 +463,13 @@ fun EmufiiApp(settings: SettingsStore) {
                             )
                             if (awaitTunnel() == null) {
                                 EmufiiWgManager.stop(context)
+                                report("tunnel_failed")
                                 return@launch fail(R.string.flow_tunnel_failed)
                             }
                             val hostIp = remote.hostIp ?: pollHostIp(client, code)
                             ?: run {
                                 EmufiiWgManager.stop(context)
+                                report("host_not_ready")
                                 return@launch fail(R.string.flow_host_not_ready)
                             }
                             val memberToken = client.heartbeat(code, profile.id, profile.name)
@@ -489,6 +494,7 @@ fun EmufiiApp(settings: SettingsStore) {
                     },
                     onDenied = {
                         scope.launch { client.leaveSession(code, profile.id, token = null) }
+                        report("vpn_denied")
                         fail(R.string.flow_no_vpn_guest)
                     }
                 )

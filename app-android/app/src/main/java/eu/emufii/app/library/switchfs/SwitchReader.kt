@@ -20,12 +20,23 @@ class SwitchReader(private val context: Context) {
                                 it.length >= 16 && it.take(16).all { c -> c.isDigit() || c in 'a'..'f' || c in 'A'..'F' }
                         }
                     }
-                    ?.firstOrNull()
-                    ?.take(16)
-                    ?.uppercase()
+                    ?.map { baseTitleId(it.take(16)) }
+                    ?.minOrNull()
             }
         }
     }.getOrNull()
+
+    companion object {
+        private val NAME_ID = Regex("""(?i)(?<![0-9a-f])(01[0-9a-f]{14})(?![0-9a-f])""")
+
+        /** For NSPs dumped without a ticket (only NCAs inside): the scene tag `[010003F003A34000]`. */
+        fun titleIdFromName(filename: String): String? =
+            NAME_ID.find(filename)?.groupValues?.get(1)?.let(::baseTitleId)
+
+        /** Update (+0x800) and DLC (+0x1000+n) tickets sit beside the game's; the compat key is the game's. */
+        fun baseTitleId(hex: String): String =
+            String.format("%016X", hex.toULong(16).toLong() and 0x1FFFL.inv())
+    }
 
     private class ChannelAccess(private val channel: FileChannel) : Pfs0.RandomAccess {
         override val size: Long get() = channel.size()

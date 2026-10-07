@@ -35,6 +35,7 @@ class EmufiiWgService : GoBackend.VpnService() {
         private const val ACTION_START = "eu.emufii.app.wg.START"
         private const val ACTION_STOP = "eu.emufii.app.wg.STOP"
         private const val EXTRA_CODE = "code"
+        private const val PRESENCE_MS = 20_000L
         private const val EXTRA_CONFIG = "config"
         private const val EXTRA_IP = "ip"
 
@@ -106,6 +107,7 @@ class EmufiiWgService : GoBackend.VpnService() {
                 // Blocking: endpoint resolution retries with one-second waits.
                 b.setState(t, Tunnel.State.UP, config)
                 notify(getString(R.string.svc_wg_online, ip))
+                startPresence(code)
             } catch (e: Exception) {
                 Log.e(TAG, "bringing the tunnel up: ${e.message}", e)
                 _state.value = WgState.Error(e.message ?: "tunnel failed")
@@ -114,6 +116,26 @@ class EmufiiWgService : GoBackend.VpnService() {
         }
 
         return START_NOT_STICKY
+    }
+
+    private var presence: kotlinx.coroutines.Job? = null
+
+    /**
+     * The session screen's heartbeat stalls 25-60 s once the emulator is in front, and the
+     * coordinator took the host for gone and closed live games (90 in 48 h, 2026-10-07).
+     * The foreground service keeps running, so it carries one too.
+     */
+    private fun startPresence(code: String) {
+        presence?.cancel()
+        presence = scope?.launch {
+            val client = eu.emufii.app.network.CoordinatorClient()
+            val profiles = eu.emufii.app.profile.ProfileStore(applicationContext)
+            while (true) {
+                val profile = profiles.profile.value
+                client.heartbeat(code, profile.id, profile.name)
+                kotlinx.coroutines.delay(PRESENCE_MS)
+            }
+        }
     }
 
     private fun holdWifiAwake() {
@@ -140,6 +162,8 @@ class EmufiiWgService : GoBackend.VpnService() {
     }
 
     private fun stopTunnel() {
+        presence?.cancel()
+        presence = null
         _state.value = WgState.Stopping
         val b = backend
         val t = tunnel

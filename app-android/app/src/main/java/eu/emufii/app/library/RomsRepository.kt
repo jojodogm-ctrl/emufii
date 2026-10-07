@@ -386,7 +386,9 @@ class RomsRepository private constructor(private val context: Context) {
             }
         }
 
-        val key = switchReader.titleId(uri) ?: return fallback
+        val key = switchReader.titleId(uri)
+            ?: eu.emufii.app.library.switchfs.SwitchReader.titleIdFromName(name)
+            ?: return fallback
         ndsKeyCache[uri.toString()] = key
 
         return fallback.copy(

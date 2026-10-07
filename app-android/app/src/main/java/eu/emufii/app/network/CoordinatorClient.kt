@@ -123,7 +123,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             if (emulatorVersion != null) put("emulator_version", emulatorVersion)
         },
         readTimeout = 15_000
-    ).map { text ->
+    ).mapCatching { text ->
         val json = JSONObject(text)
         CreatedSession(
             json.getString("code"),
@@ -160,7 +160,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
     ).map { }
 
     suspend fun getSession(code: String): Result<RemoteSession> =
-        request(path = "/sessions/$code", method = "GET").map { text ->
+        request(path = "/sessions/$code", method = "GET").mapCatching { text ->
             val json = JSONObject(text)
             RemoteSession(
                 code = json.getString("code"),
@@ -186,14 +186,14 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
 
     /** The regions a session can be placed in. A coordinator from before regions answers 404. */
     suspend fun listRelays(): Result<List<RelayRegion>> =
-        request(path = "/relays", method = "GET").map { text ->
+        request(path = "/relays", method = "GET").mapCatching { text ->
             JSONObject(text).optJSONArray("relays").map { r ->
                 RelayRegion(r.getString("id"), r.optString("name"), r.getString("ping_host"))
             }
         }
 
     suspend fun listSessions(): Result<List<OpenSession>> =
-        request(path = "/sessions", method = "GET").map { text ->
+        request(path = "/sessions", method = "GET").mapCatching { text ->
             JSONObject(text).optJSONArray("sessions").map { s ->
                 OpenSession(
                     code = s.getString("code"),
@@ -208,6 +208,19 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
         }
 
     /** The coordinator drops members that fall silent: this repeats for the whole session. */
+    /** Best effort, never awaited by the UI: the server had no trace of why a guest never arrived. */
+    suspend fun reportJoinFailure(reason: String, console: String?, code: String) {
+        request(
+            path = "/telemetry/join",
+            method = "POST",
+            body = JSONObject().apply {
+                put("reason", reason)
+                if (console != null) put("console", console)
+                put("code", code.take(3))
+            }
+        )
+    }
+
     suspend fun heartbeat(code: String, id: String, name: String): Result<Heartbeat> = request(
         path = "/sessions/$code/members",
         method = "POST",
@@ -216,7 +229,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             put("name", name)
             putIdentityKey()
         }
-    ).map { text ->
+    ).mapCatching { text ->
         val json = JSONObject(text)
         Heartbeat(
             json.optInt("players", 0),
@@ -272,7 +285,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             put("image", android.util.Base64.encodeToString(webp, android.util.Base64.NO_WRAP))
         },
         readTimeout = 10_000
-    ).map { JSONObject(it).getString("hash") }
+    ).mapCatching { JSONObject(it).getString("hash") }
 
     suspend fun deleteAvatar(id: String, key: String): Result<Unit> = request(
         path = "/avatar/delete",
@@ -296,7 +309,9 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             path = "/friends",
             method = "POST",
             body = JSONObject().apply { put("ids", JSONArray(codes)) }
-        ).map { text ->
+        // mapCatching: a garbled reply (proxy page, truncated body) threw out of the poll loop and
+        // crashed the app on every launch, since the friend that triggers the poll is saved.
+        ).mapCatching { text ->
             val json = JSONObject(text)
             val present = json.optJSONArray("friends").map { f ->
                 val session = f.optJSONObject("session")
@@ -344,7 +359,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             }
         },
         readTimeout = 15_000
-    ).map { text ->
+    ).mapCatching { text ->
         val json = JSONObject(text)
         val relay = json.optJSONObject("relay")
             ?: error("the coordinator has no relay configured")

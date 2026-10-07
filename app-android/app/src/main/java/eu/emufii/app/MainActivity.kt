@@ -74,11 +74,37 @@ class MainActivity : ComponentActivity() {
                 pending.value = null
                 if (result.resultCode == RESULT_OK) cb?.first?.invoke() else cb?.second?.invoke()
             }
+            val batteryNext = remember { mutableStateOf<(() -> Unit)?>(null) }
+            val batteryLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) {
+                batteryNext.value?.invoke()
+                batteryNext.value = null
+            }
+            // Realme/Oppo "smart control" froze the tunnel behind Azahar mid-battle (2026-10-07).
+            // Asked once, at the first session: the answer goes ahead either way.
+            val withBattery: (() -> Unit) -> Unit = { next ->
+                val power = getSystemService(android.os.PowerManager::class.java)
+                val prefs = getSharedPreferences("battery_ask", MODE_PRIVATE)
+                if (power == null || power.isIgnoringBatteryOptimizations(packageName) || prefs.getBoolean("asked", false)) {
+                    next()
+                } else {
+                    prefs.edit().putBoolean("asked", true).apply()
+                    batteryNext.value = next
+                    runCatching {
+                        batteryLauncher.launch(
+                            Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                                .setData(android.net.Uri.parse("package:$packageName"))
+                        )
+                    }.onFailure { batteryNext.value = null; next() }
+                }
+            }
             val ensureVpn = EnsureVpnPermission { onGranted, onDenied ->
+                val granted = { withBattery(onGranted) }
                 val prep: Intent? = EmufiiWgManager.prepare(this@MainActivity)
-                if (prep == null) onGranted()
+                if (prep == null) granted()
                 else {
-                    pending.value = onGranted to onDenied
+                    pending.value = granted to onDenied
                     vpnLauncher.launch(prep)
                 }
             }
