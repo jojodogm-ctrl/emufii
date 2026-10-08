@@ -206,7 +206,8 @@ object Ps2Armsx2Folder {
         val ini = root.child("PCSX2-Android.ini")?.takeIf { it.isFile }
             ?.let { readText(context, it) }?.let(Ps2Armsx2Settings::parseIni)
         val settings = json ?: ini ?: Ps2Armsx2Settings.Parsed()
-        return LoadedSettings(settings, settings.biosFilename ?: ini?.biosFilename)
+        // The ini first: [Filenames] BIOS is what the PCSX2 core boots; the json left it empty on the Thor.
+        return LoadedSettings(settings, ini?.biosFilename ?: settings.biosFilename)
     }
 
     private fun resolveIdentity(context: Context, root: DocumentFile, configuredBios: String?): IdentityResult {
@@ -214,13 +215,10 @@ object Ps2Armsx2Folder {
         val configuredName = configuredBios?.let { File(it).name }?.takeIf { it.isNotBlank() }
         val biosFiles = files.filterNot { it.extensionLower() in COMPANION_EXTENSIONS }
         val nvmFiles = files.filter { it.extensionLower() == "nvm" }
-        if (biosFiles.size > 1) {
-            return IdentityResult.Error(Outcome.AmbiguousBios(biosFiles.mapNotNull { it.name }))
-        }
-        val bios = biosFiles.singleOrNull()
-            ?: return IdentityResult.Error(Outcome.BiosUnavailable(configuredName ?: "active BIOS"))
-        if (configuredName != null && !bios.name.equals(configuredName, ignoreCase = true)) {
-            return IdentityResult.Error(Outcome.BiosUnavailable(configuredName))
+        val bios = when (val pick = pickBios(biosFiles.map { it.name.orEmpty() }, configuredName)) {
+            is BiosPick.Chosen -> biosFiles[pick.index]
+            BiosPick.Ambiguous -> return IdentityResult.Error(Outcome.AmbiguousBios(biosFiles.mapNotNull { it.name }))
+            BiosPick.Missing -> return IdentityResult.Error(Outcome.BiosUnavailable(configuredName ?: "active BIOS"))
         }
         val nvm = nvmFiles.firstOrNull { it.stem().equals(bios.stem(), ignoreCase = true) }
         if (nvm == null) {
@@ -249,6 +247,29 @@ object Ps2Armsx2Folder {
             bios.name,
             version,
         )
+    }
+
+    sealed interface BiosPick {
+        data class Chosen(val index: Int) : BiosPick
+        data object Ambiguous : BiosPick
+        data object Missing : BiosPick
+    }
+
+    /**
+     * The BIOS ARMSX2 has selected, when its settings name one. Several dumps in the folder
+     * failed the setup until 2026-10-08, although ARMSX2 itself knew which one it boots.
+     */
+    @androidx.annotation.VisibleForTesting
+    internal fun pickBios(names: List<String>, configured: String?): BiosPick {
+        if (configured != null) {
+            val index = names.indexOfFirst { it.equals(configured, ignoreCase = true) }
+            return if (index >= 0) BiosPick.Chosen(index) else BiosPick.Missing
+        }
+        return when (names.size) {
+            0 -> BiosPick.Missing
+            1 -> BiosPick.Chosen(0)
+            else -> BiosPick.Ambiguous
+        }
     }
 
     private fun publishVerified(
