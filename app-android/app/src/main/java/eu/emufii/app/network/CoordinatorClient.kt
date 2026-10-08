@@ -54,6 +54,8 @@ data class RemoteSession(
     val emulatorVersion: String?,
     /** CRC32 of the host's DS ROM file; null from older hosts. */
     val romHash: String?,
+    /** The relay region the session runs on; null from an older coordinator. */
+    val region: String?,
     /** True when missing, so an old coordinator does not block every guest. */
     val hostReady: Boolean,
     val members: List<Member>
@@ -177,6 +179,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                 room = json.roomOrNull(),
                 emulatorVersion = json.stringOrNull("emulator_version"),
                 romHash = json.stringOrNull("rom_hash"),
+                region = json.stringOrNull("region"),
                 hostReady = json.optBoolean("host_ready", true),
                 members = json.optJSONArray("members").map { m ->
                     Member(
@@ -221,17 +224,34 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             body = JSONObject().apply {
                 put("reason", reason)
                 if (console != null) put("console", console)
-                put("code", code.take(3))
+                put("code", code)
             }
         )
     }
 
-    suspend fun heartbeat(code: String, id: String, name: String): Result<Heartbeat> = request(
+    suspend fun reportEvent(event: String, console: String, code: String, role: String, detail: String?, emu: String?) {
+        request(
+            path = "/telemetry/event",
+            method = "POST",
+            body = JSONObject().apply {
+                put("event", event)
+                put("console", console)
+                put("code", code)
+                put("role", role)
+                if (detail != null) put("detail", detail)
+                if (emu != null) put("emu", emu)
+            }
+        )
+    }
+
+    suspend fun heartbeat(code: String, id: String, name: String, rttMs: Int? = null): Result<Heartbeat> = request(
         path = "/sessions/$code/members",
         method = "POST",
         body = JSONObject().apply {
             put("id", id)
             put("name", name)
+            // Round trip to the session's relay: lag reports read against distance.
+            if (rttMs != null) put("rtt_ms", rttMs)
             putIdentityKey()
         }
     ).mapCatching { text ->

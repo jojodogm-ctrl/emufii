@@ -68,6 +68,8 @@ internal data class SessionUiState(
 )
 
 @Suppress("LongParameterList")
+private const val FAR_RTT_MS = 120
+
 internal class SessionScreenState(
     private val context: Context,
     private val session: Session,
@@ -90,6 +92,19 @@ internal class SessionScreenState(
 
     private val dsGuestGated = session.backend == Backend.MELONDS && session.role == Session.Role.GUEST
     private var dsGateJob: Job? = null
+
+    init {
+        session.console?.let { console ->
+            eu.emufii.app.telemetry.SessionTelemetry.active = eu.emufii.app.telemetry.SessionTelemetry.Active(
+                session.code, console.wireName, if (session.role == Session.Role.HOST) "host" else "guest"
+            )
+        }
+    }
+
+    private fun relayRttMs(): Int? = session.region?.let { region ->
+        eu.emufii.app.network.RelayRegions.options.value
+            .firstOrNull { it.region.id == region }?.rttMs?.toInt()
+    }
 
     private val _status = MutableStateFlow<String?>(null)
     private val _members = MutableStateFlow<List<Member>>(emptyList())
@@ -159,6 +174,16 @@ internal class SessionScreenState(
     )
 
     init {
+        // A guest far from the host's relay plays with input lag: said once, with the figure.
+        if (session.role == Session.Role.GUEST && session.region != null) {
+            scope.launch {
+                eu.emufii.app.network.RelayRegions.refresh(client)
+                val rtt = relayRttMs()
+                if (rtt != null && rtt > FAR_RTT_MS && _status.value == null) {
+                    _status.value = context.getString(R.string.session_far_from_relay, rtt)
+                }
+            }
+        }
         scope.launch {
             NetplayAutomation.progress.collect { p ->
                 if (p is NetplayProgress.Done) _netplayDone.value = true
@@ -185,7 +210,7 @@ internal class SessionScreenState(
             var gone = 0
             var mute = 0
             while (true) {
-                client.heartbeat(session.code, profile.id, profile.name)
+                client.heartbeat(session.code, profile.id, profile.name, relayRttMs())
                     .onSuccess { beat -> beat.memberHandle?.let { _myHandle.value = it } }
                 client.getSession(session.code)
                     .onSuccess {
@@ -366,6 +391,7 @@ internal class SessionScreenState(
                 // Any other DS emulator ignores the netplay extras and runs the game alone, silently.
                 val ds = eu.emufii.app.library.EmulatorPick.packageFor(context, eu.emufii.app.library.Console.DS)
                 if (ds != eu.emufii.app.wfc.MelonDsPackage.DUALS_EMUFII && ds != eu.emufii.app.wfc.MelonDsPackage.DUALS_DEV) {
+                    eu.emufii.app.telemetry.SessionTelemetry.report("edition_missing", emu = ds ?: "none")
                     return context.getString(R.string.launch_ds_edition_missing) + ". " +
                         context.getString(R.string.launch_ds_edition_hint)
                 }
@@ -383,6 +409,12 @@ internal class SessionScreenState(
 
             Backend.NONE -> return context.getString(R.string.session_unsupported_console)
         }
+        val emu = "$emulator " + (rom.console.let { eu.emufii.app.library.emulatorVersion(context, it) } ?: "?")
+        eu.emufii.app.telemetry.SessionTelemetry.report(
+            if (result == LaunchResult.Success) "launch_ok" else "launch_failed",
+            detail = if (result == LaunchResult.Success) null else result::class.simpleName,
+            emu = emu
+        )
         return when (result) {
             LaunchResult.Success -> {
                 onLaunched()

@@ -379,7 +379,8 @@ fun EmufiiApp(settings: SettingsStore) {
                                     role = Session.Role.HOST,
                                     rom = rom.toRef(),
                                     token = hostToken,
-                                    room = session.room
+                                    room = session.room,
+                                    region = region
                                 )
                             )
                         }
@@ -498,7 +499,8 @@ fun EmufiiApp(settings: SettingsStore) {
                                     role = Session.Role.GUEST,
                                     rom = rom,
                                     token = memberToken,
-                                    room = remote.room
+                                    room = remote.room,
+                                    region = remote.region
                                 )
                             )
                         }

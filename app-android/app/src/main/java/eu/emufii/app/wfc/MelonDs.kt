@@ -56,7 +56,10 @@ class MelonDs(private val context: Context) {
         val intent = Intent(MelonDsPackage.actionLaunchRom(pkg)).apply {
             extras()
             component = ComponentName(pkg, MelonDsPackage.EMULATOR_ACTIVITY)
-            data = romUri
+            // No data: the Edition's filter declares none, and an explicit intent that does not
+            // match the target's filter is dropped where the Android 13 rule is enforced (MIUI).
+            // The URI travels as the "uri" extra it reads, and as ClipData for the read grant.
+            clipData = android.content.ClipData.newRawUri("rom", romUri)
             putExtra(MelonDsPackage.EXTRA_URI, romUri.toString())
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -64,6 +67,14 @@ class MelonDs(private val context: Context) {
         return runCatching {
             context.startActivity(intent)
             LaunchResult.Success
-        }.getOrElse { LaunchResult.Error(it.message ?: context.getString(R.string.err_launch)) }
+        }.getOrElse {
+            // Seen for real: the package answers, its game screen does not (disabled, archived,
+            // half installed, or another APK under the same name). Android's own text means nothing to a player.
+            if (it is android.content.ActivityNotFoundException) {
+                LaunchResult.Error(context.getString(R.string.err_ds_emulator_broken))
+            } else {
+                LaunchResult.Error(it.message ?: context.getString(R.string.err_launch))
+            }
+        }
     }
 }

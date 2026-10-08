@@ -26,8 +26,8 @@ android {
         minSdk = 33
         targetSdk = 36
         // Never reuse a published versionCode: the update check compares it alone.
-        versionCode = 53
-        versionName = "2.0.2"
+        versionCode = 54
+        versionName = "2.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

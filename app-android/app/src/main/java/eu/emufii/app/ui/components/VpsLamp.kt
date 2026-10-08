@@ -46,6 +46,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -135,6 +136,9 @@ object ServerPicker {
 
     private fun entries() = 1 + RelayRegions.options.value.size
 
+    /** Past two servers the list overflows a landscape phone: every entry, Automatic first, two per row. */
+    fun grid(count: Int = RelayRegions.options.value.size) = count > 2
+
     fun aim() {
         _aimed.value = true
     }
@@ -169,6 +173,19 @@ object ServerPicker {
         _index.value = next
     }
 
+    // Grid: entry e sits at row e / 2, column e % 2.
+    private fun gridStep(key: Key) {
+        val last = entries() - 1
+        val at = _index.value
+        _index.value = when (key) {
+            Key.DirectionUp -> if (at >= 2) at - 2 else at
+            Key.DirectionDown -> if (at + 2 <= last) at + 2 else at
+            Key.DirectionLeft -> if (at % 2 == 1) at - 1 else at
+            Key.DirectionRight -> if (at % 2 == 0 && at + 1 <= last) at + 1 else at
+            else -> at
+        }
+    }
+
     fun handleKey(event: KeyEvent, remote: Boolean): Boolean {
         val down = event.type == KeyEventType.KeyDown
         if (event.key in CONFIRM_KEYS) {
@@ -181,8 +198,10 @@ object ServerPicker {
         }
         if (_open.value) {
             if (down) when (event.key) {
-                Key.DirectionUp -> step(-1)
-                Key.DirectionDown -> step(1)
+                Key.DirectionUp, Key.DirectionDown, Key.DirectionLeft, Key.DirectionRight ->
+                    if (grid()) gridStep(event.key)
+                    else if (event.key == Key.DirectionUp) step(-1)
+                    else if (event.key == Key.DirectionDown) step(1)
                 Key.ButtonB, Key.Back -> close()
                 else -> {}
             }
@@ -372,7 +391,8 @@ private fun ServerMenu(visible: Boolean, centred: Boolean) {
             Column(
                 modifier = Modifier
                     .padding(36.dp)
-                    .width(340.dp)
+                    .widthIn(max = if (ServerPicker.grid(options.size)) 620.dp else 340.dp)
+                    .let { if (ServerPicker.grid(options.size)) it.fillMaxWidth() else it.width(340.dp) }
                     .plate(shape = shape, dark = dark, oled = oled, lift = 16.dp)
                     .padding(horizontal = 12.dp, vertical = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -384,21 +404,24 @@ private fun ServerMenu(visible: Boolean, centred: Boolean) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 12.dp, bottom = 4.dp)
                 )
-                ServerRow(
-                    modifier = Modifier.staggered(0),
-                    badge = "🌐",
-                    title = stringResource(R.string.relay_auto),
-                    detail = autoName?.let { stringResource(R.string.relay_auto_now, it) }
-                        ?: stringResource(R.string.relay_auto_hint),
-                    rtt = null,
-                    auto = true,
-                    chosen = manual == null,
-                    aimed = index == 0,
-                    onTap = { ServerPicker.pick(0) }
-                )
-                options.forEachIndexed { i, o ->
+                val autoRow: @Composable (Modifier) -> Unit = { rowModifier ->
                     ServerRow(
-                        modifier = Modifier.staggered(i + 1),
+                        modifier = rowModifier.staggered(0),
+                        badge = "🌐",
+                        title = stringResource(R.string.relay_auto),
+                        detail = autoName?.let { stringResource(R.string.relay_auto_now, it) }
+                            ?: stringResource(R.string.relay_auto_hint),
+                        rtt = null,
+                        auto = true,
+                        chosen = manual == null,
+                        aimed = index == 0,
+                        onTap = { ServerPicker.pick(0) }
+                    )
+                }
+                val serverRow: @Composable (Int, Modifier) -> Unit = { i, rowModifier ->
+                    val o = options[i]
+                    ServerRow(
+                        modifier = rowModifier.staggered(i + 1),
                         badge = regionEmoji(o.region.id),
                         title = regionName(o.region),
                         detail = o.rttMs?.let { stringResource(R.string.relay_rtt, it.roundToInt()) }
@@ -409,6 +432,19 @@ private fun ServerMenu(visible: Boolean, centred: Boolean) {
                         aimed = index == i + 1,
                         onTap = { ServerPicker.pick(i + 1) }
                     )
+                }
+                if (ServerPicker.grid(options.size)) {
+                    (0..options.size).chunked(2).forEach { pair ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            pair.forEach { e ->
+                                if (e == 0) autoRow(Modifier.weight(1f)) else serverRow(e - 1, Modifier.weight(1f))
+                            }
+                            if (pair.size == 1) Spacer(Modifier.weight(1f))
+                        }
+                    }
+                } else {
+                    autoRow(Modifier)
+                    options.indices.forEach { i -> serverRow(i, Modifier) }
                 }
             }
             }
@@ -527,6 +563,9 @@ private fun SignalBars(rtt: Double?) {
 private fun regionName(r: RelayRegion): String = when (r.id) {
     "eu" -> stringResource(R.string.region_eu)
     "na" -> stringResource(R.string.region_na)
+    "use" -> stringResource(R.string.region_use)
+    "usw" -> stringResource(R.string.region_usw)
+    "jp" -> stringResource(R.string.region_jp)
     else -> r.name.ifBlank { r.id }
 }
 
@@ -560,6 +599,9 @@ private fun latencyColor(rtt: Double?, dark: Boolean): Color = when {
 
 private fun regionEmoji(id: String): String = when (id) {
     "eu" -> "🇪🇺"
-    "na" -> "🇺🇸"
+    // Beauharnois, near Montréal: the id stays "na", apps in the field send it.
+    "na" -> "🇨🇦"
+    "use", "usw" -> "🇺🇸"
+    "jp" -> "🇯🇵"
     else -> "🌐"
 }

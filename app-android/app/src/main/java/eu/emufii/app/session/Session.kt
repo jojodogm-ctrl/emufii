@@ -24,7 +24,9 @@ data class Session(
     val rom: RomRef? = null,
     /** Proves the right to modify the session; a guest's only allows leaving. The code is public. */
     val token: String? = null,
-    val room: eu.emufii.app.network.RoomRef? = null
+    val room: eu.emufii.app.network.RoomRef? = null,
+    /** The relay region the session runs on; null from an older coordinator. */
+    val region: String? = null
 ) {
     enum class Role { HOST, GUEST }
 

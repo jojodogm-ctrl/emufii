@@ -66,6 +66,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Netplay events from WatermelonDS Emufii Edition, forwarded as telemetry. -->
+        <receiver
+            android:name=".telemetry.NetplayEventReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="eu.emufii.netplay.EVENT" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".notify.FriendWatchJob"
             android:exported="false"

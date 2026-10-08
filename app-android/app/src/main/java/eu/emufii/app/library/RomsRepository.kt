@@ -250,7 +250,12 @@ class RomsRepository private constructor(private val context: Context) {
         if (console != Console.THREE_DS) return null
 
         // CIA has no magic: only the extension says what it is.
-        val header = headerReader.read(uri, cia = name.substringAfterLast('.', "").equals("cia", true))
+        val ext = name.substringAfterLast('.', "").lowercase()
+        val header = headerReader.read(uri, cia = ext == "cia")
+        // ".app" and ".3dsx" are also plain files of other kinds, and unsorted folders hold
+        // them next to the games: without a 3DS signature they are not 3DS titles.
+        if (ext == "app" && header == null) return null
+        if (ext == "3dsx" && !startsWith3dsx(uri)) return null
         val smdh = header?.let { readSmdhWithCache(uri, it) }
         val iconFile = header?.let { h -> iconCache.fileFor(h.titleIdHex).takeIf { it.exists() } }
 
@@ -265,6 +270,13 @@ class RomsRepository private constructor(private val context: Context) {
             accentArgb = header?.let { iconCache.readAccent(it.titleIdHex) }
         )
     }
+
+    private fun startsWith3dsx(uri: android.net.Uri): Boolean = runCatching {
+        context.contentResolver.openInputStream(uri)!!.use { input ->
+            val magic = ByteArray(4)
+            input.read(magic) == 4 && String(magic, Charsets.US_ASCII) == "3DSX"
+        }
+    }.getOrDefault(false)
 
     private fun Candidate.toPspRom(): Rom? {
         val fallback = Rom(

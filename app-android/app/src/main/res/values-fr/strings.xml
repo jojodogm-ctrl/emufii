@@ -271,6 +271,7 @@
     <string name="flow_session_not_found">Session introuvable, le code est peut-être expiré</string>
     <string name="flow_coordinator_unreachable">Emufii n\'arrive pas à joindre son serveur. Vérifie ta connexion et réessaie.</string>
     <string name="flow_wrong_game">Cette session est pour %1$s. Rejoins-la avec ce jeu-là.</string>
+    <string name="session_far_from_relay">Tu es loin du serveur de cette session (%1$d ms) : attends-toi à de l\'input lag.</string>
     <string name="flow_ds_rom_differs">Une session DS demande exactement le même fichier ROM sur chaque appareil, et le tien diffère de celui de l\'hôte (région, révision, ROM réduite ou patchée). Demande son fichier à l\'hôte.</string>
     <string name="flow_wrong_game_unnamed">un autre jeu</string>
     <string name="flow_host_not_ready">L\'hôte n\'a pas fini de se connecter</string>
@@ -493,7 +494,10 @@
     <string name="relay_auto_hint">Choisit le serveur le plus proche</string>
     <string name="relay_rtt_unknown">Non mesuré</string>
     <string name="region_eu">Europe</string>
-    <string name="region_na">Amérique du Nord</string>
+    <string name="region_na">Canada (Montréal)</string>
+    <string name="region_use">USA Est (NY)</string>
+    <string name="region_usw">USA Ouest (Seattle)</string>
+    <string name="region_jp">Japon (Tokyo)</string>
     <string name="panel_page_details">R · Détails</string>
     <string name="panel_page_back">R · Revenir au jeu</string>
     <string name="panel_released">Sorti en %1$s</string>
@@ -706,6 +710,7 @@
     <string name="psp_server_nobody">Personne sur ce jeu pour l’instant</string>
     <string name="psp_server_unknown">Pas de compteur en direct</string>
     <string name="launch_ppsspp_setup_hint">Réglages → Paramétrage automatique PPSSPP</string>
+    <string name="err_ds_emulator_broken">L\'émulateur DS est installé mais ne s\'ouvre pas. Ouvre WatermelonDS Emufii Edition une fois depuis l\'écran d\'accueil ; si ça échoue, réinstalle-le depuis sa page GitHub.</string>
     <string name="launch_ds_edition_missing">Le sans-fil demande WatermelonDS Emufii Edition</string>
     <string name="launch_ds_edition_hint">Une fois installé, choisis-le pour la DS dans Réglages → Émulateurs</string>
     <string name="launch_ps2_profile_hint">Réglages → Profil réseau PS2</string>
