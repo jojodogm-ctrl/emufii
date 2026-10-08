@@ -363,6 +363,12 @@ internal class SessionScreenState(
 
             Backend.MELONDS -> {
                 if (session.hostIp.isBlank()) return context.getString(R.string.session_netplay_no_address)
+                // Any other DS emulator ignores the netplay extras and runs the game alone, silently.
+                val ds = eu.emufii.app.library.EmulatorPick.packageFor(context, eu.emufii.app.library.Console.DS)
+                if (ds != eu.emufii.app.wfc.MelonDsPackage.DUALS_EMUFII && ds != eu.emufii.app.wfc.MelonDsPackage.DUALS_DEV) {
+                    return context.getString(R.string.launch_ds_edition_missing) + ". " +
+                        context.getString(R.string.launch_ds_edition_hint)
+                }
                 eu.emufii.app.wfc.MelonDs(context).launchNetplay(
                     rom.uri,
                     isHost = session.role == Session.Role.HOST,

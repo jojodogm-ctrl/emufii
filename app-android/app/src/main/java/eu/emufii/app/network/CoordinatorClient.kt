@@ -52,6 +52,8 @@ data class RemoteSession(
     val room: RoomRef?,
     /** Null from a host on an older app: no warning rather than a false one. */
     val emulatorVersion: String?,
+    /** CRC32 of the host's DS ROM file; null from older hosts. */
+    val romHash: String?,
     /** True when missing, so an old coordinator does not block every guest. */
     val hostReady: Boolean,
     val members: List<Member>
@@ -104,7 +106,8 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
         private: Boolean = false,
         region: String? = null,
         /** Handed to guests, who warn when theirs differs. */
-        emulatorVersion: String? = null
+        emulatorVersion: String? = null,
+        romHash: String? = null
     ): Result<CreatedSession> = request(
         path = "/sessions",
         method = "POST",
@@ -121,6 +124,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             if (private) put("private", true)
             if (region != null) put("region", region)
             if (emulatorVersion != null) put("emulator_version", emulatorVersion)
+            if (romHash != null) put("rom_hash", romHash)
         },
         readTimeout = 15_000
     ).mapCatching { text ->
@@ -172,6 +176,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                 hostName = json.stringOrNull("host_name"),
                 room = json.roomOrNull(),
                 emulatorVersion = json.stringOrNull("emulator_version"),
+                romHash = json.stringOrNull("rom_hash"),
                 hostReady = json.optBoolean("host_ready", true),
                 members = json.optJSONArray("members").map { m ->
                     Member(

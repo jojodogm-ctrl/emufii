@@ -45,4 +45,11 @@ fun rememberPresentationDisplay(): State<Display?> {
 /** Skip STATE_OFF displays: showing a Presentation on one throws. */
 private fun DisplayManager.presentationDisplay(): Display? =
     getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)
-        .firstOrNull { it.isValid && it.state == Display.STATE_ON }
+        .firstOrNull { it.isValid && it.state == Display.STATE_ON && it.isBuiltIn() }
+
+// Casting, screen mirroring and some recorders add a presentation display too: a
+// single-screen phone then showed its session as a rear panel's bottom screen.
+// Display.getType is hidden; TYPE_INTERNAL is 1. Unreadable: keep the old behaviour.
+private fun Display.isBuiltIn(): Boolean =
+    runCatching { Display::class.java.getMethod("getType").invoke(this) as Int == 1 }
+        .getOrDefault(true)

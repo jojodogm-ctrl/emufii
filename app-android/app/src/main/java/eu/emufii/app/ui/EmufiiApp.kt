@@ -39,6 +39,7 @@ import eu.emufii.app.library.Console
 import eu.emufii.app.library.GameTitles
 import eu.emufii.app.library.Rom
 import eu.emufii.app.library.RomsRepository
+import eu.emufii.app.library.RomFileHash
 import eu.emufii.app.library.allEmulators
 import eu.emufii.app.library.emulatorVersion
 import eu.emufii.app.ui.components.VersionMismatchDialog
@@ -329,7 +330,8 @@ fun EmufiiApp(settings: SettingsStore) {
                         region = region,
                         emulatorVersion = withContext(Dispatchers.IO) {
                             emulatorVersion(context, rom.console)
-                        }
+                        },
+                        romHash = if (rom.console == Console.DS) RomFileHash.of(context, rom.uri) else null
                     )
                     created = outcome.getOrNull()
                     if (created != null) break
@@ -420,6 +422,15 @@ fun EmufiiApp(settings: SettingsStore) {
                         ),
                         back
                     )
+                }
+
+                // The Edition refuses a guest whose ROM differs by one byte, and the game then runs alone.
+                if (rom?.console == Console.DS && remote.romHash != null) {
+                    val ours = RomFileHash.of(context, rom.uri)
+                    if (ours != null && ours != remote.romHash) {
+                        report("rom_hash")
+                        return@launch fail(R.string.flow_ds_rom_differs, back)
+                    }
                 }
 
                 val mine = rom?.let { withContext(Dispatchers.IO) { emulatorVersion(context, it.console) } }

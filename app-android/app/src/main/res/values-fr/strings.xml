@@ -271,6 +271,7 @@
     <string name="flow_session_not_found">Session introuvable, le code est peut-être expiré</string>
     <string name="flow_coordinator_unreachable">Emufii n\'arrive pas à joindre son serveur. Vérifie ta connexion et réessaie.</string>
     <string name="flow_wrong_game">Cette session est pour %1$s. Rejoins-la avec ce jeu-là.</string>
+    <string name="flow_ds_rom_differs">Une session DS demande exactement le même fichier ROM sur chaque appareil, et le tien diffère de celui de l\'hôte (région, révision, ROM réduite ou patchée). Demande son fichier à l\'hôte.</string>
     <string name="flow_wrong_game_unnamed">un autre jeu</string>
     <string name="flow_host_not_ready">L\'hôte n\'a pas fini de se connecter</string>
     <string name="flow_no_vpn_guest">Sans autorisation VPN, Emufii ne peut pas rejoindre</string>
