@@ -6,6 +6,7 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
+import android.util.Log
 import eu.emufii.app.network.CoordinatorClient
 import eu.emufii.app.profile.FriendStatus
 import eu.emufii.app.profile.FriendStore
@@ -48,13 +49,18 @@ class FriendWatchJob : JobService() {
                 return
             }
 
-            scheduler.schedule(
-                JobInfo.Builder(JOB_ID, ComponentName(context, FriendWatchJob::class.java))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setPeriodic(PERIOD_MS)
-                    .setPersisted(true)
-                    .build()
-            )
+            // A refused job costs the friend notifications, never the app: this runs on adding a friend.
+            try {
+                scheduler.schedule(
+                    JobInfo.Builder(JOB_ID, ComponentName(context, FriendWatchJob::class.java))
+                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                        .setPeriodic(PERIOD_MS)
+                        .setPersisted(true)
+                        .build()
+                )
+            } catch (e: RuntimeException) {
+                Log.w("FriendWatchJob", "schedule refused", e)
+            }
         }
 
         suspend fun sweep(context: Context) {

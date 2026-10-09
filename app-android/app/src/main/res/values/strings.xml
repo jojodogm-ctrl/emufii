@@ -658,7 +658,7 @@
     <!-- Crash logger: the reports Emufii keeps when it dies unexpectedly -->
     <string name="settings_page_crash_logs">Crash logs</string>
     <string name="settings_sub_crash_logs">What Emufii kept from its last unexpected exits</string>
-    <string name="crash_logs_description">Every time Emufii dies unexpectedly, the last thing it did is written here. Ten reports are kept, oldest first are dropped.</string>
+    <string name="crash_logs_description">Every time Emufii dies unexpectedly, the last thing it did is written here. Ten reports are kept, oldest first are dropped. A copy also goes to Android/media/eu.emufii.app/crashes, readable from any file manager.</string>
     <string name="crash_logs_report_issue">Report an issue</string>
     <!-- Emufii\'s upstream repository: this is where its issue tracker lives. -->
     <string name="crash_logs_report_issue_url" translatable="false">https://github.com/jojodogm-ctrl/emufii/issues/new</string>

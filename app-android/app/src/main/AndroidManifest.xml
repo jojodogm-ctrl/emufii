@@ -12,6 +12,8 @@
     <!-- Wi-Fi power saving drops packets; Switch LDN does not tolerate it. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- Android 16 refuses a job with a network constraint without it (FriendWatchJob). -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <queries>
         <package android:name="org.azahar_emu.azahar" />

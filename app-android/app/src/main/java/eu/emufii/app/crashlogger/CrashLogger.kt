@@ -59,8 +59,24 @@ object CrashLogger {
             val crashReport = buildCrashReport(timestamp, thread, stackTrace)
             crashFile.writeText(crashReport)
             cleanupOldCrashes(crashDir)
+            writePublicCopy(fileName, crashReport)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to write crash log", e)
+        }
+    }
+
+    // Android/media/eu.emufii.app/crashes: reachable from any file manager or over USB, no permission needed.
+    private fun publicCrashDir(): File? =
+        appContext.externalMediaDirs.firstOrNull()?.let { File(it, CRASH_DIR) }
+
+    private fun writePublicCopy(fileName: String, crashReport: String) {
+        try {
+            val dir = publicCrashDir() ?: return
+            if (!dir.exists()) dir.mkdirs()
+            File(dir, fileName).writeText(crashReport)
+            cleanupOldCrashes(dir)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to write public crash copy", e)
         }
     }
 
@@ -135,9 +151,11 @@ object CrashLogger {
     suspend fun deleteCrashLog(fileName: String) = withContext(Dispatchers.IO) {
         val file = File(File(appContext.filesDir, CRASH_DIR), fileName)
         if (file.exists()) file.delete()
+        publicCrashDir()?.let { File(it, fileName).delete() }
     }
 
     suspend fun clearAllCrashLogs() = withContext(Dispatchers.IO) {
         File(appContext.filesDir, CRASH_DIR).listFiles()?.forEach { it.delete() }
+        publicCrashDir()?.listFiles()?.forEach { it.delete() }
     }
 }

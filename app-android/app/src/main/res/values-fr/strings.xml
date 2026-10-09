@@ -663,7 +663,7 @@
     <!-- Journal de plantages : ce qu\'Emufii garde quand elle meurt sans crier gare -->
     <string name="settings_page_crash_logs">Journal de plantages</string>
     <string name="settings_sub_crash_logs">Ce qu\'Emufii a gardé de ses dernières sorties inattendues</string>
-    <string name="crash_logs_description">Chaque fois qu\'Emufii meurt sans prévenir, ce qu\'elle faisait juste avant est écrit ici. Dix rapports sont gardés, les plus vieux disparaissent.</string>
+    <string name="crash_logs_description">Chaque fois qu\'Emufii meurt sans prévenir, ce qu\'elle faisait juste avant est écrit ici. Dix rapports sont gardés, les plus vieux disparaissent. Une copie va aussi dans Android/media/eu.emufii.app/crashes, lisible depuis n\'importe quel explorateur de fichiers.</string>
     <string name="crash_logs_report_issue">Signaler un souci</string>
     <string name="crash_logs_clear_all">Tout effacer</string>
     <string name="crash_logs_clear_all_dialog_title">Effacer tous les rapports ?</string>
