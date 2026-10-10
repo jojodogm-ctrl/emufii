@@ -12,6 +12,7 @@
 name: Android
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main]
@@ -44,7 +45,7 @@ jobs:
 
       - name: Tests unitaires et build debug
         working-directory: app-android
-        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-daemon --stacktrace
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --stacktrace
 
       # Récupérable depuis l'onglet de la PR, pour essayer la build de
       # quelqu'un d'autre sans la compiler soi-même.
@@ -53,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: emufii-debug-apk
-          path: app-android/app/build/outputs/apk/debug/*.apk
+          path: app-android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: warn
 
       - name: Garder les rapports de test quand ça casse
