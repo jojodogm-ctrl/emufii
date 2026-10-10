@@ -1,7 +1,7 @@
 package eu.emufii.app.settings
 
-import android.app.LocaleManager
 import android.content.Context
+import android.os.Build
 import android.os.LocaleList
 import androidx.core.content.edit
 import eu.emufii.app.artwork.ArtworkFrontend
@@ -156,10 +156,7 @@ class SettingsStore private constructor(context: Context) {
     }
 
     private fun readLanguage(): AppLanguage {
-        val fromSystem = localeManager()?.applicationLocales
-            ?.takeIf { !it.isEmpty }
-            ?.get(0)
-            ?.language
+        val fromSystem = readApplicationLanguageTag()
         return AppLanguage.fromTag(fromSystem ?: prefs.getString(KEY_LANGUAGE, null))
     }
 
@@ -171,13 +168,28 @@ class SettingsStore private constructor(context: Context) {
     fun setLanguage(language: AppLanguage) {
         prefs.edit { putString(KEY_LANGUAGE, language.tag) }
         _language.value = language
-        localeManager()?.applicationLocales = language.tag
-            ?.let { LocaleList.forLanguageTags(it) }
-            ?: LocaleList.getEmptyLocaleList()
+        applyApplicationLanguage(language.tag)
     }
 
-    private fun localeManager(): LocaleManager? =
-        appContext.getSystemService(LocaleManager::class.java)
+    private fun readApplicationLanguageTag(): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return null
+        val localeManager = appContext.getSystemService(Context.LOCALE_SERVICE) ?: return null
+        val locales = runCatching {
+            localeManager.javaClass.getMethod("getApplicationLocales").invoke(localeManager) as? LocaleList
+        }.getOrNull() ?: return null
+        return if (locales.isEmpty) null else locales[0]?.language
+    }
+
+    private fun applyApplicationLanguage(tag: String?) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val localeManager = appContext.getSystemService(Context.LOCALE_SERVICE) ?: return
+        val locales = tag?.let { LocaleList.forLanguageTags(it) } ?: LocaleList.getEmptyLocaleList()
+        runCatching {
+            localeManager.javaClass
+                .getMethod("setApplicationLocales", LocaleList::class.java)
+                .invoke(localeManager, locales)
+        }
+    }
 
     companion object {
         /** One shared store: a store per screen made onboarding choices silently revert. */

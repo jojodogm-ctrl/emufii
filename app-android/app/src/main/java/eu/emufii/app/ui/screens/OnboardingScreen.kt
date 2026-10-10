@@ -3,6 +3,7 @@ package eu.emufii.app.ui.screens
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -183,9 +184,12 @@ fun OnboardingScreen(
         }
     }
 
+    val notificationsRuntimePermission =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     var notificationsGranted by remember {
         mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+            !notificationsRuntimePermission ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
                 PackageManager.PERMISSION_GRANTED
         )
     }
@@ -311,7 +315,11 @@ fun OnboardingScreen(
                         notificationsGranted = notificationsGranted,
                         notificationsRefused = notificationsRefused,
                         onAskNotifications = {
-                            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            if (notificationsRuntimePermission) {
+                                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                notificationsGranted = true
+                            }
                         },
                     )
                 }
