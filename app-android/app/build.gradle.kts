@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         applicationId = "eu.emufii.app"
-        minSdk = 33
+        minSdk = 31
         targetSdk = 36
         // Never reuse a published versionCode: the update check compares it alone.
         versionCode = 54

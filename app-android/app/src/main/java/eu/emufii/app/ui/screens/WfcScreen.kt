@@ -83,8 +83,11 @@ fun WfcScreen(
 
     val consent = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            WfcManager.start(context)
-            launch()
+            if (WfcManager.start(context)) {
+                launch()
+            } else {
+                status = context.getString(R.string.flow_tunnel_failed)
+            }
         } else {
             status = context.getString(R.string.wfc_no_vpn)
         }
@@ -168,8 +171,11 @@ fun WfcScreen(
                             if (intent != null) {
                                 consent.launch(intent)
                             } else {
-                                WfcManager.start(context)
-                                launch()
+                                if (WfcManager.start(context)) {
+                                    launch()
+                                } else {
+                                    status = context.getString(R.string.flow_tunnel_failed)
+                                }
                             }
                         }
                     }
