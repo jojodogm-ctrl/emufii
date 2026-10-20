@@ -9,7 +9,7 @@ No ports to open, no IP address to share. Built for Android handhelds.
 
 [![Download](https://img.shields.io/badge/Download-APK-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
 [![Version](https://img.shields.io/badge/Version-2.0-E0457B?style=flat-square)](https://github.com/jojodogm-ctrl/emufii/releases/latest)
-[![Android](https://img.shields.io/badge/Android-13--15-3DDC84?style=flat-square&logo=android&logoColor=white)](#install)
+[![Android](https://img.shields.io/badge/Android-12--15-3DDC84?style=flat-square&logo=android&logoColor=white)](#install)
 [![Games](https://img.shields.io/badge/Games-Compatible_list-2BB5A6?style=flat-square)](COMPATIBLE-GAMES.md)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-5B6EE1?style=flat-square)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
@@ -115,7 +115,7 @@ Everyone plays as if on the same Wi-Fi.
 ## Install
 
 > [!WARNING]
-> **Beta.** Works on Android 13, 14 and 15. Expect bugs, and please report them on [Discord](https://discord.gg/tvWcb28vBZ).
+> **Beta.** Works on Android 12, 13, 14 and 15. Expect bugs, and please report them on [Discord](https://discord.gg/tvWcb28vBZ).
 
 1. Install the emulators you want to use.
 2. [Download the latest APK](https://github.com/jojodogm-ctrl/emufii/releases/latest) and install it.

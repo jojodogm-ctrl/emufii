@@ -359,10 +359,14 @@ fun EmufiiApp(settings: SettingsStore) {
                                 return@launch fail(R.string.flow_tunnel_failed)
                             }
                             // PS2 only: its keyboard has no dot key, so it dials a name.
-                            EmufiiWgManager.start(
+                            val started = EmufiiWgManager.start(
                                 context, code, info,
                                 announceDns = rom.console.backend == Backend.ARMSX2
                             )
+                            if (!started) {
+                                client.deleteSession(code, hostToken)
+                                return@launch fail(R.string.flow_tunnel_failed)
+                            }
                             if (awaitTunnel() == null) {
                                 client.deleteSession(code, hostToken)
                                 EmufiiWgManager.stop(context)
@@ -469,10 +473,14 @@ fun EmufiiApp(settings: SettingsStore) {
                                 report("claim_failed")
                                 return@launch fail(why)
                             }
-                            EmufiiWgManager.start(
+                            val started = EmufiiWgManager.start(
                                 context, code, info,
                                 announceDns = rom?.console?.backend == Backend.ARMSX2
                             )
+                            if (!started) {
+                                report("tunnel_start_not_allowed")
+                                return@launch fail(R.string.flow_tunnel_failed)
+                            }
                             if (awaitTunnel() == null) {
                                 EmufiiWgManager.stop(context)
                                 report("tunnel_failed")
@@ -990,4 +998,3 @@ private fun friendNoteText(context: android.content.Context, event: FriendEvent)
 }
 
 private const val PRELOAD_MS = 6_000L
-

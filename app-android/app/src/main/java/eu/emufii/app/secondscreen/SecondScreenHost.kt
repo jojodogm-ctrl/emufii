@@ -1,11 +1,11 @@
 package eu.emufii.app.secondscreen
 
 import android.annotation.SuppressLint
-import android.app.LocaleManager
 import android.app.Presentation
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.LocaleList
 import android.view.Display
 import android.view.WindowManager
 import androidx.compose.runtime.Composable
@@ -86,10 +86,8 @@ private class EmufiiPresentation(
 }
 
 private fun Context.withAppLocales(): Context {
-    val locales = getSystemService(LocaleManager::class.java)
-        ?.applicationLocales
-        ?.takeIf { !it.isEmpty }
-        ?: return this
+    val tag = SettingsStore.get(this).language.value.tag ?: return this
+    val locales = LocaleList.forLanguageTags(tag)
     val config = Configuration(resources.configuration).apply { setLocales(locales) }
     return createConfigurationContext(config)
 }

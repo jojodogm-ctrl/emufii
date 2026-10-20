@@ -12,15 +12,17 @@ object EmufiiWgManager {
     fun prepare(ctx: Context): Intent? = VpnService.prepare(ctx)
 
     /** Foreground service: GoBackend would otherwise start its own in the background. */
-    fun start(ctx: Context, code: String, info: WgTunnelInfo, announceDns: Boolean = false) {
+    fun start(ctx: Context, code: String, info: WgTunnelInfo, announceDns: Boolean = false): Boolean {
         val configText = WgConfig.render(
             info,
             WgKeys.privateKeyBase64(ctx),
             dns = if (announceDns) WgConfig.RELAY_ADDRESS else null
         )
-        ctx.startForegroundService(
-            EmufiiWgService.startIntent(ctx, code, configText, info.address)
-        )
+        return runCatching {
+            ctx.startForegroundService(
+                EmufiiWgService.startIntent(ctx, code, configText, info.address)
+            )
+        }.isSuccess
     }
 
     fun stop(ctx: Context) {

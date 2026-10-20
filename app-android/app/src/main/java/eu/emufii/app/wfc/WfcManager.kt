@@ -13,8 +13,10 @@ object WfcManager {
     /** Returns null if VPN permission is already granted, else the consent Intent. */
     fun prepare(ctx: Context): Intent? = VpnService.prepare(ctx)
 
-    fun start(ctx: Context) {
-        ctx.startForegroundService(WfcDnsService.startIntent(ctx))
+    fun start(ctx: Context): Boolean {
+        return runCatching {
+            ctx.startForegroundService(WfcDnsService.startIntent(ctx))
+        }.isSuccess
     }
 
     fun stop(ctx: Context) {
