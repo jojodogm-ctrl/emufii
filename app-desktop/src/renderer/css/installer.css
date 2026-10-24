@@ -1,0 +1,616 @@
+/* Emufii Custom Modern Installer GUI Styles */
+:root {
+  --installer-width: 740px;
+  --installer-height: 520px;
+}
+
+body.installer-body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  user-select: none;
+  font-family: var(--font-family);
+  overflow: hidden;
+}
+
+.installer-window {
+  width: var(--installer-width);
+  height: var(--installer-height);
+  position: relative;
+  background: #0D0A16;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85), 0 0 50px rgba(63, 207, 192, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.installer-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.65;
+}
+
+/* Frameless Titlebar */
+.installer-titlebar {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  -webkit-app-region: drag;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+
+.installer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: var(--ink-primary);
+}
+
+.installer-brand img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.installer-titlebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  -webkit-app-region: no-drag;
+}
+
+/* Language segmented switch in titlebar */
+.installer-lang-switch {
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 9999px;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.installer-lang-btn {
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 180ms ease;
+  z-index: 2;
+}
+
+.installer-lang-btn.active {
+  background: var(--accent-bright);
+  color: var(--accent-ink);
+  box-shadow: 0 2px 8px var(--accent-subtle);
+}
+
+.installer-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.installer-win-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.installer-win-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ink-primary);
+}
+
+.installer-win-btn.close:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+/* Main Content Area */
+.installer-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 5;
+  padding: 14px 28px 10px 28px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Step 1: Welcome & Setup Screen */
+.installer-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.installer-logo-wrapper {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.installer-logo-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-bright) 0%, transparent 70%);
+  opacity: 0.45;
+  filter: blur(12px);
+  animation: logo-glow-pulse 3s infinite ease-in-out;
+}
+
+@keyframes logo-glow-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.95); }
+  50% { opacity: 0.6; transform: scale(1.08); }
+}
+
+.installer-logo-img {
+  position: relative;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.installer-hero-text h1 {
+  margin: 0 0 2px 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.installer-version-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(63, 207, 192, 0.15);
+  color: var(--accent-bright);
+  border: 1px solid rgba(63, 207, 192, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.installer-hero-text p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-secondary);
+  line-height: 1.35;
+}
+
+/* Card Plates */
+.installer-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 9px 14px;
+  margin-bottom: 9px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.installer-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.installer-card-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.installer-card-sub {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  font-family: monospace;
+}
+
+.installer-path-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.installer-path-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-family: monospace;
+  font-size: 11.5px;
+  color: var(--ink-primary);
+  outline: none;
+  transition: border-color 180ms ease;
+}
+
+.installer-path-input:focus {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 10px var(--accent-subtle);
+}
+
+.installer-browse-btn {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--ink-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 180ms ease;
+  white-space: nowrap;
+}
+
+.installer-browse-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-bright);
+}
+
+/* Options Rows */
+.installer-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.installer-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 180ms ease;
+}
+
+.installer-option-row:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.installer-option-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.installer-option-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--accent-bright);
+  flex-shrink: 0;
+}
+
+.installer-option-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.installer-option-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.installer-option-desc {
+  font-size: 10.5px;
+  color: var(--ink-secondary);
+}
+
+/* Footer Controls */
+.installer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 28px;
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  z-index: 10;
+}
+
+.installer-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+
+.installer-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.installer-btn-cancel {
+  padding: 0 18px;
+  height: 40px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.installer-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink-primary);
+}
+
+.installer-btn-install {
+  padding: 0 26px;
+  height: 40px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 800;
+  background: var(--accent-bright);
+  color: var(--accent-ink);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 18px var(--accent-subtle), 0 0 14px var(--accent-bright);
+  transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.installer-btn-install:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 24px var(--accent-subtle), 0 0 20px var(--accent-bright);
+}
+
+.installer-btn-install:active {
+  transform: scale(0.97);
+}
+
+/* Step 2: Progress View */
+.installer-progress-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.installer-progress-logo {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
+}
+
+.installer-progress-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin-bottom: 6px;
+}
+
+.installer-progress-status {
+  font-size: 13px;
+  color: var(--accent-bright);
+  font-weight: 700;
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
+.installer-track-outer {
+  width: 100%;
+  max-width: 540px;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.installer-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-bright) 0%, #38E1FF 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 16px var(--accent-bright);
+  transition: width 240ms ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.installer-bar-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: bar-shimmer 1.8s infinite linear;
+}
+
+@keyframes bar-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.installer-percent-label {
+  font-size: 14px;
+  font-weight: 800;
+  font-family: monospace;
+  color: var(--ink-primary);
+  margin-bottom: 18px;
+}
+
+/* Steps checklist during install */
+.installer-steps-checklist {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.installer-step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-secondary);
+  transition: color 200ms ease;
+}
+
+.installer-step-item.active {
+  color: var(--ink-primary);
+  font-weight: 700;
+}
+
+.installer-step-item.done {
+  color: var(--accent-bright);
+}
+
+.installer-step-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--ink-tertiary);
+  flex-shrink: 0;
+}
+
+.installer-step-item.done .installer-step-badge {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+
+.installer-step-item.active .installer-step-badge {
+  border-color: var(--accent-bright);
+  color: var(--accent-bright);
+  animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(63, 207, 192, 0.4); }
+  50% { transform: scale(1.1); box-shadow: 0 0 0 4px rgba(63, 207, 192, 0); }
+}
+
+/* Step 3: Complete View */
+.installer-complete-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.installer-success-emblem {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-bright) 0%, #10b981 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0A4A44;
+  margin-bottom: 20px;
+  box-shadow: 0 0 40px rgba(63, 207, 192, 0.5), 0 0 70px rgba(16, 185, 129, 0.3);
+  animation: pop-bounce 500ms cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+
+@keyframes pop-bounce {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.installer-complete-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin-bottom: 8px;
+}
+
+.installer-complete-sub {
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  max-width: 440px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.installer-launch-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}

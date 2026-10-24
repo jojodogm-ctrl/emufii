@@ -1,0 +1,271 @@
+/* Screen Blooms & Transitions */
+.screen-container {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity var(--spring-enter), transform var(--spring-enter);
+  pointer-events: auto;
+}
+
+.screen.screen-entering {
+  opacity: 0;
+  transform: scale(0.965);
+}
+
+.screen.screen-exiting {
+  opacity: 0;
+  transform: scale(0.965);
+  transition: opacity var(--spring-exit), transform var(--spring-exit);
+  pointer-events: none;
+}
+
+/* Intrinsic Focus Ring - Exactly matching Android Neon Focus */
+*, *::before, *::after {
+  outline: none !important;
+}
+
+button, input, select, textarea {
+  outline: none !important;
+  font-family: inherit;
+}
+
+:focus-visible,
+.focused,
+.plate-button:focus-visible,
+.plate-button.focused {
+  outline: none !important;
+  box-shadow: 0 0 0 2.5px var(--accent-bright), 0 0 18px var(--accent-subtle) !important;
+}
+
+.rom-cell,
+.rom-cell:hover,
+.rom-cell:focus,
+.rom-cell:focus-visible,
+.rom-cell:focus-within,
+.rom-cell.focused,
+.folder-tile,
+.folder-tile:hover,
+.folder-tile:focus,
+.folder-tile:focus-visible,
+.folder-tile:focus-within,
+.folder-tile.focused,
+.carousel-card,
+.carousel-card:hover,
+.carousel-card:focus,
+.carousel-card:focus-visible,
+.carousel-card:focus-within,
+.carousel-card.focused,
+.rom-tile,
+.rom-tile:hover,
+.rom-tile:focus,
+.rom-tile:focus-visible,
+.rom-tile.focused {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.filter-tab:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.filter-tab:focus-visible,
+.filter-tab.focused {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--accent-bright), 0 0 10px var(--accent-subtle) !important;
+}
+
+.filter-tab.active {
+  box-shadow: 0 3px 12px var(--accent-subtle) !important;
+}
+
+.filter-tab.active:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-bright), 0 3px 12px var(--accent-subtle) !important;
+}
+
+/* Plate Press & Hover Motion */
+.plate-button {
+  transition:
+    transform var(--spring-pop),
+    box-shadow var(--spring-morph),
+    background-color var(--spring-tint),
+    border-color var(--spring-tint);
+}
+
+.plate-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.plate-button:active {
+  transform: scale(0.97) translateY(0);
+}
+
+/* Modal and Dialog Top Layer Animations (Compliant with modern-web-guidance) */
+dialog[closedby="any"] {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: auto;
+  outline: none;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 1;
+  transition: opacity var(--spring-enter);
+}
+
+:is(dialog[open]):where(:not([data-closing])) {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity var(--spring-enter), transform var(--spring-enter);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  &::backdrop {
+    opacity: 1;
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+}
+
+dialog[data-closing] {
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity var(--spring-exit), transform var(--spring-exit);
+}
+
+dialog[data-closing]::backdrop {
+  opacity: 0;
+  transition: opacity var(--spring-exit);
+}
+
+/* Animated Tick / Draw */
+@keyframes checkmark-draw {
+  0% {
+    stroke-dashoffset: 48;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.tick-animated path {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: checkmark-draw 340ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+/* Spinner */
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Logo pulse on splash */
+@keyframes logo-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45));
+  }
+  50% {
+    transform: scale(1.035);
+    filter: drop-shadow(0 20px 36px rgba(63, 207, 192, 0.35));
+  }
+}
+
+/* Signal Pips Splash Loading Animation matching SplashScreen.kt */
+.signal-pips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.signal-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--pip-color);
+  opacity: 0.22;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  animation: pip-charge 1.4s infinite ease-in-out alternate;
+}
+
+.signal-pip:nth-child(1) { --pip-color: #EE6FA3; animation-delay: 0s; }
+.signal-pip:nth-child(2) { --pip-color: #CA72BD; animation-delay: 0.28s; }
+.signal-pip:nth-child(3) { --pip-color: #A379D5; animation-delay: 0.56s; }
+.signal-pip:nth-child(4) { --pip-color: #6EB2CD; animation-delay: 0.84s; }
+.signal-pip:nth-child(5) { --pip-color: #3FCFC0; animation-delay: 1.12s; }
+
+@keyframes pip-charge {
+  0%, 15% {
+    opacity: 0.18;
+    transform: scale(0.85);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.28);
+    box-shadow: 0 0 16px var(--pip-color), 0 0 6px var(--pip-color);
+  }
+  85%, 100% {
+    opacity: 0.18;
+    transform: scale(0.85);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--accent-bright);
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+/* Glow Halo */
+.cover-glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: calc(var(--radius-lg) + 12px);
+  opacity: 0;
+  transition: opacity var(--spring-morph);
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(16px);
+}
+
+.rom-tile:hover .cover-glow,
+.rom-tile.focused .cover-glow,
+.carousel-card:hover .cover-glow,
+.carousel-card.active .cover-glow {
+  opacity: 0.75;
+}

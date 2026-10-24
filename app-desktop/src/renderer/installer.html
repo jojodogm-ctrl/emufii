@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emufii Setup</title>
+  <link rel="stylesheet" href="./css/fonts.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/motion.css">
+  <link rel="stylesheet" href="./css/app.css">
+  <link rel="stylesheet" href="./css/installer.css">
+</head>
+<body class="installer-body" data-theme="dark" data-accent="teal">
+  <div class="installer-window" id="installerWindow">
+    <!-- Ambient Dynamic Wave Canvas -->
+    <canvas id="installerBackdropCanvas" class="installer-backdrop"></canvas>
+
+    <!-- Custom Handheld Frameless Titlebar -->
+    <header class="installer-titlebar" id="installerTitlebar">
+      <div class="installer-brand">
+        <img src="./assets/logo.png" alt="Emufii Logo">
+        <span id="titlebarHeading">Emufii Setup</span>
+      </div>
+
+      <div class="installer-titlebar-actions">
+        <!-- Language Switcher Pill -->
+        <div class="installer-lang-switch">
+          <button class="installer-lang-btn active" id="btnLangEs" data-lang="es">ES</button>
+          <button class="installer-lang-btn" id="btnLangEn" data-lang="en">EN</button>
+        </div>
+
+        <!-- Window Controls -->
+        <div class="installer-window-controls">
+          <button class="installer-win-btn" id="btnInstallerMin" title="Minimizar">
+            <svg width="10" height="1" viewBox="0 0 10 1" fill="currentColor"><rect width="10" height="1"/></svg>
+          </button>
+          <button class="installer-win-btn close" id="btnInstallerClose" title="Cerrar">
+            <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.3"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dynamic Stage Container -->
+    <main class="installer-main" id="installerMain">
+      <!-- Injected dynamically via installer.ts -->
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="installer-footer" id="installerFooter">
+      <!-- Injected dynamically based on stage -->
+    </footer>
+  </div>
+
+  <script src="./installer.js" type="module"></script>
+</body>
+</html>

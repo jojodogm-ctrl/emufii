@@ -1,0 +1,166 @@
+:root {
+  /* Default Typography (matching Rounded M+ from app-android) */
+  --font-family: 'Rounded Mplus', 'Rounded Mplus 1c', sans-serif;
+
+  /* Accent: Teal (Emufii signature matching TealCuts from app-android) */
+  --accent-bright: #3FCFC0;
+  --accent-deep: #0E9C8F;
+  --accent-ink: #0A4A44;
+  --accent-subtle: rgba(63, 207, 192, 0.20);
+  --accent-dark-bright: #5CE0D2;
+
+  /* Console Badge / Silhouette Accent Colors */
+  --color-3ds: #D12229;
+  --color-psp: #003791;
+  --color-ds: #5E6D82;
+  --color-switch: #E60012;
+  --color-gamecube: #6246EA;
+  --color-wii: #009AC7;
+  --color-ps2: #002E7A;
+
+  /* Status / Ratings matching Color.kt Good, Warn, Error */
+  --compat-perfect: #1FA98B;
+  --compat-good: #F59E0B;
+  --compat-partial: #C98A12;
+  --compat-broken: #E5604F;
+  --compat-untested: #6E6475;
+
+  /* Corner Radii - Exactly matching Shapes.kt */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-inset: 14px; /* InsetShape */
+  --radius-art: 16px;   /* ArtworkShape */
+  --radius-tile: 20px;  /* TileShape */
+  --radius-card: 28px;  /* CardCorner */
+  --radius-pill: 9999px;/* PillShape */
+
+  /* Springs and timings from Motion.kt */
+  --spring-morph: 380ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring-enter: 320ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  --spring-exit: 220ms cubic-bezier(0.3, 0, 0.8, 0.15);
+  --spring-pop: 340ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-cursor: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-tint: 260ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Light Theme (matching ShellLight #F1EFEA and PlateLight #FFFFFF from app-android) */
+body[data-theme="light"],
+body[data-theme="day"] {
+  --bg-floor: #F1EFEA;
+  --bg-floor-low: #E2DFD7;
+  --bg-shelf: #E2DFD7;
+  --bg-inset: #D9D6CE;
+  --plate-bg: rgba(255, 255, 255, 0.90);
+  --plate-bg-low: rgba(247, 245, 241, 0.85);
+  --plate-border: rgba(36, 22, 16, 0.08);
+  --plate-bevel: rgba(255, 255, 255, 0.9);
+  --ink-primary: #221B26;
+  --ink-secondary: #6E6475;
+  --ink-tertiary: #655B6E;
+  --shadow-spot: 0 16px 40px -12px rgba(36, 22, 16, 0.14);
+  --shadow-ambient: 0 4px 16px rgba(36, 22, 16, 0.06);
+  --shadow-lift: 0 8px 24px rgba(36, 22, 16, 0.10);
+  --header-glass: rgba(241, 239, 234, 0.75);
+  background-color: #F1EFEA;
+}
+
+/* Dark Theme (matching ShellDark #120F1D and PlateDark #272238 from app-android) */
+body[data-theme="dark"],
+body[data-theme="night"],
+body:not([data-theme]) {
+  --bg-floor: #120F1D;
+  --bg-floor-low: #090711;
+  --bg-shelf: #090711;
+  --bg-inset: #090711;
+  --plate-bg: rgba(39, 34, 56, 0.75);
+  --plate-bg-low: rgba(28, 25, 41, 0.70);
+  --plate-border: rgba(255, 255, 255, 0.08);
+  --plate-bevel: rgba(255, 255, 255, 0.06);
+  --ink-primary: #F0EAF5;
+  --ink-secondary: #9B93AC;
+  --ink-tertiary: #8C84A0;
+  --shadow-spot: 0 20px 50px -15px rgba(9, 7, 17, 0.60);
+  --shadow-ambient: 0 6px 20px rgba(9, 7, 17, 0.35);
+  --shadow-lift: 0 10px 24px rgba(9, 7, 17, 0.45);
+  --header-glass: rgba(18, 15, 29, 0.75);
+  background-color: #120F1D;
+}
+
+/* OLED Theme (ShellOled #000000, PlateOled #16131F) */
+body[data-theme="oled"] {
+  --bg-floor: #000000;
+  --bg-floor-low: #000000;
+  --bg-shelf: #000000;
+  --bg-inset: #000000;
+  --plate-bg: #16131F;
+  --plate-bg-low: #0F0D17;
+  --plate-border: rgba(255, 255, 255, 0.14);
+  --plate-bevel: rgba(255, 255, 255, 0.08);
+  --ink-primary: #FFFFFF;
+  --ink-secondary: #9B93AC;
+  --ink-tertiary: #8C84A0;
+  --shadow-spot: none;
+  --shadow-ambient: none;
+  --shadow-lift: 0 0 0 1.5px var(--accent-bright);
+  --header-glass: rgba(0, 0, 0, 0.85);
+  background-image:
+    radial-gradient(circle at 5% -5%, rgba(238, 111, 163, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 95% 105%, rgba(63, 207, 192, 0.09) 0%, transparent 45%);
+}
+
+/* Accent Variations (Matching CoralCuts and color variants) */
+body[data-accent="teal"], body:not([data-accent]) {
+  --accent-bright: #3FCFC0;
+  --accent-deep: #0E9C8F;
+  --accent-ink: #0A4A44;
+  --accent-subtle: rgba(63, 207, 192, 0.20);
+}
+
+body[data-accent="coral"] {
+  --accent-bright: #EE6FA3;
+  --accent-deep: #C24B7E;
+  --accent-ink: #5A1D3E;
+  --accent-subtle: rgba(238, 111, 163, 0.20);
+}
+
+body[data-accent="cyan"] {
+  --accent-bright: #38E1FF;
+  --accent-deep: #00829B;
+  --accent-ink: #002D37;
+  --accent-subtle: rgba(56, 225, 255, 0.18);
+}
+
+body[data-accent="purple"] {
+  --accent-bright: #8E93EC;
+  --accent-deep: #6B72E0;
+  --accent-ink: #1F2356;
+  --accent-subtle: rgba(142, 147, 236, 0.20);
+}
+
+body[data-accent="green"] {
+  --accent-bright: #3BC4A6;
+  --accent-deep: #1FA98B;
+  --accent-ink: #04241C;
+  --accent-subtle: rgba(59, 196, 166, 0.20);
+}
+
+body[data-accent="yellow"] {
+  --accent-bright: #E3A83C;
+  --accent-deep: #C98A12;
+  --accent-ink: #332000;
+  --accent-subtle: rgba(227, 168, 60, 0.20);
+}
+
+body[data-accent="red"] {
+  --accent-bright: #F0796A;
+  --accent-deep: #E5604F;
+  --accent-ink: #2B0805;
+  --accent-subtle: rgba(240, 121, 106, 0.20);
+}
+
+body[data-accent="blue"] {
+  --accent-bright: #82AFE6;
+  --accent-deep: #5A8FD8;
+  --accent-ink: #0F2344;
+  --accent-subtle: rgba(130, 175, 230, 0.20);
+}

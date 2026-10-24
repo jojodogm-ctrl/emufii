@@ -1,0 +1,32 @@
+{
+  "name": "emufii",
+  "version": "2.0.4",
+  "description": "Play your emulators online with friends, using a six-character code",
+  "type": "module",
+  "main": "dist/main/index.cjs",
+  "author": "Emufii contributors <support@emufii.eu>",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jojodogm-ctrl/emufii"
+  },
+  "scripts": {
+    "build:main": "esbuild src/main/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/main/index.cjs --external:electron",
+    "build:preload": "esbuild src/preload/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/preload/index.cjs --external:electron",
+    "build:renderer": "node scripts/build-renderer.js",
+    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
+    "start": "npm run build && electron .",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:all": "npm run build && electron-builder -mwl --x64 --arm64",
+    "dist:linux": "npm run build && electron-builder --linux --x64 --arm64",
+    "dist:win": "npm run build && electron-builder --win --x64 --arm64",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --arm64"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.2"
+  }
+}

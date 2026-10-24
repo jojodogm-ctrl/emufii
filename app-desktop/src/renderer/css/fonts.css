@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'Rounded Mplus';
+  src: url('../assets/fonts/rounded_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rounded Mplus';
+  src: url('../assets/fonts/rounded_medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rounded Mplus';
+  src: url('../assets/fonts/rounded_bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rounded Mplus';
+  src: url('../assets/fonts/rounded_bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rounded Mplus';
+  src: url('../assets/fonts/rounded_extrabold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rounded Mplus';
+  src: url('../assets/fonts/rounded_black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}

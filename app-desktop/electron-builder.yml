@@ -1,0 +1,78 @@
+appId: eu.emufii.desktop
+productName: Emufii
+copyright: Copyright © 2026 Emufii contributors
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - "dist/**/*"
+  - "package.json"
+
+extraResources:
+  - from: "src/renderer/assets/ps2/emufii-ps2-net.ps2"
+    to: "ps2/emufii-ps2-net.ps2"
+
+linux:
+  maintainer: "Emufii Contributors <support@emufii.eu>"
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
+    - target: deb
+      arch:
+        - x64
+        - arm64
+    - target: tar.gz
+      arch:
+        - x64
+        - arm64
+  category: Game
+  icon: build/icon.png
+  desktop:
+    Name: Emufii
+    Comment: Play your emulators online with friends
+    Categories: Game;Emulator;Network;
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - arm64
+    - target: portable
+      arch:
+        - x64
+        - arm64
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeader: build/installerHeader.bmp
+  installerSidebar: build/installerSidebar.bmp
+  uninstallerSidebar: build/uninstallerSidebar.bmp
+  installerHeaderIcon: build/icon.ico
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+        - universal
+    - target: zip
+      arch:
+        - x64
+        - arm64
+        - universal
+  category: public.app-category.games
+  icon: build/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
