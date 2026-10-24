@@ -29,8 +29,10 @@ fun SecondScreenHost(enabled: Boolean) {
     val display by rememberPresentationDisplay()
     val foreground by AppForeground.visible.collectAsStateWithLifecycle()
     val model by SecondScreen.model.collectAsStateWithLifecycle()
+    val hleActive by eu.emufii.dshle.DsHleRuntime.active.collectAsStateWithLifecycle()
+    val silverActive by eu.emufii.dsnemul.DsNemulRuntime.active.collectAsStateWithLifecycle()
 
-    val wanted = secondScreenWanted(enabled, foreground, model)
+    val wanted = !hleActive && !silverActive && secondScreenWanted(enabled, foreground, model)
 
     // Setting off, app left, or panel gone must take the window down alike.
     DisposableEffect(display, wanted) {

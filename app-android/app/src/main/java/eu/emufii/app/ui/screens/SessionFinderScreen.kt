@@ -123,7 +123,7 @@ fun SessionFinderScreen(
         val q = query.trim()
         if (q.isBlank()) sessions
         else sessions.filter {
-            listOfNotNull(it.romTitle, it.hostName, it.code)
+            listOfNotNull(it.romTitle, it.hostName, it.code, it.native?.roomCode)
                 .any { field -> field.contains(q, ignoreCase = true) }
         }
     }
@@ -262,8 +262,8 @@ private fun SessionCard(
     val host = session.hostName?.let { playerDisplayName(it) }
         ?: stringResource(R.string.finder_host)
 
-    val ps2Blocked = rom?.console == Console.PS2 && !rememberPs2Ready()
-    val pspBlocked = rom?.console == Console.PSP && !rememberPpssppReady()
+    val ps2Blocked = session.ds == null && session.native == null && rom?.console == Console.PS2 && !rememberPs2Ready()
+    val pspBlocked = session.ds == null && session.native == null && rom?.console == Console.PSP && !rememberPpssppReady()
     val joinBlocked = ps2Blocked || pspBlocked
 
     SoftCard(onClick = onJoin, modifier = modifier) {
@@ -294,10 +294,17 @@ private fun SessionCard(
                     rom?.let { MetaChip(it.console.label) }
                     (rom?.titleIdHex ?: rom?.productCode)?.let { MetaChip(it) }
                     MetaChip(session.code, highlight = true)
+                    session.native?.let { native ->
+                        MetaChip("DSi / DSPico")
+                        MetaChip(native.roomCode, highlight = true)
+                    }
+                    session.ds?.let { MetaChip(stringResource(if (it.mode == eu.emufii.app.ds.DsTier.GOLD)
+                        R.string.ds_gold else R.string.ds_silver)) }
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "$host · ${playersLabel(session.players)}",
+                    session.native?.let { "$host · ${it.players}/${it.maxPlayers} · ${it.phase.label}" }
+                        ?: "$host · ${playersLabel(session.players)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -309,7 +316,9 @@ private fun SessionCard(
                 modifier = Modifier.defaultMinSize(minHeight = 36.dp),
                 contentAlignment = Alignment.Center
             ) {
-                if (session.ready && !joinBlocked) {
+                if (session.native != null) {
+                    GhostButton(label = "Voir le salon DSi", onClick = onJoin)
+                } else if ((session.ready || session.ds != null) && !joinBlocked) {
                     GhostButton(
                         label = stringResource(R.string.finder_join),
                         onClick = onJoin

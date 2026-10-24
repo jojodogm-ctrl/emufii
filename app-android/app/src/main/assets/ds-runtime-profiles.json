@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "protocol": "emufii-ds-session-v1",
+  "profiles": [
+    {
+      "gameId": "mpds",
+      "title": "Mario Party DS",
+      "productCode": "A8TE",
+      "profileId": "mpds-us-debugmenu-room-v1",
+      "pipeline": "mpds-us-debugmenu-room-p4-v2",
+      "romSha256": "07b4ac7550e5ed876dd83578d49441712bbbd8127cdd60155e4d1a87604a5af7",
+      "profileFingerprint": "370383c764f93960d9ed2438cb0dce77711c610716583c651a18aa0f445e9509",
+      "players": [
+        2,
+        3,
+        4
+      ],
+      "runtimeVersion": "android-hle-81a4372b6e559756",
+      "canonicalRomSha256": "07b4ac7550e5ed876dd83578d49441712bbbd8127cdd60155e4d1a87604a5af7",
+      "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
+    },
+    {
+      "gameId": "mpds",
+      "title": "Mario Party DS",
+      "productCode": "A8TE",
+      "profileId": "mpds-us-debugmenu-room-v1",
+      "pipeline": "mpds-us-debugmenu-room-p4-v2",
+      "romSha256": "28ce638914e3304eab95167cd17dc1ef893d226c18f9395683d5cbdf2e35ee2f",
+      "profileFingerprint": "370383c764f93960d9ed2438cb0dce77711c610716583c651a18aa0f445e9509",
+      "players": [
+        2,
+        3,
+        4
+      ],
+      "runtimeVersion": "android-hle-81a4372b6e559756",
+      "canonicalRomSha256": "07b4ac7550e5ed876dd83578d49441712bbbd8127cdd60155e4d1a87604a5af7",
+      "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
+    },
+    {
+      "gameId": "mkds",
+      "title": "Mario Kart DS",
+      "productCode": "AMCE",
+      "profileId": "mkds-us-authority-v1",
+      "pipeline": "mkds-authority-menu-p8-q64-pair-v1",
+      "romSha256": "0ea8a91a0ae3e9db26337c25a6a8568f6737fa36c1e0761988c0fa0ecbf210ed",
+      "profileFingerprint": "5f713074d37ca34db790220d44b143b8ec80d5bd5833dbde43831770d0a859a5",
+      "players": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "runtimeVersion": "android-hle-81a4372b6e559756",
+      "canonicalRomSha256": "0ea8a91a0ae3e9db26337c25a6a8568f6737fa36c1e0761988c0fa0ecbf210ed",
+      "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
+    },
+    {
+      "gameId": "dkr",
+      "title": "Diddy Kong Racing DS",
+      "productCode": "AWDP",
+      "profileId": "dkr-eu-sdk-room-v1",
+      "pipeline": "dkr-awdp-sdk3-room-v1",
+      "romSha256": "c29bb5a082bc4c8507e08f7ab6fcb2ef825ba079897e32f487c872172cc9946d",
+      "profileFingerprint": "271abc2a973c7b5e6a98bd521831da678d46580f89aa4bd4283306ccfba6863f",
+      "players": [
+        2
+      ],
+      "runtimeVersion": "android-hle-81a4372b6e559756",
+      "canonicalRomSha256": "c29bb5a082bc4c8507e08f7ab6fcb2ef825ba079897e32f487c872172cc9946d",
+      "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
+    },
+    {
+      "gameId": "experimental",
+      "title": "Mario Slam Basketball — HLE SDK (test)",
+      "productCode": "AB3P",
+      "profileId": "experimental-sdk-room-v2",
+      "pipeline": "experimental-wm-freedownload-v2",
+      "romSha256": "ca4242d7f88a4b8c4c84e28adcebb3ff558e11863c31d3e83c848a4a230715dc",
+      "profileFingerprint": "f9f5b6961222245fc5f59de79c49409379455ee7dacba9e14ac1a42e3f4644b1",
+      "players": [
+        2
+      ],
+      "runtimeVersion": "android-hle-81a4372b6e559756",
+      "canonicalRomSha256": "ca4242d7f88a4b8c4c84e28adcebb3ff558e11863c31d3e83c848a4a230715dc",
+      "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
+    }
+  ],
+  "silver": {
+    "available": true,
+    "maxPlayers": 4,
+    "runtimeVersion": "android-nemul-ca43f8efdeeccd19",
+    "runtimeSha256": "ca43f8efdeeccd19e0a17e4e801feb046b232ea277b20f5066d4ac8ae70a0fdf",
+    "protocol": "emufii-ds-session-v1"
+  }
+}

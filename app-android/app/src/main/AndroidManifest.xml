@@ -25,6 +25,12 @@
         <package android:name="me.magnum.melondualds" />
         <package android:name="me.magnum.melondualds.dev" />
         <package android:name="me.magnum.melondualds.emufii" />
+        <!-- N Emul beta has a separate relay and join flow. -->
+        <package android:name="com.mpds.nemul" />
+        <!-- Production One Tap Party owns its HLE room and native runtime. -->
+        <package android:name="com.mpds.online.singleowner.dev" />
+        <!-- Private diagnostics retain the pinned public native libraries in a separate package. -->
+        <package android:name="com.mpds.online.singleowner.emufii.metrics" />
         <package android:name="dev.eden.eden_emulator" />
         <package android:name="dev.eden.eden_emulator.nightly" />
         <!-- "Eden Optimized" ships under this package name. -->

@@ -187,7 +187,7 @@ internal fun RomTile(
                 .gamepadClick(interaction, onClick = onClick)
         ) {
             val rating = LocalCompatDb.current.ratingFor(rom.compatKeys())?.rating
-            val broken = rating == CompatRating.BROKEN
+            val broken = rating == CompatRating.BROKEN && rom.console != eu.emufii.app.library.Console.DS
             if (art.model != null) {
                 AsyncImage(
                     colorFilter = if (broken) GreyedOut else null,
@@ -230,7 +230,9 @@ internal fun RomTile(
                     .padding(BADGE_INSET)
             )
 
-            rating?.takeIf { !broken }?.let { verdict ->
+            if (rom.console == eu.emufii.app.library.Console.DS) {
+                eu.emufii.app.ds.DsTierBadge(rom, Modifier.align(Alignment.BottomStart).padding(BADGE_INSET))
+            } else rating?.takeIf { !broken }?.let { verdict ->
                 CompatBadge(
                     rating = verdict,
                     modifier = Modifier

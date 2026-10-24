@@ -1,4 +1,11 @@
 pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "com.android.library") {
+                useModule("com.android.tools.build:gradle:${requested.version ?: "9.3.1"}")
+            }
+        }
+    }
     repositories {
         google {
             content {
@@ -24,3 +31,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Emufii"
 include(":app")
+include(":ds-hle-runtime")
+include(":ds-nemul-runtime")

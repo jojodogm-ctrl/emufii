@@ -3,6 +3,7 @@ package eu.emufii.app.netplay
 import eu.emufii.app.dolphin.DolphinTarget
 import eu.emufii.app.ps2.Ps2Target
 import eu.emufii.app.wfc.MelonDsPackage
+import eu.emufii.app.nemul.NemulPackage
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -140,5 +141,6 @@ class PackageVisibilityTest {
         for (pkg in MelonDsPackage.candidates) {
             assertTrue(pkg, manifest.contains("""android:name="$pkg""""))
         }
+        assertTrue(NemulPackage.BETA, manifest.contains("""android:name="${NemulPackage.BETA}""""))
     }
 }

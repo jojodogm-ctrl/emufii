@@ -15,6 +15,10 @@ import okio.Path.Companion.toOkioPath
 class EmufiiApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
+        // Native round processes own only their game service. UI caches and
+        // profile state belong to the application's main process.
+        if (Application.getProcessName() != packageName) return
+        eu.emufii.app.notify.AppForeground.install(this)
         CrashLogger.initialize(this)
         eu.emufii.app.network.RelayRegions.init(this)
         eu.emufii.app.network.CoordinatorClient.identityKey =

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0E0F1A">
+
+    <!-- ===== the game (under the lobby overlay) ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- top bar: just the fps/status now (no ROM picker — this is a join-only client) -->
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:textColor="#8A8DA8"
+            android:textSize="12sp"
+            android:text="" />
+
+        <!-- the dual screen -->
+        <com.mpds.online.DsView
+            android:id="@+id/dsView"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- on-screen controls (hidden on dual-screen devices; physical buttons drive it) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/controlsRoot"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <Button android:id="@+id/btnUp"    style="@style/Dpad" android:text="▲" />
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <Button android:id="@+id/btnLeft"  style="@style/Dpad" android:text="◀" />
+                    <Space android:layout_width="48dp" android:layout_height="48dp" />
+                    <Button android:id="@+id/btnRight" style="@style/Dpad" android:text="▶" />
+                </LinearLayout>
+                <Button android:id="@+id/btnDown"  style="@style/Dpad" android:text="▼" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <Button android:id="@+id/btnL" style="@style/Face" android:text="L" />
+                    <Button android:id="@+id/btnR" style="@style/Face" android:text="R" />
+                </LinearLayout>
+                <Button android:id="@+id/btnSelect" style="@style/Face" android:text="SEL" />
+                <Button android:id="@+id/btnStart"  style="@style/Face" android:text="START" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                <Button android:id="@+id/btnX" style="@style/Dpad" android:text="X" />
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <Button android:id="@+id/btnY" style="@style/Dpad" android:text="Y" />
+                    <Space android:layout_width="48dp" android:layout_height="48dp" />
+                    <Button android:id="@+id/btnA" style="@style/Dpad" android:text="A" />
+                </LinearLayout>
+                <Button android:id="@+id/btnB" style="@style/Dpad" android:text="B" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ===== the lobby overlay (name + room code, like the Windows/Mac clients) ===== -->
+    <ScrollView
+        android:id="@+id/lobbyRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0E0F1A"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="28dp"
+            android:paddingVertical="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EMUFII DS"
+                android:textColor="#FF5C8A"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.18" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="12dp"
+                android:text="SALON DS"
+                android:textColor="#8A8DA8"
+                android:textSize="13sp"
+                android:letterSpacing="0.05" />
+
+            <TextView
+                android:id="@+id/joinedRoomCode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="48sp"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/joinedRoster"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="12dp"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:textColor="#B9B5A3"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <TextView android:id="@+id/nameLabel" style="@style/LobbyLabel" android:text="VOTRE NOM" />
+            <EditText
+                android:id="@+id/nameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/lobby_field"
+                android:paddingHorizontal="18dp"
+                android:paddingVertical="10dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Entrez votre nom"
+                android:textColorHint="#4A4D68"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:maxLength="10"
+                android:inputType="textPersonName|textCapWords"
+                android:imeOptions="actionNext"
+                android:singleLine="true" />
+
+            <TextView android:id="@+id/codeLabel" style="@style/LobbyLabel" android:text="CODE DU SALON" />
+            <EditText
+                android:id="@+id/codeInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/lobby_field"
+                android:paddingHorizontal="18dp"
+                android:paddingVertical="10dp"
+                android:layout_marginBottom="12dp"
+                android:hint="ABCD"
+                android:textColorHint="#4A4D68"
+                android:textColor="#FF8A5C"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.32"
+                android:gravity="center"
+                android:fontFamily="monospace"
+                android:maxLength="7"
+                android:inputType="textCapCharacters|textNoSuggestions"
+                android:imeOptions="actionGo"
+                android:singleLine="true" />
+
+            <Button
+                android:id="@+id/joinButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/lobby_button"
+                android:paddingVertical="16dp"
+                android:text="REJOINDRE"
+                android:textColor="#0E0F1A"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:stateListAnimator="@null" />
+
+            <TextView
+                android:id="@+id/lobbyStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Entrez votre nom et le code du salon."
+                android:textColor="#8A8DA8"
+                android:textSize="14sp"
+                android:lineSpacingExtra="3dp" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

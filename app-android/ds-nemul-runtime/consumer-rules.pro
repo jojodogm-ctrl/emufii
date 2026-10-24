@@ -1,0 +1,1 @@
+-keep class eu.emufii.dsnemul.NemulNative { *; }

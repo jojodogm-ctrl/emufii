@@ -9,6 +9,8 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import eu.emufii.app.profile.Profile
+import eu.emufii.app.ds.DsSessionSpec
+import eu.emufii.app.nativeds.NativeDsRoom
 
 const val COORDINATOR_BASE_URL: String = BuildConfig.COORDINATOR_BASE_URL
 
@@ -16,7 +18,9 @@ data class CreatedSession(
     val code: String,
     val subnet: String,
     val token: String,
-    val room: RoomRef? = null
+    val room: RoomRef? = null,
+    val ds: DsSessionSpec? = null,
+    val memberToken: String? = null
 )
 
 sealed class CoordinatorError(message: String) : Exception(message) {
@@ -56,7 +60,10 @@ data class RemoteSession(
     val romHash: String?,
     /** True when missing, so an old coordinator does not block every guest. */
     val hostReady: Boolean,
-    val members: List<Member>
+    val members: List<Member>,
+    val ds: DsSessionSpec? = null,
+    val dsRuntime: JSONObject? = null,
+    val native: NativeDsRoom? = null
 )
 
 data class FriendsReply(
@@ -74,7 +81,9 @@ data class FriendPresence(
     val romTitle: String?,
     val romTitleId: String?,
     val players: Int,
-    val ready: Boolean
+    val ready: Boolean,
+    val ds: DsSessionSpec? = null,
+    val native: NativeDsRoom? = null
 )
 
 data class OpenSession(
@@ -84,7 +93,9 @@ data class OpenSession(
     val hostName: String?,
     val players: Int,
     val ready: Boolean,
-    val ageSeconds: Int
+    val ageSeconds: Int,
+    val ds: DsSessionSpec? = null,
+    val native: NativeDsRoom? = null
 )
 
 class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
@@ -107,7 +118,8 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
         region: String? = null,
         /** Handed to guests, who warn when theirs differs. */
         emulatorVersion: String? = null,
-        romHash: String? = null
+        romHash: String? = null,
+        ds: DsSessionSpec? = null
     ): Result<CreatedSession> = request(
         path = "/sessions",
         method = "POST",
@@ -125,15 +137,18 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             if (region != null) put("region", region)
             if (emulatorVersion != null) put("emulator_version", emulatorVersion)
             if (romHash != null) put("rom_hash", romHash)
+            ds?.let { put("transport", it.transport); put("ds", it.toJson()) }
         },
         readTimeout = 15_000
     ).mapCatching { text ->
         val json = JSONObject(text)
         CreatedSession(
             json.getString("code"),
-            json.getString("subnet"),
+            json.stringOrNull("subnet").orEmpty(),
             json.optString("token"),
-            json.roomOrNull()
+            json.roomOrNull(),
+            json.dsOrNull(),
+            json.stringOrNull("member_token")
         )
     }
 
@@ -168,7 +183,7 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             val json = JSONObject(text)
             RemoteSession(
                 code = json.getString("code"),
-                subnet = json.getString("subnet"),
+                subnet = json.stringOrNull("subnet").orEmpty(),
                 hostIp = json.stringOrNull("host_ip"),
                 port = json.intOrNull("port"),
                 romTitleId = json.stringOrNull("rom_title_id"),
@@ -185,9 +200,29 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                         forSeconds = m.optInt("for_s", 0),
                         avatar = m.stringOrNull("avatar")
                     )
-                }
+                },
+                ds = json.dsOrNull(),
+                dsRuntime = json.optJSONObject("runtime"),
+                native = json.nativeOrNull()
             )
         }
+
+    /** Signed control-plane requests for the embedded DS runtime. The shared
+     * client signature is combined with profile ownership or a session Bearer.
+     * Binary preparations are bounded by the expected length at the call site. */
+    suspend fun dsRequest(
+        path: String,
+        method: String,
+        body: JSONObject? = null,
+        bearer: String? = null,
+        maxBytes: Int = 64 * 1024,
+        readTimeout: Int = 15_000,
+    ): Result<ByteArray> {
+        require(path.matches(Regex("/sessions/[A-Z0-9-]{3,16}/ds/[A-Za-z0-9/_-]+")))
+        require(method in setOf("GET", "POST", "DELETE"))
+        require(maxBytes in 0..(256 * 1024 * 1024))
+        return requestBytes(path, method, body, readTimeout, bearer, maxBytes)
+    }
 
     /** The regions a session can be placed in. A coordinator from before regions answers 404. */
     suspend fun listRelays(): Result<List<RelayRegion>> =
@@ -207,7 +242,9 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                     hostName = s.stringOrNull("host_name"),
                     players = s.optInt("players", 0),
                     ready = s.optBoolean("ready", false),
-                    ageSeconds = s.optInt("age_s", 0)
+                    ageSeconds = s.optInt("age_s", 0),
+                    ds = s.dsOrNull(),
+                    native = s.nativeOrNull()
                 )
             }
         }
@@ -326,7 +363,9 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
                     romTitle = session?.stringOrNull("rom_title"),
                     romTitleId = session?.stringOrNull("rom_title_id"),
                     players = session?.optInt("players", 0) ?: 0,
-                    ready = session?.optBoolean("ready", false) ?: false
+                    ready = session?.optBoolean("ready", false) ?: false,
+                    ds = session?.dsOrNull(),
+                    native = session?.nativeOrNull()
                 )
             }.toMap()
             // Absent from older coordinators.
@@ -420,6 +459,9 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
             val payload = body?.toString()
             val conn = (URL("$baseUrl$path").openConnection() as HttpURLConnection).apply {
                 requestMethod = method
+                // Explicit typed-discovery opt-in preserves older APK directories.
+                setRequestProperty(NativeDsRoom.DISCOVERY_HEADER, "1")
+                instanceFollowRedirects = false
                 connectTimeout = 4000
                 this.readTimeout = readTimeout
                 if (body != null) {
@@ -464,6 +506,20 @@ class CoordinatorClient(private val baseUrl: String = COORDINATOR_BASE_URL) {
 
     private fun JSONObject.stringOrNull(key: String): String? =
         if (has(key) && !isNull(key)) getString(key) else null
+
+    private fun JSONObject.nativeOrNull(): NativeDsRoom? = NativeDsRoom.fromSession(this)
+
+    private fun JSONObject.dsOrNull(): DsSessionSpec? {
+        if (nativeOrNull() != null) return null
+        val transport = stringOrNull("transport")
+        if (transport == null || transport == "wireguard") {
+            require(!has("ds") || isNull("ds")) { "unexpected DS descriptor" }
+            return null
+        }
+        return requireNotNull(DsSessionSpec.parse(transport, getJSONObject("ds"))) {
+            "unsupported DS session descriptor"
+        }
+    }
 
     private fun JSONObject.roomOrNull(): RoomRef? {
         val r = optJSONObject("room") ?: return null

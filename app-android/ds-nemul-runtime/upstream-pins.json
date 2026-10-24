@@ -1,0 +1,16 @@
+{
+  "runtimeVersion": "android-nemul-ca43f8efdeeccd19",
+  "sourceRevision": "41f251bffae81e65fcb86a9f2f21d761ea9067b3",
+  "sourceArchive": "downloads/nemul-41f251bf/Nemul.apk",
+  "sourceApkSha256": "f49d1055311572b9bcd1a59bf6543bf57d9898ce60e1589ca7f3b102539eb091",
+  "abi": "arm64-v8a",
+  "engineLibrary": "libmpdsprobe.so",
+  "engineSha256": "ca43f8efdeeccd19e0a17e4e801feb046b232ea277b20f5066d4ac8ae70a0fdf",
+  "cxxSharedSha256": "83269b3124a287fac36b17c9fb64beb398c83dad6677b19ce63cf80d09966fd7",
+  "players": { "min": 2, "max": 4 },
+  "consolesPerDevice": "players",
+  "mode": "generic-direct-boot",
+  "externalWire": "emufii-silver-udp-v1",
+  "upstreamWire": "native UDP MRJN / packed little-endian input-window v41f251bf",
+  "engineSourceEdited": false
+}

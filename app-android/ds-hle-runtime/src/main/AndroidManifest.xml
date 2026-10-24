@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <application>
+        <!-- Native teardown kills this process, never Emufii's UI process. -->
+        <service android:name="com.mpds.online.RoomEngineService"
+            android:exported="false" android:process=":round" />
+        <activity android:name="com.mpds.online.HleGameActivity"
+            android:exported="false" android:launchMode="singleTop"
+            android:theme="@style/HleRuntimeTheme"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard|navigation|uiMode|density"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name="com.mpds.online.BottomScreenActivity"
+            android:exported="false" android:launchMode="singleTop"
+            android:excludeFromRecents="true" android:theme="@style/HleRuntimeTheme"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard|navigation|uiMode|density"
+            android:screenOrientation="landscape" />
+    </application>
+</manifest>

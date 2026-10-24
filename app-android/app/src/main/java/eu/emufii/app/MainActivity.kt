@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        AppForeground.set(true)
         Notifications.PendingOpen.offer(intent)
     }
 
@@ -52,7 +51,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        AppForeground.set(false)
     }
 
     override fun onStart() {

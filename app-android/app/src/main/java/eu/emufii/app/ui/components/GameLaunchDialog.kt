@@ -164,6 +164,8 @@ fun GameLaunchDialog(
     onPrimary: (private: Boolean) -> Unit,
     onJoinWithCode: (() -> Unit)?,
     onPlayOnline: (() -> Unit)? = null,
+    onJoinNemul: (() -> Unit)? = null,
+    onOneTap: (() -> Unit)? = null,
 ) {
     val dark = LocalEmufiiDarkTheme.current
     var starting by remember { mutableStateOf(false) }
@@ -219,12 +221,12 @@ fun GameLaunchDialog(
     }
     val modeVerdict = if (publicMode) onlineVerdict else wirelessVerdict
     val compat = listed?.let { entry -> modeVerdict?.let { entry.copy(rating = it) } ?: entry }
-    val incompatible = compat?.rating == CompatRating.BROKEN ||
+    val incompatible = (compat?.rating == CompatRating.BROKEN && !(rom.console == Console.DS && !publicMode)) ||
         publicMode && rom.console == Console.PS2 && !ps2Served
     // Broken in this mode only: name the mode that works instead of calling the game incompatible.
     val otherModeWorks = hasModes && incompatible &&
         (if (publicMode) wirelessVerdict else onlineVerdict).let { it != null && it != CompatRating.BROKEN }
-    val dsEditionMissing = rom.console == Console.DS && !publicMode && !rememberDsEditionPicked()
+    val dsEditionMissing = false // Local DS now runs in the embedded GOLD/SILVER modules.
     val setupBlocked = ps2Blocked || pspBlocked || incompatible || dsEditionMissing
 
     LaunchedEffect(starting) {
@@ -390,6 +392,9 @@ fun GameLaunchDialog(
             )
 
 
+            if (rom.console == Console.DS && !publicMode) {
+                eu.emufii.app.ds.DsTierBadge(rom, Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
+            }
             if (wide) {
                 Row(
                     modifier = Modifier
@@ -419,7 +424,8 @@ fun GameLaunchDialog(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .align(Alignment.CenterVertically),
+                            .align(Alignment.CenterVertically)
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(18.dp)
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -530,6 +536,16 @@ fun GameLaunchDialog(
                         }
                         }
                         }
+                        onJoinNemul?.let {
+                            NemulJoinAction(
+                                enabled = !starting,
+                                onClick = it,
+                                modifier = if (setupBlocked) Modifier.focusRequester(firstAction) else Modifier
+                            )
+                        }
+                        onOneTap?.let {
+                            OneTapAction(enabled = !starting, onClick = it)
+                        }
                     }
                 }
                 return@SoftCard
@@ -635,6 +651,17 @@ fun GameLaunchDialog(
                         ) { Text(stringResource(R.string.lib_join_by_code)) }
                     }
                 }
+                onJoinNemul?.let {
+                    NemulJoinAction(
+                        enabled = !starting,
+                        onClick = it,
+                        modifier = Modifier.padding(top = gap)
+                            .then(if (setupBlocked) Modifier.focusRequester(firstAction) else Modifier)
+                    )
+                }
+                onOneTap?.let {
+                    OneTapAction(enabled = !starting, onClick = it, modifier = Modifier.padding(top = gap))
+                }
                 }
 
             }
@@ -644,6 +671,26 @@ fun GameLaunchDialog(
 }
 
 private const val START_PAUSE_MS = 350L
+
+@Composable
+private fun OneTapAction(enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    OutlinedButton(onClick = sounded(onClick), enabled = enabled, shape = PillShape,
+        modifier = modifier.fillMaxWidth().heightIn(min = 48.dp).controlRing(PillShape)) {
+        Text(stringResource(R.string.one_tap_action))
+    }
+}
+
+@Composable
+private fun NemulJoinAction(enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    OutlinedButton(
+        onClick = sounded(onClick),
+        enabled = enabled,
+        shape = PillShape,
+        modifier = modifier.fillMaxWidth().heightIn(min = 48.dp).controlRing(PillShape)
+    ) {
+        Text(stringResource(R.string.nemul_join_action))
+    }
+}
 
 @Composable
 private fun TitleBlock(rom: Rom, online: Boolean, compat: CompatEntry?) {

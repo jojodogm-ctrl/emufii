@@ -59,7 +59,8 @@ class FriendWatcher(context: Context, private val client: CoordinatorClient) {
                     romTitle = it.romTitle,
                     romTitleId = it.romTitleId,
                     players = it.players,
-                    ready = it.ready
+                    ready = it.ready,
+                    ds = it.ds
                 )
             } ?: FriendStatus.Offline
         }

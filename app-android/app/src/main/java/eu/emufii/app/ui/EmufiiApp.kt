@@ -124,6 +124,7 @@ private sealed interface Screen {
     data class Preparing(val label: String) : Screen
     data class Join(val rom: RomRef) : Screen
     data class InSession(val session: Session) : Screen
+    data object DsSession : Screen
 
     data class Wfc(val rom: Rom) : Screen
 
@@ -199,10 +200,18 @@ fun EmufiiApp(settings: SettingsStore) {
     val settingsStore = settings
     val romsRepo = remember { RomsRepository.get(context) }
     val profile by profileStore.profile.collectAsStateWithLifecycle()
+    val dsManager = remember(context) { eu.emufii.app.ds.DsSessionManager.get(context) }
+    val dsSession by dsManager.session.collectAsStateWithLifecycle()
+    var nativeCompanion by remember { mutableStateOf<eu.emufii.app.nativeds.NativeDsSelection?>(null) }
+    var dsCreate by remember { mutableStateOf<Pair<Rom, Boolean>?>(null) }
+    var dsCreating by remember { mutableStateOf(false) }
+    var dsCreateError by remember { mutableStateOf<String?>(null) }
+    var dsLeaving by remember { mutableStateOf(false) }
 
     var onProfilePage by rememberSaveable { mutableStateOf(false) }
     var screen by remember {
-        mutableStateOf(if (onProfilePage) Screen.ProfileAndSettings else Screen.Library)
+        mutableStateOf(if (dsManager.session.value != null) Screen.DsSession
+            else if (onProfilePage) Screen.ProfileAndSettings else Screen.Library)
     }
     // In composition, before the new screen's cursor lands: see `Sfx.settle`.
     var settledFor by remember { mutableStateOf<Screen?>(null) }
@@ -213,7 +222,7 @@ fun EmufiiApp(settings: SettingsStore) {
     // The gate must not re-arm while a session lives, or returning lands on the logo.
     SideEffect {
         SplashGate.sessionAlive =
-            screen is Screen.InSession || screen is Screen.Preparing
+            screen is Screen.InSession || screen is Screen.Preparing || dsSession != null
     }
     DisposableEffect(Unit) { onDispose { SecondScreen.clear() } }
 
@@ -392,7 +401,7 @@ fun EmufiiApp(settings: SettingsStore) {
             }
         }
 
-    fun startJoinFlow(rom: RomRef?, code: String) {
+    fun startLegacyJoinFlow(rom: RomRef?, code: String) {
         // Gates joining as well as hosting, and is said before the VPN prompt.
         if (rom?.console == Console.PS2 && !Ps2NetworkProfile.isReady(context)) {
             return fail(R.string.launch_ps2_profile_missing, screen)
@@ -409,6 +418,16 @@ fun EmufiiApp(settings: SettingsStore) {
                         else R.string.flow_coordinator_unreachable,
                         back
                     )
+                }
+
+                remote.native?.let { native ->
+                    nativeCompanion = eu.emufii.app.nativeds.NativeDsSelection(remote.code, remote.hostName ?: "Hôte", native)
+                    screen = back
+                    return@launch
+                }
+
+                if (remote.ds != null) {
+                    return@launch fail("Le mode de cette session a changé. Rejoins-la à nouveau.", back)
                 }
 
                 // Two regional dumps share a title id, so only different titles are caught.
@@ -513,7 +532,37 @@ fun EmufiiApp(settings: SettingsStore) {
         }
     }
 
-    fun joinKnownSession(code: String, romTitleId: String?, romTitle: String? = null) {
+    fun startJoinFlow(rom: RomRef?, code: String) {
+        val epoch = prepEpoch
+        scope.launch {
+            screen = Screen.Preparing(context.getString(R.string.flow_finding_session))
+            val remote = client.getSession(code).getOrElse { err ->
+                return@launch fail(if (err is CoordinatorError.NotFound) R.string.flow_session_not_found
+                    else R.string.flow_coordinator_unreachable)
+            }
+            if (epoch != prepEpoch) return@launch
+            remote.native?.let { native ->
+                nativeCompanion = eu.emufii.app.nativeds.NativeDsSelection(remote.code, remote.hostName ?: "Hôte", native)
+                screen = if (rom != null) Screen.Join(rom) else Screen.Finder
+                return@launch
+            }
+            if (remote.ds != null) {
+                val result = dsManager.join(remote, rom, profile)
+                if (epoch != prepEpoch) { if (result.isSuccess) dsManager.leave(); return@launch }
+                result.fold(
+                    onSuccess = { screen = Screen.DsSession },
+                    onFailure = { fail(it.message ?: context.getString(R.string.flow_create_failed)) }
+                )
+            } else startLegacyJoinFlow(rom, code)
+        }
+    }
+
+    fun joinKnownSession(code: String, romTitleId: String?, romTitle: String? = null,
+        native: eu.emufii.app.nativeds.NativeDsRoom? = null, hostName: String? = null) {
+        if (native != null) {
+            nativeCompanion = eu.emufii.app.nativeds.NativeDsSelection(code, hostName ?: "Hôte", native)
+            return
+        }
         scope.launch {
             val rom = withContext(Dispatchers.IO) {
                 val library = romsRepo.cachedOrScan()
@@ -529,7 +578,7 @@ fun EmufiiApp(settings: SettingsStore) {
         }
     }
 
-    val inSession = screen is Screen.InSession
+    val inSession = screen is Screen.InSession || dsSession != null
     LaunchedEffect(profile.id, profile.name, inSession) {
         if (inSession) return@LaunchedEffect
         while (true) {
@@ -550,6 +599,7 @@ fun EmufiiApp(settings: SettingsStore) {
             }
             is Screen.Wfc -> launched(s.rom)
             is Screen.PspOnline -> launched(s.rom)
+            Screen.DsSession -> dsSession?.let { lastLaunched = it.title to it.spec.gameId }
             else -> Unit
         }
     }
@@ -623,7 +673,7 @@ fun EmufiiApp(settings: SettingsStore) {
                                 inSession = status?.inSession == true,
                                 onRemove = { friendStore.remove(friend.code) },
                                 onJoin = status?.sessionCode
-                                    ?.takeIf { status.ready }
+                                    ?.takeIf { status.joinable }
                                     ?.let { session ->
                                         { joinKnownSession(session, status.romTitleId, status.romTitle) }
                                     },
@@ -740,6 +790,7 @@ fun EmufiiApp(settings: SettingsStore) {
         Screen.Library -> null
         is Screen.Preparing -> null
         is Screen.InSession -> null
+        Screen.DsSession -> null
         Screen.ProfileAndSettings -> ({ onProfilePage = false; screen = Screen.Library })
         else -> ({ screen = Screen.Library })
     }
@@ -788,7 +839,10 @@ fun EmufiiApp(settings: SettingsStore) {
                 onOpenProfile = { onProfilePage = true; screen = Screen.ProfileAndSettings },
                 onOpenFriends = { screen = Screen.Friends },
                 onOpenFinder = { screen = Screen.Finder },
-                onCreate = { rom, private -> startHostSession(rom, private) },
+                onCreate = { rom, private ->
+                    if (rom.console == Console.DS) { dsCreateError = null; dsCreate = rom to private }
+                    else startHostSession(rom, private)
+                },
                 onJoinWith = { rom -> screen = Screen.Join(rom.toRef()) },
                 onPlayPublic = { rom ->
                     if (rom.console == Console.DS) {
@@ -830,7 +884,7 @@ fun EmufiiApp(settings: SettingsStore) {
                 client = client,
                 romsRepo = romsRepo,
                 onBack = { screen = Screen.Library },
-                onJoin = { open -> joinKnownSession(open.code, open.romTitleId, open.romTitle) }
+                onJoin = { open -> joinKnownSession(open.code, open.romTitleId, open.romTitle, open.native, open.hostName) }
             )
 
             Screen.Friends -> FriendsScreen(
@@ -848,6 +902,25 @@ fun EmufiiApp(settings: SettingsStore) {
                 },
                 onBack = { screen = Screen.Library }
             )
+
+            Screen.DsSession -> dsSession?.let { active ->
+                eu.emufii.app.ds.DsSessionScreen(active, dsLeaving,
+                    onLaunch = {
+                        scope.launch {
+                            dsManager.launchGame().onFailure {
+                                Toast.makeText(context, it.message ?: context.getString(R.string.flow_create_failed), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }, onLeave = {
+                        dsLeaving = true
+                        scope.launch {
+                            dsManager.leave().fold(onSuccess = { screen = Screen.Library }, onFailure = {
+                                Toast.makeText(context, it.message ?: context.getString(R.string.flow_create_failed), Toast.LENGTH_LONG).show()
+                            })
+                            dsLeaving = false
+                        }
+                    })
+            }
 
             is Screen.Preparing -> PreparingScreen(
                 label = s.label,
@@ -917,6 +990,25 @@ fun EmufiiApp(settings: SettingsStore) {
                 }
         }
 }
+    }
+
+    nativeCompanion?.let { selected ->
+        eu.emufii.app.nativeds.NativeDsCompanionDialog(client, selected, onDismiss = { nativeCompanion = null })
+    }
+
+    dsCreate?.let { (rom, private) ->
+        eu.emufii.app.ds.DsCreateDialog(rom, private, dsCreating, dsCreateError,
+            onDismiss = { if (!dsCreating) dsCreate = null },
+            onCreate = { identity, players ->
+                dsCreating = true; dsCreateError = null
+                scope.launch {
+                    dsManager.create(rom, identity, players, private, profile).fold(
+                        onSuccess = { dsCreate = null; screen = Screen.DsSession },
+                        onFailure = { dsCreateError = it.message ?: context.getString(R.string.flow_create_failed) }
+                    )
+                    dsCreating = false
+                }
+            })
     }
 
     // Last in source order, so it covers everything.

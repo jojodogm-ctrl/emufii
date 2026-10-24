@@ -151,6 +151,9 @@ import eu.emufii.app.ui.components.CompatBadge
 import eu.emufii.app.ui.components.FolderMark
 import eu.emufii.app.ui.components.FriendsChip
 import eu.emufii.app.ui.components.GameLaunchDialog
+import eu.emufii.app.ui.components.NemulJoinDialog
+import eu.emufii.app.onetap.OneTapGames
+import eu.emufii.app.onetap.OneTapJoinDialog
 import eu.emufii.app.ui.components.HideRomDialog
 import eu.emufii.app.ui.components.IconPickerDialog
 import eu.emufii.app.ui.components.LayoutChip
@@ -244,6 +247,8 @@ fun LibraryScreen(
     val ui by state.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val settings = remember(context) { SettingsStore.get(context) }
+    var nemulRom by remember { mutableStateOf<Rom?>(null) }
+    var oneTapRom by remember { mutableStateOf<Rom?>(null) }
 
     val topBarLeftFocus = remember { FocusRequester() }
     val topBarFocus = remember { FocusRequester() }
@@ -445,12 +450,26 @@ fun LibraryScreen(
                 onDismiss = { state.clearSelection() },
                 onPrimary = { private -> onCreate(rom, private) },
                 onJoinWithCode = { state.clearSelection(); onJoinWith(rom) },
+                onJoinNemul = null,
+                onOneTap = null,
                 onPlayOnline =
                     if (rom.console.backend == Backend.PPSSPP || rom.console.backend == Backend.MELONDS ||
                         rom.console.backend == Backend.ARMSX2)
                         ({ onPlayPublic(rom) })
                     else null
             )
+        }
+        nemulRom?.let { rom ->
+            NemulJoinDialog(
+                rom = rom,
+                playerName = profile.name,
+                onDismiss = { nemulRom = null }
+            )
+        }
+        oneTapRom?.let { rom ->
+            OneTapGames.fromProductCode(rom.productCode)?.let { game ->
+                OneTapJoinDialog(game = game, playerName = profile.name, onDismiss = { oneTapRom = null })
+            }
         }
     }
     }
@@ -1116,6 +1135,7 @@ private fun EntryRow(
         }
 
         if (entry is Entry.Game) {
+            eu.emufii.app.ds.DsTierBadge(entry.rom, Modifier.padding(end = 8.dp))
             LocalCompatDb.current.ratingFor(entry.rom.compatKeys())?.let { known ->
                 CompatBadge(rating = known.rating, modifier = Modifier.padding(end = 8.dp))
             }

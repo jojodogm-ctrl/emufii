@@ -489,7 +489,7 @@ private fun CardBody(
 ) {
     val (friend, status, lastGame, avatar) = state
     val name = friend.name?.let { playerDisplayName(it) } ?: friend.displayCode
-    val session = status.sessionCode?.takeIf { status.ready }
+    val session = status.sessionCode?.takeIf { status.joinable }
     // In a game, the game they are in; otherwise the last one they launched.
     val game = if (status.inSession) {
         status.romTitle?.let { LastGame(it, lastGame?.takeIf { g -> g.title == it }?.titleId, 0L) } ?: lastGame

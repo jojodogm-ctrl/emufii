@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.net.URI
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,9 +13,18 @@ val keystoreProperties = Properties().apply {
 }
 val hasSigningConfig = keystoreProperties.getProperty("storeFile") != null
 
+// Invitations never choose an executable package. Only preview can target the pinned diagnostic client.
+val oneTapPreviewNativePackage = project.findProperty("emufii.oneTapNativePackage")
+    ?.toString()?.trim() ?: "com.mpds.online.singleowner.dev"
+require(oneTapPreviewNativePackage in setOf(
+    "com.mpds.online.singleowner.dev",
+    "com.mpds.online.singleowner.emufii.metrics"
+)) { "Unsupported One Tap native target" }
+
 
 android {
     namespace = "eu.emufii.app"
+    ndkVersion = "26.3.11579264"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -26,10 +36,11 @@ android {
         minSdk = 33
         targetSdk = 36
         // Never reuse a published versionCode: the update check compares it alone.
-        versionCode = 53
-        versionName = "2.0.2"
+        versionCode = 55
+        versionName = "2.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "ONE_TAP_NATIVE_PACKAGE", "\"com.mpds.online.singleowner.dev\"")
 
         ndk {
             abiFilters += listOf("arm64-v8a")
@@ -59,6 +70,21 @@ android {
     // Dumps the a11y tree into Downloads. Never enable in a published build.
     val treeDump = project.findProperty("emufii.treeDump")?.toString() == "true"
 
+    // Remain disabled until the adapter and integrated frontend have been deployed.
+    val oneTapAdapterUrl = project.findProperty("emufii.oneTapAdapterUrl")?.toString()?.trim().orEmpty()
+    val oneTapFrontendUrl = project.findProperty("emufii.oneTapFrontendUrl")?.toString()?.trim().orEmpty()
+    fun validateOneTapUrl(value: String, path: String) {
+        if (value.isEmpty()) return
+        val uri = runCatching { URI(value) }.getOrNull()
+        require(uri != null && uri.scheme == "https" && !uri.host.isNullOrEmpty() &&
+            uri.rawUserInfo == null && uri.port == -1 && uri.rawQuery == null && uri.rawFragment == null &&
+            uri.rawPath.orEmpty() == path && uri.toASCIIString() == value) {
+            "One Tap configuration requires an HTTPS URL with path '$path' and no credentials/query/fragment"
+        }
+    }
+    validateOneTapUrl(oneTapAdapterUrl, "")
+    validateOneTapUrl(oneTapFrontendUrl, "/emufii/play/")
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -69,6 +95,8 @@ android {
             buildConfigField("String", "COORDINATOR_BASE_URL", "\"$coordinatorUrl\"")
             buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
             buildConfigField("boolean", "TREE_DUMP", "$treeDump")
+            buildConfigField("String", "ONE_TAP_ADAPTER_URL", "\"$oneTapAdapterUrl\"")
+            buildConfigField("String", "ONE_TAP_FRONTEND_URL", "\"$oneTapFrontendUrl\"")
         }
         release {
             if (hasSigningConfig) signingConfig = signingConfigs.getByName("release")
@@ -82,6 +110,8 @@ android {
             buildConfigField("String", "COORDINATOR_BASE_URL", "\"$coordinatorUrl\"")
             buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
             buildConfigField("boolean", "TREE_DUMP", "$treeDump")
+            buildConfigField("String", "ONE_TAP_ADAPTER_URL", "\"$oneTapAdapterUrl\"")
+            buildConfigField("String", "ONE_TAP_FRONTEND_URL", "\"$oneTapFrontendUrl\"")
         }
         create("preview") {
             initWith(getByName("release"))
@@ -89,6 +119,7 @@ android {
             versionNameSuffix = "-preview"
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += "release"
+            buildConfigField("String", "ONE_TAP_NATIVE_PACKAGE", "\"$oneTapPreviewNativePackage\"")
         }
     }
     compileOptions {
@@ -99,9 +130,29 @@ android {
         compose = true
         buildConfig = true
     }
+    // Physical DS tests may use an app-local localhost CA generated outside
+    // sources. This opt-in changes debug resources only; normal builds retain
+    // their existing trust policy, and release/preview never contain the CA.
+    if (providers.gradleProperty("emufii.dsDeviceFixture").orNull == "true") {
+        val fixtureResources = rootProject.file("../build/device/tls/res")
+        require(fixtureResources.resolve("raw/ds_device_fixture_ca.crt").isFile &&
+            fixtureResources.resolve("xml/network_security_config.xml").isFile) {
+            "Generate the private localhost device fixture before its debug build"
+        }
+        sourceSets.getByName("debug").res.setSrcDirs(listOf(fixtureResources))
+    }
+    packaging {
+        jniLibs {
+            keepDebugSymbols += listOf("**/libmelonjni.so", "**/libmpdsprobe.so", "**/libc++_shared.so")
+            // Both runtimes use the byte-identical pinned Android C++ library.
+            pickFirsts += "**/libc++_shared.so"
+        }
+    }
 }
 
 dependencies {
+    implementation(project(":ds-hle-runtime"))
+    implementation(project(":ds-nemul-runtime"))
     implementation(platform(libs.androidx.compose.bom))
     // Without it baseline-prof.txt ships but is never applied.
     implementation(libs.androidx.profileinstaller)

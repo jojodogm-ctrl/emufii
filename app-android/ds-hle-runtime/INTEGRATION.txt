@@ -1,0 +1,65 @@
+Embedded GOLD integration
+
+Public API: eu.emufii.dshle.DsHleRuntime.openGuest / openHost / requestClose,
+active, supported. active is released only after the native lease is retired.
+Only ARM64 is provided. minSdk 33, compileSdk 37.1, Java 17, AGP 9 built-in Kotlin.
+New broker helper requires Android NDK and CMake 3.22.1. It uses c++_static with
+hidden C++ symbols; only its JNI methods export. It is independent of the NDS.
+
+SDK500 candidate: libmelonjni.so is freshly rebuilt from the native common-SDK
+source commit312f0d9. The matching broker uses explicit SharingBlocks lead40
+for Experimental cartridge rooms; other room families keep their prior mode.
+libc++_shared.so is the exact previously verified stripped NDK26.3 runtime,
+byte-identical in GOLD and SILVER. Native hashes and sources are in upstream-pins.json.
+Keep com.mpds.online.NativeBridge names and native method signatures under R8.
+The com.mpds.online namespace is fixed by the pinned binary JNI exports.
+Avoid loading another library exporting that NativeBridge in the same process.
+
+RoomEngineService owns exactly one console in :round. The host broker runs in
+the UI process and serves opaque SDK records; it creates no extra consoles.
+The application's Application.onCreate must exclude :round from UI/backend
+initialization. Its foreground tracker must include internal HLE activities.
+Its Presentation must stop while this runtime owns the second panel.
+
+HostAccess.prepare receives only the verified local ROM's length/SHA256 and
+returns two lists of signed invitations ordered P1..Pn: persistent lobby and
+fresh inner game. The inner epoch/room must differ and expire no later than the
+outer lobby. All invitations must opt in shareAssets and match game/players.
+HostAccess.gatewayTicket must authorize owner server roles for derived routes;
+the module derives channels from the signed invitations, never caller keys.
+HostAccess.openPreparation streams private boot/seat files matching the signed
+manifest. ROM bytes come from the app-selected URI. The coordinator receives
+only ROM length/hash metadata; guests receive assets through the host broker
+and the sealed private gateway carrier.
+HostAccess.publish runs after real native lobby carriers were installed.
+HostAccess.close retires the private session on a worker. Bound all blocking
+adapter calls and cancel outstanding requests when the owner is retired.
+
+Host supports MPDS 2-4 with pinned private seat preparations, MKDS 2-8 and
+DKR 2 cartridge boot. The integrated private coordinator selects cold boot for
+MKDS and DKR. Its preparation endpoint serves only the pinned MPDS seat files;
+the optional mkdsMenu boot envelope is not used by this integration.
+There is no personal-save prompt. Collective game-go
+is emitted only after all real asset COMMITTED
+receipts and the sender drain/grace. Native boot then waits for actual SDK and
+authority carriers. Checkpoint host coordination is not advertised; guest
+checkpoint support remains the public production implementation.
+
+Gateway and HTTP origins remain fixed by this integration's code/build config;
+never take a gateway URL or relay override from Intent, ROM, or invitation.
+The directory/gateway defaults use the private Emufii coordinator:
+https://coord.emufii.xyz/ds/nifi2/rooms and
+wss://coord.emufii.xyz/ds/nifi2/wire. emufii.coordinatorUrl changes that fixed
+origin at build time; emufii.dsGoldDirectoryUrl and emufii.dsGoldGatewayUrl can
+select explicit fixed secure endpoints. acceptsEndpoints checks metadata equals
+the compiled origins before opening. It does not reconfigure the runtime.
+An optional GuestAccess callback on openGuest binds directory requests to the
+application's signed membership transport. It receives only native code4,
+allowed directory operations, the admitted seat token and bounded JSON bytes.
+Its credentials live in memory and are released after directory leave. Private
+session codes are separate: the native directory still requires code4 in every
+snapshot. Map the session to that native code in the authenticated coordinator.
+
+Build verification uses :ds-hle-runtime:testDebugUnitTest and APK assembly/R8
+plus pinned native hashes. On-device smoke and multiplayer sessions are separate
+checks: build success does not establish gameplay or relay health.

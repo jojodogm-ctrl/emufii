@@ -23,9 +23,11 @@ data class FriendStatus(
     val romTitle: String? = null,
     val romTitleId: String? = null,
     val players: Int = 0,
-    val ready: Boolean = false
+    val ready: Boolean = false,
+    val ds: eu.emufii.app.ds.DsSessionSpec? = null
 ) {
     val inSession: Boolean get() = sessionCode != null
+    val joinable: Boolean get() = ready || ds != null
 
     companion object {
         val Offline = FriendStatus(online = false)

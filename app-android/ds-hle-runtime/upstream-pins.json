@@ -1,0 +1,559 @@
+{
+  "schema": "emufii-sdk500-native-source-v1",
+  "nativeRebuilt": true,
+  "sourceModified": true,
+  "baseCommit": "043436d7d29dc4245ac50dacd4199b39712d6a19",
+  "nativeSourceEdits": {
+    "base": "043436d7d29dc4245ac50dacd4199b39712d6a19",
+    "files": [
+      {
+        "path": "android/app/src/main/cpp/CMakeLists.txt",
+        "before": "6bc94acbf03ecb1e72250a07fc34c80414e160ced11d92b35f37c533e982e171",
+        "after": "11970378f27672158a64967a151a1bb202ddbcae2618e77ca3e60ba2cdbfecf4"
+      },
+      {
+        "path": "android/app/src/main/cpp/SingleOwnerLaunch.h",
+        "before": "487fa51b626c3d6ee72fe47c5425bee3eab604342b4c6e4181527b291885e7b8",
+        "after": "cc3dfff1d5f6ea2c433a0113bbd5820167059e7445ad7b66178bdec4dfcf525e"
+      },
+      {
+        "path": "android/app/src/main/cpp/melonjni.cpp",
+        "before": "5f310498fb2085e5a7cc85672abdec8e5e7ae2c0f0e220eb35d9ed60e5a9107b",
+        "after": "6a10e1d265ac2547ded3d32ecbb098098e65ef1c0f31d7290b6f9844bb87a8c3"
+      }
+    ],
+    "latencyCeilingMs": 500,
+    "productionModified": false
+  },
+  "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c",
+  "stdlibSha256": "83269b3124a287fac36b17c9fb64beb398c83dad6677b19ce63cf80d09966fd7",
+  "sdkBlocks": {
+    "cohort": 5,
+    "capacity": 64,
+    "lead": 40,
+    "cartridgeOnly": true,
+    "genericSdkOnly": true,
+    "jitForThisPath": false
+  },
+  "sourceFiles": [
+    {
+      "path": "build.gradle.kts",
+      "sha256": "8f9cee4932f02231695702e47a55576ebf0bed9f215b42e4106742767f12a327"
+    },
+    {
+      "path": "src/test/java/eu/emufii/dshle/GuestRequestTest.kt",
+      "sha256": "728be4a3cc334f0d93e433f00925f91be92c8c09282760465669bac95ce708a4"
+    },
+    {
+      "path": "src/test/java/eu/emufii/dshle/NativePinsTest.kt",
+      "sha256": "8c46c70ad9bc65d8b8850189f1a05c8a1a6b99fa0dff7ed72a28becea5f2f8a2"
+    },
+    {
+      "path": "src/test/java/com/mpds/online/HostProtocolTest.kt",
+      "sha256": "ea791bf0b2523f315bc5f36da8b384ccfb3a610a9f55358c0e3128cf71ea46bd"
+    },
+    {
+      "path": "src/test/java/com/mpds/online/PrivateGuestDirectoryTest.kt",
+      "sha256": "632f6d8e8acbeb88b3b16431d87fda365452d25acc02a0d0e59f231cd3947f13"
+    },
+    {
+      "path": "src/main/cpp/host_broker_jni.cpp",
+      "sha256": "0666f0d4fa60121338adee909ebf0197a24c8c00c84e65131f0aeef104039099"
+    },
+    {
+      "path": "src/main/java/eu/emufii/dshle/DsHleRuntime.kt",
+      "sha256": "c62c5ce6f8894c5eddfa7560926e6daafa07d560bdf34fee4fc3744636279555"
+    },
+    {
+      "path": "src/main/java/eu/emufii/dshle/GuestRequest.kt",
+      "sha256": "04b3202160d92c49d2d7b4e9e68a5428998551ab44b7a156390aa0fc7d4efb9c"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/Boards.kt",
+      "sha256": "eb4d006ed92a3408761540122ade364ec81f2ec438c312d5e57d9c4e9a87aa22"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/BottomScreenActivity.kt",
+      "sha256": "c677afe3b07e551901c1cac6848cc91af0eaff43f1e7a739c2935ada3d9e39a0"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/DsView.kt",
+      "sha256": "9a95628935b44bedc72fbb7b5bc29d4d75e31b393f2054fa611a3e5bb547e88a"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/GameLink.kt",
+      "sha256": "cbb7cd5da26bf713d79460cc991cd0d0118e8239ce99ac52ad1e7ea84565f3f2"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/HleGameActivity.kt",
+      "sha256": "af995f04ac748b904a7d30a3e843e3b0385bb94ccdc2b99630e2b3fd13719266"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/HostBrokerBridge.kt",
+      "sha256": "f6cc0c818c3637b6731ef141e268bef9fb169a563ae0aadc1d2f9880820dae5a"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/NativeBridge.kt",
+      "sha256": "cf71bedeedcc3882d8e3e021e57a275bc52ed91edc3faa5637f174c77acc0187"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/PixelUi.kt",
+      "sha256": "c6e3022a10faedad890667034d9189a0b333ff856df84b80e24ba77ca7422050"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomAssetManifest.kt",
+      "sha256": "54d14b2e197fcf5cc34874e2004a669550740f776fbfa18be863e5a819169056"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomAssetReceiver.kt",
+      "sha256": "186eecea212a1b2edceefb7554f7f457d8f6c79d1d0198be8b2c89fa75430927"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomAssetWire.kt",
+      "sha256": "7f0f78f8c24bac377a54934f0194782b6addb86ca335db1dd7f3073883f81996"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomAuthorityCheckpoint.kt",
+      "sha256": "7bb8798a6795a3b1c8e76d58001f3735d9b829a93435789765af81a155e391e7"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointCapture.kt",
+      "sha256": "13cb7e433f7cdc7552b36f69a07b2908c4fe8e109609b0a2c351def5f94b22a3"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointLane.kt",
+      "sha256": "f895ca1d66cfe646705cd12bae38bf1923c8906ed2972f2c2be84e5b0869415c"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointOwner.kt",
+      "sha256": "77717bb2e81e4977344ebe987e848bb4801068f65cd86ccd5f95ef099ebce042"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointPump.kt",
+      "sha256": "9f4587342cda8a08147cff51eccb89c9d8b17a4e889da45468c8e36ab62568ec"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointRestore.kt",
+      "sha256": "5a69fe7c6f51340d5c57c1b2177212ea2ffe4ea78aabf194c94266f0f6df9380"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointRoutes.kt",
+      "sha256": "b687a6aff5babc4fe6f6e6518694ffde743651210186d0eb172a643963914271"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCheckpointRpc.kt",
+      "sha256": "3cb027d6980782044b8c7aa35509c42402522fe677664ec66ef5bbb813e8b5e3"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomCode.kt",
+      "sha256": "db2fa7bc65743947914956439a0d411aa949f114b87b45ea1182b7bff4990476"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomDirectory.kt",
+      "sha256": "e073a39eaea22b6835ad33bfcc3a7b32da97d94ad1f025c381479bb1ead86254"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomEngine.kt",
+      "sha256": "51058337ed758623f51db9ddd8310cfcbe6e946eb958630f365f52f1bda89ba2"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomEngineService.kt",
+      "sha256": "576b28f791c177e277035c6b71f78c7ca5ce80911ec2de008ab433928445da08"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGameNetwork.kt",
+      "sha256": "9c3caedc1d10b3290d40884e6b40a0e31c44646b30c4680c03f2a5ac1770f450"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGameNotices.kt",
+      "sha256": "2160d248abe50737360f18f96e059d268d20b1493c374639e00a3a19d4335169"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGameWire.kt",
+      "sha256": "5f2e936ad7469257cf9d667090ea2212e4d1b6363800d8edeefa4eeb7fd9b753"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGatewayChannel.kt",
+      "sha256": "7bc04ff53b300ca733cc61afc7d23c4b4085f493cab7d49c0cb3cb770897fdd7"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGuestConnection.kt",
+      "sha256": "b47ca9b8c13203991d4f9adb772a5dfe2e8f9c636d3b5ea0f2dfb7dff5cfa0bc"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGuestLobby.kt",
+      "sha256": "0f184edf28adda8eac89e016466d4b2996df2deaecd6d34ec1a7da72e6b0e650"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomGuestSession.kt",
+      "sha256": "5a7471064fd103b270e2011645b78fe09ef4c85085014741bbfb42523b623f87"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomHostAssets.kt",
+      "sha256": "8d0071339a54a34c5b2cde757b715930c2c3f5a65683f57f8fc76bf1a903ddb1"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomHostBroker.kt",
+      "sha256": "49c82d7aa173a396d6455018447da3a14e779b21e15877d090fdd9f4dc9b13fe"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomHostGameNetwork.kt",
+      "sha256": "de4719e66921aa926baceb2e868e21f6ad74b7c10365204860c35ae4789baacb"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomHostSession.kt",
+      "sha256": "a894172158490377117524706ba8502e6f7c8f07b7800dfd79d9e94ebeab0327"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomInvitation.kt",
+      "sha256": "946f649dbaf30b31afc75087187c9cb29e6c1be7d358b6a4b46e317aa7ce0b8b"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomInvitationIdentity.kt",
+      "sha256": "4e3549ac519c6b0c718a6636dbf79d63f2bf4aa5e98d91d0fe39641576565549"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomInvitationPins.kt",
+      "sha256": "9056857bc89d396ff39598cf038ede0b678b9f1829c1fb6fbae6bf4085acce82"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomJson.kt",
+      "sha256": "cd31acec97e2ca782fad548853924ffbbc53e101ce46d3e2743efd8027674158"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomLaunchFiles.kt",
+      "sha256": "7a9a5a0377d01d23a3adff2a42999bc82f0d0394bbbdbe762c5ecbfc74df7908"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomLobbyChannel.kt",
+      "sha256": "9c686f54033241c7c74345fa1cb3b1248cc3b9b2f82f3c0593b4ffe430aadf44"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomLobbySavePolicy.kt",
+      "sha256": "e361586204bca008fe18ec1a50c6e084ab3aa839a9f6a45baa0c32cc7cf5b30f"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomNativeGame.kt",
+      "sha256": "bf52eb38375f63866e74cc043bae44238e084c9c6d563173f38c17fbe9945a13"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomNativeNetwork.kt",
+      "sha256": "58432fab59cac2a3c4d904031dc1c2429d1393a06ca91cb4c2b06564eff3efd4"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomNoticeBanner.kt",
+      "sha256": "d5d99725a179ea0c548a4bdafd3def4bc26c6bb2d94dc18270ad07ca5f348270"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomPlayerProfile.kt",
+      "sha256": "4537e91d4532d41f3019647406de222041e1b31dbde634f59704783cba3f440f"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomRelayCodec.kt",
+      "sha256": "95a819330c9e3e44458959a66d75d2c1ddd2fb2b49f5f4bc6417775a0faa8655"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomRelayPeer.kt",
+      "sha256": "f43ee138b4c1bf569c70d6a414dc612fa4f9f5e6a9b58d6e63dcd37b9b025c5e"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomRomPrefetch.kt",
+      "sha256": "4216fc4616bc840125d1530912a59a4a1f8aad06c28213ada2c9464739cb9d73"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomRoundAdmission.kt",
+      "sha256": "39d08adca974491dc39da0452229d1031f30f2d755314995ef076ed5971004f3"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomStartFailure.kt",
+      "sha256": "cb4ad4986c7f261013576fc29f3c240ee76caaa6d6fb36f5069f6c3addbb8026"
+    },
+    {
+      "path": "src/main/java/com/mpds/online/RoomStreamJournal.kt",
+      "sha256": "82a832f3b31f614bfd2c1fae35249c73da2b1eb39849c3ca2d2d2c04c708a1d6"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/MkdsMenuPrepIdentity.h",
+      "sha256": "825af860eca5f0066e97a450edb0410dc8f6feed26db4271e8e4d47556d5a2ec"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/MpdsCompactPipeline.h",
+      "sha256": "fcf5d8cbd4b84e5bf1a41cd58f2eb14f26254c2fe1d366defb85238e887e985f"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/MpdsRoomBootstrap.h",
+      "sha256": "e822512842c739a9894425b65115d6bd92be7bf4848d2cb6f2b70271a70a974b"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/Nifi2NetworkProfile.h",
+      "sha256": "339f5598642ef839c456e1f49c6fe36c70d245fa56e96b4d263836a130e4dfd5"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/NsmbPrepIdentity.h",
+      "sha256": "4a2133587a101dcc84b4733561abd1e661b2b5691d92ad630b810bc0bebba6f8"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdk300Code.h",
+      "sha256": "4469d1e386a2d98140afec2581c201dec83b75a514d42e3de1d5eee42e91dc5c"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdk300Graph.h",
+      "sha256": "fa380c216efaaabf2281a0543b2db4cd029a69ca10f3372d1998c6625213cc4c"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdk300GraphPins.h",
+      "sha256": "076aca94509240ba4935cbd0cdc4d97fbd92101098e739268ad877f3a4bbef78"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdk300ResponseGraph.h",
+      "sha256": "0fd8761fdcfe87130cfa8105834f5f0ceeef4506c6c7dec7fbd860ca62d117b3"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdk300ResponseGraphPins.h",
+      "sha256": "d80a23a7506d379c593dce93de056fe9a61e1849763882180c2db21d5f5d6264"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdk300SharingAbi.h",
+      "sha256": "7b44bf1a6f60921c44425c055adea7ff8160a044fc0fefa74925b3ebecd25844"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkAbi.h",
+      "sha256": "4db0ae0664499d76828e02559aac40730936237e59a578653f1d72baee14bff8"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockChunk.h",
+      "sha256": "c0e69b3ab252c151cfd158a42b8046fc26a50ae24c226936a23867eaa3a8890d"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockMemoryView.h",
+      "sha256": "3373cd37aa60283fa14e7b4cdb6aafb788d374fa88585ead1ea61f026ab0bdc1"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockRegistryGraph.h",
+      "sha256": "249afe7048f518ac9892d81c7f78822fe33aace39e7af53a6f149efecc29bbd1"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockRegistryHooks.h",
+      "sha256": "a5212784f12eb72e52211adcab4cd2ed76ec58651965fa63d92fd994ee0ee998"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockRegistryLifetime.h",
+      "sha256": "75f3e5e9d62589e2b2843a92b6e80e4371fcb70d75f950ebdcb00266d6d3f780"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockRegistryPins.h",
+      "sha256": "8331b58fdf3a5fb4b05687d28dee299844559a3475b52bee631253c72d71bfb8"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockSource.h",
+      "sha256": "d71a812c027264fb1f60e31feac2fb5655f2e06b4bc47c92e62a10b56a38933b"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockTransferGraph.h",
+      "sha256": "fdbf13447f1daaa94c95e0102dd19e23db646f39d3520ba5440b0e0fd4200726"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockTransferHooks.h",
+      "sha256": "bb815c2db835a40001934ff95ebb9eb25ca9f1928d20635965959b12d4e1518b"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockTransferLifetime.h",
+      "sha256": "40376965d6ef69237df50f81378a4925201b9faac33ef5195dc1b8d1bd6023c2"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockTransferPins.h",
+      "sha256": "0beecc42c265cbe62b1f5fa0fa7de2cd23a90b8dc16b090fa8a95a3e9966983b"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockWindow.h",
+      "sha256": "ca0dccf2e75e916e0bafcc0d650a972821fcbd8226e0a06e0957d8c5241726b8"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBlockWindowWire.h",
+      "sha256": "3919f9d8c9acb180595025bcd535d029feac0c86d6e5d941a3de247949046f71"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkBrokerOptions.h",
+      "sha256": "982e7f3788a148a24058fd8ac93036ae8f02c5501400b71f80c30c1f18409422"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkCapturePolicy.h",
+      "sha256": "af897614905cd0ee91a167370effbaedfeaa52becdb426acf847d6f5cac40f68"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkCheckpointBinding.h",
+      "sha256": "d1989a7bd6af244bebaa134401829fba130fcb27bf13e53167236d77503e3218"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkConsoleSnapshot.h",
+      "sha256": "6fe7f39b51263d1c73838c4ada0bb0853ba166ba997307a031d979790415498e"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkConsoleSnapshotLocal.h",
+      "sha256": "b55cce1d06539b5f9dfa78519cc9420651df9f3b09e2f7677174003096520b3d"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkConsoleSnapshotState.h",
+      "sha256": "ddc3351002c547e7b25ceddffb5298aa246df33a6346d5a52a3761d64290191a"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkDataSharingWindow.h",
+      "sha256": "0d6f6f203375fc8fc4d1c695220858360c33084395f355bfcf27c5988b32ef54"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkExperimentalSnapshot.h",
+      "sha256": "d395393bc56c942fad6f313cabfee3066a3bd7693f3d3cc3908284bdd542276a"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkMessageBus.h",
+      "sha256": "d04d411bc800b83742896cdf12e3ebb1f5102d16fbbf34165b73070232f10f5d"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkNet.h",
+      "sha256": "72195a3ba483f3ab86508fa795b267f9334ec877969d0d391e2e573259ae50c4"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkRegistryDataView.h",
+      "sha256": "52422c677a1ed6540d4338be1ac84117c5eb08349d92ace748fc975a69c4b51b"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkRequestQueue.h",
+      "sha256": "f180d7d805d4f4eb0414fb3c700c313fc8a6c726474bf6181c1dd23ad0e2661b"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkResponseHooks.h",
+      "sha256": "452b60c84362b1fc9e0108ad74dd311aaf497625f8315545aa9f4c2a6e72cffa"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkResponseLifetime.h",
+      "sha256": "72a15197aadd3a3343c783448e53b453252f4955ffb6dc664d8a0ead575c64f1"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkRoomCheckpoint.h",
+      "sha256": "41e48dcdcd1435431de361d39e06357f43655e5892a5dc4fcb4b8d788bcbea74"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSavedRoom.h",
+      "sha256": "1243c8b500d1921ce89b04c576f06a087aa6ac1435c6ccb5bd32aebf2d8c0a59"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSession.h",
+      "sha256": "fd80d89f6c08accf4ff96c85046eef7b8264285ef4c7595d699fdba8355cdde1"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSharingCopy.h",
+      "sha256": "3e299819aa02f502bd07b0231f02e01c18070751fb0b0317149e548833852667"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSharingPolicy.h",
+      "sha256": "a38e10e0a967dff662a35359453a9176eadb22b32178ef6dd37a0af1d3e40bc9"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSharingRetirement.h",
+      "sha256": "2cb14d16832c18004fccf71c56e89e28a498ca1338850ab7277f2a3592d577b2"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSharingRuntime.h",
+      "sha256": "66d1ee9f3fd8210b4334df116f3997b701e12e10fac5f4d5d639090bf012dfdd"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSnapshot.h",
+      "sha256": "edd916c3a4d072150aeec980bceb769e9e64b001764547a979b2d6926346c9bc"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSnapshotMedium.h",
+      "sha256": "fd972530b0be68e58ccf4b9cf0e76211524cbfae108a9c34b89bd5e4df4a3fe3"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSnapshotRegistry.h",
+      "sha256": "056cc79e0395fbb04445f14b215377823b6968760e14fcf0d55f1d769af79022"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkSnapshotRemote.h",
+      "sha256": "465bcc62d0cb67bc0b211cb5c1f0519990c161f3487a963f18424248c1486630"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkTape.h",
+      "sha256": "8784f9d60ccb31dd4a173ed837b974daa573e7621a1bdbd4df0a26a8b4107a30"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkTapeFrames.h",
+      "sha256": "86ab3789b45283a962d942a295551b998afd64c484498c4200d63749de8fd897"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkTimingPolicy.h",
+      "sha256": "b2a9a6e40cff6aba2527a45aaf0045a806b408fb7cc6fa1f3fb985eee21d6826"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkTransport.h",
+      "sha256": "bb000ecf3ec9b632cf8a186298193c6ac2eb3594ddf22678f63a668e7734a13e"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkV3.h",
+      "sha256": "d1e02ad1059947211033c6ddbe4c3eafd0dbb574c36801fcf2b7eee398349e52"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/WmSdkWireWindow.h",
+      "sha256": "79c2a77c06494f7b4dc9ee55ecc0647c7a0e64baa39803cd3ed25a871f88f000"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/frontend/wasm/BrowserBroker.cpp",
+      "sha256": "b3acec4c0fe3c2a29bfa621ea2dfb8ae0b757d9c9c64dfdfb750e727ac2f2286"
+    },
+    {
+      "path": "src/main/cpp/upstream/src/frontend/wasm/BrowserBroker.h",
+      "sha256": "60c111a655eb1be43c26a505f604bcd1fbae5673e2c83baed8a0fd82dcdb68ed"
+    }
+  ],
+  "nativeSourceCommit": "312f0d9c864472386ad6a8247d8c47f1d3fc03a9",
+  "stdlibNormalization": "Exact old83269b bytes reproduced by stripping the same NDK26.3 library; both modules now identical, removes pickFirst ambiguity.",
+  "unstrippedRuntimeSha256": "4e3a1e6d3782b615d2f1c2070b10c8c896a455b8132bc33938e7bbad1158c270",
+  "stripProof": "native-strip-proof506.json",
+  "menuExitPatch": {
+    "baseCommit": "312f0d9c864472386ad6a8247d8c47f1d3fc03a9",
+    "files": [
+      {
+        "path": "ds-anywhere/wasmelonDS/src/WmSdkTransport.h",
+        "before": "0e70c3a0c80336da6cffbfab687f1ed6a98ab4e5713c9c3b6cad4a241ac85e81",
+        "after": "bb000ecf3ec9b632cf8a186298193c6ac2eb3594ddf22678f63a668e7734a13e"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/WmSdkNet.h",
+        "before": "cd8f9c24c4d6b67d32d8234c431f24f933a6a558f525aadd899a7f0757c197a5",
+        "after": "72195a3ba483f3ab86508fa795b267f9334ec877969d0d391e2e573259ae50c4"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/WmSdk.cpp",
+        "before": "1b8e27917eab58a4a8495e3b1a8340efbd4cf52e79959ed0ee2d239a27fcab02",
+        "after": "6d9c683c9c2df49427bf40999ceff199befbb7d454d48222d2c8a832b0ca7bf8"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/MkdsAuthority.cpp",
+        "before": "a558f657999f4c5c927cd7532e6745d9da1d7a9c6621309659db2d9e564de41f",
+        "after": "4fe878f298d972395ac21171454937f8cfc226e866bf030c6faf94cdb7d0defe"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/MkdsAuthority.h",
+        "before": "445ba92233347927a02cba8e09c6ab415d632057383d1e939915218cda829f8b",
+        "after": "1151b5a0f9e4234efeb7c3b3c8260a6aa25b45cb1d08a55227eac6fff84d865f"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/MkdsState.cpp",
+        "before": "90d6c38e0b942fec0e692fd183481f010f472538d010ba8264545f4acd08fdf7",
+        "after": "3d662d4402e16c6c72bb0d477806190265b54e0a9bebe1e0b59c5f8ab98cf56f"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/MkdsState.h",
+        "before": "0b7879d15c7299f6aab93ba728861d70b25fb687f189d1125f09ed12a6b0f86b",
+        "after": "b403432a2cc742ebffc5ce53eca56ddfa11f30c33e47441bc357002e1e1b439f"
+      },
+      {
+        "path": "ds-anywhere/wasmelonDS/src/Nifi2Lifecycle.h",
+        "before": "d7a133c94b0b50c4bceba77cd825b535e9665e2a84e08bec27ac764359f22ef7",
+        "after": "2b5723fe0f07eccb15735404506fa9409cca9b2176266843584ec46513552e05"
+      }
+    ],
+    "raceBufferChanged": false,
+    "productionModified": false
+  }
+}
