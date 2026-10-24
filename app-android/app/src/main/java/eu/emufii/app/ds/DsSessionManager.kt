@@ -66,7 +66,9 @@ class DsSessionManager private constructor(private val context: Context) {
         lock.withLock {
             checkIdle()
             val identityKey = DsSessionPolicy.identityKey(CoordinatorClient.identityKey)
-            val actual = DsCatalog.assess(context, rom.uri)
+            val assessed = DsCatalog.assess(context, rom.uri)
+            // Without its Emufii edition, a GOLD cartridge runs as the original game.
+            val actual = if (identity.profile == null) assessed.original() else assessed
             require(actual == identity) { "La ROM a changé depuis sa vérification." }
             val spec = DsCatalog.choose(actual, players)
             var last: Throwable? = null

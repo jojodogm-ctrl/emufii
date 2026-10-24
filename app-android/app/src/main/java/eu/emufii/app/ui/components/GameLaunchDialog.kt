@@ -186,7 +186,20 @@ fun GameLaunchDialog(
         Console.PS2 -> if (ps2Served) listed?.online else CompatRating.BROKEN
         else -> wirelessVerdict
     }
-    val hasModes = onPlayOnline != null && listed?.rating != CompatRating.BROKEN
+    val context = LocalContext.current
+    val edition = eu.emufii.app.ds.DsEdition.of(rom)
+    var editionOn by remember { mutableStateOf(eu.emufii.app.ds.DsEdition.wanted(context, rom)) }
+    val playingEdition = edition != null && editionOn
+    // The edition runs on the GOLD profile; a dump without one has no edition to launch.
+    var editionRuns by remember { mutableStateOf<Boolean?>(null) }
+    LaunchedEffect(rom.uri, edition) {
+        if (edition != null) editionRuns = try {
+            eu.emufii.app.ds.DsCatalog.assess(context, rom.uri).tier == eu.emufii.app.ds.DsTier.GOLD
+        } catch (e: CancellationException) { throw e } catch (_: Exception) { false }
+    }
+    val editionUnavailable = playingEdition && editionRuns == false
+    // The edition carries its own public rooms: Download Play and Kaeru WFC belong to the original game.
+    val hasModes = onPlayOnline != null && listed?.rating != CompatRating.BROKEN && !playingEdition
 
     // A game that only works online opens on Online.
     var publicMode by remember {
@@ -227,7 +240,12 @@ fun GameLaunchDialog(
     val otherModeWorks = hasModes && incompatible &&
         (if (publicMode) wirelessVerdict else onlineVerdict).let { it != null && it != CompatRating.BROKEN }
     val dsEditionMissing = false // Local DS now runs in the embedded GOLD/SILVER modules.
-    val setupBlocked = ps2Blocked || pspBlocked || incompatible || dsEditionMissing
+    val setupBlocked = ps2Blocked || pspBlocked || incompatible || dsEditionMissing || editionUnavailable
+    val pickEdition: (Boolean) -> Unit = { on ->
+        editionOn = on
+        if (on) publicMode = false
+        eu.emufii.app.ds.DsEdition.remember(context, rom, on)
+    }
 
     LaunchedEffect(starting) {
         if (starting) {
@@ -393,7 +411,8 @@ fun GameLaunchDialog(
 
 
             if (rom.console == Console.DS && !publicMode) {
-                eu.emufii.app.ds.DsTierBadge(rom, Modifier.padding(horizontal = 24.dp, vertical = 12.dp))
+                eu.emufii.app.ds.DsTierBadge(rom, Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                    original = edition != null && !editionOn)
             }
             if (wide) {
                 Row(
@@ -445,6 +464,12 @@ fun GameLaunchDialog(
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                        }
+
+                        if (edition != null) {
+                            CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
+                                EditionToggle(checked = editionOn, enabled = !starting, onChange = pickEdition)
+                            }
                         }
 
                         if (hasModes) {
@@ -507,6 +532,8 @@ fun GameLaunchDialog(
                                 PpssppSetupMissing()
                             } else if (dsEditionMissing) {
                                 DsEditionMissing()
+                            } else if (editionUnavailable) {
+                                EditionUnavailable()
                             } else {
                                 PrimaryAction(
                                     label = primaryLabel,
@@ -556,6 +583,12 @@ fun GameLaunchDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 14.dp)
             ) {
+                if (edition != null) {
+                    CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
+                        EditionToggle(checked = editionOn, enabled = !starting, onChange = pickEdition)
+                    }
+                }
+
                 if (hasModes) {
                     CompositionLocalProvider(LocalRingTone provides RingTone.CORAL) {
                         ModeSwitch(
@@ -623,6 +656,8 @@ fun GameLaunchDialog(
                     PpssppSetupMissing()
                 } else if (dsEditionMissing) {
                     DsEditionMissing()
+                } else if (editionUnavailable) {
+                    EditionUnavailable()
                 } else {
                     PrimaryAction(
                         label = primaryLabel,
@@ -800,6 +835,46 @@ private fun PrivacyToggle(
         SwitchFace(checked = checked)
     }
 }
+
+/** Ticked, the Emufii edition and its public rooms; unticked, the original game. */
+@Composable
+private fun EditionToggle(
+    checked: Boolean,
+    enabled: Boolean,
+    onChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .controlRing(PillShape)
+            .clip(PillShape)
+            .tap(enabled = enabled, sound = Sfx::toggle) { onChange(!checked) }
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Column(Modifier.weight(1f).animateContentSize(Motion.morph())) {
+            Text(
+                stringResource(R.string.launch_edition),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Crossfade(targetState = checked, animationSpec = Motion.morph(), label = "edition") { checked ->
+                Text(
+                    stringResource(if (checked) R.string.launch_edition_on else R.string.launch_edition_off),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        SwitchFace(checked = checked)
+    }
+}
+
+@Composable
+private fun EditionUnavailable() =
+    SetupNotice(R.string.launch_edition_unavailable, R.string.launch_edition_unavailable_hint)
 
 @Composable
 private fun ModeSwitch(

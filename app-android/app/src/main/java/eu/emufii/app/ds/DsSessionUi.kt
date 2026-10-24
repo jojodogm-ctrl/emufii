@@ -41,9 +41,12 @@ import kotlinx.coroutines.sync.withPermit
 private val identityReaders = Semaphore(2)
 
 @Composable
-fun DsTierBadge(rom: Rom, modifier: Modifier = Modifier) {
+fun DsTierBadge(rom: Rom, modifier: Modifier = Modifier, original: Boolean? = null) {
     if (rom.console != Console.DS) return
     val context = LocalContext.current
+    // An unticked Emufii edition launches the original game, which only SILVER runs.
+    val unmodified = original ?: !DsEdition.wanted(context, rom)
+    val edition = DsEdition.of(rom) != null && !unmodified
     var tier by remember(rom.uri) { mutableStateOf<DsTier?>(null) }
     var unreadable by remember(rom.uri) { mutableStateOf(false) }
     LaunchedEffect(rom.uri) {
@@ -51,13 +54,15 @@ fun DsTierBadge(rom: Rom, modifier: Modifier = Modifier) {
         catch (e: CancellationException) { throw e }
         catch (_: Exception) { unreadable = true }
     }
+    val shown = if (tier == DsTier.GOLD && DsEdition.of(rom) != null && unmodified) DsTier.SILVER else tier
     Text(stringResource(when {
         unreadable -> R.string.ds_unreadable
-        tier == DsTier.GOLD -> R.string.ds_gold
-        tier == DsTier.SILVER -> R.string.ds_silver
+        shown == DsTier.GOLD && edition -> R.string.ds_edition
+        shown == DsTier.GOLD -> R.string.ds_gold
+        shown == DsTier.SILVER -> R.string.ds_silver
         else -> R.string.ds_checking
     }), modifier = modifier, style = MaterialTheme.typography.labelMedium,
-        color = when (tier) {
+        color = when (shown) {
             DsTier.GOLD -> Color(0xffb88400)
             DsTier.SILVER -> MaterialTheme.colorScheme.onSurfaceVariant
             null -> MaterialTheme.colorScheme.onSurfaceVariant
@@ -72,7 +77,10 @@ fun DsCreateDialog(rom: Rom, private: Boolean, creating: Boolean, error: String?
     var readError by remember(rom.uri) { mutableStateOf<String?>(null) }
     var players by remember(rom.uri) { mutableStateOf(2) }
     LaunchedEffect(rom.uri) {
-        try { identity = identityReaders.withPermit { DsCatalog.assess(context, rom.uri) } }
+        try {
+            val assessed = identityReaders.withPermit { DsCatalog.assess(context, rom.uri) }
+            identity = if (DsEdition.of(rom) != null && !DsEdition.wanted(context, rom)) assessed.original() else assessed
+        }
         catch (e: CancellationException) { throw e }
         catch (_: Exception) { readError = context.getString(R.string.ds_unreadable) }
     }

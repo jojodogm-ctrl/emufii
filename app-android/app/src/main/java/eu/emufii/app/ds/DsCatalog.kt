@@ -48,6 +48,9 @@ data class DsGameIdentity internal constructor(
     val tier: DsTier get() = if (profile != null) DsTier.GOLD else DsTier.SILVER
     val allowedPlayers: List<Int> get() = profile?.players ?: if (silverAvailable) (2..4).toList() else emptyList()
     val maxPlayers: Int get() = allowedPlayers.maxOrNull() ?: 0
+
+    /** The same cartridge without its GOLD profile: the unmodified game, on SILVER. */
+    fun original(): DsGameIdentity = if (profile == null) this else DsGameIdentity(sha256, null, silverAvailable)
 }
 
 /** Public coordinator descriptor. It contains no endpoint, key, ticket, or invitation URL. */
