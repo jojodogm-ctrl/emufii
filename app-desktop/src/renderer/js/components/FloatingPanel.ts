@@ -83,6 +83,18 @@ export function positionFloatingPanel(tab: FloatingTab) {
   const trigger = document.getElementById(TRIGGERS[tab]);
   if (!trigger) return;
   const rect = trigger.getBoundingClientRect();
+
+  // Triggers in the navigation rail open their flyout beside it, anchored to the trigger.
+  if (trigger.closest('.app-rail')) {
+    const height = Math.min(panel.scrollHeight || 420, window.innerHeight - 32);
+    const top = Math.max(16, Math.min(rect.top, window.innerHeight - height - 16));
+    panel.style.left = `${Math.round(rect.right + 12)}px`;
+    panel.style.top = `${Math.round(top)}px`;
+    panel.style.maxHeight = `${window.innerHeight - top - 16}px`;
+    panel.style.transformOrigin = rect.top > window.innerHeight / 2 ? '0% 100%' : '0% 0%';
+    return;
+  }
+
   const center = rect.left + rect.width / 2;
   const left = Math.max(16, Math.min(center - panelWidth / 2, screenWidth - panelWidth - 16));
   const top = Math.round(rect.bottom + 10);
@@ -98,11 +110,22 @@ if (typeof window !== 'undefined') {
     if (isOpen) positionFloatingPanel(currentTab);
   });
   window.addEventListener('emufii:friends-panel-refresh', () => {
-    if (isOpen && currentTab === 'friends') renderFloatingPanel();
+    if (isShowing('friends')) renderFloatingPanel();
   });
 }
 
+function pageFor(tab: FloatingTab): PanelPage | null {
+  return tab === 'friends' ? 'friends' : tab === 'sessions' || tab === 'join' ? 'sessions' : null;
+}
+
 export function toggleFloatingPanel(tab: FloatingTab) {
+  const page = pageFor(tab);
+  if (page) {
+    closeFloatingPanel();
+    store.navigate(page);
+    if (tab === 'join') setTimeout(() => (document.getElementById('joinCodeInput') as HTMLInputElement | null)?.focus(), 380);
+    return;
+  }
   if (isOpen && currentTab === tab) {
     closeFloatingPanel();
   } else if (isOpen) {
@@ -114,6 +137,10 @@ export function toggleFloatingPanel(tab: FloatingTab) {
 }
 
 export function openFloatingPanel(tab: FloatingTab = 'sessions') {
+  if (pageFor(tab)) {
+    toggleFloatingPanel(tab);
+    return;
+  }
   const panel = document.getElementById('floatingCloudPanel');
   const backdrop = document.getElementById('floatingPanelBackdrop');
   if (!panel) return;
@@ -134,7 +161,7 @@ export function openFloatingPanel(tab: FloatingTab = 'sessions') {
   if (tab === 'friends') {
     document.getElementById('emufiiFriendToast')?.remove();
     syncFriendsRealtime(() => {
-      if (isOpen && currentTab === 'friends') renderFloatingPanel();
+      if (isShowing('friends')) renderFloatingPanel();
     });
   }
   if (tab === 'server') refreshRelayLatencies();
@@ -258,21 +285,98 @@ function getTabHeaderInfo(tab: FloatingTab, profile: any) {
   }
 }
 
-export function renderFloatingPanel() {
-  const panel = document.getElementById('floatingCloudPanel');
-  if (!panel) return;
+// Sessions and Friends are full pages on desktop; they reuse the panel renderers inside a host.
+export type PanelPage = 'sessions' | 'friends';
+let embedded: { host: HTMLElement; page: PanelPage } | null = null;
 
+const PAGE_TABS: Record<PanelPage, FloatingTab[]> = {
+  sessions: ['join', 'sessions'],
+  friends: ['friends'],
+};
+
+function isShowing(tab: FloatingTab): boolean {
+  return (isOpen && currentTab === tab) || (!!embedded && PAGE_TABS[embedded.page].includes(tab));
+}
+
+export function mountPanelPage(host: HTMLElement, page: PanelPage): () => void {
+  embedded = { host, page };
+  if (page === 'sessions') refreshSessions();
+  else syncFriendsRealtime(() => renderFloatingPanel());
+  renderEmbedded();
+  return () => {
+    if (embedded?.host === host) embedded = null;
+  };
+}
+
+function preserveAndRender(root: HTMLElement, html: string, attach: () => void) {
   const activeEl = document.activeElement as HTMLElement | null;
-  const activeId = activeEl && panel.contains(activeEl) ? activeEl.id : null;
+  const activeId = activeEl && root.contains(activeEl) ? activeEl.id : null;
   const activeSel = activeEl instanceof HTMLInputElement ? [activeEl.selectionStart, activeEl.selectionEnd] : null;
-  const scrolls = Array.from(panel.querySelectorAll<HTMLElement>('[data-scroll-key]')).map((el) => [el.dataset.scrollKey, el.scrollTop] as const);
-  const existingCodeVal = (panel.querySelector('#inputFloatingFriendCode') as HTMLInputElement | null)?.value || '';
+  const scrolls = Array.from(root.querySelectorAll<HTMLElement>('[data-scroll-key]')).map((el) => [el.dataset.scrollKey, el.scrollTop] as const);
+  const existingCodeVal = (root.querySelector('#inputFloatingFriendCode') as HTMLInputElement | null)?.value || '';
+
+  root.innerHTML = html;
+  attach();
+
+  for (const [key, top] of scrolls) {
+    const el = root.querySelector<HTMLElement>(`[data-scroll-key="${key}"]`);
+    if (el) el.scrollTop = top;
+  }
+  if (existingCodeVal) {
+    const codeInput = root.querySelector('#inputFloatingFriendCode') as HTMLInputElement | null;
+    if (codeInput) codeInput.value = existingCodeVal;
+  }
+  if (activeId) {
+    const toFocus = root.querySelector<HTMLElement>(`#${CSS.escape(activeId)}`);
+    toFocus?.focus({ preventScroll: true });
+    if (toFocus instanceof HTMLInputElement && activeSel) {
+      try {
+        toFocus.setSelectionRange(activeSel[0], activeSel[1]);
+      } catch {}
+    }
+  }
+}
+
+function renderEmbedded() {
+  if (!embedded || !document.contains(embedded.host)) {
+    embedded = null;
+    return;
+  }
+  const { host, page } = embedded;
+  if (page === 'sessions') {
+    preserveAndRender(
+      host,
+      `<section class="page-card join-card">
+         <div class="page-card-head"><h2>Join with a code</h2><p>Paste or type the code your friend shared.</p></div>
+         ${renderJoinTab()}
+       </section>
+       <section class="page-card">
+         <div class="page-card-head">
+           <h2>Open sessions</h2><p>Public rooms you can jump into right now.</p>
+           <button class="panel-header-btn plate-button" id="btnRefreshFloatingSessions" title="Refresh (F5)">${REFRESH_ICON}<span>Refresh</span></button>
+         </div>
+         <div data-scroll-key="sessions-page">${renderSessionsTab()}</div>
+       </section>`,
+      () => {
+        attachJoinListeners(host);
+        attachSessionsListeners(host);
+      }
+    );
+  } else {
+    preserveAndRender(host, `<div class="friends-page">${renderFriendsTab()}</div>`, () => attachFriendsListeners(host));
+  }
+}
+
+export function renderFloatingPanel() {
+  renderEmbedded();
+  const panel = document.getElementById('floatingCloudPanel');
+  if (!panel || !isOpen) return;
 
   const header = getTabHeaderInfo(currentTab, store.get().profile);
 
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', currentTab);
-  panel.innerHTML = `
+  preserveAndRender(panel, `
     <div class="floating-panel-container">
       <div class="floating-panel-header">
         <div class="floating-panel-heading-wrap">
@@ -298,31 +402,13 @@ export function renderFloatingPanel() {
         }
       </div>
     </div>
-  `;
-
-  if (currentTab === 'server') attachServerListeners(panel);
-  else if (currentTab === 'sessions') attachSessionsListeners(panel);
-  else if (currentTab === 'join') attachJoinListeners(panel);
-  else if (currentTab === 'friends') attachFriendsListeners(panel);
-  else attachProfileListeners(panel);
-
-  for (const [key, top] of scrolls) {
-    const el = panel.querySelector<HTMLElement>(`[data-scroll-key="${key}"]`);
-    if (el) el.scrollTop = top;
-  }
-  if (existingCodeVal) {
-    const codeInput = panel.querySelector('#inputFloatingFriendCode') as HTMLInputElement | null;
-    if (codeInput) codeInput.value = existingCodeVal;
-  }
-  if (activeId) {
-    const toFocus = panel.querySelector<HTMLElement>(`#${CSS.escape(activeId)}`);
-    toFocus?.focus({ preventScroll: true });
-    if (toFocus instanceof HTMLInputElement && activeSel) {
-      try {
-        toFocus.setSelectionRange(activeSel[0], activeSel[1]);
-      } catch {}
-    }
-  }
+  `, () => {
+    if (currentTab === 'server') attachServerListeners(panel);
+    else if (currentTab === 'sessions') attachSessionsListeners(panel);
+    else if (currentTab === 'join') attachJoinListeners(panel);
+    else if (currentTab === 'friends') attachFriendsListeners(panel);
+    else attachProfileListeners(panel);
+  });
 }
 
 function avatarHtml(url: string | null | undefined, name: string, size = 34): string {
@@ -390,7 +476,7 @@ export async function refreshRelayLatencies() {
   if (!emuApi?.coordinator?.measureRelays) return;
 
   measuringRelays = true;
-  if (isOpen && currentTab === 'server') renderFloatingPanel();
+  if (isShowing('server')) renderFloatingPanel();
 
   try {
     const measured: { id: string; rttMs: number | null }[] = await emuApi.coordinator.measureRelays();
@@ -405,7 +491,7 @@ export async function refreshRelayLatencies() {
   } finally {
     measuringRelays = false;
     updateHeaderVpsLabel();
-    if (isOpen && currentTab === 'server') renderFloatingPanel();
+    if (isShowing('server')) renderFloatingPanel();
   }
 }
 
@@ -538,7 +624,7 @@ async function refreshSessions() {
   if (loadingSessions) return;
   const emuApi = (window as any).emufii;
   loadingSessions = true;
-  if (isOpen && currentTab === 'sessions') renderFloatingPanel();
+  if (isShowing('sessions')) renderFloatingPanel();
 
   try {
     const timeout = new Promise<OpenSession[]>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 6000));
@@ -548,7 +634,7 @@ async function refreshSessions() {
   } finally {
     loadingSessions = false;
     sessionsLoaded = true;
-    if (isOpen && currentTab === 'sessions') renderFloatingPanel();
+    if (isShowing('sessions')) renderFloatingPanel();
   }
 }
 
@@ -640,7 +726,7 @@ async function connectToSession(rawCode: string) {
   const profile = store.get().profile;
 
   joining = true;
-  if (isOpen && currentTab === 'join') renderFloatingPanel();
+  if (isShowing('join')) renderFloatingPanel();
 
   try {
     const remote = await emuApi.coordinator.getSession(code);
@@ -679,7 +765,7 @@ async function connectToSession(rawCode: string) {
     store.navigate('session');
   } catch (err) {
     joining = false;
-    if (isOpen && currentTab === 'join') renderFloatingPanel();
+    if (isShowing('join')) renderFloatingPanel();
     toast(`Could not join ${code}: ${errorMessage(err, 'session not found')}`, 'error');
   }
 }

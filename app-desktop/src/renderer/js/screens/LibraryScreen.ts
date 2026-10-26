@@ -27,7 +27,7 @@ const ICONS = {
   copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
 };
 
-function getConsoleSlug(consoleType: string): string {
+export function getConsoleSlug(consoleType: string): string {
   const map: Record<string, string> = {
     '3DS': 'three_ds',
     PSP: 'psp',
@@ -86,7 +86,7 @@ export function romTitle(rom: RomItem): string {
   return store.get().settings.customTitles?.[rom.id] || rom.displayName;
 }
 
-function consoleOf(rom: RomItem): string {
+export function consoleOf(rom: RomItem): string {
   return (rom.console as string) === 'GBA' ? 'DS' : rom.console;
 }
 
@@ -95,7 +95,7 @@ function isNoise(rom: RomItem): boolean {
   return name.startsWith('photo') || name.includes('photos-') || name.includes('screenshot');
 }
 
-function parentDir(filePath: string): string {
+export function parentDir(filePath: string): string {
   const idx = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'));
   return idx > 0 ? filePath.slice(0, idx) : filePath;
 }
@@ -151,7 +151,7 @@ function filteredRoms(state: AppState): RomItem[] {
   return list;
 }
 
-function consoleGroups(state: AppState): ConsoleGroup[] {
+export function consoleGroups(state: AppState): ConsoleGroup[] {
   const map = new Map<string, RomItem[]>();
   for (const r of visibleRoms(state)) {
     const c = consoleOf(r);
@@ -177,7 +177,7 @@ function renderCompatBadge(rating?: string | null): string {
     </span>`;
 }
 
-function renderArtwork(r: RomItem, imgClass: string, placeholderClass = 'rom-placeholder-art'): string {
+export function renderArtwork(r: RomItem, imgClass: string, placeholderClass = 'rom-placeholder-art'): string {
   const title = romTitle(r);
   const [c1, c2] = paletteFor(r.displayName);
   return `
@@ -187,46 +187,8 @@ function renderArtwork(r: RomItem, imgClass: string, placeholderClass = 'rom-pla
     </div>`;
 }
 
-function consoleThumb(consoleName: string, isLight: boolean): string {
-  const [c1, c2] = paletteFor(consoleName);
-  const slug = getConsoleSlug(consoleName);
-  return `
-    <span class="sidebar-thumb" style="background: linear-gradient(135deg, ${c1}, ${c2});">
-      <img src="assets/consoles/console_${slug}_${isLight ? 'light' : 'dark'}.webp" alt="" draggable="false">
-    </span>`;
-}
-
 function countLabel(n: number): string {
   return `${n} ${n === 1 ? 'game' : 'games'}`;
-}
-
-function renderSidebar(state: AppState, isLight: boolean): string {
-  const groups = consoleGroups(state);
-  const total = visibleRoms(state).length;
-  const item = (id: string, label: string, count: number, thumb: string) => `
-    <button class="sidebar-item ${state.consoleFilter === id ? 'active' : ''}" data-filter="${esc(id)}" aria-current="${state.consoleFilter === id}">
-      ${thumb}
-      <span class="sidebar-label">${esc(label)}</span>
-      <span class="sidebar-count">${count}</span>
-    </button>`;
-
-  return `
-    <div class="sidebar-section-label">Library</div>
-    <nav class="sidebar-nav" aria-label="Consoles" data-own-arrows>
-      ${item(
-        'ALL',
-        'All games',
-        total,
-        '<span class="sidebar-thumb icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg></span>'
-      )}
-      ${groups.length ? '<div class="sidebar-section-label sub">Consoles</div>' : ''}
-      ${groups.map((g) => item(g.console, getConsoleFriendlyName(g.console), g.roms.length, consoleThumb(g.console, isLight))).join('')}
-    </nav>
-    <button class="sidebar-add" id="btnSidebarAdd">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add games</span>
-      <small>or drop files here</small>
-    </button>`;
 }
 
 function renderHero(rom: RomItem | null): string {
@@ -402,7 +364,7 @@ function renderToolbar(state: AppState): string {
     </div>`;
 }
 
-async function addRomFiles() {
+export async function addRomFiles() {
   const emuApi = (window as any).emufii;
   const selected = await emuApi.dialog.selectRomFiles();
   if (!selected?.length) return;
@@ -415,7 +377,7 @@ async function addRomFiles() {
   if (res?.count) toast(`Imported ${res.count} ${res.count === 1 ? 'game' : 'games'}`, 'success', 2500);
 }
 
-async function addRomFolder() {
+export async function addRomFolder() {
   const emuApi = (window as any).emufii;
   const selected = await emuApi.dialog.selectDirectory();
   if (!selected) return;
@@ -425,7 +387,7 @@ async function addRomFolder() {
   store.set({ roms: scanned, settings: { ...store.get().settings, romDirectories: config.settings.romDirectories } });
 }
 
-function romMenu(rom: RomItem): MenuEntry[] {
+export function romMenu(rom: RomItem): MenuEntry[] {
   const emuApi = (window as any).emufii;
   const hasCustomTitle = !!store.get().settings.customTitles?.[rom.id];
   return [
@@ -463,7 +425,7 @@ function romMenu(rom: RomItem): MenuEntry[] {
   ];
 }
 
-async function renameRom(rom: RomItem) {
+export async function renameRom(rom: RomItem) {
   const emuApi = (window as any).emufii;
   const value = await promptText({
     title: 'Rename game',
@@ -478,7 +440,7 @@ async function renameRom(rom: RomItem) {
   store.set({ settings: { ...store.get().settings, customTitles: config.settings.customTitles } });
 }
 
-async function hideRom(rom: RomItem) {
+export async function hideRom(rom: RomItem) {
   const emuApi = (window as any).emufii;
   await emuApi.config.toggleHideRom(rom.id);
   const config = await emuApi.config.get();
@@ -580,13 +542,16 @@ export function renderLibraryScreen(container: HTMLElement) {
   let viewport = container.querySelector<HTMLElement>('#libraryViewport');
   if (!viewport) {
     container.innerHTML = `
-      <div class="library-shell">
-        <aside class="library-sidebar" id="librarySidebar"></aside>
-        <section class="library-main">
+      <div class="page library-page">
+        <header class="page-header">
+          <div class="page-title-block">
+            <h1 class="page-title" id="libraryTitle"></h1>
+            <span class="page-count" id="libraryCount"></span>
+          </div>
           ${renderToolbar(state)}
-          <div class="library-hero" id="libraryHero"></div>
-          <div class="library-viewport" id="libraryViewport" data-layout="${layout}"></div>
-        </section>
+        </header>
+        <div class="library-hero" id="libraryHero"></div>
+        <div class="library-viewport" id="libraryViewport" data-layout="${layout}"></div>
       </div>
     `;
     viewport = container.querySelector<HTMLElement>('#libraryViewport')!;
@@ -619,35 +584,6 @@ export function renderLibraryScreen(container: HTMLElement) {
       btn.addEventListener('click', () => setLibraryLayout(btn.dataset.layoutBtn as Layout));
     });
 
-    const sidebar = container.querySelector<HTMLElement>('#librarySidebar')!;
-    sidebar.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      const item = target.closest<HTMLElement>('[data-filter]');
-      if (item) {
-        const filter = item.dataset.filter || 'ALL';
-        if (filter !== store.get().consoleFilter) {
-          sfx.play('click');
-          carouselIndex = 0;
-          store.set({ consoleFilter: filter });
-        }
-        return;
-      }
-      if (target.closest('#btnSidebarAdd')) {
-        sfx.play('click');
-        openContextMenuAt(target.closest('#btnSidebarAdd') as HTMLElement, [
-          { label: 'Add game files…', icon: ICONS.copy, action: addRomFiles },
-          { label: 'Add a folder…', icon: ICONS.folder, action: addRomFolder },
-        ]);
-      }
-    });
-    sidebar.addEventListener('keydown', (e) => {
-      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-      const items = Array.from(sidebar.querySelectorAll<HTMLElement>('[data-filter]'));
-      const idx = items.indexOf(document.activeElement as HTMLElement);
-      if (idx < 0) return;
-      e.preventDefault();
-      items[(idx + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
-    });
   } else {
     container.querySelectorAll<HTMLElement>('[data-layout-btn]').forEach((btn) => {
       const active = btn.dataset.layoutBtn === layout;
@@ -660,10 +596,10 @@ export function renderLibraryScreen(container: HTMLElement) {
     if (search && search.value !== state.searchQuery) search.value = state.searchQuery;
   }
 
-  const sidebar = container.querySelector<HTMLElement>('#librarySidebar')!;
-  const sidebarFocus = sidebar.contains(document.activeElement) ? (document.activeElement as HTMLElement).dataset.filter : null;
-  sidebar.innerHTML = renderSidebar(state, isLight);
-  if (sidebarFocus) sidebar.querySelector<HTMLElement>(`[data-filter="${CSS.escape(sidebarFocus)}"]`)?.focus({ preventScroll: true });
+  const titleEl = container.querySelector<HTMLElement>('#libraryTitle');
+  const countEl = container.querySelector<HTMLElement>('#libraryCount');
+  if (titleEl) titleEl.textContent = state.consoleFilter === 'ALL' ? 'Library' : getConsoleFriendlyName(state.consoleFilter);
+  if (countEl) countEl.textContent = countLabel(roms.length);
 
   const hadFocusInViewport = viewport.contains(document.activeElement);
   const focusedKey = (document.activeElement as HTMLElement | null)?.dataset?.romId;

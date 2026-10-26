@@ -32,48 +32,58 @@
   </header>
 
   <div class="app-scaffold">
-    <nav class="header-band" id="appHeaderBand" hidden>
-      <div class="header-left" id="headerLeftArea">
-        <button class="header-avatar-btn" id="headerProfileBtn" title="Your profile" aria-label="Your profile" aria-haspopup="dialog">
+    <aside class="app-rail" id="appRail" aria-label="Main navigation">
+      <button class="rail-profile" id="headerProfileBtn" title="Your profile" aria-haspopup="dialog">
+        <span class="rail-avatar">
           <span class="chip-avatar" id="headerProfileAvatar">J</span>
           <span class="user-status-dot online" id="headerStatusDot"></span>
+        </span>
+        <span class="rail-profile-text">
+          <span class="rail-profile-name" id="railProfileName">Player</span>
+          <span class="rail-profile-sub" id="headerSubtitle"></span>
+        </span>
+        <svg class="rail-profile-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <nav class="rail-nav" id="railNav">
+        <button class="rail-item" data-nav="library" title="Library">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>Library</span>
+          <span class="rail-badge" id="railLibraryCount"></span>
         </button>
+        <button class="rail-item" data-nav="sessions" title="Sessions (Ctrl+O)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="3" width="9.5" height="7.5" rx="2"/><rect x="12.5" y="13.5" width="9.5" height="7.5" rx="2"/><line x1="6.5" y1="10.5" x2="17.5" y2="13.5" stroke-linecap="round" stroke-dasharray="0.1 3.8"/></svg>
+          <span>Sessions</span>
+          <span class="rail-badge live" id="railSessionBadge" hidden></span>
+        </button>
+        <button class="rail-item" data-nav="friends" title="Friends (Ctrl+Shift+F)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Friends</span>
+          <span class="rail-badge" id="railFriendsBadge"></span>
+        </button>
+        <button class="rail-item" data-nav="settings" title="Settings (Ctrl+,)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
 
-        <div class="header-status-block" id="headerStatusBlock">
-          <div class="header-subtitle" id="headerSubtitle"></div>
-          <div class="header-title-row">
-            <span class="header-title" id="headerTitle">Library</span>
-            <span class="header-count" id="headerCount"></span>
-          </div>
-        </div>
-      </div>
+      <div class="rail-section-label">Consoles</div>
+      <nav class="rail-consoles" id="railConsoles" aria-label="Consoles"></nav>
 
-      <div class="header-right">
-        <button class="server-status-pill plate-button" id="vpsStatusChip" title="Emufii coordinator" aria-haspopup="dialog">
+      <div class="rail-footer">
+        <button class="rail-add" id="btnRailAdd" title="Add games (or drop files anywhere)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Add games</span>
+        </button>
+        <button class="server-status-pill" id="vpsStatusChip" title="Emufii coordinator" aria-haspopup="dialog">
           <span class="lamp" id="vpsLamp"></span>
           <span class="server-status-text">
             <span class="server-name">Emufii server</span>
             <span class="server-sub" id="vpsText">Connecting…</span>
           </span>
         </button>
-
-        <button class="icon-btn plate-button" id="headerFriendsBtn" title="Friends (Ctrl+Shift+F)" aria-label="Friends" aria-haspopup="dialog">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </button>
-
-        <button class="chip plate-button icon-chip" id="headerFinderBtn" title="Open sessions (Ctrl+O) · Join with a code (Ctrl+J)" aria-label="Open sessions" aria-haspopup="dialog">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="sessions-icon">
-            <rect x="2" y="3" width="9.5" height="7.5" rx="2" stroke="currentColor" stroke-width="2" fill="none" />
-            <rect x="12.5" y="13.5" width="9.5" height="7.5" rx="2" stroke="currentColor" stroke-width="2" fill="none" />
-            <line x1="6.5" y1="10.5" x2="17.5" y2="13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="0.1 3.8" />
-          </svg>
-        </button>
-
-        <button class="icon-btn plate-button" id="headerSettingsBtn" title="Settings (Ctrl+,)" aria-label="Settings">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
       </div>
-    </nav>
+    </aside>
 
     <div id="floatingPanelBackdrop" class="floating-panel-backdrop"></div>
     <div id="floatingCloudPanel" class="floating-cloud-panel" aria-hidden="true" inert></div>
@@ -82,10 +92,6 @@
       <div class="screen" id="currentScreenView"></div>
     </main>
   </div>
-
-  <dialog id="factSheetDialog">
-    <div class="dialog-content"></div>
-  </dialog>
 
   <div class="drop-overlay" id="dropOverlay" aria-hidden="true">
     <div class="drop-overlay-card">

@@ -3,7 +3,16 @@ import type { RomItem } from '../main/library/scanner.js';
 import { sfx } from './js/sfx.js';
 import { nav, isEditable } from './js/navigation.js';
 import { renderSplashScreen } from './js/screens/SplashScreen.js';
-import { renderLibraryScreen, setLibraryLayout } from './js/screens/LibraryScreen.js';
+import {
+  renderLibraryScreen,
+  setLibraryLayout,
+  consoleGroups,
+  paletteFor,
+  getConsoleFriendlyName,
+  getConsoleSlug,
+  addRomFiles,
+  addRomFolder,
+} from './js/screens/LibraryScreen.js';
 import { renderSessionScreen } from './js/screens/SessionScreen.js';
 import { renderSettingsScreen, resetSettingsView } from './js/screens/SettingsScreen.js';
 import { resolveTheme } from './js/theme.js';
@@ -21,7 +30,11 @@ import { syncFriendsRealtime, encodeAvatarToWebpBase64 } from './js/components/F
 import { openUpdateModal } from './js/components/UpdateModal.js';
 import { closeContextMenu } from './js/contextMenu.js';
 import { toast } from './js/toast.js';
-import { withTransition, animateDialogClose } from './js/motion.js';
+import { withTransition } from './js/motion.js';
+import { esc } from './js/html.js';
+import { renderGameScreen } from './js/screens/GameScreen.js';
+import { renderPanelPage } from './js/screens/PanelPages.js';
+import { openContextMenuAt } from './js/contextMenu.js';
 
 const emuApi = (window as any).emufii;
 
@@ -217,8 +230,6 @@ async function bootstrap() {
   await sfx.init();
 
   nav.init({ onBack: goBack });
-  const sheet = document.getElementById('factSheetDialog') as HTMLDialogElement | null;
-  if (sheet) animateDialogClose(sheet);
   window.addEventListener('keydown', handleShortcuts);
   setupImageFallbacks();
   setupDragAndDrop();
@@ -249,20 +260,58 @@ async function bootstrap() {
     .then((isMax: boolean) => isMax && updateMaximizeUI(true))
     .catch(() => {});
 
-  const headerActions: [string, () => void][] = [
-    ['headerFinderBtn', () => toggleFloatingPanel('sessions')],
-    ['headerJoinBtn', () => toggleFloatingPanel('join')],
-    ['headerFriendsBtn', () => toggleFloatingPanel('friends')],
-    ['headerProfileBtn', () => toggleFloatingPanel('profile')],
-    ['vpsStatusChip', () => toggleFloatingPanel('server')],
-    ['headerSettingsBtn', toggleSettings],
-  ];
-  for (const [id, action] of headerActions) {
-    document.getElementById(id)?.addEventListener('click', () => {
-      sfx.play('click');
-      action();
-    });
-  }
+  document.getElementById('railNav')?.addEventListener('click', (e) => {
+    const item = (e.target as HTMLElement).closest<HTMLElement>('[data-nav]');
+    if (!item) return;
+    const target = item.dataset.nav as ScreenType;
+    sfx.play('click');
+    closeFloatingPanel();
+    if (target === 'library') store.set({ consoleFilter: 'ALL', searchQuery: '' });
+    if (target === 'sessions' && store.get().activeSession && store.get().currentScreen !== 'session') {
+      store.navigate('session');
+      return;
+    }
+    store.navigate(target);
+  });
+  document.getElementById('railConsoles')?.addEventListener('click', (e) => {
+    const item = (e.target as HTMLElement).closest<HTMLElement>('[data-console-filter]');
+    if (!item) return;
+    sfx.play('click');
+    closeFloatingPanel();
+    store.set({ consoleFilter: item.dataset.consoleFilter || 'ALL', searchQuery: '' });
+    store.navigate('library');
+  });
+  document.getElementById('appRail')?.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const items = Array.from(document.querySelectorAll<HTMLElement>('#railNav [data-nav], #railConsoles [data-console-filter]'));
+    const idx = items.indexOf(document.activeElement as HTMLElement);
+    if (idx < 0) return;
+    e.preventDefault();
+    items[Math.max(0, Math.min(items.length - 1, idx + (e.key === 'ArrowDown' ? 1 : -1)))].focus();
+  });
+  document.getElementById('headerProfileBtn')?.addEventListener('click', () => {
+    sfx.play('click');
+    toggleFloatingPanel('profile');
+  });
+  document.getElementById('vpsStatusChip')?.addEventListener('click', () => {
+    sfx.play('click');
+    toggleFloatingPanel('server');
+  });
+  document.getElementById('btnRailAdd')?.addEventListener('click', (e) => {
+    sfx.play('click');
+    openContextMenuAt(e.currentTarget as HTMLElement, [
+      {
+        label: 'Add game files…',
+        icon: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+        action: addRomFiles,
+      },
+      {
+        label: 'Add a folder…',
+        icon: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+        action: addRomFolder,
+      },
+    ]);
+  });
   document.getElementById('floatingPanelBackdrop')?.addEventListener('click', () => closeFloatingPanel());
 
   const config = await emuApi.config.get();
@@ -291,7 +340,7 @@ async function bootstrap() {
   if (backdropCanvas) trayBackdrop = new TrayBackdrop(backdropCanvas);
 
   store.set({ profile: config.profile, settings: config.settings });
-  updateHeader(store.get());
+  updateRail(store.get());
 
   loadMetadataAndScan();
 
@@ -343,7 +392,7 @@ async function bootstrap() {
   let last = libraryKey(store.get());
   let lastView = '';
   store.subscribe((state) => {
-    updateHeader(state);
+    updateRail(state);
     document.body.classList.toggle('reduce-motion', state.settings.animations === false);
 
     const resolvedTheme = resolveTheme(state.settings.theme || 'dark');
@@ -392,12 +441,10 @@ function libraryKey(state: AppState): string {
   ].join('|');
 }
 
-function updateHeader(state: AppState) {
+function updateRail(state: AppState) {
   const avatarEl = document.getElementById('headerProfileAvatar');
   const dotEl = document.getElementById('headerStatusDot');
   const subtitleEl = document.getElementById('headerSubtitle');
-  const titleEl = document.getElementById('headerTitle');
-  const countEl = document.getElementById('headerCount');
 
   if (avatarEl) {
     const url = state.profile.avatarDataUrl;
@@ -420,28 +467,69 @@ function updateHeader(state: AppState) {
     const friendsList = state.settings.friends || [];
     const onlineCount = friendsList.filter((code) => !!state.friendStatuses?.present?.[code]).length;
     subtitleEl.textContent =
-      friendsList.length === 0
-        ? state.profile.name || 'Player'
+      getPresence() === 'offline'
+        ? 'Invisible'
+        : friendsList.length === 0
+        ? 'Online'
         : onlineCount > 0
         ? `${onlineCount} ${onlineCount === 1 ? 'friend' : 'friends'} online`
         : `0 of ${friendsList.length} friends online`;
   }
 
-  if (state.currentScreen === 'session') {
-    const session = state.activeSession;
-    if (titleEl) titleEl.textContent = session?.code === 'ONLINE' ? 'Online play' : 'Session';
-    if (countEl) countEl.textContent = session && session.code !== 'ONLINE' ? `${session.isHost ? 'Host' : 'Guest'} · ${session.code}` : '';
-    return;
+  const nameEl = document.getElementById('railProfileName');
+  if (nameEl) nameEl.textContent = state.profile.name || 'Player';
+
+  const navScreen: Record<string, string> = { game: 'library', session: 'sessions' };
+  const activeNav = navScreen[state.currentScreen] || state.currentScreen;
+  document.querySelectorAll<HTMLElement>('#railNav [data-nav]').forEach((item) => {
+    const active = item.dataset.nav === activeNav;
+    item.classList.toggle('active', active);
+    item.setAttribute('aria-current', active ? 'page' : 'false');
+  });
+
+  const visible = state.roms.filter((r: RomItem) => !state.settings.hiddenRoms?.includes(r.id));
+  const libCount = document.getElementById('railLibraryCount');
+  if (libCount) libCount.textContent = visible.length ? String(visible.length) : '';
+
+  const friendsBadge = document.getElementById('railFriendsBadge');
+  if (friendsBadge) {
+    const friends = state.settings.friends || [];
+    const online = friends.filter((code) => !!state.friendStatuses?.present?.[code]).length;
+    const pending = (state.settings.pendingFriendRequests || []).length + (state.settings.pendingSessionInvites || []).length;
+    friendsBadge.textContent = pending ? String(pending) : online ? `${online} on` : '';
+    friendsBadge.classList.toggle('alert', pending > 0);
   }
 
-  const isInFolder = state.currentScreen === 'library' && state.consoleFilter !== 'ALL';
-  const visible = state.roms.filter((r: RomItem) => !state.settings.hiddenRoms?.includes(r.id));
-  const count = isInFolder
-    ? visible.filter((r: RomItem) => ((r.console as string) === 'GBA' ? 'DS' : r.console) === state.consoleFilter).length
-    : visible.length;
+  const sessionBadge = document.getElementById('railSessionBadge');
+  if (sessionBadge) {
+    const session = state.activeSession;
+    sessionBadge.hidden = !session;
+    sessionBadge.textContent = session ? (session.code === 'ONLINE' ? 'Live' : session.code) : '';
+  }
 
-  if (titleEl) titleEl.textContent = isInFolder ? state.consoleFilter : 'Library';
-  if (countEl) countEl.textContent = `${count} ${count === 1 ? 'game' : 'games'}`;
+  const consolesEl = document.getElementById('railConsoles');
+  if (consolesEl) {
+    const groups = consoleGroups(state);
+    const filter = state.currentScreen === 'library' || state.currentScreen === 'game' ? state.consoleFilter : null;
+    const key = groups.map((g) => `${g.console}:${g.roms.length}`).join(',') + `|${filter}|${document.body.dataset.theme}`;
+    if (consolesEl.dataset.key !== key) {
+      consolesEl.dataset.key = key;
+      const light = document.body.dataset.theme === 'light';
+      consolesEl.innerHTML = groups
+        .map((g) => {
+          const [c1, c2] = paletteFor(g.console);
+          return `
+          <button class="rail-console ${filter === g.console ? 'active' : ''}" data-console-filter="${esc(g.console)}" title="${esc(getConsoleFriendlyName(g.console))}">
+            <span class="rail-console-thumb" style="background: linear-gradient(135deg, ${c1}, ${c2});">
+              <img src="assets/consoles/console_${getConsoleSlug(g.console)}_${light ? 'light' : 'dark'}.webp" alt="" draggable="false">
+            </span>
+            <span class="rail-console-name">${esc(getConsoleFriendlyName(g.console))}</span>
+            <span class="rail-console-count">${g.roms.length}</span>
+          </button>`;
+        })
+        .join('');
+    }
+  }
 }
 
 async function loadMetadataAndScan() {
@@ -467,8 +555,7 @@ function renderCurrentScreen(screen: ScreenType, fresh = true) {
     cleanupCurrentScreen = null;
   }
 
-  const headerBand = document.getElementById('appHeaderBand');
-  if (headerBand) headerBand.hidden = screen === 'splash' || screen === 'settings';
+  document.body.dataset.screen = screen;
 
   const titlebarBrand = document.querySelector<HTMLElement>('.titlebar-brand');
   if (titlebarBrand) titlebarBrand.style.visibility = screen === 'splash' ? 'hidden' : 'visible';
@@ -505,6 +592,13 @@ function renderCurrentScreen(screen: ScreenType, fresh = true) {
       break;
     case 'library':
       cleanupCurrentScreen = renderLibraryScreen(targetView) || null;
+      break;
+    case 'game':
+      cleanupCurrentScreen = renderGameScreen(targetView) || null;
+      break;
+    case 'sessions':
+    case 'friends':
+      cleanupCurrentScreen = renderPanelPage(targetView, screen);
       break;
     case 'session':
       cleanupCurrentScreen = renderSessionScreen(targetView) || null;
