@@ -73,8 +73,23 @@
       "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
     },
     {
+      "gameId": "nsmb",
+      "title": "New Super Mario Bros.",
+      "productCode": "A2DP",
+      "profileId": "nsmb-eu-cartridge-preparation-v1",
+      "pipeline": "nsmb-a2dp-cartridge-preparation-rows10-v1",
+      "romSha256": "dd2e519a9e46134e213e6e63dd2b478d9a258627769b777baddb2316dc21b81d",
+      "profileFingerprint": "8efa0c76ade3005001b115c1d40a8ecf0428a57b9b7eac0d7593d51129eb7255",
+      "players": [
+        2
+      ],
+      "runtimeVersion": "android-hle-81a4372b6e559756",
+      "canonicalRomSha256": "dd2e519a9e46134e213e6e63dd2b478d9a258627769b777baddb2316dc21b81d",
+      "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c"
+    },
+    {
       "gameId": "experimental",
-      "title": "Mario Slam Basketball — HLE SDK (test)",
+      "title": "Mario Slam Basketball \u00e2\u20ac\u201d HLE SDK (test)",
       "productCode": "AB3P",
       "profileId": "experimental-sdk-room-v2",
       "pipeline": "experimental-wm-freedownload-v2",

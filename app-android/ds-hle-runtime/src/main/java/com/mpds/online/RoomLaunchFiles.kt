@@ -78,7 +78,8 @@ internal class RoomLaunchFiles private constructor(val directory:File) : Closeab
                             "DKR room rejects linked paths")
                         val reason=NativeBridge.nativeSingleOwnerError()
                         android.util.Log.w("Wantap-room","Preparation importer: " +
-                            if(reason in known)reason else "unclassified-native-rejection")
+                            if(reason in known)reason else "unclassified-native-rejection" +
+                                if(BuildConfig.DEBUG)": "+reason.take(160) else "")
                     }
                     check(imported==1) { "room-preparation-rejected" }
                     active();Files.delete(input.toPath())

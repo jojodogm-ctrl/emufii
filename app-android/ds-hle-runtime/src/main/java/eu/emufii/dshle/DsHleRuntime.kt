@@ -63,7 +63,7 @@ object DsHleRuntime {
         val parsed=GuestRequest.parse("0000",request.playerName) ?: return LaunchResult.InvalidRequest
         val hostCode=request.roomCode.trim().uppercase(java.util.Locale.ROOT)
         if(request.roomCode.any {it.code>127}||!Regex("[A-Z0-9-]{3,16}").matches(hostCode))return LaunchResult.InvalidRequest
-        if(request.game !in (setOf("mpds","mkds","dkr") + if(BuildConfig.SDK_BLOCKS)setOf("experimental")else emptySet()) || request.players !in 2..when(request.game){"mpds"->4;"dkr"->2;else->8} ||
+        if(request.game !in (setOf("mpds","mkds","dkr","nsmb") + if(BuildConfig.SDK_BLOCKS)setOf("experimental")else emptySet()) || request.players !in 2..when(request.game){"mpds"->4;"dkr","nsmb"->2;else->8} ||
             request.romUri.scheme !in setOf("content","file") ||
             request.game=="mpds"&&parsed.playerName.length>8)return LaunchResult.InvalidRequest
         if(!supported)return LaunchResult.UnsupportedDevice
