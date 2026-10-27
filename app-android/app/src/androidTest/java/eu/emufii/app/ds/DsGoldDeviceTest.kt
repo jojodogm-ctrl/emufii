@@ -256,6 +256,71 @@ class DsGoldDeviceTest {
         }
     }
 
+    /** Android-vs-Android GOLD host for emulated Thors: the same manager and real
+     * start button as above, but the guest is a second Emufii device joining from
+     * its Open sessions list, and the round is held so both screens can be driven
+     * and captured from outside (adb). Optional; needs dsGoldRomPath. */
+    @Test(timeout = 3_600_000)
+    fun goldHostHoldsRoundForAndroidGuest() {
+        val arguments = InstrumentationRegistry.getArguments()
+        val supplied = arguments.getString("dsGoldRomPath")
+        assumeTrue("Provide dsGoldRomPath and a second Emufii device as guest", !supplied.isNullOrBlank())
+        assertTrue("The native GOLD engine requires ARM64", DsHleRuntime.supported)
+        assertFalse(DsHleRuntime.active.value)
+        val product = arguments.getString("dsGoldProductCode") ?: "A8TE"
+        val holdSeconds = (arguments.getString("dsGoldHoldSeconds") ?: "600").toInt().coerceIn(10, 3000)
+        val file = privateFile(checkNotNull(supplied))
+        val rom = Rom(Uri.fromFile(file), file.name, TEST_TITLE, Console.DS, productCode = product)
+        val identity = runBlocking { withTimeout(60_000) { DsCatalog.assess(context, rom.uri) } }
+        assertEquals(DsTier.GOLD, identity.tier)
+        val profile = ProfileStore(context).profile.value.copy(name = "ThorA")
+        val manager = DsSessionManager.get(context)
+        assertEquals("A test must not replace an existing DS session", null, manager.session.value)
+        var created = false
+        try {
+            managed(120_000) { manager.create(rom, identity, 2, private = false, profile = profile).getOrThrow() }
+            created = true
+            val session = checkNotNull(manager.session.value)
+            Log.i(TAG, "GOLD_HOLD_SESSION code=${session.code} game=${identity.profile?.gameId}")
+            managed(120_000) { manager.launchGame().getOrThrow() }
+            var lobby = ""
+            await(900, { "Android guest did not enable start: ${lobby.take(512)}" }) {
+                requireLive(manager)
+                onMain {
+                    val activity = hostActivity()
+                    if (activity == null) false else {
+                        lobby = activity.findViewById<TextView>(com.mpds.online.R.id.lobbyStatus).text.toString()
+                        activity.findViewById<Button>(com.mpds.online.R.id.joinButton).isEnabled
+                    }
+                }
+            }
+            Log.i(TAG, "GOLD_HOLD_GUEST_READY lobby=${lobby.take(200)}")
+            onMain { check(checkNotNull(hostActivity()).findViewById<Button>(com.mpds.online.R.id.joinButton).performClick()) }
+            Log.i(TAG, "GOLD_HOLD_START_CLICKED code=${session.code}")
+            await(900, { "Native GOLD cartridge did not boot; lobby=${lobby.take(512)}" }) {
+                requireLive(manager)
+                lobby = onMain { hostActivity()?.findViewById<TextView>(com.mpds.online.R.id.lobbyStatus)?.text?.toString().orEmpty() }
+                // ARM-translated emulators answer slowly while the core is busy.
+                try { bounded(60) { RoomEngine.nativeIsBooted() } == 1 }
+                catch (_: java.util.concurrent.TimeoutException) { false }
+                catch (failure: IllegalStateException) {
+                    if (failure.message !in setOf("RoomEngine requires an open lease", "Room lease is not ready")) throw failure
+                    false
+                }
+            }
+            Log.i(TAG, "GOLD_HOLD_BOOTED code=${session.code}")
+            val until = SystemClock.elapsedRealtime() + holdSeconds * 1000L
+            while (SystemClock.elapsedRealtime() < until) {
+                requireLive(manager)
+                val fps = onMain { hostActivity()?.findViewById<DsView>(com.mpds.online.R.id.dsView)?.fps ?: -1f }
+                Log.i(TAG, "GOLD_HOLD_TICK fps=$fps error=${runCatching { bounded(30) { RoomEngine.nativeSingleOwnerError() } }.getOrDefault("slow").take(200)}")
+                SystemClock.sleep(10_000)
+            }
+        } finally {
+            if (created && manager.session.value != null) managed(60_000) { manager.leave().getOrThrow() }
+        }
+    }
+
     private fun requireLive(manager: DsSessionManager) {
         val session = checkNotNull(manager.session.value) { "Emufii unexpectedly released its DS session" }
         check(session.error == null) { "Emufii session error: ${session.error}" }
