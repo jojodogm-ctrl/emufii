@@ -18,6 +18,8 @@ internal object RoomInvitationIdentity {
     private const val NSMB_BOOT = "3ab3644a786183c758f9789f52e51325482c9771973672fa585af493279981e3"
     private const val NSMB_SET = "0d8c0d4fa62d8b256130d068b9814d6a48578d9345d3e6a095e10270b32fa96d"
     private const val EXP_PROFILE = "experimental-sdk-room-v2"
+    // Wide-window (SDK500) metadata carries 64 send slots: bound each meta by 64 KiB.
+    internal const val NSMB_GENERATED_MAX_BOOT = 38619610L
 
     fun validate(r: Map<String, Any?>, selected: RoomDirectory.Snapshot) {
         val game = game(selected); val players = selected.settings.players; val seat = selected.seat
@@ -28,7 +30,7 @@ internal object RoomInvitationIdentity {
                 r["sdkPipeline"] == NSMB_PIPE && r["romSha256"] == NSMB_ROM &&
                 r["authorityTransport"] == "n2s1-loopback-datagram-v2" && r["bufferTicks"] == 10.0 &&
                 players == 2 && r["savedAid"] == (seat - 1).toDouble() && r["snapshotSha256"] == "" &&
-                hash(r["setSha256"]) && hash(r["bootSha256"]) && inRange(r["bootBytes"], 357, 38527422)
+                hash(r["setSha256"]) && hash(r["bootSha256"]) && inRange(r["bootBytes"], 357, NSMB_GENERATED_MAX_BOOT)
             check(generated || r["profile"] == "nsmb-eu-cartridge-preparation-v1" &&
                 r["sdkPipeline"] == NSMB_PIPE && r["bootSha256"] == NSMB_BOOT &&
                 r["bootBytes"] == 38527066.0 && r["bufferTicks"] == 10.0, "invitation-profile")

@@ -9,7 +9,7 @@ import org.junit.Test
 class NativePinsTest {
     @Test fun embeddedRuntimeUsesTheRebuiltSdk500NativeLibraries() {
         val expected = mapOf(
-            "libmelonjni.so" to "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c",
+            "libmelonjni.so" to "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9",
             "libc++_shared.so" to "83269b3124a287fac36b17c9fb64beb398c83dad6677b19ce63cf80d09966fd7"
         )
         expected.forEach { (name, pin) ->

@@ -70,7 +70,7 @@ class DsHleHostAccess(
             .also {require(TICKET.matches(it));current()}
     }
     override fun openPreparation(seat:Int,kind:String,bytes:Long,sha256:String):InputStream {
-        require(generation>0&&seat in 1..8&&kind in setOf("seat","boot")&&bytes in 1..38527422&&HASH.matches(sha256))
+        require(generation>0&&seat in 1..8&&kind in setOf("seat","boot")&&bytes in 1..MAX_PREPARATION_BYTES&&HASH.matches(sha256))
         // No ROM source/bytes enter this route. The signed invitation selects
         // the exact private preparation; runtime revalidates it before staging.
         val result=call("preparation",body().put("generation",generation).put("seat",seat).put("kind",kind)
@@ -100,6 +100,8 @@ class DsHleHostAccess(
     }
     override fun toString()="DsHleHostAccess(redacted)"
     companion object {
+        // Wide-window NSMB generated bundles: two cores plus two 64 KiB metas.
+        private const val MAX_PREPARATION_BYTES=38619610L
         private val HASH=Regex("[0-9a-f]{64}")
         private val ROUTE=Regex("[A-Za-z0-9_-]{1,15}")
         private val TICKET=Regex("[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]")

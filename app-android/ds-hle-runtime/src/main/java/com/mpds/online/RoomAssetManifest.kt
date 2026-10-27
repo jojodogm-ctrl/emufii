@@ -30,7 +30,7 @@ internal object RoomAssetManifest {
         } else if (game == "nsmb" || game == "mkds" && r["mkdsMenu"] == true) {
             val hash = r["bootSha256"] as? String
             require(RoomInvitation.hash(hash))
-            out.add(Entry("boot", RoomInvitation.number(r["bootBytes"], 1, 38527422), hash!!))
+            out.add(Entry("boot", RoomInvitation.number(r["bootBytes"], 1, RoomInvitationIdentity.NSMB_GENERATED_MAX_BOOT), hash!!))
         }
         return out.toList()
     }

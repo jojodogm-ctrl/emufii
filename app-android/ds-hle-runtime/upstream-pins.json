@@ -25,7 +25,7 @@
     "latencyCeilingMs": 500,
     "productionModified": false
   },
-  "runtimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c",
+  "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9",
   "stdlibSha256": "83269b3124a287fac36b17c9fb64beb398c83dad6677b19ce63cf80d09966fd7",
   "sdkBlocks": {
     "cohort": 5,
@@ -555,5 +555,21 @@
     ],
     "raceBufferChanged": false,
     "productionModified": false
+  },
+  "nsmbWideBoundsPatch": {
+    "baseCommit": "312f0d9c864472386ad6a8247d8c47f1d3fc03a9",
+    "reason": "SDK500 wide window serializes 64 send slots; NSMB generated bundles need 2x64KiB meta bounds",
+    "previousRuntimeSha256": "81a4372b6e5597561c255202cd8d25201a9dcbffdc7d4dcb002afcb31e1a150c",
+    "files": [
+      {
+        "path": "ds-anywhere/wasmelonDS/src/NsmbGeneratedPrep.h",
+        "after": "c6bbcb731b664af97a21f5b5df816a65adc82b77c8577b6564878aa251d0c4c2"
+      },
+      {
+        "path": "android/app/src/main/cpp/SingleOwnerBootstrap.h",
+        "after": "11e23cdc12380613da393ef21f54240a090b0bd6380ecf8b00c67d5b28a3db10"
+      }
+    ],
+    "build": "cmake android/app/src/main/cpp -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-26 -DANDROID_STL=c++_shared -DANDROID_SINGLE_OWNER=ON -DANDROID_SDK_BLOCKS=ON -DCMAKE_BUILD_TYPE=Release, NDK 26.3.11579264, CMake 3.22.1, llvm-strip --strip-unneeded"
   }
 }
