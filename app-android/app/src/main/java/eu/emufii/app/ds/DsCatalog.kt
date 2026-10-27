@@ -109,8 +109,8 @@ data class DsSessionSpec internal constructor(
 }
 
 object DsCatalog {
-    private const val GOLD_RUNTIME = "android-hle-9bd1b92d70e3a7ca"
-    private const val GOLD_SHA = "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+    private const val GOLD_RUNTIME = "android-hle-275f8fd4c104f96c"
+    private const val GOLD_SHA = "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     @Volatile private var loaded: Registry? = null
     private val hashes = ConcurrentHashMap<FileStamp, String>()
     private const val MAX_ROM_BYTES = 512L * 1024 * 1024

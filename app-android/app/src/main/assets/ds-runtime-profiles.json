@@ -9,15 +9,15 @@
       "profileId": "mpds-us-debugmenu-room-v1",
       "pipeline": "mpds-us-debugmenu-room-p4-v2",
       "romSha256": "07b4ac7550e5ed876dd83578d49441712bbbd8127cdd60155e4d1a87604a5af7",
-      "profileFingerprint": "7f003b10cdd546d2710180752194da48890e92b07444ee602899a0dbd150e034",
+      "profileFingerprint": "8254e99f59a4bed5bcecb77d5e7794dbd384db1e92c6a8a261904efed0dd5479",
       "players": [
         2,
         3,
         4
       ],
-      "runtimeVersion": "android-hle-9bd1b92d70e3a7ca",
+      "runtimeVersion": "android-hle-275f8fd4c104f96c",
       "canonicalRomSha256": "07b4ac7550e5ed876dd83578d49441712bbbd8127cdd60155e4d1a87604a5af7",
-      "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+      "runtimeSha256": "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     },
     {
       "gameId": "mpds",
@@ -26,15 +26,15 @@
       "profileId": "mpds-us-debugmenu-room-v1",
       "pipeline": "mpds-us-debugmenu-room-p4-v2",
       "romSha256": "28ce638914e3304eab95167cd17dc1ef893d226c18f9395683d5cbdf2e35ee2f",
-      "profileFingerprint": "7f003b10cdd546d2710180752194da48890e92b07444ee602899a0dbd150e034",
+      "profileFingerprint": "8254e99f59a4bed5bcecb77d5e7794dbd384db1e92c6a8a261904efed0dd5479",
       "players": [
         2,
         3,
         4
       ],
-      "runtimeVersion": "android-hle-9bd1b92d70e3a7ca",
+      "runtimeVersion": "android-hle-275f8fd4c104f96c",
       "canonicalRomSha256": "07b4ac7550e5ed876dd83578d49441712bbbd8127cdd60155e4d1a87604a5af7",
-      "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+      "runtimeSha256": "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     },
     {
       "gameId": "mkds",
@@ -43,7 +43,7 @@
       "profileId": "mkds-us-authority-v1",
       "pipeline": "mkds-authority-menu-p8-q64-pair-v1",
       "romSha256": "0ea8a91a0ae3e9db26337c25a6a8568f6737fa36c1e0761988c0fa0ecbf210ed",
-      "profileFingerprint": "062cf6937d11b6ff0998f1aae153b37546846b63007a820c7349ce05d02c4902",
+      "profileFingerprint": "0d18e3489392531b619ca5fa4e66869a5b9d03b48667a4cda15f8c09ad03a064",
       "players": [
         2,
         3,
@@ -53,9 +53,9 @@
         7,
         8
       ],
-      "runtimeVersion": "android-hle-9bd1b92d70e3a7ca",
+      "runtimeVersion": "android-hle-275f8fd4c104f96c",
       "canonicalRomSha256": "0ea8a91a0ae3e9db26337c25a6a8568f6737fa36c1e0761988c0fa0ecbf210ed",
-      "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+      "runtimeSha256": "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     },
     {
       "gameId": "dkr",
@@ -64,13 +64,13 @@
       "profileId": "dkr-eu-sdk-room-v1",
       "pipeline": "dkr-awdp-sdk3-room-v1",
       "romSha256": "c29bb5a082bc4c8507e08f7ab6fcb2ef825ba079897e32f487c872172cc9946d",
-      "profileFingerprint": "af3bc8db6820bf2ffeb74b8537065422eb72ee9e093c29cd859312888006bb44",
+      "profileFingerprint": "de9fea0c983aa2c2278926ba07ab8c4bfa3401a65c537ef0245faad7b3d33ea2",
       "players": [
         2
       ],
-      "runtimeVersion": "android-hle-9bd1b92d70e3a7ca",
+      "runtimeVersion": "android-hle-275f8fd4c104f96c",
       "canonicalRomSha256": "c29bb5a082bc4c8507e08f7ab6fcb2ef825ba079897e32f487c872172cc9946d",
-      "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+      "runtimeSha256": "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     },
     {
       "gameId": "nsmb",
@@ -79,13 +79,13 @@
       "profileId": "nsmb-eu-cartridge-preparation-v1",
       "pipeline": "nsmb-a2dp-cartridge-preparation-rows10-v1",
       "romSha256": "dd2e519a9e46134e213e6e63dd2b478d9a258627769b777baddb2316dc21b81d",
-      "profileFingerprint": "b5a3cbb3b5c920f20adedeedf62bc3aa5072e39e402685c7e61b8c7ef70c9bbf",
+      "profileFingerprint": "0e6372824ccebf302639751a6ecb155d6f92c74418acede94bdfd65e3cd73d42",
       "players": [
         2
       ],
-      "runtimeVersion": "android-hle-9bd1b92d70e3a7ca",
+      "runtimeVersion": "android-hle-275f8fd4c104f96c",
       "canonicalRomSha256": "dd2e519a9e46134e213e6e63dd2b478d9a258627769b777baddb2316dc21b81d",
-      "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+      "runtimeSha256": "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     },
     {
       "gameId": "experimental",
@@ -94,13 +94,13 @@
       "profileId": "experimental-sdk-room-v2",
       "pipeline": "experimental-wm-freedownload-v2",
       "romSha256": "ca4242d7f88a4b8c4c84e28adcebb3ff558e11863c31d3e83c848a4a230715dc",
-      "profileFingerprint": "ba223f8367e280eb5541388e5efe31f810daf42562f58d1506334959d43738fd",
+      "profileFingerprint": "f0f8a190d8a1e51f4656434c95c55da74ce4019cc116cc6742877ed683a964fc",
       "players": [
         2
       ],
-      "runtimeVersion": "android-hle-9bd1b92d70e3a7ca",
+      "runtimeVersion": "android-hle-275f8fd4c104f96c",
       "canonicalRomSha256": "ca4242d7f88a4b8c4c84e28adcebb3ff558e11863c31d3e83c848a4a230715dc",
-      "runtimeSha256": "9bd1b92d70e3a7ca39d99d5074ac51847f8ff2852b70ab82d61c4642ba83b5c9"
+      "runtimeSha256": "275f8fd4c104f96c7801b3ce21d646009324e1db26367ccddcc8fe187a1acd45"
     }
   ],
   "silver": {
