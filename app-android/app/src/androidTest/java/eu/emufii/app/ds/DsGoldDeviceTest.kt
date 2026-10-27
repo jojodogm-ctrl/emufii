@@ -310,14 +310,62 @@ class DsGoldDeviceTest {
             }
             Log.i(TAG, "GOLD_HOLD_BOOTED code=${session.code}")
             val until = SystemClock.elapsedRealtime() + holdSeconds * 1000L
+            var nextTick = 0L
             while (SystemClock.elapsedRealtime() < until) {
                 requireLive(manager)
-                val fps = onMain { hostActivity()?.findViewById<DsView>(com.mpds.online.R.id.dsView)?.fps ?: -1f }
-                Log.i(TAG, "GOLD_HOLD_TICK fps=$fps error=${runCatching { bounded(30) { RoomEngine.nativeSingleOwnerError() } }.getOrDefault("slow").take(200)}")
-                SystemClock.sleep(10_000)
+                runInjectedCommands()
+                if (SystemClock.elapsedRealtime() >= nextTick) {
+                    nextTick = SystemClock.elapsedRealtime() + 10_000
+                    val fps = onMain { hostActivity()?.findViewById<DsView>(com.mpds.online.R.id.dsView)?.fps ?: -1f }
+                    Log.i(TAG, "GOLD_HOLD_TICK fps=$fps error=${runCatching { bounded(30) { RoomEngine.nativeSingleOwnerError() } }.getOrDefault("slow").take(200)}")
+                }
+                SystemClock.sleep(200)
             }
         } finally {
             if (created && manager.session.value != null) managed(60_000) { manager.leave().getOrThrow() }
+        }
+    }
+
+    /** Guest-side companion for emulated Thors: keeps this process instrumented
+     * (the guest still joins through the normal Emufii UI) so touch commands can
+     * be injected with real per-frame timing. Optional; needs dsInjectSeconds. */
+    @Test(timeout = 3_600_000)
+    fun injectTouchesWhileGuestPlays() {
+        val seconds = InstrumentationRegistry.getArguments().getString("dsInjectSeconds")
+        assumeTrue("Provide dsInjectSeconds for this optional companion", !seconds.isNullOrBlank())
+        val until = SystemClock.elapsedRealtime() + checkNotNull(seconds).toInt().coerceIn(10, 3000) * 1000L
+        Log.i(TAG, "INJECT_READY")
+        while (SystemClock.elapsedRealtime() < until) { runInjectedCommands(); SystemClock.sleep(200) }
+    }
+
+    /** Commands in files/thor/inject.txt, one per line, screen pixels:
+     * "drag x1 y1 x2 y2 ms" or "tap x y ms". The file is consumed once. */
+    private fun runInjectedCommands() {
+        val file = File(context.filesDir, "thor/inject.txt")
+        if (!file.isFile) return
+        val lines = file.readLines(); file.delete()
+        val automation = instrumentation.uiAutomation
+        fun send(action: Int, down: Long, x: Float, y: Float) {
+            val event = android.view.MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, y, 0)
+            event.source = android.view.InputDevice.SOURCE_TOUCHSCREEN
+            try { check(automation.injectInputEvent(event, true)) { "inject failed" } } finally { event.recycle() }
+        }
+        for (line in lines) {
+            val p = line.trim().split(Regex("\\s+")); if (p.isEmpty() || p[0].isEmpty()) continue
+            val down = SystemClock.uptimeMillis()
+            when (p[0]) {
+                "tap" -> { val (x, y) = p[1].toFloat() to p[2].toFloat()
+                    send(android.view.MotionEvent.ACTION_DOWN, down, x, y)
+                    SystemClock.sleep(p.getOrNull(3)?.toLong() ?: 300)
+                    send(android.view.MotionEvent.ACTION_UP, down, x, y) }
+                "drag" -> { val (x1, y1, x2, y2) = p.subList(1, 5).map { it.toFloat() }
+                    val ms = p.getOrNull(5)?.toLong() ?: 600; val steps = (ms / 16).coerceAtLeast(2)
+                    send(android.view.MotionEvent.ACTION_DOWN, down, x1, y1); SystemClock.sleep(150)
+                    for (i in 1..steps) { val f = i.toFloat() / steps
+                        send(android.view.MotionEvent.ACTION_MOVE, down, x1 + (x2 - x1) * f, y1 + (y2 - y1) * f); SystemClock.sleep(16) }
+                    SystemClock.sleep(200); send(android.view.MotionEvent.ACTION_UP, down, x2, y2) }
+            }
+            Log.i(TAG, "INJECTED $line")
         }
     }
 
