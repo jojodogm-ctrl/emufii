@@ -126,6 +126,9 @@ internal class RoomAssetWire(
         failure?.let { throw it }
     }
     private fun progress() { lastProgress = System.nanoTime() }
+    /** The carrier only became usable now (a host lane waits for its guest):
+     * count idleness from this point, not from construction. */
+    fun carrierReady() = lock.withLock { if (failure == null) progress() }
     private fun awaitChange(deadline: Long) {
         ensureLocked(deadline)
         changed.awaitNanos(minOf(retryNanos, deadline - System.nanoTime(), idleNanos - (System.nanoTime() - lastProgress)))

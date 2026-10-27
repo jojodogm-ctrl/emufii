@@ -55,7 +55,25 @@ internal class RoomLobbyChannel private constructor(
             check(tokens>=1) { "lobby-rate-limit" };tokens--
         }
     }
+    // The host's lane becomes ready only once a guest reaches the gateway. A
+    // guest may still be installing, joining or pressing Play, so the host waits
+    // visibly (its lobby keeps "waiting for players") instead of closing the room
+    // after 30 s. Still bounded, and released as soon as the lobby is closed.
+    private fun awaitGateway(ready: CompletableFuture<Unit>, host: Boolean) {
+        val deadline = System.nanoTime() + gatewayWaitNanos(host)
+        while (true) {
+            ensure()
+            try { ready.get(1, TimeUnit.SECONDS); return }
+            catch (timeout: java.util.concurrent.TimeoutException) {
+                if (System.nanoTime() - deadline >= 0) throw timeout
+            }
+        }
+    }
     companion object {
+        internal const val GUEST_GATEWAY_WAIT_SECONDS = 30L
+        internal const val HOST_GATEWAY_WAIT_SECONDS = 15 * 60L
+        internal fun gatewayWaitNanos(host: Boolean) =
+            TimeUnit.SECONDS.toNanos(if (host) HOST_GATEWAY_WAIT_SECONDS else GUEST_GATEWAY_WAIT_SECONDS)
         fun open(round: RoomGuestSession.Round, admission: RoomInvitation.Admission,
                  onMessage: (Map<String,Any?>)->Unit, onClosed:(String)->Unit,
                  startImmediately:Boolean = true): RoomLobbyChannel {
@@ -95,7 +113,7 @@ internal class RoomLobbyChannel private constructor(
                     { reason -> stop(reason) })
                 gateway=opened
                 if(closed.get()) { opened.close();return@Thread }
-                opened.ready.get(30,TimeUnit.SECONDS);ensure()
+                awaitGateway(opened.ready, host);ensure();wire.carrierReady()
                 diagnostics=if(host)wire.authenticateSender(key,reuse=false,diagnostics=true).diagnostics
                     else wire.authenticateReceiver(key,diagnostics=true).diagnostics
                 wire.send(RoomAssetWire.TrustedFrame(16,1),byteArrayOf(1))
