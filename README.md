@@ -12,7 +12,7 @@ No ports to open, no IP address to share. Built for Android handhelds.
 [![Android](https://img.shields.io/badge/Android-12--16-3DDC84?style=flat-square&logo=android&logoColor=white)](#install)
 [![Games](https://img.shields.io/badge/Games-Compatible_list-2BB5A6?style=flat-square)](COMPATIBLE-GAMES.md)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-5B6EE1?style=flat-square)](LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/tvWcb28vBZ)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/emufii)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support-13C3FF?style=flat-square&logo=kofi&logoColor=white)](https://ko-fi.com/emufii)
 
 **[What it is](#what-emufii-is-and-isnt)** · **[How it works](#how-it-works)** · **[Consoles](#consoles)** · **[Install](#install)** · **[Privacy](#privacy)**
@@ -115,7 +115,7 @@ Everyone plays as if on the same Wi-Fi.
 ## Install
 
 > [!WARNING]
-> **Beta.** Works on Android 13, 14 and 15. Expect bugs, and please report them on [Discord](https://discord.gg/tvWcb28vBZ).
+> **Beta.** Works on Android 13, 14 and 15. Expect bugs, and please report them on [Discord](https://discord.gg/emufii).
 
 1. Install the emulators you want to use.
 2. [Download the latest APK](https://github.com/jojodogm-ctrl/emufii/releases/latest) and install it.
@@ -173,7 +173,7 @@ apksigner verify --print-certs Emufii-2.0.apk
 
 [AGPL-3.0](LICENSE) (details in [NOTICE.md](NOTICE.md)). The app's source code is in this repository, but the session server and relay are private.
 
-If you find a security issue, please report it privately on [Discord](https://discord.gg/tvWcb28vBZ).
+If you find a security issue, please report it privately on [Discord](https://discord.gg/emufii).
 
 <br>
 
@@ -196,7 +196,7 @@ contributing to the project.
 
 If that sounds good to you,
 **[grab the latest version](https://github.com/jojodogm-ctrl/emufii/releases/latest)**
-and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
+and come say hi on [Discord](https://discord.gg/emufii)!
 
 <br>
 
@@ -228,6 +228,6 @@ and come say hi on [Discord](https://discord.gg/tvWcb28vBZ)!
 
 <br>
 
-<sub>And everyone on the <a href="https://discord.gg/tvWcb28vBZ">Discord</a> who tests, reports bugs and plays.</sub>
+<sub>And everyone on the <a href="https://discord.gg/emufii">Discord</a> who tests, reports bugs and plays.</sub>
 
 </div>

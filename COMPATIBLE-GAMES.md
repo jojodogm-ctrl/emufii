@@ -4,7 +4,7 @@ Every game Emufii expects to work, console by console. This is the same list the
 
 A few honest notes before you dive in:
 
-- **"Expected to work" is not "tested by hand".** The lists are built from each console's multiplayer mode (see [Consoles](README.md#consoles)), and only a fraction were played end to end. If a game here lets you down, tell us on [Discord](https://discord.gg/tvWcb28vBZ) and it will be fixed.
+- **"Expected to work" is not "tested by hand".** The lists are built from each console's multiplayer mode (see [Consoles](README.md#consoles)), and only a fraction were played end to end. If a game here lets you down, tell us on [Discord](https://discord.gg/emufii) and it will be fixed.
 - **Both players need the same dump of the same game**, same region included.
 - Some titles appear several times, once per regional release.
 

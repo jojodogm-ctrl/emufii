@@ -1270,7 +1270,7 @@ function attachDetailListeners(view: SettingsView, container: HTMLElement, state
 
     container.querySelector('#btnOpenDiscord')?.addEventListener('click', () => {
       sfx.play('click');
-      const url = 'https://discord.gg/tvWcb28vBZ';
+      const url = 'https://discord.gg/emufii';
       if (emuApi?.openExternal) {
         emuApi.openExternal(url);
       } else {

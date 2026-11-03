@@ -127,7 +127,7 @@ private fun JoinBlock(open: (String) -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-private const val DISCORD_URL = "https://discord.gg/tvWcb28vBZ"
+private const val DISCORD_URL = "https://discord.gg/emufii"
 
 private const val KOFI_URL = "https://ko-fi.com/emufii"
 
