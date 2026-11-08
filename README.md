@@ -213,7 +213,7 @@ and come say hi on [Discord](https://discord.gg/emufii)!
 [@ThePastPlayer](https://github.com/ThePastPlayer) for his amazing work on DS local wireless and Emufii!<br>
 [@sofianeelhor](https://github.com/sofianeelhor) for the PPSSPP and ARMSX2 network automation<br>
 [@BrianJr03](https://github.com/BrianJr03) for the manual session setup and uncropped covers<br>
-[@Noobiez_ez](https://github.com/Noobiez_ez) for building the foundation of Emufii's desktop version
+[@Noobiez_ez](https://github.com/Noobiez16) for building the foundation of Emufii's desktop version
 
 <br>
 
