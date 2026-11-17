@@ -107,7 +107,6 @@ import androidx.compose.ui.unit.lerp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import dev.chrisbanes.haze.hazeSource
 import eu.emufii.app.ui.LocalGlassPane
 import eu.emufii.app.ui.glass
 import com.kyant.backdrop.effects.vibrancy
@@ -119,7 +118,6 @@ import com.kyant.backdrop.drawBackdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import com.kyant.backdrop.Backdrop
-import dev.chrisbanes.haze.rememberHazeState
 import eu.emufii.app.R
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.fadeOut
@@ -317,7 +315,6 @@ fun LibraryScreen(
         LocalCardRom provides ui.selected?.uri,
     ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        val hazeState = rememberHazeState()
         var shelfBottom by remember { mutableStateOf(0.dp) }
         val gridScrolled = remember { mutableFloatStateOf(0f) }
         val barCursor = remember { mutableStateOf(false) }
@@ -331,7 +328,6 @@ fun LibraryScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .then(if (ui.searchOpen) Modifier.hazeSource(hazeState) else Modifier)
                 .layerBackdrop(glass)
         ) {
             TrayBackdrop(modifier = Modifier.fillMaxSize(), dark = dark)
